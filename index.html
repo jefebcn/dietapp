@@ -1190,15 +1190,21 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
    service cloud.firestore {
      match /databases/{database}/documents {
 
-       // Chiunque autenticato può leggere la lista utenti (serve all'admin)
+       // Funzione helper: controlla se chi fa la richiesta è admin
+       function isAdmin() {
+         return request.auth != null &&
+           get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+       }
+
        match /users/{userId} {
+         // Tutti gli utenti autenticati possono leggere i profili (serve per la lista admin)
          allow read: if request.auth != null;
          allow create: if request.auth.uid == userId;
-         allow update, delete: if request.auth.uid == userId;
+         allow update, delete: if request.auth.uid == userId || isAdmin();
 
-         // Ogni utente accede solo ai propri dati
+         // Subcollection: utente accede ai propri, admin accede a tutti
          match /{subcollection}/{docId} {
-           allow read, write: if request.auth.uid == userId;
+           allow read, write: if request.auth.uid == userId || isAdmin();
          }
        }
      }
@@ -2248,28 +2254,56 @@ function calcBMI() {
 // ADMIN
 // ══════════════════════════════════
 async function loadAdminUsers() {
-  const {db, collection, getDocs, query, orderBy} = window._fb;
-  const snap = await getDocs(query(collection(db,'users'), orderBy('createdAt','asc')));
-  const users = snap.docs.map(d=>({uid:d.id,...d.data()}));
-  document.getElementById('admin-user-count').textContent = users.length + ' utenti registrati';
-
-  // For each user, get last weight
-  const rows = await Promise.all(users.map(async u => {
-    const ws = await getDocs(query(collection(db,'users',u.uid,'weights'), orderBy('date','desc'), window._fb.limit(1)));
-    const lastW = ws.empty ? null : ws.docs[0].data().weight;
-    return {...u, lastWeight: lastW};
-  }));
-
   const tbody = document.getElementById('admin-tbody');
-  tbody.innerHTML = rows.map(u=>`
-    <tr onclick="viewUserDetail('${u.uid}','${u.name||u.email}')">
-      <td><strong>${u.name||'—'}</strong></td>
-      <td style="font-family:var(--font-mono);font-size:12px">${u.email}</td>
-      <td>${u.role==='admin'?'<span class="badge badge-admin">Admin</span>':'<span class="badge badge-green">Utente</span>'}</td>
-      <td style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">${u.createdAt?new Date(u.createdAt).toLocaleDateString('it-IT'):'—'}</td>
-      <td>${u.lastWeight?`<strong style="color:var(--green)">${u.lastWeight} kg</strong>`:'<span style="color:var(--muted)">—</span>'}</td>
-      <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();viewUserDetail('${u.uid}','${u.name||u.email}')">Visualizza →</button></td>
-    </tr>`).join('');
+  tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted)">Caricamento...</td></tr>';
+  try {
+    const {db, collection, getDocs, query, orderBy} = window._fb;
+
+    // Legge tutti gli utenti senza orderBy (evita errori indici mancanti)
+    const snap = await getDocs(collection(db,'users'));
+    if (snap.empty) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--muted)">Nessun utente trovato.</td></tr>';
+      return;
+    }
+
+    // Ordina lato client per data registrazione
+    let users = snap.docs.map(d=>({uid:d.id,...d.data()}));
+    users.sort((a,b) => (a.createdAt||0) - (b.createdAt||0));
+    document.getElementById('admin-user-count').textContent = users.length + ' utenti registrati';
+
+    // Per ogni utente recupera l'ultimo peso — ignora errori permessi
+    const rows = await Promise.all(users.map(async u => {
+      let lastW = null;
+      try {
+        const ws = await getDocs(query(
+          collection(db,'users',u.uid,'weights'),
+          orderBy('date','desc'),
+          window._fb.limit(1)
+        ));
+        if (!ws.empty) lastW = ws.docs[0].data().weight;
+      } catch(e) {
+        // Utente non ha ancora pesi o mancano permessi lettura subcollection
+      }
+      return {...u, lastWeight: lastW};
+    }));
+
+    tbody.innerHTML = rows.map(u=>`
+      <tr onclick="viewUserDetail('${u.uid}','${(u.name||u.email).replace(/'/g,"\'")}')">
+        <td><strong>${u.name||'—'}</strong></td>
+        <td style="font-family:var(--font-mono);font-size:12px">${u.email||'—'}</td>
+        <td>${u.role==='admin'?'<span class="badge badge-admin">Admin</span>':'<span class="badge badge-green">Utente</span>'}</td>
+        <td style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">${u.createdAt?new Date(u.createdAt).toLocaleDateString('it-IT'):'—'}</td>
+        <td>${u.lastWeight!=null?`<strong style="color:var(--green)">${u.lastWeight} kg</strong>`:'<span style="color:var(--muted)">—</span>'}</td>
+        <td><button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();viewUserDetail('${u.uid}','${(u.name||u.email).replace(/'/g,"\'")}')">Visualizza →</button></td>
+      </tr>`).join('');
+
+  } catch(e) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--danger)">
+      Errore caricamento: ${e.message}<br>
+      <span style="font-size:12px;color:var(--muted)">Controlla le regole Firestore (vedi commento nel codice)</span>
+    </td></tr>`;
+    console.error('Admin loadUsers error:', e);
+  }
 }
 
 let adminChartInst = null;
@@ -2279,8 +2313,13 @@ async function viewUserDetail(targetUid, name) {
   document.getElementById('admin-detail-name').textContent = name;
 
   const {db, collection, query, orderBy, getDocs} = window._fb;
-  const snap = await getDocs(query(collection(db,'users',targetUid,'weights'), orderBy('date','asc')));
-  const data = snap.docs.map(d=>d.data());
+  let data = [];
+  try {
+    const snap = await getDocs(query(collection(db,'users',targetUid,'weights'), orderBy('date','asc')));
+    data = snap.docs.map(d=>d.data());
+  } catch(e) {
+    console.warn('Impossibile leggere i pesi di questo utente:', e.message);
+  }
 
   // Stats
   if (data.length) {
