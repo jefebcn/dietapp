@@ -642,36 +642,6 @@ body::before {
         <canvas id="weight-chart"></canvas>
       </div>
     </div>
-
-    <!-- Weight History -->
-    <div style="margin-top:24px">
-      <div class="section-header" style="margin-bottom:16px">
-        <h3>Storico Pesi</h3>
-        <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">modifica o elimina una misurazione</span>
-      </div>
-      <div class="grid-2">
-        <!-- ELIA history -->
-        <div class="card" style="border-top:2px solid var(--elia);padding:0;overflow:hidden">
-          <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-            <h3 style="color:var(--elia)">Elia</h3>
-            <span class="person-badge elia" id="elia-count-badge">0 misurazioni</span>
-          </div>
-          <div id="history-elia" style="max-height:340px;overflow-y:auto">
-            <div class="empty" style="padding:28px"><div class="empty-icon">⚖️</div><p>Nessuna misurazione ancora.</p></div>
-          </div>
-        </div>
-        <!-- ALEX history -->
-        <div class="card" style="border-top:2px solid var(--alex);padding:0;overflow:hidden">
-          <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-            <h3 style="color:var(--alex)">Alex</h3>
-            <span class="person-badge alex" id="alex-count-badge">0 misurazioni</span>
-          </div>
-          <div id="history-alex" style="max-height:340px;overflow-y:auto">
-            <div class="empty" style="padding:28px"><div class="empty-icon">⚖️</div><p>Nessuna misurazione ancora.</p></div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- ═══════ ELIA PAGE ═══════ -->
@@ -1252,108 +1222,7 @@ function computeStats(data) {
   return {last, weekly, monthly};
 }
 
-// ══════════════════════════════════════════════
-// WEIGHT HISTORY — render, delete, edit
-// ══════════════════════════════════════════════
-function renderWeightHistory() {
-  ['elia','alex'].forEach(person => {
-    const data = person === 'elia' ? weightDataElia : weightDataAlex;
-    const color = person === 'elia' ? 'var(--elia)' : 'var(--alex)';
-    const el = document.getElementById('history-'+person);
-    const badge = document.getElementById(person+'-count-badge');
-    if (!el) return;
-
-    if (badge) badge.textContent = data.length + ' misurazion' + (data.length === 1 ? 'e' : 'i');
-
-    if (!data.length) {
-      el.innerHTML = '<div class="empty" style="padding:28px"><div class="empty-icon">⚖️</div><p>Nessuna misurazione ancora.</p></div>';
-      return;
-    }
-
-    const sorted = [...data].sort((a,b) => b.date.localeCompare(a.date));
-    el.innerHTML = sorted.map((entry, i) => {
-      const docId = person + '_' + entry.date;
-      const prevEntry = sorted[i+1];
-      let deltaHtml = '';
-      if (prevEntry) {
-        const diff = (entry.weight - prevEntry.weight).toFixed(1);
-        const v = parseFloat(diff);
-        const col = v > 0 ? '#f87171' : v < 0 ? '#4ade80' : 'var(--muted)';
-        const arrow = v > 0 ? '↑' : v < 0 ? '↓' : '→';
-        deltaHtml = '<span style="font-family:var(--font-mono);font-size:11px;color:'+col+'">'+(v>0?'+':'')+diff+' kg '+arrow+'</span>';
-      }
-      const isToday = entry.date === todayStr();
-      return `
-        <div class="weight-history-row" id="row-${docId}" style="display:flex;align-items:center;gap:12px;padding:11px 20px;border-bottom:1px solid var(--border);transition:background 0.15s" onmouseenter="this.style.background='var(--bg3)'" onmouseleave="this.style.background='transparent'">
-          <div style="flex:1">
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">${formatDate(entry.date)}</span>
-              ${isToday ? '<span style="font-family:var(--font-mono);font-size:9px;padding:2px 6px;background:rgba(163,230,53,0.12);color:var(--accent);border-radius:4px">OGGI</span>' : ''}
-            </div>
-            <div id="display-${docId}" style="display:flex;align-items:center;gap:10px;margin-top:2px">
-              <span style="font-family:var(--font-display);font-weight:700;font-size:18px;color:${color}">${entry.weight} kg</span>
-              ${deltaHtml}
-            </div>
-            <div id="edit-${docId}" style="display:none;margin-top:4px">
-              <div style="display:flex;gap:8px;align-items:center">
-                <input type="number" id="editval-${docId}" value="${entry.weight}" step="0.1" min="20" max="300"
-                  style="width:100px;font-family:var(--font-mono);font-size:16px;text-align:center"
-                  onkeydown="if(event.key==='Enter') confirmEdit('${person}','${docId}'); if(event.key==='Escape') cancelEdit('${docId}')">
-                <span style="color:var(--muted);font-family:var(--font-mono);font-size:12px">kg</span>
-                <button class="btn btn-primary btn-sm" onclick="confirmEdit('${person}','${docId}')">✓</button>
-                <button class="btn btn-ghost btn-sm" onclick="cancelEdit('${docId}')">✕</button>
-              </div>
-            </div>
-          </div>
-          <div style="display:flex;gap:6px">
-            <button class="btn btn-ghost btn-sm btn-icon" title="Modifica" onclick="startEditWeight('${docId}')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            </button>
-            <button class="btn btn-danger btn-sm btn-icon" title="Elimina" onclick="deleteWeight('${person}','${docId}')">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-            </button>
-          </div>
-        </div>`;
-    }).join('');
-  });
-}
-
-function startEditWeight(docId) {
-  document.getElementById('display-'+docId).style.display = 'none';
-  document.getElementById('edit-'+docId).style.display = 'block';
-  const inp = document.getElementById('editval-'+docId);
-  if (inp) { inp.focus(); inp.select(); }
-}
-
-function cancelEdit(docId) {
-  document.getElementById('display-'+docId).style.display = 'flex';
-  document.getElementById('edit-'+docId).style.display = 'none';
-}
-
-async function confirmEdit(person, docId) {
-  const inp = document.getElementById('editval-'+docId);
-  if (!inp) return;
-  const val = parseFloat(inp.value);
-  if (!val || val < 20 || val > 300) { toast('Peso non valido!', 'var(--danger)'); return; }
-  const {db, dbFns} = window;
-  const {doc, updateDoc} = dbFns;
-  try {
-    await updateDoc(doc(db, 'weights', docId), { weight: val });
-    toast('Peso aggiornato!', person === 'elia' ? 'var(--elia)' : 'var(--alex)');
-  } catch(e) { toast('Errore: '+e.message, 'var(--danger)'); }
-}
-
-async function deleteWeight(person, docId) {
-  if (!confirm('Eliminare questa misurazione?')) return;
-  const {db, dbFns} = window;
-  const {doc, deleteDoc} = dbFns;
-  try {
-    await deleteDoc(doc(db, 'weights', docId));
-    toast('Misurazione eliminata', 'var(--danger)');
-  } catch(e) { toast('Errore: '+e.message, 'var(--danger)'); }
-}
-
-
+function computeDelta(data) {
   if (data.length < 2) return null;
   const sorted = [...data].sort((a,b) => a.date.localeCompare(b.date));
   const last = sorted[sorted.length-1].weight;
@@ -1455,9 +1324,6 @@ function updateStats() {
 
   // Reminder banner
   updateReminderBanner();
-
-  // Render history tables
-  renderWeightHistory();
 
   // Also update goal progress
   updateGoalProgress();
