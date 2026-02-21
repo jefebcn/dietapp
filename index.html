@@ -1,0 +1,1502 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NutriTrack — Elia & Alex</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc, query, orderBy, onSnapshot, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyA7R-rCJ1B63j95qPctFf0gYgCiVtOvvOw",
+    authDomain: "dietapp-8ad72.firebaseapp.com",
+    projectId: "dietapp-8ad72",
+    storageBucket: "dietapp-8ad72.firebasestorage.app",
+    messagingSenderId: "903928286116",
+    appId: "1:903928286116:web:84a2013356a2740fed8f31"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  window.db = db;
+  window.dbFns = { collection, doc, setDoc, getDoc, getDocs, addDoc, query, orderBy, onSnapshot, updateDoc, deleteDoc };
+  window.firebaseReady = true;
+  document.dispatchEvent(new Event('firebaseReady'));
+</script>
+
+<style>
+:root {
+  --bg: #0a0c0f;
+  --bg2: #111318;
+  --bg3: #181c23;
+  --card: #1a1f29;
+  --card2: #1f2535;
+  --border: #2a3045;
+  --accent: #a3e635;
+  --accent2: #4ade80;
+  --accent3: #22d3ee;
+  --elia: #f97316;
+  --alex: #818cf8;
+  --text: #e8eaf0;
+  --muted: #6b7280;
+  --danger: #f87171;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+  --font-mono: 'DM Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ─── SIDEBAR NAV ─── */
+.sidebar {
+  position: fixed;
+  left: 0; top: 0;
+  width: 72px;
+  height: 100vh;
+  background: var(--bg2);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 0;
+  gap: 8px;
+  z-index: 100;
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 2px;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  margin-bottom: 24px;
+}
+
+.nav-btn {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.nav-btn svg { width: 20px; height: 20px; stroke: var(--muted); fill: none; stroke-width: 1.8; transition: stroke 0.2s; }
+.nav-btn span { font-size: 8px; color: var(--muted); font-family: var(--font-mono); letter-spacing: 0.5px; transition: color 0.2s; }
+
+.nav-btn:hover { background: var(--bg3); }
+.nav-btn:hover svg { stroke: var(--text); }
+.nav-btn:hover span { color: var(--text); }
+
+.nav-btn.active { background: rgba(163,230,53,0.08); }
+.nav-btn.active svg { stroke: var(--accent); }
+.nav-btn.active span { color: var(--accent); }
+.nav-btn.elia-btn.active { background: rgba(249,115,22,0.1); }
+.nav-btn.elia-btn.active svg { stroke: var(--elia); }
+.nav-btn.elia-btn.active span { color: var(--elia); }
+.nav-btn.alex-btn.active { background: rgba(129,140,248,0.1); }
+.nav-btn.alex-btn.active svg { stroke: var(--alex); }
+.nav-btn.alex-btn.active span { color: var(--alex); }
+
+/* ─── MAIN ─── */
+.main {
+  margin-left: 72px;
+  min-height: 100vh;
+  padding: 32px;
+}
+
+/* ─── PAGES ─── */
+.page { display: none; }
+.page.active { display: block; animation: fadeIn 0.3s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── TYPOGRAPHY ─── */
+h1 { font-family: var(--font-display); font-weight: 800; font-size: 32px; letter-spacing: -0.5px; }
+h2 { font-family: var(--font-display); font-weight: 700; font-size: 20px; }
+h3 { font-family: var(--font-display); font-weight: 600; font-size: 16px; }
+
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 32px;
+}
+
+.page-title { display: flex; flex-direction: column; gap: 4px; }
+.page-tag { font-family: var(--font-mono); font-size: 11px; color: var(--muted); letter-spacing: 2px; text-transform: uppercase; }
+
+/* ─── CARDS ─── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.card-sm { padding: 16px; border-radius: 12px; }
+
+/* ─── GRID ─── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+/* ─── STATS ─── */
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+
+.stat-card.elia::before { background: var(--elia); }
+.stat-card.alex::before { background: var(--alex); }
+.stat-card.green::before { background: var(--accent); }
+
+.stat-label { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 8px; }
+.stat-value { font-family: var(--font-display); font-weight: 700; font-size: 28px; }
+.stat-sub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+/* ─── INPUTS ─── */
+input, select, textarea {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  padding: 10px 14px;
+  outline: none;
+  transition: border-color 0.2s;
+  width: 100%;
+}
+
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+select option { background: var(--bg3); }
+textarea { resize: vertical; min-height: 80px; }
+
+/* ─── BUTTONS ─── */
+.btn {
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: 14px;
+  padding: 10px 20px;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #0a0c0f;
+}
+.btn-primary:hover { background: #c4f000; transform: translateY(-1px); }
+
+.btn-elia { background: var(--elia); color: white; }
+.btn-elia:hover { background: #fb923c; }
+.btn-alex { background: var(--alex); color: white; }
+.btn-alex:hover { background: #a5b4fc; }
+
+.btn-ghost {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+.btn-ghost:hover { background: var(--bg3); }
+.btn-danger { background: rgba(248,113,113,0.15); color: var(--danger); border: 1px solid rgba(248,113,113,0.3); }
+.btn-danger:hover { background: rgba(248,113,113,0.25); }
+
+.btn-sm { padding: 6px 12px; font-size: 12px; border-radius: 8px; }
+.btn-icon { width: 34px; height: 34px; padding: 0; display: inline-flex; align-items: center; justify-content: center; }
+
+/* ─── WEIGHT INPUT SECTION ─── */
+.weight-input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.weight-input-row input[type="number"] {
+  width: 120px;
+  font-size: 20px;
+  font-family: var(--font-mono);
+  text-align: center;
+}
+
+/* ─── CHART ─── */
+.chart-wrap {
+  position: relative;
+  height: 260px;
+  width: 100%;
+}
+
+/* ─── PERSON BADGE ─── */
+.person-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+
+.person-badge.elia { background: rgba(249,115,22,0.15); color: var(--elia); }
+.person-badge.alex { background: rgba(129,140,248,0.15); color: var(--alex); }
+
+/* ─── FOOD PLAN ─── */
+.meal-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+
+.meal-item .food-name { flex: 1; font-weight: 500; font-size: 14px; }
+.meal-item .gram-input { width: 80px; text-align: center; }
+.macros-mini { display: flex; gap: 8px; }
+.macro-chip {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.macro-chip.kcal { background: rgba(163,230,53,0.12); color: var(--accent); }
+.macro-chip.prot { background: rgba(74,222,128,0.12); color: var(--accent2); }
+.macro-chip.carb { background: rgba(34,211,238,0.12); color: var(--accent3); }
+.macro-chip.fat { background: rgba(251,191,36,0.12); color: #fbbf24; }
+
+/* ─── TOTALS BAR ─── */
+.totals-bar {
+  display: flex;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin: 16px 0;
+}
+
+.total-item { text-align: center; }
+.total-item .val { font-family: var(--font-display); font-weight: 700; font-size: 20px; }
+.total-item .lbl { font-family: var(--font-mono); font-size: 9px; color: var(--muted); letter-spacing: 1px; }
+
+/* ─── EXCESS TABLE ─── */
+.excess-table { width: 100%; border-collapse: collapse; }
+.excess-table th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  letter-spacing: 1.5px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.excess-table td {
+  padding: 10px 12px;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(42,48,69,0.5);
+}
+.excess-table tr:last-child td { border-bottom: none; }
+.excess-table tr:hover td { background: var(--bg3); }
+
+/* ─── GOAL BAR ─── */
+.goal-progress {
+  height: 8px;
+  background: var(--bg);
+  border-radius: 100px;
+  overflow: hidden;
+  margin: 8px 0;
+}
+.goal-progress-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+
+/* ─── TABS ─── */
+.tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 24px;
+}
+
+.tab {
+  flex: 1;
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.tab:hover { color: var(--text); }
+.tab.active { background: var(--card); color: var(--text); }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ─── DIVIDER ─── */
+.divider { height: 1px; background: var(--border); margin: 24px 0; }
+
+/* ─── SECTION HEADER ─── */
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+/* ─── AUTOCOMPLETE ─── */
+.autocomplete-wrap { position: relative; }
+.autocomplete-list {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0; right: 0;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  z-index: 50;
+  max-height: 220px;
+  overflow-y: auto;
+  display: none;
+}
+.autocomplete-list.open { display: block; }
+.autocomplete-item {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.autocomplete-item:hover { background: var(--bg3); }
+.autocomplete-item .food-meta { font-family: var(--font-mono); font-size: 10px; color: var(--muted); }
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 768px) {
+  .sidebar { width: 56px; }
+  .main { margin-left: 56px; padding: 16px; }
+  .grid-2 { grid-template-columns: 1fr; }
+  .grid-3 { grid-template-columns: 1fr 1fr; }
+  .grid-4 { grid-template-columns: 1fr 1fr; }
+}
+
+/* ─── TOAST ─── */
+#toast {
+  position: fixed;
+  bottom: 24px; right: 24px;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 20px;
+  font-size: 13px;
+  z-index: 999;
+  transform: translateY(80px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.4,0,0.2,1);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast .toast-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+/* ─── LOADING ─── */
+.spinner {
+  width: 20px; height: 20px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── EMPTY STATE ─── */
+.empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+}
+.empty-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+.empty p { font-size: 13px; }
+
+/* ─── NOISE OVERLAY ─── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* saved plan list */
+.plan-saved-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  margin-bottom: 8px;
+}
+.plan-saved-item:hover { border-color: var(--accent); }
+
+/* section divider with label */
+.section-label {
+  display: flex; align-items: center; gap: 12px;
+  margin: 24px 0 16px;
+}
+.section-label span { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 2px; white-space: nowrap; }
+.section-label::before, .section-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="logo">NUTRI<br>TRACK</div>
+  <button class="nav-btn active" onclick="goPage('home')" id="nav-home">
+    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    <span>HOME</span>
+  </button>
+  <button class="nav-btn elia-btn" onclick="goPage('elia')" id="nav-elia">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/></svg>
+    <span>ELIA</span>
+  </button>
+  <button class="nav-btn alex-btn" onclick="goPage('alex')" id="nav-alex">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0112 0v2"/></svg>
+    <span>ALEX</span>
+  </button>
+  <button class="nav-btn" onclick="goPage('goals')" id="nav-goals">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+    <span>OBJ</span>
+  </button>
+</nav>
+
+<main class="main">
+
+  <!-- ═══════ HOME PAGE ═══════ -->
+  <div class="page active" id="page-home">
+    <div class="page-header">
+      <div class="page-title">
+        <span class="page-tag">// dashboard</span>
+        <h1>Peso & Andamento</h1>
+      </div>
+      <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted)" id="today-date"></div>
+    </div>
+
+    <!-- Weight input cards -->
+    <div class="grid-2" style="margin-bottom:24px">
+      <!-- ELIA -->
+      <div class="card" style="border-top:2px solid var(--elia)">
+        <div class="section-header">
+          <div>
+            <div class="stat-label">Peso oggi</div>
+            <h2 style="color:var(--elia)">Elia</h2>
+          </div>
+          <span class="person-badge elia">ELIA</span>
+        </div>
+        <div class="weight-input-row">
+          <input type="number" id="weight-elia" placeholder="75.0" step="0.1" style="width:130px;font-size:22px;text-align:center;">
+          <span style="color:var(--muted);font-family:var(--font-mono)">kg</span>
+          <button class="btn btn-elia" onclick="saveWeight('elia')">Salva</button>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:12px">
+          <div>
+            <div class="stat-label">Ultimo peso</div>
+            <div style="font-family:var(--font-display);font-weight:700;font-size:20px" id="last-elia">—</div>
+          </div>
+          <div>
+            <div class="stat-label">Media sett.</div>
+            <div style="font-family:var(--font-display);font-weight:700;font-size:20px" id="weekly-elia">—</div>
+          </div>
+          <div>
+            <div class="stat-label">Media mens.</div>
+            <div style="font-family:var(--font-display);font-weight:700;font-size:20px" id="monthly-elia">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ALEX -->
+      <div class="card" style="border-top:2px solid var(--alex)">
+        <div class="section-header">
+          <div>
+            <div class="stat-label">Peso oggi</div>
+            <h2 style="color:var(--alex)">Alex</h2>
+          </div>
+          <span class="person-badge alex">ALEX</span>
+        </div>
+        <div class="weight-input-row">
+          <input type="number" id="weight-alex" placeholder="65.0" step="0.1" style="width:130px;font-size:22px;text-align:center;">
+          <span style="color:var(--muted);font-family:var(--font-mono)">kg</span>
+          <button class="btn btn-alex" onclick="saveWeight('alex')">Salva</button>
+        </div>
+        <div style="margin-top:12px;display:flex;gap:12px">
+          <div>
+            <div class="stat-label">Ultimo peso</div>
+            <div style="font-family:var(--font-display);font-weight:700;font-size:20px" id="last-alex">—</div>
+          </div>
+          <div>
+            <div class="stat-label">Media sett.</div>
+            <div style="font-family:var(--font-display);font-weight:700;font-size:20px" id="weekly-alex">—</div>
+          </div>
+          <div>
+            <div class="stat-label">Media mens.</div>
+            <div style="font-family:var(--font-display);font-weight:700;font-size:20px" id="monthly-alex">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart -->
+    <div class="card">
+      <div class="section-header">
+        <h3>Andamento Peso</h3>
+        <div style="display:flex;gap:12px;font-family:var(--font-mono);font-size:11px">
+          <span style="color:var(--elia)">● Elia</span>
+          <span style="color:var(--alex)">● Alex</span>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="weight-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════ ELIA PAGE ═══════ -->
+  <div class="page" id="page-elia">
+    <div class="page-header">
+      <div class="page-title">
+        <span class="page-tag">// sezione personale</span>
+        <h1 style="color:var(--elia)">Elia</h1>
+      </div>
+      <span class="person-badge elia">ELIA</span>
+    </div>
+    <div id="elia-content"></div>
+  </div>
+
+  <!-- ═══════ ALEX PAGE ═══════ -->
+  <div class="page" id="page-alex">
+    <div class="page-header">
+      <div class="page-title">
+        <span class="page-tag">// sezione personale</span>
+        <h1 style="color:var(--alex)">Alex</h1>
+      </div>
+      <span class="person-badge alex">ALEX</span>
+    </div>
+    <div id="alex-content"></div>
+  </div>
+
+  <!-- ═══════ GOALS PAGE ═══════ -->
+  <div class="page" id="page-goals">
+    <div class="page-header">
+      <div class="page-title">
+        <span class="page-tag">// obbiettivi</span>
+        <h1>Obbiettivi</h1>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div id="goal-elia-card"></div>
+      <div id="goal-alex-card"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- TOAST -->
+<div id="toast"><div class="toast-dot"></div><span id="toast-msg">Salvato!</span></div>
+
+<script>
+// ══════════════════════════════════════════════
+// FOOD DATABASE (per 100g)
+// ══════════════════════════════════════════════
+const FOODS = [
+  // Cereali e derivati
+  {n:"Riso bianco cotto",kcal:130,p:2.7,c:28.7,f:0.3},
+  {n:"Riso integrale cotto",kcal:111,p:2.6,c:23,f:0.9},
+  {n:"Pasta di semola cotta",kcal:158,p:5.8,c:30.9,f:0.9},
+  {n:"Pasta integrale cotta",kcal:124,p:5.3,c:25,f:1.2},
+  {n:"Pane bianco",kcal:265,p:8.5,c:53,f:1.7},
+  {n:"Pane integrale",kcal:247,p:10,c:46,f:3.4},
+  {n:"Farro cotto",kcal:130,p:5,c:26,f:0.7},
+  {n:"Avena fiocchi",kcal:389,p:17,c:66,f:7},
+  {n:"Quinoa cotta",kcal:120,p:4.4,c:21.3,f:1.9},
+  {n:"Patata bollita",kcal:77,p:2,c:17.5,f:0.1},
+  {n:"Patata dolce cotta",kcal:90,p:2,c:20.7,f:0.1},
+  {n:"Fette biscottate",kcal:410,p:10,c:81,f:5},
+  // Proteine animali
+  {n:"Petto di pollo",kcal:165,p:31,c:0,f:3.6},
+  {n:"Coscia di pollo",kcal:197,p:27,c:0,f:10},
+  {n:"Tacchino fesa",kcal:157,p:30,c:0,f:3.9},
+  {n:"Manzo magro",kcal:180,p:27,c:0,f:8},
+  {n:"Maiale lonza",kcal:182,p:25,c:0,f:9},
+  {n:"Salmone",kcal:208,p:20,c:0,f:13},
+  {n:"Tonno al naturale",kcal:103,p:23,c:0,f:1},
+  {n:"Merluzzo",kcal:82,p:18,c:0,f:0.7},
+  {n:"Uova intere",kcal:155,p:13,c:1.1,f:11},
+  {n:"Albume",kcal:52,p:11,c:0.7,f:0.2},
+  {n:"Gamberetti",kcal:99,p:20,c:0.9,f:1.7},
+  {n:"Bresaola",kcal:143,p:29,c:0.8,f:2.3},
+  {n:"Prosciutto crudo magro",kcal:145,p:27,c:0,f:5},
+  // Latticini
+  {n:"Latte intero",kcal:61,p:3.2,c:4.8,f:3.3},
+  {n:"Latte scremato",kcal:34,p:3.4,c:5,f:0.1},
+  {n:"Yogurt greco 0%",kcal:59,p:10,c:3.6,f:0.4},
+  {n:"Yogurt greco intero",kcal:115,p:9,c:3.8,f:7.7},
+  {n:"Ricotta vaccina",kcal:146,p:11,c:3,f:10},
+  {n:"Fiocchi di latte",kcal:72,p:12.5,c:3,f:0.5},
+  {n:"Mozzarella",kcal:254,p:18,c:2.2,f:20},
+  {n:"Parmigiano Reggiano",kcal:431,p:33,c:0,f:29},
+  {n:"Grana Padano",kcal:383,p:33,c:0,f:28},
+  // Legumi
+  {n:"Ceci cotti",kcal:164,p:8.9,c:27,f:2.6},
+  {n:"Lenticchie cotte",kcal:116,p:9,c:20,f:0.4},
+  {n:"Fagioli neri cotti",kcal:132,p:8.9,c:24,f:0.5},
+  {n:"Edamame",kcal:121,p:11,c:8.9,f:5.2},
+  {n:"Tofu",kcal:76,p:8,c:1.9,f:4.8},
+  // Verdure
+  {n:"Spinaci crudi",kcal:23,p:2.9,c:3.6,f:0.4},
+  {n:"Broccoli",kcal:34,p:2.8,c:7,f:0.4},
+  {n:"Zucchine",kcal:17,p:1.2,c:3.1,f:0.3},
+  {n:"Pomodori",kcal:18,p:0.9,c:3.9,f:0.2},
+  {n:"Insalata mista",kcal:15,p:1.3,c:2.4,f:0.2},
+  {n:"Carote",kcal:41,p:0.9,c:9.6,f:0.2},
+  {n:"Peperoni",kcal:31,p:1,c:6,f:0.3},
+  {n:"Cetrioli",kcal:15,p:0.6,c:3.6,f:0.1},
+  {n:"Asparagi",kcal:20,p:2.2,c:3.9,f:0.1},
+  {n:"Cavolfiore",kcal:25,p:1.9,c:5,f:0.3},
+  {n:"Funghi champignon",kcal:22,p:3.1,c:3.3,f:0.3},
+  // Frutta
+  {n:"Banana",kcal:89,p:1.1,c:23,f:0.3},
+  {n:"Mela",kcal:52,p:0.3,c:14,f:0.2},
+  {n:"Arancia",kcal:47,p:0.9,c:12,f:0.1},
+  {n:"Fragole",kcal:32,p:0.7,c:7.7,f:0.3},
+  {n:"Mirtilli",kcal:57,p:0.7,c:14,f:0.3},
+  {n:"Kiwi",kcal:61,p:1.1,c:15,f:0.5},
+  {n:"Pera",kcal:57,p:0.4,c:15,f:0.1},
+  {n:"Anguria",kcal:30,p:0.6,c:7.6,f:0.2},
+  {n:"Avocado",kcal:160,p:2,c:9,f:15},
+  // Grassi e condimenti
+  {n:"Olio EVO",kcal:884,p:0,c:0,f:100},
+  {n:"Burro",kcal:717,p:0.9,c:0.1,f:81},
+  {n:"Mandorle",kcal:579,p:21,c:22,f:50},
+  {n:"Noci",kcal:654,p:15,c:14,f:65},
+  {n:"Pistacchi",kcal:560,p:20,c:28,f:45},
+  // Proteine in polvere
+  {n:"Whey protein",kcal:380,p:80,c:7,f:4},
+  {n:"Caseina",kcal:380,p:82,c:5,f:2},
+  // Extra
+  {n:"Pesto genovese",kcal:475,p:6,c:3.5,f:48},
+  {n:"Hummus",kcal:177,p:8,c:20,f:8},
+];
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let weightChart = null;
+let weightDataElia = [];
+let weightDataAlex = [];
+let mealPlanElia = [];
+let mealPlanAlex = [];
+let savedPlansElia = [];
+let savedPlansAlex = [];
+let excessElia = [];
+let excessAlex = [];
+let goalsData = {};
+
+// ══════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════
+function goPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  document.getElementById('nav-'+id).classList.add('active');
+}
+
+// ══════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════
+function toast(msg, color='var(--accent)') {
+  const t = document.getElementById('toast');
+  const d = t.querySelector('.toast-dot');
+  d.style.background = color;
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ══════════════════════════════════════════════
+// DATE
+// ══════════════════════════════════════════════
+function todayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+function formatDate(str) {
+  const d = new Date(str+'T00:00:00');
+  return d.toLocaleDateString('it-IT', {day:'2-digit',month:'short'});
+}
+document.getElementById('today-date').textContent = new Date().toLocaleDateString('it-IT', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+// ══════════════════════════════════════════════
+// WEIGHT CHART
+// ══════════════════════════════════════════════
+function initChart() {
+  const ctx = document.getElementById('weight-chart').getContext('2d');
+  weightChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [
+        {
+          label: 'Elia',
+          data: [],
+          borderColor: '#f97316',
+          backgroundColor: 'rgba(249,115,22,0.08)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#f97316',
+          pointRadius: 4,
+          pointHoverRadius: 6,
+        },
+        {
+          label: 'Alex',
+          data: [],
+          borderColor: '#818cf8',
+          backgroundColor: 'rgba(129,140,248,0.08)',
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#818cf8',
+          pointRadius: 4,
+          pointHoverRadius: 6,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1f2535',
+          borderColor: '#2a3045',
+          borderWidth: 1,
+          titleColor: '#6b7280',
+          bodyColor: '#e8eaf0',
+          callbacks: {
+            label: ctx => ` ${ctx.dataset.label}: ${ctx.raw} kg`
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(42,48,69,0.5)' },
+          ticks: { color: '#6b7280', font: { family: 'DM Mono', size: 10 } }
+        },
+        y: {
+          grid: { color: 'rgba(42,48,69,0.5)' },
+          ticks: { color: '#6b7280', font: { family: 'DM Mono', size: 10 }, callback: v => v+' kg' }
+        }
+      }
+    }
+  });
+}
+
+function updateChart() {
+  // Merge all dates
+  const allDates = [...new Set([
+    ...weightDataElia.map(w=>w.date),
+    ...weightDataAlex.map(w=>w.date)
+  ])].sort();
+
+  const labels = allDates.map(formatDate);
+  const eliaData = allDates.map(d => { const r = weightDataElia.find(w=>w.date===d); return r ? r.weight : null; });
+  const alexData = allDates.map(d => { const r = weightDataAlex.find(w=>w.date===d); return r ? r.weight : null; });
+
+  weightChart.data.labels = labels;
+  weightChart.data.datasets[0].data = eliaData;
+  weightChart.data.datasets[1].data = alexData;
+  weightChart.update();
+}
+
+function computeStats(data) {
+  if (!data.length) return {last:'—', weekly:'—', monthly:'—'};
+  const sorted = [...data].sort((a,b)=>b.date.localeCompare(a.date));
+  const last = sorted[0].weight.toFixed(1)+' kg';
+  const now = new Date();
+  // Weekly: last 7 days
+  const weekAgo = new Date(now); weekAgo.setDate(weekAgo.getDate()-7);
+  const weekData = data.filter(w => new Date(w.date+'T00:00:00') >= weekAgo);
+  const weekly = weekData.length ? (weekData.reduce((a,b)=>a+b.weight,0)/weekData.length).toFixed(1)+' kg' : '—';
+  // Monthly: current month
+  const monthStr = now.toISOString().slice(0,7);
+  const monthData = data.filter(w => w.date.startsWith(monthStr));
+  const monthly = monthData.length ? (monthData.reduce((a,b)=>a+b.weight,0)/monthData.length).toFixed(1)+' kg' : '—';
+  return {last, weekly, monthly};
+}
+
+function updateStats() {
+  const s1 = computeStats(weightDataElia);
+  document.getElementById('last-elia').textContent = s1.last;
+  document.getElementById('weekly-elia').textContent = s1.weekly;
+  document.getElementById('monthly-elia').textContent = s1.monthly;
+  const s2 = computeStats(weightDataAlex);
+  document.getElementById('last-alex').textContent = s2.last;
+  document.getElementById('weekly-alex').textContent = s2.weekly;
+  document.getElementById('monthly-alex').textContent = s2.monthly;
+  // Also update goal progress
+  updateGoalProgress();
+}
+
+// ══════════════════════════════════════════════
+// FIREBASE WEIGHT OPERATIONS
+// ══════════════════════════════════════════════
+async function saveWeight(person) {
+  const val = parseFloat(document.getElementById('weight-'+person).value);
+  if (!val || val < 20 || val > 300) { toast('Inserisci un peso valido!', 'var(--danger)'); return; }
+  const {db, dbFns} = window;
+  const {doc, setDoc} = dbFns;
+  const today = todayStr();
+  try {
+    await setDoc(doc(db, 'weights', `${person}_${today}`), {
+      person, date: today, weight: val, ts: Date.now()
+    });
+    toast(`Peso di ${person === 'elia' ? 'Elia' : 'Alex'} salvato! (${val} kg)`, person === 'elia' ? 'var(--elia)' : 'var(--alex)');
+    document.getElementById('weight-'+person).value = '';
+  } catch(e) { toast('Errore salvataggio: '+e.message, 'var(--danger)'); }
+}
+
+async function loadWeights() {
+  const {db, dbFns} = window;
+  const {collection, getDocs, query, orderBy} = dbFns;
+  try {
+    const snap = await getDocs(query(collection(db,'weights'), orderBy('date','asc')));
+    weightDataElia = [];
+    weightDataAlex = [];
+    snap.forEach(d => {
+      const data = d.data();
+      if(data.person === 'elia') weightDataElia.push(data);
+      else weightDataAlex.push(data);
+    });
+    updateStats();
+    updateChart();
+  } catch(e) { console.error(e); }
+}
+
+// ══════════════════════════════════════════════
+// PERSON PAGE BUILDER
+// ══════════════════════════════════════════════
+function buildPersonPage(person) {
+  const isElia = person === 'elia';
+  const color = isElia ? 'var(--elia)' : 'var(--alex)';
+  const name = isElia ? 'Elia' : 'Alex';
+  const mp = isElia ? mealPlanElia : mealPlanAlex;
+
+  const el = document.getElementById(person+'-content');
+  el.innerHTML = `
+    <div class="tabs" id="tabs-${person}">
+      <button class="tab active" onclick="switchTab('${person}','diet')">🥗 Piano Alimentare</button>
+      <button class="tab" onclick="switchTab('${person}','plans')">📋 Piani Salvati</button>
+      <button class="tab" onclick="switchTab('${person}','excess')">⚠️ Pasti in Eccesso</button>
+    </div>
+
+    <!-- TAB DIET -->
+    <div class="tab-panel active" id="tp-${person}-diet">
+      <div class="card" style="margin-bottom:20px">
+        <h3 style="margin-bottom:16px">Aggiungi Alimento al Piano</h3>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end">
+          <div style="flex:1;min-width:200px">
+            <div class="autocomplete-wrap">
+              <input type="text" id="food-search-${person}" placeholder="Cerca alimento..." oninput="searchFood('${person}')" autocomplete="off">
+              <div class="autocomplete-list" id="food-ac-${person}"></div>
+            </div>
+          </div>
+          <div style="width:110px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-family:var(--font-mono)">GRAMMI</div>
+            <input type="number" id="food-grams-${person}" placeholder="100" min="1" max="2000" value="100">
+          </div>
+          <button class="btn" style="background:${color};color:white;white-space:nowrap" onclick="addFoodToPlan('${person}')">+ Aggiungi</button>
+        </div>
+      </div>
+
+      <div class="section-header">
+        <h3>Piano Attuale — ${name}</h3>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="clearPlan('${person}')">Svuota</button>
+          <button class="btn btn-sm" style="background:${color};color:white" onclick="openSavePlanModal('${person}')">💾 Salva Piano</button>
+        </div>
+      </div>
+
+      <div id="plan-items-${person}">
+        <div class="empty"><div class="empty-icon">🍽️</div><p>Nessun alimento nel piano. Inizia ad aggiungere!</p></div>
+      </div>
+
+      <div class="totals-bar" id="totals-${person}" style="display:none">
+        <div class="total-item"><div class="val" id="tot-kcal-${person}" style="color:var(--accent)">0</div><div class="lbl">KCAL</div></div>
+        <div class="total-item"><div class="val" id="tot-p-${person}" style="color:var(--accent2)">0g</div><div class="lbl">PROT</div></div>
+        <div class="total-item"><div class="val" id="tot-c-${person}" style="color:var(--accent3)">0g</div><div class="lbl">CARB</div></div>
+        <div class="total-item"><div class="val" id="tot-f-${person}" style="color:#fbbf24">0g</div><div class="lbl">GRASSI</div></div>
+      </div>
+    </div>
+
+    <!-- TAB PLANS -->
+    <div class="tab-panel" id="tp-${person}-plans">
+      <div class="section-header">
+        <h3>Piani Salvati</h3>
+      </div>
+      <div id="saved-plans-${person}"></div>
+    </div>
+
+    <!-- TAB EXCESS -->
+    <div class="tab-panel" id="tp-${person}-excess">
+      <div class="card" style="margin-bottom:20px">
+        <h3 style="margin-bottom:16px">Registra Pasto in Eccesso</h3>
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:200px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-family:var(--font-mono)">DATA</div>
+            <input type="date" id="excess-date-${person}" value="${todayStr()}">
+          </div>
+          <div style="flex:2;min-width:200px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-family:var(--font-mono)">DESCRIZIONE</div>
+            <input type="text" id="excess-desc-${person}" placeholder="Es. Pizza, birra, dessert...">
+          </div>
+          <div style="width:100px">
+            <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-family:var(--font-mono)">KCAL EST.</div>
+            <input type="number" id="excess-kcal-${person}" placeholder="500">
+          </div>
+          <div style="display:flex;align-items:flex-end">
+            <button class="btn" style="background:${color};color:white" onclick="addExcess('${person}')">+ Aggiungi</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="excess-table-wrap-${person}">
+        <div class="empty"><div class="empty-icon">✅</div><p>Nessun pasto in eccesso registrato!</p></div>
+      </div>
+    </div>
+  `;
+
+  // Load data
+  loadSavedPlans(person);
+  loadExcess(person);
+  renderPlan(person);
+}
+
+// ══════════════════════════════════════════════
+// TABS WITHIN PERSON PAGE
+// ══════════════════════════════════════════════
+function switchTab(person, tab) {
+  document.querySelectorAll(`#tabs-${person} .tab`).forEach(t => t.classList.remove('active'));
+  document.querySelectorAll(`[id^="tp-${person}-"]`).forEach(p => p.classList.remove('active'));
+  const panels = {diet:0, plans:1, excess:2};
+  document.querySelectorAll(`#tabs-${person} .tab`)[panels[tab]].classList.add('active');
+  document.getElementById(`tp-${person}-${tab}`).classList.add('active');
+}
+
+// ══════════════════════════════════════════════
+// FOOD SEARCH AUTOCOMPLETE
+// ══════════════════════════════════════════════
+let selectedFood = {elia: null, alex: null};
+
+function searchFood(person) {
+  const q = document.getElementById(`food-search-${person}`).value.toLowerCase().trim();
+  const list = document.getElementById(`food-ac-${person}`);
+  if (!q) { list.classList.remove('open'); selectedFood[person] = null; return; }
+  const matches = FOODS.filter(f => f.n.toLowerCase().includes(q)).slice(0, 10);
+  if (!matches.length) { list.classList.remove('open'); return; }
+  list.innerHTML = matches.map(f => `
+    <div class="autocomplete-item" onclick="selectFood('${person}','${f.n}')">
+      <span>${f.n}</span>
+      <span class="food-meta">${f.kcal} kcal/100g · P:${f.p}g C:${f.c}g G:${f.f}g</span>
+    </div>
+  `).join('');
+  list.classList.add('open');
+}
+
+function selectFood(person, name) {
+  document.getElementById(`food-search-${person}`).value = name;
+  selectedFood[person] = FOODS.find(f => f.n === name);
+  document.getElementById(`food-ac-${person}`).classList.remove('open');
+}
+
+document.addEventListener('click', e => {
+  ['elia','alex'].forEach(p => {
+    const ac = document.getElementById(`food-ac-${p}`);
+    if (ac && !ac.contains(e.target)) ac.classList.remove('open');
+  });
+});
+
+// ══════════════════════════════════════════════
+// MEAL PLAN
+// ══════════════════════════════════════════════
+function addFoodToPlan(person) {
+  const food = selectedFood[person];
+  if (!food) { toast('Seleziona un alimento dalla lista!', 'var(--danger)'); return; }
+  const grams = parseFloat(document.getElementById(`food-grams-${person}`).value) || 100;
+  const arr = person === 'elia' ? mealPlanElia : mealPlanAlex;
+  arr.push({ ...food, grams, id: Date.now() });
+  document.getElementById(`food-search-${person}`).value = '';
+  document.getElementById(`food-grams-${person}`).value = 100;
+  selectedFood[person] = null;
+  renderPlan(person);
+}
+
+function removeFoodFromPlan(person, id) {
+  if (person === 'elia') mealPlanElia = mealPlanElia.filter(f => f.id !== id);
+  else mealPlanAlex = mealPlanAlex.filter(f => f.id !== id);
+  renderPlan(person);
+}
+
+function updateGrams(person, id, grams) {
+  const arr = person === 'elia' ? mealPlanElia : mealPlanAlex;
+  const item = arr.find(f => f.id === id);
+  if (item) item.grams = parseFloat(grams) || 0;
+  renderPlanTotals(person);
+}
+
+function clearPlan(person) {
+  if (person === 'elia') mealPlanElia = [];
+  else mealPlanAlex = [];
+  renderPlan(person);
+}
+
+function calcMacros(item) {
+  const f = item.grams / 100;
+  return {
+    kcal: Math.round(item.kcal * f),
+    p: (item.p * f).toFixed(1),
+    c: (item.c * f).toFixed(1),
+    fat: (item.f * f).toFixed(1)
+  };
+}
+
+function renderPlan(person) {
+  const arr = person === 'elia' ? mealPlanElia : mealPlanAlex;
+  const container = document.getElementById(`plan-items-${person}`);
+  const totalsBar = document.getElementById(`totals-${person}`);
+  if (!container) return;
+
+  if (!arr.length) {
+    container.innerHTML = `<div class="empty"><div class="empty-icon">🍽️</div><p>Nessun alimento nel piano. Inizia ad aggiungere!</p></div>`;
+    totalsBar.style.display = 'none';
+    return;
+  }
+
+  container.innerHTML = arr.map(item => {
+    const m = calcMacros(item);
+    return `
+      <div class="meal-item">
+        <div class="food-name">${item.n}</div>
+        <input type="number" class="gram-input" value="${item.grams}" min="1" max="2000"
+          oninput="updateGrams('${person}',${item.id},this.value)" style="width:80px">
+        <span style="color:var(--muted);font-size:12px">g</span>
+        <div class="macros-mini">
+          <span class="macro-chip kcal">${m.kcal} kcal</span>
+          <span class="macro-chip prot">P ${m.p}g</span>
+          <span class="macro-chip carb">C ${m.c}g</span>
+          <span class="macro-chip fat">G ${m.fat}g</span>
+        </div>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="removeFoodFromPlan('${person}',${item.id})">✕</button>
+      </div>
+    `;
+  }).join('');
+
+  totalsBar.style.display = 'flex';
+  renderPlanTotals(person);
+}
+
+function renderPlanTotals(person) {
+  const arr = person === 'elia' ? mealPlanElia : mealPlanAlex;
+  let totKcal=0, totP=0, totC=0, totF=0;
+  arr.forEach(item => {
+    const m = calcMacros(item);
+    totKcal += m.kcal;
+    totP += parseFloat(m.p);
+    totC += parseFloat(m.c);
+    totF += parseFloat(m.fat);
+  });
+  const el = id => document.getElementById(id);
+  if(el(`tot-kcal-${person}`)) {
+    el(`tot-kcal-${person}`).textContent = totKcal;
+    el(`tot-p-${person}`).textContent = totP.toFixed(1)+'g';
+    el(`tot-c-${person}`).textContent = totC.toFixed(1)+'g';
+    el(`tot-f-${person}`).textContent = totF.toFixed(1)+'g';
+  }
+}
+
+// ══════════════════════════════════════════════
+// SAVE / LOAD PLANS
+// ══════════════════════════════════════════════
+function openSavePlanModal(person) {
+  const name = prompt('Nome del piano (es. "Giorno 1 - Bulk"):');
+  if (!name) return;
+  savePlan(person, name);
+}
+
+async function savePlan(person, planName) {
+  const arr = person === 'elia' ? mealPlanElia : mealPlanAlex;
+  if (!arr.length) { toast('Aggiungi almeno un alimento!', 'var(--danger)'); return; }
+  const {db, dbFns} = window;
+  const {collection, addDoc} = dbFns;
+  try {
+    await addDoc(collection(db, 'plans'), {
+      person, name: planName, items: arr.map(i=>({n:i.n,kcal:i.kcal,p:i.p,c:i.c,f:i.f,grams:i.grams})),
+      createdAt: Date.now()
+    });
+    toast('Piano salvato: '+planName, person==='elia'?'var(--elia)':'var(--alex)');
+    loadSavedPlans(person);
+  } catch(e) { toast('Errore: '+e.message,'var(--danger)'); }
+}
+
+async function loadSavedPlans(person) {
+  const {db, dbFns} = window;
+  const {collection, getDocs, query, orderBy} = dbFns;
+  try {
+    const snap = await getDocs(query(collection(db,'plans'), orderBy('createdAt','desc')));
+    const plans = [];
+    snap.forEach(d => { if(d.data().person === person) plans.push({id:d.id,...d.data()}); });
+    if(person==='elia') savedPlansElia = plans;
+    else savedPlansAlex = plans;
+    renderSavedPlans(person);
+  } catch(e) { console.error(e); }
+}
+
+function renderSavedPlans(person) {
+  const plans = person==='elia' ? savedPlansElia : savedPlansAlex;
+  const el = document.getElementById(`saved-plans-${person}`);
+  if (!el) return;
+  if (!plans.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">📋</div><p>Nessun piano salvato ancora.</p></div>`;
+    return;
+  }
+  const color = person==='elia'?'var(--elia)':'var(--alex)';
+  el.innerHTML = plans.map(plan => {
+    const totKcal = plan.items.reduce((a,i) => a + Math.round(i.kcal * i.grams/100), 0);
+    const totP = plan.items.reduce((a,i) => a + i.p * i.grams/100, 0).toFixed(1);
+    return `
+      <div class="plan-saved-item">
+        <div>
+          <div style="font-weight:600;margin-bottom:4px">${plan.name}</div>
+          <div style="display:flex;gap:8px">
+            <span class="macro-chip kcal">${totKcal} kcal</span>
+            <span class="macro-chip prot">P ${totP}g</span>
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${plan.items.length} alimenti</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost btn-sm" onclick="loadPlanIntoEditor('${person}','${plan.id}')">📥 Carica</button>
+          <button class="btn btn-danger btn-sm" onclick="deletePlan('${person}','${plan.id}')">✕</button>
+        </div>
+      </div>
+      <div id="plan-detail-${plan.id}" style="display:none;margin-bottom:8px;padding:12px;background:var(--bg3);border-radius:8px;font-size:12px">
+        ${plan.items.map(i=>
+          `<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border)">
+            <span>${i.n}</span>
+            <span style="color:var(--muted)">${i.grams}g → ${Math.round(i.kcal*i.grams/100)} kcal</span>
+          </div>`
+        ).join('')}
+      </div>
+    `;
+  }).join('');
+}
+
+function loadPlanIntoEditor(person, planId) {
+  const plans = person==='elia' ? savedPlansElia : savedPlansAlex;
+  const plan = plans.find(p=>p.id===planId);
+  if(!plan) return;
+  const items = plan.items.map((i,idx) => ({...i, id: Date.now()+idx}));
+  if(person==='elia') mealPlanElia = items;
+  else mealPlanAlex = items;
+  switchTab(person, 'diet');
+  renderPlan(person);
+  toast('Piano caricato nell\'editor!', person==='elia'?'var(--elia)':'var(--alex)');
+}
+
+async function deletePlan(person, planId) {
+  if(!confirm('Eliminare questo piano?')) return;
+  const {db, dbFns} = window;
+  const {doc, deleteDoc} = dbFns;
+  await deleteDoc(doc(db,'plans',planId));
+  loadSavedPlans(person);
+  toast('Piano eliminato', 'var(--danger)');
+}
+
+// ══════════════════════════════════════════════
+// EXCESS MEALS
+// ══════════════════════════════════════════════
+async function addExcess(person) {
+  const date = document.getElementById(`excess-date-${person}`).value;
+  const desc = document.getElementById(`excess-desc-${person}`).value.trim();
+  const kcal = document.getElementById(`excess-kcal-${person}`).value;
+  if (!desc) { toast('Inserisci una descrizione!', 'var(--danger)'); return; }
+  const {db, dbFns} = window;
+  const {collection, addDoc} = dbFns;
+  try {
+    await addDoc(collection(db,'excess'), { person, date, desc, kcal: parseFloat(kcal)||0, ts: Date.now() });
+    document.getElementById(`excess-desc-${person}`).value = '';
+    document.getElementById(`excess-kcal-${person}`).value = '';
+    toast('Pasto in eccesso registrato!', 'var(--danger)');
+    loadExcess(person);
+  } catch(e) { toast('Errore: '+e.message,'var(--danger)'); }
+}
+
+async function loadExcess(person) {
+  const {db, dbFns} = window;
+  const {collection, getDocs, query, orderBy} = dbFns;
+  try {
+    const snap = await getDocs(query(collection(db,'excess'), orderBy('ts','desc')));
+    const items = [];
+    snap.forEach(d => { if(d.data().person===person) items.push({id:d.id,...d.data()}); });
+    if(person==='elia') excessElia = items;
+    else excessAlex = items;
+    renderExcess(person);
+  } catch(e) { console.error(e); }
+}
+
+async function deleteExcess(person, id) {
+  const {db, dbFns} = window;
+  const {doc, deleteDoc} = dbFns;
+  await deleteDoc(doc(db,'excess',id));
+  loadExcess(person);
+}
+
+function renderExcess(person) {
+  const items = person==='elia' ? excessElia : excessAlex;
+  const el = document.getElementById(`excess-table-wrap-${person}`);
+  if (!el) return;
+  if(!items.length) {
+    el.innerHTML = `<div class="empty"><div class="empty-icon">✅</div><p>Nessun pasto in eccesso registrato!</p></div>`;
+    return;
+  }
+  el.innerHTML = `
+    <div class="card card-sm" style="padding:0;overflow:hidden">
+      <table class="excess-table">
+        <thead>
+          <tr>
+            <th>DATA</th>
+            <th>DESCRIZIONE</th>
+            <th>KCAL EST.</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${items.map(i=>`
+            <tr>
+              <td style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">${formatDate(i.date)}</td>
+              <td>${i.desc}</td>
+              <td><span class="macro-chip kcal">${i.kcal||'—'} kcal</span></td>
+              <td><button class="btn btn-danger btn-sm btn-icon" onclick="deleteExcess('${person}','${i.id}')">✕</button></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ══════════════════════════════════════════════
+// GOALS PAGE
+// ══════════════════════════════════════════════
+function buildGoalsPage() {
+  buildGoalCard('elia');
+  buildGoalCard('alex');
+}
+
+async function buildGoalCard(person) {
+  const {db, dbFns} = window;
+  const {doc, getDoc} = dbFns;
+  const isElia = person==='elia';
+  const color = isElia ? 'var(--elia)' : 'var(--alex)';
+  const name = isElia ? 'Elia' : 'Alex';
+  const el = document.getElementById(`goal-${person}-card`);
+
+  let goal = null;
+  try {
+    const snap = await getDoc(doc(db,'goals',person));
+    if(snap.exists()) goal = snap.data();
+  } catch(e) {}
+
+  const lastWeight = (isElia ? weightDataElia : weightDataAlex).sort((a,b)=>b.date.localeCompare(a.date))[0];
+  const current = lastWeight ? lastWeight.weight : null;
+
+  let progress = null, progressText = '', diff = '';
+  if(goal && current) {
+    const start = goal.startWeight;
+    const target = goal.targetWeight;
+    if(start !== target) {
+      const totalChange = target - start;
+      const currentChange = current - start;
+      const pct = Math.min(100, Math.max(0, (currentChange / totalChange)*100));
+      progress = pct;
+      diff = (current - target).toFixed(1);
+      const diffNum = parseFloat(diff);
+      if(Math.abs(diffNum) < 0.3) progressText = '🎯 Obbiettivo raggiunto!';
+      else if(diffNum < 0) progressText = `Ancora ${Math.abs(diffNum)} kg da perdere`;
+      else progressText = `Ancora ${diffNum} kg da guadagnare`;
+    }
+  }
+
+  el.innerHTML = `
+    <div class="card" style="border-top:2px solid ${color};height:100%">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <h2 style="color:${color}">${name}</h2>
+        <span class="person-badge ${person}">${person.toUpperCase()}</span>
+      </div>
+
+      <div style="margin-bottom:20px">
+        <div class="stat-label">Peso attuale</div>
+        <div style="font-family:var(--font-display);font-weight:700;font-size:32px">${current ? current+' kg' : '—'}</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <h3 style="margin-bottom:16px">Imposta Obbiettivo</h3>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px">
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-family:var(--font-mono)">PESO PARTENZA (kg)</div>
+          <input type="number" id="goal-start-${person}" step="0.1" value="${goal?.startWeight||''}" placeholder="${current||75}">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-family:var(--font-mono)">OBBIETTIVO PESO (kg)</div>
+          <input type="number" id="goal-target-${person}" step="0.1" value="${goal?.targetWeight||''}" placeholder="es. 70">
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:4px;font-family:var(--font-mono)">NOTE / STRATEGIA</div>
+          <textarea id="goal-note-${person}" placeholder="Es: -0.5kg/settimana, deficit 400kcal...">${goal?.note||''}</textarea>
+        </div>
+        <button class="btn" style="background:${color};color:white" onclick="saveGoal('${person}')">Salva Obbiettivo</button>
+      </div>
+
+      ${goal ? `
+        <div class="divider"></div>
+        <h3 style="margin-bottom:12px">Progressi</h3>
+        ${progress !== null ? `
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px">
+            <span style="font-size:13px">${progressText}</span>
+            <span style="font-family:var(--font-mono);font-size:13px;color:${color}">${progress.toFixed(0)}%</span>
+          </div>
+          <div class="goal-progress">
+            <div class="goal-progress-fill" style="width:${progress}%;background:${color}"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:8px;font-family:var(--font-mono);font-size:10px;color:var(--muted)">
+            <span>START: ${goal.startWeight} kg</span>
+            <span>TARGET: ${goal.targetWeight} kg</span>
+          </div>
+        ` : '<p style="color:var(--muted);font-size:13px">Inserisci un peso per vedere i progressi.</p>'}
+        ${goal.note ? `<div style="margin-top:12px;padding:12px;background:var(--bg3);border-radius:8px;font-size:13px;color:var(--muted)">${goal.note}</div>` : ''}
+      ` : ''}
+    </div>
+  `;
+}
+
+async function saveGoal(person) {
+  const start = parseFloat(document.getElementById(`goal-start-${person}`).value);
+  const target = parseFloat(document.getElementById(`goal-target-${person}`).value);
+  const note = document.getElementById(`goal-note-${person}`).value;
+  if(!start || !target) { toast('Inserisci peso di partenza e obbiettivo!','var(--danger)'); return; }
+  const {db, dbFns} = window;
+  const {doc, setDoc} = dbFns;
+  try {
+    await setDoc(doc(db,'goals',person), { startWeight:start, targetWeight:target, note, updatedAt: Date.now() });
+    toast('Obbiettivo salvato!', person==='elia'?'var(--elia)':'var(--alex)');
+    buildGoalCard(person);
+  } catch(e) { toast('Errore: '+e.message,'var(--danger)'); }
+}
+
+function updateGoalProgress() {
+  // Rebuild goal cards if on goals page (non-blocking)
+  if(document.getElementById('page-goals').classList.contains('active')) {
+    buildGoalCard('elia');
+    buildGoalCard('alex');
+  }
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+function init() {
+  initChart();
+  buildPersonPage('elia');
+  buildPersonPage('alex');
+  buildGoalsPage();
+  loadWeights();
+
+  // Realtime listener for weights
+  const {db, dbFns} = window;
+  const {collection, query, orderBy, onSnapshot} = dbFns;
+  onSnapshot(query(collection(db,'weights'), orderBy('date','asc')), snap => {
+    weightDataElia = [];
+    weightDataAlex = [];
+    snap.forEach(d => {
+      const data = d.data();
+      if(data.person==='elia') weightDataElia.push(data);
+      else weightDataAlex.push(data);
+    });
+    updateStats();
+    updateChart();
+  });
+}
+
+document.addEventListener('firebaseReady', init);
+if(window.firebaseReady) init();
+</script>
+</body>
+</html>
