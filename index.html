@@ -498,6 +498,11 @@ body::before {
 }
 .plan-saved-item:hover { border-color: var(--accent); }
 
+@keyframes pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50% { opacity:0.7; transform:scale(1.15); }
+}
+
 /* section divider with label */
 .section-label {
   display: flex; align-items: center; gap: 12px;
@@ -542,6 +547,9 @@ body::before {
       <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted)" id="today-date"></div>
     </div>
 
+    <!-- Reminder banner -->
+    <div id="reminder-banner" style="display:none;margin-bottom:20px"></div>
+
     <!-- Weight input cards -->
     <div class="grid-2" style="margin-bottom:24px">
       <!-- ELIA -->
@@ -558,10 +566,18 @@ body::before {
           <span style="color:var(--muted);font-family:var(--font-mono)">kg</span>
           <button class="btn btn-elia" onclick="saveWeight('elia')">Salva</button>
         </div>
-        <div style="margin-top:12px;display:flex;gap:12px">
+        <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
           <div>
             <div class="stat-label">Ultimo peso</div>
             <div style="font-family:var(--font-display);font-weight:700;font-size:20px" id="last-elia">—</div>
+          </div>
+          <div>
+            <div class="stat-label">Variazione</div>
+            <div style="font-family:var(--font-mono);font-weight:600;font-size:16px;margin-top:4px" id="delta-elia">—</div>
+          </div>
+          <div>
+            <div class="stat-label">Streak</div>
+            <div style="font-size:14px;margin-top:4px" id="streak-elia">—</div>
           </div>
           <div>
             <div class="stat-label">Media sett.</div>
@@ -588,10 +604,18 @@ body::before {
           <span style="color:var(--muted);font-family:var(--font-mono)">kg</span>
           <button class="btn btn-alex" onclick="saveWeight('alex')">Salva</button>
         </div>
-        <div style="margin-top:12px;display:flex;gap:12px">
+        <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
           <div>
             <div class="stat-label">Ultimo peso</div>
             <div style="font-family:var(--font-display);font-weight:700;font-size:20px" id="last-alex">—</div>
+          </div>
+          <div>
+            <div class="stat-label">Variazione</div>
+            <div style="font-family:var(--font-mono);font-weight:600;font-size:16px;margin-top:4px" id="delta-alex">—</div>
+          </div>
+          <div>
+            <div class="stat-label">Streak</div>
+            <div style="font-size:14px;margin-top:4px" id="streak-alex">—</div>
           </div>
           <div>
             <div class="stat-label">Media sett.</div>
@@ -1198,6 +1222,72 @@ function computeStats(data) {
   return {last, weekly, monthly};
 }
 
+function computeDelta(data) {
+  if (data.length < 2) return null;
+  const sorted = [...data].sort((a,b) => a.date.localeCompare(b.date));
+  const last = sorted[sorted.length-1].weight;
+  const prev = sorted[sorted.length-2].weight;
+  return (last - prev).toFixed(1);
+}
+
+function computeStreak(data) {
+  if (!data.length) return 0;
+  const dates = [...new Set(data.map(d => d.date))].sort((a,b) => b.localeCompare(a));
+  let streak = 0;
+  let cursor = new Date(); cursor.setHours(0,0,0,0);
+  for (let i = 0; i < dates.length; i++) {
+    const d = new Date(dates[i]+'T00:00:00');
+    const diff = Math.round((cursor - d) / 86400000);
+    if (diff === 0 || diff === 1) { streak++; cursor = d; }
+    else break;
+  }
+  return streak;
+}
+
+function updateReminderBanner() {
+  const today = todayStr();
+  const eliaToday = weightDataElia.some(w => w.date === today);
+  const alexToday = weightDataAlex.some(w => w.date === today);
+  const banner = document.getElementById('reminder-banner');
+  if (!banner) return;
+
+  const missing = [];
+  if (!eliaToday) missing.push({name:'Elia', color:'var(--elia)', id:'elia'});
+  if (!alexToday) missing.push({name:'Alex', color:'var(--alex)', id:'alex'});
+
+  if (!missing.length) {
+    banner.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;padding:14px 20px;background:rgba(163,230,53,0.08);border:1px solid rgba(163,230,53,0.2);border-radius:14px">
+        <span style="font-size:20px">✅</span>
+        <div>
+          <div style="font-weight:600;font-size:14px;color:var(--accent)">Ottimo! Entrambi i pesi registrati oggi</div>
+          <div style="font-size:12px;color:var(--muted)">Dati aggiornati — continua così!</div>
+        </div>
+      </div>`;
+    banner.style.display = 'block';
+    return;
+  }
+
+  const parts = missing.map(m =>
+    `<span style="color:${m.color};font-weight:700">${m.name}</span>`
+  ).join(' e ');
+
+  banner.innerHTML = `
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:14px 20px;background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.25);border-radius:14px">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:22px;animation:pulse 2s infinite">⚖️</span>
+        <div>
+          <div style="font-weight:600;font-size:14px;color:#fbbf24">Promemoria: pesa ${parts} oggi!</div>
+          <div style="font-size:12px;color:var(--muted)">Nessun peso registrato ancora per oggi — ${new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'})}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        ${missing.map(m => `<button class="btn btn-sm" style="background:${m.color};color:white" onclick="document.getElementById('weight-${m.id}').focus();goPage('home')"">Inserisci ${m.name}</button>`).join('')}
+      </div>
+    </div>`;
+  banner.style.display = 'block';
+}
+
 function updateStats() {
   const s1 = computeStats(weightDataElia);
   document.getElementById('last-elia').textContent = s1.last;
@@ -1207,6 +1297,34 @@ function updateStats() {
   document.getElementById('last-alex').textContent = s2.last;
   document.getElementById('weekly-alex').textContent = s2.weekly;
   document.getElementById('monthly-alex').textContent = s2.monthly;
+
+  // Delta peso
+  const deltaElia = computeDelta(weightDataElia);
+  const deltaAlex = computeDelta(weightDataAlex);
+  const deltaEliaEl = document.getElementById('delta-elia');
+  const deltaAlexEl = document.getElementById('delta-alex');
+  if (deltaEliaEl && deltaElia !== null) {
+    const v = parseFloat(deltaElia);
+    deltaEliaEl.textContent = (v>0?'↑ +':'↓ ')+deltaElia+' kg';
+    deltaEliaEl.style.color = v>0?'var(--danger)':'var(--accent2)';
+  }
+  if (deltaAlexEl && deltaAlex !== null) {
+    const v = parseFloat(deltaAlex);
+    deltaAlexEl.textContent = (v>0?'↑ +':'↓ ')+deltaAlex+' kg';
+    deltaAlexEl.style.color = v>0?'var(--danger)':'var(--accent2)';
+  }
+
+  // Streak
+  const streakElia = computeStreak(weightDataElia);
+  const streakAlex = computeStreak(weightDataAlex);
+  const seEl = document.getElementById('streak-elia');
+  const saEl = document.getElementById('streak-alex');
+  if (seEl) seEl.textContent = streakElia > 1 ? '🔥 '+streakElia+' giorni' : streakElia === 1 ? '✅ Iniziato!' : '—';
+  if (saEl) saEl.textContent = streakAlex > 1 ? '🔥 '+streakAlex+' giorni' : streakAlex === 1 ? '✅ Iniziato!' : '—';
+
+  // Reminder banner
+  updateReminderBanner();
+
   // Also update goal progress
   updateGoalProgress();
 }
@@ -1791,6 +1909,7 @@ function init() {
   buildPersonPage('elia');
   buildPersonPage('alex');
   buildGoalsPage();
+  updateReminderBanner(); // show reminder immediately before data loads
   loadWeights();
 
   // Realtime listener for weights
