@@ -1088,22 +1088,58 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 
       <!-- User detail view (hidden by default) -->
       <div id="admin-user-detail" style="display:none">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+        <!-- Header -->
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap">
           <button class="btn btn-ghost btn-sm" onclick="closeUserDetail()">← Torna alla lista</button>
           <h2 id="admin-detail-name"></h2>
+          <span id="admin-detail-badge" class="badge badge-green" style="margin-left:4px"></span>
         </div>
-        <div class="card" style="margin-bottom:20px">
-          <div class="sec-header"><h3>📈 Andamento peso</h3></div>
-          <div class="chart-wrap"><canvas id="admin-chart"></canvas></div>
-        </div>
+
+        <!-- Stats strip -->
         <div class="grid-3" style="margin-bottom:20px">
           <div class="stat-chip"><div class="val" id="adm-last" style="color:var(--green)">—</div><div class="lbl">ULTIMO PESO</div></div>
           <div class="stat-chip"><div class="val" id="adm-weekly">—</div><div class="lbl">MEDIA SETT.</div></div>
           <div class="stat-chip"><div class="val" id="adm-monthly">—</div><div class="lbl">MEDIA MENS.</div></div>
         </div>
-        <div class="card" style="padding:0;overflow:hidden">
-          <div style="padding:14px 22px;border-bottom:1.5px solid var(--border)"><h3>Storico pesi</h3></div>
-          <div id="admin-weight-list" style="max-height:300px;overflow-y:auto"></div>
+
+        <!-- Tabs -->
+        <div class="tabs" id="admin-detail-tabs">
+          <button class="tab active" onclick="switchAdminTab('weights')">⚖️ Pesi</button>
+          <button class="tab" onclick="switchAdminTab('foods')">🥗 Alimenti</button>
+          <button class="tab" onclick="switchAdminTab('plans')">📋 Piani Pasto</button>
+        </div>
+
+        <!-- Tab: Pesi -->
+        <div class="tab-panel active" id="adm-tab-weights">
+          <div class="card" style="margin-bottom:20px">
+            <div class="sec-header"><h3>📈 Andamento peso</h3></div>
+            <div class="chart-wrap"><canvas id="admin-chart"></canvas></div>
+          </div>
+          <div class="card" style="padding:0;overflow:hidden">
+            <div style="padding:14px 22px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+              <h3>Storico misurazioni</h3>
+              <span id="adm-weight-count" style="font-family:var(--font-mono);font-size:11px;color:var(--muted)"></span>
+            </div>
+            <div id="admin-weight-list" style="max-height:360px;overflow-y:auto"></div>
+          </div>
+        </div>
+
+        <!-- Tab: Alimenti -->
+        <div class="tab-panel" id="adm-tab-foods">
+          <div class="card" style="margin-bottom:12px;padding:12px 18px">
+            <input type="text" id="adm-foods-search" placeholder="🔍  Cerca negli alimenti di questo utente..."
+              oninput="filterAdminFoods()" style="border:none;background:transparent;font-size:15px;padding:0;box-shadow:none">
+          </div>
+          <div id="admin-foods-list">
+            <div class="empty"><div class="empty-icon">🥗</div><p>Nessun alimento creato da questo utente.</p></div>
+          </div>
+        </div>
+
+        <!-- Tab: Piani Pasto -->
+        <div class="tab-panel" id="adm-tab-plans">
+          <div id="admin-plans-list">
+            <div class="empty"><div class="empty-icon">📋</div><p>Nessun piano pasto salvato da questo utente.</p></div>
+          </div>
         </div>
       </div>
 
@@ -2306,26 +2342,40 @@ async function loadAdminUsers() {
   }
 }
 
+// ══════════════════════════════════
+// ADMIN — DETTAGLIO UTENTE
+// ══════════════════════════════════
 let adminChartInst = null;
+let adminCurrentUid = null;        // UID utente visualizzato
+let adminUserFoods  = [];          // cache alimenti utente
+
 async function viewUserDetail(targetUid, name) {
+  adminCurrentUid = targetUid;
+
   document.getElementById('admin-user-list').style.display = 'none';
   document.getElementById('admin-user-detail').style.display = 'block';
   document.getElementById('admin-detail-name').textContent = name;
 
+  // Reset tab a "Pesi"
+  switchAdminTab('weights');
+
+  // Reset stats
+  ['adm-last','adm-weekly','adm-monthly'].forEach(id => document.getElementById(id).textContent = '—');
+
   const {db, collection, query, orderBy, getDocs} = window._fb;
+
+  // ── PESI ──
   let data = [];
   try {
     const snap = await getDocs(query(collection(db,'users',targetUid,'weights'), orderBy('date','asc')));
     data = snap.docs.map(d=>d.data());
-  } catch(e) {
-    console.warn('Impossibile leggere i pesi di questo utente:', e.message);
-  }
+  } catch(e) { console.warn('Pesi:', e.message); }
 
-  // Stats
+  // Stats peso
   if (data.length) {
     const s = [...data].sort((a,b)=>b.date.localeCompare(a.date));
     document.getElementById('adm-last').textContent = s[0].weight+' kg';
-    const weekAgo=new Date();weekAgo.setDate(weekAgo.getDate()-7);
+    const weekAgo=new Date(); weekAgo.setDate(weekAgo.getDate()-7);
     const wk=data.filter(w=>new Date(w.date+'T00:00:00')>=weekAgo);
     document.getElementById('adm-weekly').textContent = wk.length?(wk.reduce((a,b)=>a+b.weight,0)/wk.length).toFixed(1)+' kg':'—';
     const mo=todayStr().slice(0,7);
@@ -2333,32 +2383,162 @@ async function viewUserDetail(targetUid, name) {
     document.getElementById('adm-monthly').textContent = mm.length?(mm.reduce((a,b)=>a+b.weight,0)/mm.length).toFixed(1)+' kg':'—';
   }
 
-  // Chart
+  // Grafico peso
   if (adminChartInst) adminChartInst.destroy();
   const ctx = document.getElementById('admin-chart').getContext('2d');
   adminChartInst = new Chart(ctx, {
     type:'line',
-    data:{labels:data.map(w=>new Date(w.date+'T00:00:00').toLocaleDateString('it-IT',{day:'2-digit',month:'short'})),
-      datasets:[{label:'Peso',data:data.map(w=>w.weight),borderColor:'#e07020',backgroundColor:'rgba(224,112,32,0.08)',
-        fill:true,tension:0.4,pointBackgroundColor:'#e07020',pointRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
-      scales:{x:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#9a8f85',font:{size:10}}},
-              y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#9a8f85',font:{size:10},callback:v=>v+' kg'}}}}
+    data:{
+      labels: data.map(w=>new Date(w.date+'T00:00:00').toLocaleDateString('it-IT',{day:'2-digit',month:'short'})),
+      datasets:[{label:'Peso', data:data.map(w=>w.weight),
+        borderColor:'#e07020', backgroundColor:'rgba(224,112,32,0.08)',
+        fill:true, tension:0.4, pointBackgroundColor:'#e07020', pointRadius:4}]
+    },
+    options:{responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{
+        x:{grid:{color:'rgba(0,0,0,0.05)'}, ticks:{color:'#9a8f85',font:{size:10}}},
+        y:{grid:{color:'rgba(0,0,0,0.05)'}, ticks:{color:'#9a8f85',font:{size:10},callback:v=>v+' kg'}}
+      }
+    }
   });
 
-  // Weight list
+  // Lista pesi
   const wl = document.getElementById('admin-weight-list');
-  const sorted = [...data].sort((a,b)=>b.date.localeCompare(a.date));
-  wl.innerHTML = sorted.map(w=>`
-    <div class="hist-row">
-      <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);flex:1">${formatDate(w.date)}</span>
-      <span style="font-family:var(--font-brand);font-weight:800;font-size:17px;color:var(--orange)">${w.weight} kg</span>
+  const wc = document.getElementById('adm-weight-count');
+  if (wc) wc.textContent = data.length + ' misurazion' + (data.length===1?'e':'i');
+  if (!data.length) {
+    wl.innerHTML = '<div class="empty"><div class="empty-icon">⚖️</div><p>Nessuna misurazione registrata.</p></div>';
+  } else {
+    const sorted = [...data].sort((a,b)=>b.date.localeCompare(a.date));
+    wl.innerHTML = sorted.map((w,i)=>{
+      const prev = sorted[i+1];
+      let deltaHtml = '';
+      if (prev) {
+        const diff = (w.weight - prev.weight).toFixed(1);
+        const v = parseFloat(diff);
+        const col = v>0?'#f87171':v<0?'#4ade80':'var(--muted)';
+        deltaHtml = `<span style="font-family:var(--font-mono);font-size:11px;color:${col}">${v>0?'+':''}${diff} kg ${v>0?'↑':v<0?'↓':'→'}</span>`;
+      }
+      return `
+      <div class="hist-row">
+        <div style="flex:1">
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">${formatDate(w.date)}</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-top:2px">
+            <span style="font-family:var(--font-brand);font-weight:800;font-size:18px;color:var(--orange)">${w.weight} kg</span>
+            ${deltaHtml}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // ── ALIMENTI ──
+  adminUserFoods = [];
+  try {
+    const fsnap = await getDocs(query(collection(db,'users',targetUid,'foods'), orderBy('name','asc')));
+    adminUserFoods = fsnap.docs.map(d=>({id:d.id,...d.data()}));
+  } catch(e) { console.warn('Alimenti:', e.message); }
+  renderAdminFoods(adminUserFoods);
+
+  // ── PIANI PASTO ──
+  try {
+    const psnap = await getDocs(query(collection(db,'users',targetUid,'plans'), orderBy('createdAt','desc')));
+    const plans = psnap.docs.map(d=>({id:d.id,...d.data()}));
+    renderAdminPlans(plans);
+  } catch(e) {
+    console.warn('Piani:', e.message);
+    renderAdminPlans([]);
+  }
+}
+
+// ── TAB SWITCHING ──
+function switchAdminTab(tab) {
+  ['weights','foods','plans'].forEach(t => {
+    document.getElementById('adm-tab-'+t).classList.toggle('active', t===tab);
+  });
+  document.querySelectorAll('#admin-detail-tabs .tab').forEach((btn,i) => {
+    const tabs = ['weights','foods','plans'];
+    btn.classList.toggle('active', tabs[i]===tab);
+  });
+}
+
+// ── RENDER ALIMENTI ──
+function renderAdminFoods(foods) {
+  const el = document.getElementById('admin-foods-list');
+  if (!el) return;
+  if (!foods.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">🥗</div><p>Nessun alimento creato da questo utente.</p></div>';
+    return;
+  }
+  el.innerHTML = foods.map(f=>`
+    <div class="food-card">
+      <div style="flex:1">
+        <div class="food-name">${f.name}</div>
+        ${f.notes?`<div style="font-size:12px;color:var(--muted);margin-top:2px">${f.notes}</div>`:''}
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <span class="macro-pill mp-kcal">${f.kcal} kcal</span>
+        <span class="macro-pill mp-prot">P ${f.protein}g</span>
+        <span class="macro-pill mp-carb">C ${f.carbs}g</span>
+        <span class="macro-pill mp-fat">G ${f.fat}g</span>
+        <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">/100g</span>
+      </div>
     </div>`).join('');
+}
+
+function filterAdminFoods() {
+  const q = document.getElementById('adm-foods-search').value.toLowerCase();
+  renderAdminFoods(adminUserFoods.filter(f=>!q||f.name.toLowerCase().includes(q)));
+}
+
+// ── RENDER PIANI PASTO ──
+function renderAdminPlans(plans) {
+  const el = document.getElementById('admin-plans-list');
+  if (!el) return;
+  if (!plans.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>Nessun piano pasto salvato da questo utente.</p></div>';
+    return;
+  }
+  el.innerHTML = plans.map(plan=>{
+    const entries = plan.entries||[];
+    const totKcal = entries.reduce((a,e)=>a+e.kcal,0);
+    const totP    = entries.reduce((a,e)=>a+e.protein,0).toFixed(1);
+    const totC    = entries.reduce((a,e)=>a+e.carbs,0).toFixed(1);
+    const totF    = entries.reduce((a,e)=>a+e.fat,0).toFixed(1);
+    const date    = plan.createdAt ? new Date(plan.createdAt).toLocaleDateString('it-IT') : '—';
+    return `
+    <div class="food-card" style="flex-direction:column;align-items:flex-start;gap:12px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between;width:100%">
+        <div>
+          <div style="font-weight:700;font-size:15px">📋 ${plan.name}</div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px">Salvato il ${date} · ${entries.length} alimenti</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="macro-pill mp-kcal">${totKcal} kcal</span>
+          <span class="macro-pill mp-prot">P ${totP}g</span>
+          <span class="macro-pill mp-carb">C ${totC}g</span>
+          <span class="macro-pill mp-fat">G ${totF}g</span>
+        </div>
+      </div>
+      ${entries.length ? `
+      <div style="width:100%;border-top:1.5px solid var(--border);padding-top:10px">
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;margin-bottom:8px">ALIMENTI NEL PIANO</div>
+        ${entries.map(e=>`
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(0,0,0,0.05)">
+            <span style="font-size:13px">${e.name} <span style="color:var(--muted);font-size:11px">${e.grams}g</span></span>
+            <span style="font-family:var(--font-mono);font-size:11px;color:var(--green)">${e.kcal} kcal</span>
+          </div>`).join('')}
+      </div>` : ''}
+    </div>`;
+  }).join('');
 }
 
 function closeUserDetail() {
   document.getElementById('admin-user-list').style.display='block';
   document.getElementById('admin-user-detail').style.display='none';
+  adminCurrentUid = null;
+  adminUserFoods  = [];
 }
 </script>
 </body>
