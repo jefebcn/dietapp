@@ -14,6 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
 <!-- ═══ FIREBASE ═══ -->
 <script type="module">
@@ -925,6 +926,132 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   animation: pulse 1.5s ease infinite;
 }
 
+/* ── DIARY NAV ARROWS ── */
+.diary-nav {
+  display: flex; align-items: center; gap: 10px;
+}
+.diary-nav-btn {
+  background: var(--cream); border: 1.5px solid var(--border);
+  border-radius: 8px; width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 16px; transition: all 0.15s;
+  color: var(--text);
+}
+.diary-nav-btn:hover { border-color: var(--green); color: var(--green); }
+.diary-date-label {
+  font-family: var(--font-mono); font-size: 12px;
+  color: var(--text); min-width: 110px; text-align: center;
+  cursor: pointer; padding: 4px 8px;
+  border-radius: 6px; border: 1.5px solid transparent;
+  transition: border-color 0.15s;
+}
+.diary-date-label:hover { border-color: var(--border); }
+
+/* ── SCANNER MODAL ── */
+.scanner-modal {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.9); z-index: 600;
+  flex-direction: column; align-items: center; justify-content: center;
+}
+.scanner-modal.open { display: flex; }
+.scanner-box {
+  width: min(380px, 90vw); background: var(--card);
+  border-radius: 20px; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+.scanner-header {
+  padding: 16px 20px; display: flex;
+  align-items: center; justify-content: space-between;
+  border-bottom: 1.5px solid var(--border);
+}
+#qr-reader { width: 100%; min-height: 240px; }
+#qr-reader video { border-radius: 0 !important; }
+.scanner-result { padding: 16px 20px; }
+
+/* ── PHOTO ANALYSIS MODAL ── */
+.photo-modal {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.85); z-index: 600;
+  flex-direction: column; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.photo-modal.open { display: flex; }
+.photo-box {
+  width: min(440px, 95vw); background: var(--card);
+  border-radius: 20px; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  max-height: 88vh; overflow-y: auto;
+}
+.photo-box-header {
+  padding: 16px 20px; display: flex;
+  align-items: center; justify-content: space-between;
+  border-bottom: 1.5px solid var(--border);
+  position: sticky; top: 0; background: var(--card); z-index: 2;
+}
+.photo-preview {
+  width: 100%; max-height: 220px; object-fit: cover;
+  display: none;
+}
+.photo-preview.show { display: block; }
+.ai-food-result {
+  border: 1.5px solid var(--green); border-radius: 12px;
+  padding: 14px; margin: 12px 20px; background: var(--green-bg);
+}
+.ai-loading {
+  text-align: center; padding: 28px;
+  font-family: var(--font-mono); font-size: 13px; color: var(--muted);
+}
+@keyframes pulse-dot {
+  0%,100% { opacity: 0.3; } 50% { opacity: 1; }
+}
+.ai-loading span { animation: pulse-dot 1.2s infinite; display: inline-block; }
+.ai-loading span:nth-child(2) { animation-delay: 0.2s; }
+.ai-loading span:nth-child(3) { animation-delay: 0.4s; }
+
+/* ── SHARE MODAL ── */
+.share-modal {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.8); z-index: 600;
+  flex-direction: column; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.share-modal.open { display: flex; }
+.share-box {
+  width: min(420px, 95vw); background: var(--card);
+  border-radius: 20px; overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+#share-canvas { display: block; width: 100%; border-radius: 0; }
+.share-actions { padding: 16px 20px; display: flex; gap: 10px; }
+
+/* ── NOTIFICATION BANNER ── */
+.notif-banner {
+  background: linear-gradient(135deg, #1e40af, #2563eb);
+  color: white; border-radius: 14px; padding: 14px 18px;
+  margin-bottom: 16px; display: flex;
+  align-items: center; gap: 14px;
+}
+.notif-banner-icon { font-size: 26px; flex-shrink: 0; }
+.notif-banner-text { flex: 1; font-size: 13px; line-height: 1.5; }
+.notif-banner-text strong { display: block; font-size: 15px; margin-bottom: 2px; }
+
+/* ── OFFLINE INDICATOR ── */
+.offline-bar {
+  position: fixed; top: 0; left: 0; right: 0;
+  background: #b45309; color: white;
+  text-align: center; font-size: 12px; font-family: var(--font-mono);
+  padding: 6px; z-index: 1000;
+  transform: translateY(-100%); transition: transform 0.3s;
+}
+.offline-bar.show { transform: translateY(0); }
+
+/* ── API KEY SETTINGS ── */
+.settings-section {
+  background: var(--cream); border-radius: 12px;
+  padding: 14px 18px; margin-top: 16px;
+  border: 1.5px solid var(--border);
+}
+
 /* ── WIZARD ACTIVITY OPTION ── */
 .wz-activity-opt {
   padding: 12px 16px;
@@ -1241,7 +1368,21 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
           <div class="page-title-tag">// dashboard</div>
           <h1 id="home-greeting">Ciao!</h1>
         </div>
-        <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted)" id="home-date"></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="btn btn-ghost btn-sm" onclick="openShareCard()" title="Condividi progressi" style="font-size:18px;padding:6px 10px">📤</button>
+          <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted)" id="home-date"></div>
+        </div>
+      </div>
+
+      <!-- Notification permission banner -->
+      <div id="notif-permission-banner" style="display:none" class="notif-banner">
+        <div class="notif-banner-icon">🔔</div>
+        <div class="notif-banner-text">
+          <strong>Attiva i reminder</strong>
+          Ricevi notifiche per pesarti e completare i macro ogni giorno.
+        </div>
+        <button class="btn btn-green btn-sm" onclick="requestNotifications()" style="flex-shrink:0">Attiva</button>
+        <button onclick="document.getElementById('notif-permission-banner').style.display='none'" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;flex-shrink:0;padding:4px">✕</button>
       </div>
 
       <!-- Reminder banner -->
@@ -1361,8 +1502,11 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
           <div class="page-title-tag">// diario alimentare</div>
           <h1>Diario</h1>
         </div>
-        <div style="display:flex;gap:10px;align-items:center">
-          <input type="date" id="diary-date" style="width:160px" onchange="loadDiary()">
+        <div class="diary-nav">
+          <button class="diary-nav-btn" onclick="diaryGoDay(-1)" title="Giorno precedente">‹</button>
+          <div class="diary-date-label" id="diary-date-label" onclick="diaryPickDate()">Oggi</div>
+          <button class="diary-nav-btn" onclick="diaryGoDay(+1)" title="Giorno successivo" id="diary-next-btn">›</button>
+          <input type="date" id="diary-date" style="display:none" onchange="loadDiary()">
           <button class="btn btn-ghost btn-sm" onclick="setDiaryToday()">Oggi</button>
         </div>
       </div>
@@ -1460,7 +1604,13 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 
       <!-- Add food to diary -->
       <div class="card" style="margin-bottom:20px">
-        <h3 style="margin-bottom:14px">➕ Aggiungi alimento</h3>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <h3>➕ Aggiungi alimento</h3>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-sm" onclick="openScanner()" title="Scansiona barcode">📷 Barcode</button>
+            <button class="btn btn-ghost btn-sm" onclick="openPhotoAnalysis()" title="Analizza foto con AI">🤖 Foto AI</button>
+          </div>
+        </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
           <div style="flex:2;min-width:0">
             <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--font-brand);font-weight:700">ALIMENTO</div>
@@ -1479,46 +1629,18 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 
       <!-- Diary entries -->
       <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:14px 22px;border-bottom:1.5px solid var(--border)">
-          <h3>Alimenti di oggi</h3>
+        <div style="padding:14px 22px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <h3 id="diary-entries-title">Alimenti di oggi</h3>
         </div>
         <div id="diary-entries" style="padding:16px">
           <div class="empty"><div class="empty-icon">🍽️</div><p>Nessun alimento nel diario di oggi.</p></div>
         </div>
       </div>
 
-      <!-- ⚡ SPEED TRACK -->
+      <!-- ⚡ SPEED TRACK & PASTI PREFERITI -->
       <div style="margin-top:20px;margin-bottom:20px">
         <div class="sec-header" style="margin-bottom:14px">
           <h3>⚡ Speed Track</h3>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-ghost btn-sm" onclick="copyYesterdayDiary()">📅 Copia da ieri</button>
-            <button class="btn btn-orange btn-sm" onclick="saveMealPreset()">⭐ Salva come pasto preferito</button>
-          </div>
-        </div>
-        <div id="meal-presets-list">
-          <div style="color:var(--muted);font-size:13px;padding:10px 0">Nessun pasto preferito salvato ancora.</div>
-        </div>
-      </div>
-
-      <!-- ⚡ SPEED TRACK -->
-      <div style="margin-top:20px;margin-bottom:20px">
-        <div class="sec-header" style="margin-bottom:14px">
-          <h3>⚡ Pasti Preferiti</h3>
-          <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <button class="btn btn-ghost btn-sm" onclick="copyYesterdayDiary()">📅 Copia da ieri</button>
-            <button class="btn btn-orange btn-sm" onclick="saveMealPreset()">⭐ Salva diario come preferito</button>
-          </div>
-        </div>
-        <div id="meal-presets-list">
-          <div style="color:var(--muted);font-size:13px;padding:8px 0">Nessun pasto preferito salvato ancora.</div>
-        </div>
-      </div>
-
-       <!-- ⚡ SPEED TRACK -->
-      <div style="margin-top:20px;margin-bottom:20px">
-        <div class="sec-header" style="margin-bottom:14px">
-          <h3>⚡ Pasti Preferiti</h3>
           <div style="display:flex;gap:8px;flex-wrap:wrap">
             <button class="btn btn-ghost btn-sm" onclick="copyYesterdayDiary()">📅 Copia da ieri</button>
             <button class="btn btn-orange btn-sm" onclick="saveMealPreset()">⭐ Salva come preferito</button>
@@ -1938,6 +2060,112 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   </div>
 </div>
 
+<!-- OFFLINE BAR -->
+<div class="offline-bar" id="offline-bar">📵 Modalità offline — i dati verranno sincronizzati quando torni online</div>
+
+<!-- ══ BARCODE SCANNER MODAL ══ -->
+<div class="scanner-modal" id="scanner-modal">
+  <div class="scanner-box">
+    <div class="scanner-header">
+      <div>
+        <div style="font-family:var(--font-brand);font-weight:800;font-size:16px">📷 Scansiona Barcode</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">Punta la fotocamera al codice a barre del prodotto</div>
+      </div>
+      <button onclick="closeScanner()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted)">✕</button>
+    </div>
+    <div id="qr-reader"></div>
+    <div class="scanner-result" id="scanner-result" style="display:none">
+      <div style="font-family:var(--font-mono);font-size:11px;color:var(--muted);margin-bottom:8px">PRODOTTO TROVATO</div>
+      <div id="scanner-found-name" style="font-weight:700;font-size:15px;margin-bottom:6px"></div>
+      <div id="scanner-found-macros" style="font-size:13px;color:var(--muted);margin-bottom:12px"></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <label style="font-size:12px;color:var(--muted)">Grammi:</label>
+        <input type="number" id="scanner-grams" value="100" min="1" max="2000" style="width:80px">
+        <button class="btn btn-green" onclick="addScannedFood()">➕ Aggiungi al diario</button>
+      </div>
+    </div>
+    <div id="scanner-loading" style="text-align:center;padding:16px;font-size:13px;color:var(--muted);display:none">🔍 Ricerca prodotto...</div>
+    <div id="scanner-error" style="padding:16px;color:var(--danger);font-size:13px;display:none"></div>
+  </div>
+</div>
+
+<!-- ══ PHOTO AI ANALYSIS MODAL ══ -->
+<div class="photo-modal" id="photo-modal">
+  <div class="photo-box">
+    <div class="photo-box-header">
+      <div>
+        <div style="font-family:var(--font-brand);font-weight:800;font-size:16px">🤖 Analisi Foto Pasto</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">AI stima i macro dal tuo pasto</div>
+      </div>
+      <button onclick="closePhotoAnalysis()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted)">✕</button>
+    </div>
+    <img id="photo-preview" class="photo-preview" src="" alt="Anteprima pasto">
+    <div style="padding:16px 20px">
+      <input type="file" id="photo-input" accept="image/*" capture="environment" style="display:none" onchange="handlePhotoSelected(event)">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">
+        <button class="btn btn-green" onclick="document.getElementById('photo-input').click()" style="flex:1">📷 Scatta foto</button>
+        <button class="btn btn-ghost" onclick="document.getElementById('photo-input-gallery').click()" style="flex:1">🖼️ Galleria</button>
+        <input type="file" id="photo-input-gallery" accept="image/*" style="display:none" onchange="handlePhotoSelected(event)">
+      </div>
+      <div class="settings-section" id="apikey-section">
+        <div style="font-size:12px;color:var(--muted);margin-bottom:8px;font-family:var(--font-brand);font-weight:700">🔑 ANTHROPIC API KEY</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px">Necessaria per l'analisi AI. <a href="https://console.anthropic.com" target="_blank" style="color:var(--green)">Ottienila qui →</a></div>
+        <div style="display:flex;gap:8px">
+          <input type="password" id="apikey-input" placeholder="sk-ant-..." style="flex:1;font-size:12px">
+          <button class="btn btn-green btn-sm" onclick="saveApiKey()">Salva</button>
+        </div>
+        <div id="apikey-status" style="font-size:11px;margin-top:6px;color:var(--muted)"></div>
+      </div>
+    </div>
+    <div id="photo-ai-loading" class="ai-loading" style="display:none">
+      <div style="font-size:28px;margin-bottom:8px">🧠</div>
+      Analisi in corso<span>.</span><span>.</span><span>.</span>
+    </div>
+    <div id="photo-ai-result" style="padding:0 20px 20px;display:none">
+      <div class="ai-food-result">
+        <div style="font-weight:700;font-size:14px;margin-bottom:10px" id="ai-food-name">—</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+          <div style="text-align:center">
+            <div style="font-family:var(--font-brand);font-weight:800;font-size:18px;color:var(--green)" id="ai-kcal">—</div>
+            <div style="font-size:9px;color:var(--muted);font-family:var(--font-mono)">KCAL</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:var(--font-brand);font-weight:800;font-size:18px;color:var(--orange)" id="ai-prot">—</div>
+            <div style="font-size:9px;color:var(--muted);font-family:var(--font-mono)">PROT</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:var(--font-brand);font-weight:800;font-size:18px;color:#3b82f6" id="ai-carb">—</div>
+            <div style="font-size:9px;color:var(--muted);font-family:var(--font-mono)">CARB</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:var(--font-brand);font-weight:800;font-size:18px;color:#ca8a04" id="ai-fat">—</div>
+            <div style="font-size:9px;color:var(--muted);font-family:var(--font-mono)">GRASSI</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:10px" id="ai-note"></div>
+        <button class="btn btn-green" onclick="addAiFood()" style="width:100%">➕ Aggiungi al diario</button>
+      </div>
+      <button class="btn btn-ghost" onclick="document.getElementById('photo-input').click()" style="width:100%;margin-top:8px">📷 Analizza un'altra foto</button>
+    </div>
+    <div id="photo-ai-error" style="padding:16px 20px;color:var(--danger);font-size:13px;display:none"></div>
+  </div>
+</div>
+
+<!-- ══ SHARE PROGRESS CARD MODAL ══ -->
+<div class="share-modal" id="share-modal">
+  <div class="share-box">
+    <div style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1.5px solid var(--border)">
+      <div style="font-family:var(--font-brand);font-weight:800;font-size:16px">📤 Condividi Progressi</div>
+      <button onclick="closeShareCard()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted)">✕</button>
+    </div>
+    <canvas id="share-canvas" width="1080" height="1080"></canvas>
+    <div class="share-actions">
+      <button class="btn btn-green" onclick="doShare()" style="flex:1">📤 Condividi</button>
+      <button class="btn btn-ghost" onclick="downloadShareCard()" style="flex:1">💾 Scarica</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast"><div class="t-dot"></div><span id="toast-msg">Salvato!</span></div>
 <!-- POINTS TOAST -->
@@ -2319,6 +2547,8 @@ function showApp() {
   loadUserTargets();
   loadCustomTargets();
   loadNutriPoints();
+  initNotifications();
+  initOfflineMode();
   updateHomeDiarySummary();
   loadMacroWeekChart();
   // Show FAB
@@ -2709,6 +2939,7 @@ async function deleteFood(foodId) {
 function setDiaryToday() {
   currentDiaryDate = todayStr();
   document.getElementById('diary-date').value = currentDiaryDate;
+  setTimeout(updateDiaryDateLabel, 0);
   loadDiary();
 }
 
@@ -3926,6 +4157,527 @@ async function checkRingClosure() {
       if (pc) { pc.classList.add('ring-complete'); setTimeout(() => pc.classList.remove('ring-complete'), 4000); }
     }
   }
+}
+
+// ══════════════════════════════════════════════════════
+// FEATURE 1: DIARY DATE NAVIGATION
+// ══════════════════════════════════════════════════════
+function diaryGoDay(delta) {
+  const cur = document.getElementById('diary-date').value || todayStr();
+  const d = new Date(cur + 'T00:00:00');
+  d.setDate(d.getDate() + delta);
+  const newDate = d.toISOString().split('T')[0];
+  if (newDate > todayStr()) return; // can't go to future
+  document.getElementById('diary-date').value = newDate;
+  loadDiary();
+}
+
+function diaryPickDate() {
+  const inp = document.getElementById('diary-date');
+  inp.max = todayStr();
+  inp.style.display = 'block';
+  inp.style.position = 'absolute';
+  inp.style.opacity = '0';
+  inp.focus();
+  inp.showPicker && inp.showPicker();
+  setTimeout(() => { inp.style.display = 'none'; inp.style.position = ''; inp.style.opacity = ''; }, 200);
+}
+
+function updateDiaryDateLabel() {
+  const cur = document.getElementById('diary-date').value || todayStr();
+  const today = todayStr();
+  const yesterday = (() => { const d = new Date(); d.setDate(d.getDate()-1); return d.toISOString().split('T')[0]; })();
+  const lbl = document.getElementById('diary-date-label');
+  const titleEl = document.getElementById('diary-entries-title');
+  let label, title;
+  if (cur === today) { label = 'Oggi'; title = 'Alimenti di oggi'; }
+  else if (cur === yesterday) { label = 'Ieri'; title = 'Alimenti di ieri'; }
+  else { label = formatDate(cur); title = 'Alimenti del ' + formatDate(cur); }
+  if (lbl) lbl.textContent = label;
+  if (titleEl) titleEl.textContent = title;
+  // Disable next button if on today
+  const nextBtn = document.getElementById('diary-next-btn');
+  if (nextBtn) nextBtn.style.opacity = cur === today ? '0.3' : '1';
+}
+
+// updateDiaryDateLabel is called directly from the patched originals below
+
+// ══════════════════════════════════════════════════════
+// FEATURE 2: BARCODE SCANNER
+// ══════════════════════════════════════════════════════
+let html5QrCode = null;
+let scannedFood = null;
+
+function openScanner() {
+  document.getElementById('scanner-modal').classList.add('open');
+  document.getElementById('scanner-result').style.display = 'none';
+  document.getElementById('scanner-loading').style.display = 'none';
+  document.getElementById('scanner-error').style.display = 'none';
+  setTimeout(() => startScanner(), 300);
+}
+
+function startScanner() {
+  if (html5QrCode) return;
+  html5QrCode = new Html5Qrcode('qr-reader');
+  html5QrCode.start(
+    { facingMode: 'environment' },
+    { fps: 10, qrbox: { width: 250, height: 150 }, aspectRatio: 1.5 },
+    async (decodedText) => {
+      await onBarcodeScanned(decodedText);
+    },
+    () => {}
+  ).catch(err => {
+    const errEl = document.getElementById('scanner-error');
+    errEl.textContent = '⚠️ Fotocamera non disponibile: ' + (err.message || err);
+    errEl.style.display = 'block';
+  });
+}
+
+async function onBarcodeScanned(barcode) {
+  if (html5QrCode) {
+    try { await html5QrCode.stop(); } catch(e) {}
+    html5QrCode = null;
+  }
+  document.getElementById('scanner-loading').style.display = 'block';
+  document.getElementById('scanner-result').style.display = 'none';
+  document.getElementById('scanner-error').style.display = 'none';
+  try {
+    const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
+    const data = await res.json();
+    document.getElementById('scanner-loading').style.display = 'none';
+    if (data.status !== 1 || !data.product) {
+      throw new Error('Prodotto non trovato nel database.');
+    }
+    const p = data.product;
+    const n = p.nutriments || {};
+    const per100 = {
+      kcal:    Math.round(n['energy-kcal_100g'] || n['energy_100g'] / 4.184 || 0),
+      protein: Math.round(n['proteins_100g'] || 0),
+      carbs:   Math.round(n['carbohydrates_100g'] || 0),
+      fat:     Math.round(n['fat_100g'] || 0),
+    };
+    scannedFood = {
+      name: p.product_name || p.product_name_it || 'Prodotto sconosciuto',
+      per100
+    };
+    document.getElementById('scanner-found-name').textContent = scannedFood.name;
+    document.getElementById('scanner-found-macros').textContent =
+      `Per 100g: ${per100.kcal} kcal · P ${per100.protein}g · C ${per100.carbs}g · G ${per100.fat}g`;
+    document.getElementById('scanner-result').style.display = 'block';
+  } catch(e) {
+    document.getElementById('scanner-loading').style.display = 'none';
+    const errEl = document.getElementById('scanner-error');
+    errEl.textContent = '⚠️ ' + (e.message || 'Errore di rete');
+    errEl.style.display = 'block';
+    setTimeout(() => { errEl.style.display = 'none'; startScanner(); }, 2500);
+  }
+}
+
+function addScannedFood() {
+  if (!scannedFood) return;
+  const grams = parseFloat(document.getElementById('scanner-grams').value) || 100;
+  const ratio = grams / 100;
+  const f = scannedFood;
+  selectedDiaryFood = {
+    name: f.name,
+    kcal:    Math.round(f.per100.kcal    * ratio),
+    protein: Math.round(f.per100.protein * ratio),
+    carbs:   Math.round(f.per100.carbs   * ratio),
+    fat:     Math.round(f.per100.fat     * ratio),
+    kcalPer100:    f.per100.kcal,
+    proteinPer100: f.per100.protein,
+    carbsPer100:   f.per100.carbs,
+    fatPer100:     f.per100.fat,
+  };
+  document.getElementById('diary-grams').value = grams;
+  document.getElementById('diary-food-search').value = f.name;
+  closeScanner();
+  addToDiary();
+}
+
+function closeScanner() {
+  if (html5QrCode) {
+    html5QrCode.stop().catch(()=>{});
+    html5QrCode = null;
+  }
+  document.getElementById('scanner-modal').classList.remove('open');
+  document.getElementById('qr-reader').innerHTML = '';
+}
+
+// ══════════════════════════════════════════════════════
+// FEATURE 3: PUSH NOTIFICATIONS
+// ══════════════════════════════════════════════════════
+function initNotifications() {
+  if (!('Notification' in window)) return;
+  const banner = document.getElementById('notif-permission-banner');
+  if (Notification.permission === 'default' && !localStorage.getItem('nt-notif-dismissed')) {
+    if (banner) banner.style.display = 'flex';
+  }
+  if (Notification.permission === 'granted') scheduleNotifications();
+}
+
+async function requestNotifications() {
+  const banner = document.getElementById('notif-permission-banner');
+  if (!('Notification' in window)) { toast('Notifiche non supportate dal browser','var(--danger)'); return; }
+  const perm = await Notification.requestPermission();
+  if (banner) banner.style.display = 'none';
+  if (perm === 'granted') {
+    scheduleNotifications();
+    toast('🔔 Notifiche attivate!');
+    localStorage.setItem('nt-notif-granted', '1');
+  } else {
+    localStorage.setItem('nt-notif-dismissed', '1');
+    toast('Notifiche non attivate', 'var(--muted)');
+  }
+}
+
+function scheduleNotifications() {
+  if (Notification.permission !== 'granted') return;
+  // Clear existing
+  if (window._notifTimers) window._notifTimers.forEach(clearTimeout);
+  window._notifTimers = [];
+  // Schedule daily weight reminder at 8:00
+  const scheduleDaily = (hour, minute, title, body, icon = '⚖️') => {
+    const now = new Date();
+    const target = new Date();
+    target.setHours(hour, minute, 0, 0);
+    if (target <= now) target.setDate(target.getDate() + 1);
+    const delay = target - now;
+    const t = setTimeout(() => {
+      if (Notification.permission === 'granted') {
+        new Notification(title, { body, icon: 'data:text/plain,'+icon, tag: 'nutritrack-' + hour });
+      }
+      scheduleDaily(hour, minute, title, body, icon); // reschedule for tomorrow
+    }, delay);
+    window._notifTimers.push(t);
+  };
+  scheduleDaily(8, 0, '⚖️ NutriTrack — Peso', 'Ricordati di pesarti stamattina!', '⚖️');
+  scheduleDaily(20, 30, '🍽️ NutriTrack — Diario', 'Hai registrato tutti i pasti di oggi?', '🍽️');
+}
+
+// ══════════════════════════════════════════════════════
+// FEATURE 4: PHOTO → AI FOOD ANALYSIS
+// ══════════════════════════════════════════════════════
+let aiAnalyzedFood = null;
+let currentPhotoBase64 = null;
+
+function openPhotoAnalysis() {
+  document.getElementById('photo-modal').classList.add('open');
+  document.getElementById('photo-ai-result').style.display = 'none';
+  document.getElementById('photo-ai-loading').style.display = 'none';
+  document.getElementById('photo-ai-error').style.display = 'none';
+  // Show/hide API key section
+  const key = localStorage.getItem('nt-anthropic-key');
+  const keySection = document.getElementById('apikey-section');
+  if (key) {
+    if (keySection) keySection.style.display = 'none';
+    document.getElementById('apikey-status').textContent = '✅ API Key salvata';
+  } else {
+    if (keySection) keySection.style.display = 'block';
+  }
+}
+
+function closePhotoAnalysis() {
+  document.getElementById('photo-modal').classList.remove('open');
+}
+
+function saveApiKey() {
+  const key = document.getElementById('apikey-input').value.trim();
+  if (!key.startsWith('sk-ant-')) { toast('Chiave non valida (deve iniziare con sk-ant-)', 'var(--danger)'); return; }
+  localStorage.setItem('nt-anthropic-key', key);
+  document.getElementById('apikey-status').textContent = '✅ API Key salvata!';
+  document.getElementById('apikey-section').style.display = 'none';
+  toast('🔑 API Key salvata con successo!');
+}
+
+async function handlePhotoSelected(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  event.target.value = '';
+  // Show preview
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const base64Full = e.target.result;
+    const base64 = base64Full.split(',')[1];
+    currentPhotoBase64 = base64;
+    const preview = document.getElementById('photo-preview');
+    preview.src = base64Full;
+    preview.classList.add('show');
+    document.getElementById('photo-ai-result').style.display = 'none';
+    document.getElementById('photo-ai-error').style.display = 'none';
+    // Check API key
+    const apiKey = localStorage.getItem('nt-anthropic-key');
+    if (!apiKey) {
+      document.getElementById('apikey-section').style.display = 'block';
+      toast('⚠️ Inserisci prima l\'API Key Anthropic', 'var(--orange)');
+      return;
+    }
+    await analyzePhotoWithAI(base64, file.type || 'image/jpeg');
+  };
+  reader.readAsDataURL(file);
+}
+
+async function analyzePhotoWithAI(base64, mediaType) {
+  const apiKey = localStorage.getItem('nt-anthropic-key');
+  if (!apiKey) { toast('API Key mancante', 'var(--danger)'); return; }
+  document.getElementById('photo-ai-loading').style.display = 'block';
+  document.getElementById('photo-ai-result').style.display = 'none';
+  document.getElementById('photo-ai-error').style.display = 'none';
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-4-5',
+        max_tokens: 400,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
+            { type: 'text', text: 'Analizza questo pasto e stima i valori nutrizionali. Rispondi SOLO con un JSON valido senza markdown, nel formato: {"name":"nome del pasto","kcal":numero,"protein":numero,"carbs":numero,"fat":numero,"note":"breve nota sulla stima","grams":numero} I valori devono essere per la porzione INTERA visibile nella foto. Stima in modo realistico.' }
+          ]
+        }]
+      })
+    });
+    document.getElementById('photo-ai-loading').style.display = 'none';
+    if (!response.ok) {
+      const err = await response.json();
+      throw new Error(err.error?.message || 'Errore API (' + response.status + ')');
+    }
+    const data = await response.json();
+    const text = data.content?.[0]?.text || '';
+    let parsed;
+    try {
+      parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
+    } catch(e) {
+      const match = text.match(/\{[\s\S]*\}/);
+      if (match) parsed = JSON.parse(match[0]);
+      else throw new Error('Risposta AI non valida');
+    }
+    aiAnalyzedFood = parsed;
+    document.getElementById('ai-food-name').textContent = parsed.name || 'Pasto analizzato';
+    document.getElementById('ai-kcal').textContent = Math.round(parsed.kcal || 0);
+    document.getElementById('ai-prot').textContent = Math.round(parsed.protein || 0) + 'g';
+    document.getElementById('ai-carb').textContent = Math.round(parsed.carbs || 0) + 'g';
+    document.getElementById('ai-fat').textContent = Math.round(parsed.fat || 0) + 'g';
+    document.getElementById('ai-note').textContent = parsed.note || '';
+    document.getElementById('photo-ai-result').style.display = 'block';
+  } catch(e) {
+    document.getElementById('photo-ai-loading').style.display = 'none';
+    const errEl = document.getElementById('photo-ai-error');
+    errEl.textContent = '⚠️ ' + (e.message || 'Errore sconosciuto');
+    errEl.style.display = 'block';
+  }
+}
+
+async function addAiFood() {
+  if (!aiAnalyzedFood) return;
+  const f = aiAnalyzedFood;
+  const entry = {
+    id: Date.now(),
+    name: f.name || 'Pasto AI',
+    grams: f.grams || 1,
+    kcal:    Math.round(f.kcal || 0),
+    protein: Math.round(f.protein || 0),
+    carbs:   Math.round(f.carbs || 0),
+    fat:     Math.round(f.fat || 0),
+  };
+  diaryEntries.push(entry);
+  await saveDiary();
+  renderDiary();
+  updateHomeDiarySummary();
+  if (currentDiaryDate === todayStr()) checkRingClosure();
+  closePhotoAnalysis();
+  toast('🤖 Pasto AI aggiunto al diario!');
+}
+
+// ══════════════════════════════════════════════════════
+// FEATURE 5: SHARE PROGRESS CARD
+// ══════════════════════════════════════════════════════
+function openShareCard() {
+  document.getElementById('share-modal').classList.add('open');
+  setTimeout(() => drawShareCanvas(), 100);
+}
+function closeShareCard() {
+  document.getElementById('share-modal').classList.remove('open');
+}
+
+function drawShareCanvas() {
+  const canvas = document.getElementById('share-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = 1080, H = 1080;
+  canvas.width = W; canvas.height = H;
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const bg = isDark ? '#1a1a18' : '#f3ede2';
+  const card = isDark ? '#2a2a27' : '#ffffff';
+  const text = isDark ? '#f0ebe0' : '#1a1a18';
+  const muted = isDark ? '#888' : '#888';
+  const green = '#4a7a35';
+
+  // Background
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, W, H);
+
+  // Header stripe
+  ctx.fillStyle = green;
+  ctx.fillRect(0, 0, W, 180);
+
+  // NutriTrack title
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 72px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText('NutriTrack', W/2, 90);
+  ctx.font = '32px system-ui, sans-serif';
+  ctx.fillStyle = 'rgba(255,255,255,0.75)';
+  ctx.fillText(new Date().toLocaleDateString('it-IT', { weekday:'long', day:'numeric', month:'long', year:'numeric' }), W/2, 145);
+
+  // Weight card
+  const latestWeight = weightData.length
+    ? [...weightData].sort((a,b) => b.date.localeCompare(a.date))[0].weight
+    : null;
+  drawCard(ctx, 60, 220, 440, 240, card);
+  ctx.fillStyle = muted; ctx.font = '28px monospace'; ctx.textAlign = 'center';
+  ctx.fillText('PESO ATTUALE', 280, 275);
+  ctx.fillStyle = green; ctx.font = 'bold 96px system-ui, sans-serif';
+  ctx.fillText(latestWeight ? latestWeight + ' kg' : '—', 280, 380);
+
+  // NutriPoints card
+  const pts = nutriPoints.total || 0;
+  const badge = currentBadge(pts);
+  drawCard(ctx, 560, 220, 460, 240, card);
+  ctx.fillStyle = muted; ctx.font = '28px monospace'; ctx.textAlign = 'center';
+  ctx.fillText('NUTRIPOINTS', 790, 275);
+  ctx.fillStyle = '#ca8a04'; ctx.font = 'bold 96px system-ui, sans-serif';
+  ctx.fillText(pts, 790, 380);
+  ctx.fillStyle = muted; ctx.font = '32px system-ui, sans-serif';
+  ctx.fillText(badge.icon + ' ' + badge.name, 790, 430);
+
+  // Macro circles
+  const totals = diaryTotals();
+  const targets = getActiveTargets();
+  const macros = [
+    { label: 'KCAL', val: totals.kcal, tgt: targets.kcal, color: green, unit: '' },
+    { label: 'PROT', val: totals.protein, tgt: targets.prot, color: '#f97316', unit: 'g' },
+    { label: 'CARB', val: totals.carbs, tgt: targets.carbs, color: '#3b82f6', unit: 'g' },
+    { label: 'GRASSI', val: totals.fat, tgt: targets.fat, color: '#ca8a04', unit: 'g' },
+  ];
+  macros.forEach((m, i) => {
+    const cx = 135 + i * 210, cy = 600;
+    const pct = m.tgt > 0 ? Math.min(1, m.val / m.tgt) : 0;
+    // Track
+    ctx.beginPath(); ctx.arc(cx, cy, 80, 0, Math.PI*2);
+    ctx.strokeStyle = isDark ? '#333' : '#e5e0d5'; ctx.lineWidth = 18;
+    ctx.stroke();
+    // Fill
+    if (pct > 0) {
+      ctx.beginPath(); ctx.arc(cx, cy, 80, -Math.PI/2, -Math.PI/2 + pct*Math.PI*2);
+      ctx.strokeStyle = m.color; ctx.lineWidth = 18; ctx.lineCap = 'round';
+      ctx.stroke();
+    }
+    // Value
+    ctx.fillStyle = text; ctx.font = 'bold 38px system-ui, sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(Math.round(m.val) + m.unit, cx, cy + 14);
+    ctx.fillStyle = muted; ctx.font = '24px monospace';
+    ctx.fillText(m.label, cx, cy + 50);
+    ctx.fillStyle = m.color; ctx.font = '20px monospace';
+    ctx.fillText('/ ' + m.tgt + m.unit, cx, cy + 110);
+  });
+
+  // Streak
+  const streak = computeStreak ? computeStreak(weightData) : 0;
+  drawCard(ctx, 60, 740, 960, 170, card);
+  ctx.fillStyle = muted; ctx.font = '28px monospace'; ctx.textAlign = 'center';
+  ctx.fillText('STREAK PESATE CONSECUTIVE', W/2, 790);
+  ctx.fillStyle = text; ctx.font = 'bold 80px system-ui, sans-serif';
+  ctx.fillText('🔥 ' + streak + ' giorni', W/2, 880);
+
+  // Footer
+  ctx.fillStyle = muted; ctx.font = '24px monospace'; ctx.textAlign = 'center';
+  ctx.fillText('Generato con NutriTrack · flexenofitness.com', W/2, 1050);
+}
+
+function drawCard(ctx, x, y, w, h, color) {
+  ctx.fillStyle = color;
+  const r = 24;
+  ctx.beginPath();
+  ctx.moveTo(x+r, y); ctx.lineTo(x+w-r, y);
+  ctx.arcTo(x+w, y, x+w, y+r, r); ctx.lineTo(x+w, y+h-r);
+  ctx.arcTo(x+w, y+h, x+w-r, y+h, r); ctx.lineTo(x+r, y+h);
+  ctx.arcTo(x, y+h, x, y+h-r, r); ctx.lineTo(x, y+r);
+  ctx.arcTo(x, y, x+r, y, r); ctx.closePath();
+  ctx.fill();
+}
+
+async function doShare() {
+  const canvas = document.getElementById('share-canvas');
+  try {
+    canvas.toBlob(async (blob) => {
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], 'nutritrack-progressi.png', { type: 'image/png' });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: 'I miei progressi NutriTrack 🌱' });
+          return;
+        }
+      }
+      downloadShareCard();
+    }, 'image/png');
+  } catch(e) { downloadShareCard(); }
+}
+
+function downloadShareCard() {
+  const canvas = document.getElementById('share-canvas');
+  const a = document.createElement('a');
+  a.download = 'nutritrack-progressi.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+  toast('📥 Card scaricata!');
+}
+
+// ══════════════════════════════════════════════════════
+// FEATURE 6: OFFLINE MODE
+// ══════════════════════════════════════════════════════
+let offlineQueue = [];
+const OFFLINE_QUEUE_KEY = 'nt-offline-queue';
+
+function initOfflineMode() {
+  const bar = document.getElementById('offline-bar');
+  const updateBar = () => {
+    if (bar) bar.classList.toggle('show', !navigator.onLine);
+  };
+  window.addEventListener('online',  () => { updateBar(); processOfflineQueue(); });
+  window.addEventListener('offline', updateBar);
+  updateBar();
+  // Load pending queue
+  try {
+    const q = localStorage.getItem(OFFLINE_QUEUE_KEY);
+    if (q) offlineQueue = JSON.parse(q);
+  } catch(e) { offlineQueue = []; }
+  if (navigator.onLine && offlineQueue.length) processOfflineQueue();
+}
+
+function queueOfflineWrite(path, data) {
+  offlineQueue.push({ path, data, ts: Date.now() });
+  try { localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(offlineQueue)); } catch(e) {}
+}
+
+async function processOfflineQueue() {
+  if (!offlineQueue.length) return;
+  const {db, doc, setDoc} = window._fb;
+  const processed = [];
+  for (const item of offlineQueue) {
+    try {
+      await setDoc(doc(db, ...item.path.split('/')), item.data, { merge: true });
+      processed.push(item);
+    } catch(e) { break; }
+  }
+  offlineQueue = offlineQueue.filter(i => !processed.includes(i));
+  try { localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(offlineQueue)); } catch(e) {}
+  if (processed.length) toast(`✅ Sincronizzati ${processed.length} record offline`);
 }
 
 // ══════════════════════════════════════════════════════
