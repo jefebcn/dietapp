@@ -704,6 +704,75 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 /* pulse animation */
 @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.7;transform:scale(1.12)} }
 
+/* ── PAGE TRANSITION ── */
+@keyframes pageIn {
+  from { opacity:0; transform:translateY(14px) scale(0.99); }
+  to   { opacity:1; transform:translateY(0)    scale(1); }
+}
+.page.active { animation: pageIn 0.28s cubic-bezier(0.4,0,0.2,1); }
+
+/* ── CARB DAY SELECTOR ── */
+.carb-day-bar {
+  display: flex; gap: 8px; flex-wrap: wrap;
+  padding: 14px 18px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 18px;
+  align-items: center;
+}
+.carb-day-btn {
+  padding: 7px 16px; border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: transparent; cursor: pointer;
+  font-family: var(--font-brand); font-weight: 700; font-size: 12px;
+  color: var(--muted); transition: all 0.18s;
+}
+.carb-day-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+.carb-day-btn.active-hc { background:#3b82f6; color:white; border-color:#3b82f6; }
+.carb-day-btn.active-lc { background:var(--orange); color:white; border-color:var(--orange); }
+.carb-day-btn.active-std { background:var(--green); color:white; border-color:var(--green); }
+
+/* ── MACRO PROGRESS BAR ── */
+.macro-progress-wrap {
+  margin-top: 12px;
+}
+.macro-progress-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 8px;
+}
+.macro-progress-row .mpr-label {
+  font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+  letter-spacing: 1px; width: 56px; flex-shrink: 0;
+}
+.macro-progress-row .mpr-track {
+  flex: 1; height: 8px; background: var(--cream); border-radius: 100px;
+  border: 1.5px solid var(--border); overflow: hidden;
+}
+.macro-progress-row .mpr-fill {
+  height: 100%; border-radius: 100px;
+  transition: width 0.5s cubic-bezier(0.4,0,0.2,1), background 0.3s;
+}
+.macro-progress-row .mpr-val {
+  font-family: var(--font-mono); font-size: 10px; width: 76px;
+  text-align: right; flex-shrink: 0; transition: color 0.3s;
+}
+
+/* ── MACRO NUMBER COLOR OVERRIDE (over target) ── */
+.over-target { color: var(--danger) !important; }
+.near-target { color: var(--orange) !important; }
+
+/* ── SPEED-TRACK MEAL PRESET ── */
+.meal-preset-card {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 16px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  transition: border-color 0.15s;
+}
+.meal-preset-card:hover { border-color: var(--orange); }
+
 /* ── FAB ── */
 .fab {
   position: fixed;
@@ -1016,12 +1085,61 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         </div>
       </div>
 
-      <!-- Macro totals -->
+      <!-- Carb Day Selector -->
+      <div class="carb-day-bar">
+        <span style="font-family:var(--font-brand);font-weight:700;font-size:13px;color:var(--text2)">Tipo di giorno:</span>
+        <button class="carb-day-btn active-std" id="cbd-std" onclick="setCarbDay('std')">🟢 Standard</button>
+        <button class="carb-day-btn" id="cbd-hc"  onclick="setCarbDay('hc')">🔵 High Carb</button>
+        <button class="carb-day-btn" id="cbd-lc"  onclick="setCarbDay('lc')">🟠 Low Carb</button>
+        <span id="carb-day-tdee-label" style="margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--muted)"></span>
+      </div>
+
+      <!-- Macro totals + progress bars -->
       <div class="macro-summary" id="diary-macro-summary">
-        <div class="macro-box"><div class="mval" style="color:var(--green)" id="d-kcal">0</div><div class="mlbl">KCAL</div></div>
-        <div class="macro-box"><div class="mval" style="color:var(--orange)" id="d-prot">0g</div><div class="mlbl">PROTEINE</div></div>
-        <div class="macro-box"><div class="mval" style="color:#3b82f6" id="d-carb">0g</div><div class="mlbl">CARBOIDRATI</div></div>
-        <div class="macro-box"><div class="mval" style="color:#ca8a04" id="d-fat">0g</div><div class="mlbl">GRASSI</div></div>
+        <div class="macro-box">
+          <div class="mval" id="d-kcal" style="color:var(--green)">0</div>
+          <div class="mlbl">KCAL</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:2px" id="d-kcal-target"></div>
+        </div>
+        <div class="macro-box">
+          <div class="mval" id="d-prot" style="color:var(--orange)">0g</div>
+          <div class="mlbl">PROTEINE</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:2px" id="d-prot-target"></div>
+        </div>
+        <div class="macro-box">
+          <div class="mval" id="d-carb" style="color:#3b82f6">0g</div>
+          <div class="mlbl">CARBOIDRATI</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:2px" id="d-carb-target"></div>
+        </div>
+        <div class="macro-box">
+          <div class="mval" id="d-fat" style="color:#ca8a04">0g</div>
+          <div class="mlbl">GRASSI</div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:2px" id="d-fat-target"></div>
+        </div>
+      </div>
+
+      <!-- Macro progress bars -->
+      <div class="card macro-progress-wrap" style="margin-bottom:18px;padding:16px 20px" id="macro-progress-card" style="display:none">
+        <div class="macro-progress-row">
+          <span class="mpr-label">KCAL</span>
+          <div class="mpr-track"><div class="mpr-fill" id="mpr-kcal" style="background:var(--green)"></div></div>
+          <span class="mpr-val" id="mpr-kcal-val">—</span>
+        </div>
+        <div class="macro-progress-row">
+          <span class="mpr-label">PROTEINE</span>
+          <div class="mpr-track"><div class="mpr-fill" id="mpr-prot" style="background:var(--orange)"></div></div>
+          <span class="mpr-val" id="mpr-prot-val">—</span>
+        </div>
+        <div class="macro-progress-row">
+          <span class="mpr-label">CARB</span>
+          <div class="mpr-track"><div class="mpr-fill" id="mpr-carb" style="background:#3b82f6"></div></div>
+          <span class="mpr-val" id="mpr-carb-val">—</span>
+        </div>
+        <div class="macro-progress-row">
+          <span class="mpr-label">GRASSI</span>
+          <div class="mpr-track"><div class="mpr-fill" id="mpr-fat" style="background:#ca8a04"></div></div>
+          <span class="mpr-val" id="mpr-fat-val">—</span>
+        </div>
       </div>
 
       <!-- Add food to diary -->
@@ -1053,7 +1171,49 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         </div>
       </div>
 
-      <!-- Piani pasto -->
+      <!-- ⚡ SPEED TRACK -->
+      <div style="margin-top:20px;margin-bottom:20px">
+        <div class="sec-header" style="margin-bottom:14px">
+          <h3>⚡ Speed Track</h3>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-sm" onclick="copyYesterdayDiary()">📅 Copia da ieri</button>
+            <button class="btn btn-orange btn-sm" onclick="saveMealPreset()">⭐ Salva come pasto preferito</button>
+          </div>
+        </div>
+        <div id="meal-presets-list">
+          <div style="color:var(--muted);font-size:13px;padding:10px 0">Nessun pasto preferito salvato ancora.</div>
+        </div>
+      </div>
+
+      <!-- ⚡ SPEED TRACK -->
+      <div style="margin-top:20px;margin-bottom:20px">
+        <div class="sec-header" style="margin-bottom:14px">
+          <h3>⚡ Pasti Preferiti</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="copyYesterdayDiary()">📅 Copia da ieri</button>
+            <button class="btn btn-orange btn-sm" onclick="saveMealPreset()">⭐ Salva diario come preferito</button>
+          </div>
+        </div>
+        <div id="meal-presets-list">
+          <div style="color:var(--muted);font-size:13px;padding:8px 0">Nessun pasto preferito salvato ancora.</div>
+        </div>
+      </div>
+
+       <!-- ⚡ SPEED TRACK -->
+      <div style="margin-top:20px;margin-bottom:20px">
+        <div class="sec-header" style="margin-bottom:14px">
+          <h3>⚡ Pasti Preferiti</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="copyYesterdayDiary()">📅 Copia da ieri</button>
+            <button class="btn btn-orange btn-sm" onclick="saveMealPreset()">⭐ Salva come preferito</button>
+          </div>
+        </div>
+        <div id="meal-presets-list">
+          <div style="color:var(--muted);font-size:13px;padding:8px 0">Nessun pasto preferito salvato ancora.</div>
+        </div>
+      </div>
+
+     <!-- Piani pasto -->
       <div style="margin-top:20px">
         <div class="sec-header">
           <h3>📋 Piani Pasto Salvati</h3>
@@ -1752,6 +1912,7 @@ function showApp() {
   subscribeWeights();
   loadUserFoods();
   loadGoal();
+  loadUserTargets();
   updateHomeDiarySummary();
   loadMacroWeekChart();
 }
@@ -2133,9 +2294,13 @@ async function loadDiary() {
   const {db, doc, getDoc} = window._fb;
   const snap = await getDoc(doc(db,'users',uid(),'diary',currentDiaryDate));
   diaryEntries = snap.exists() ? (snap.data().entries||[]) : [];
+  // Load targets if not already loaded
+  if (!userTargets) await loadUserTargets();
+  else updateCarbDayUI();
   renderDiary();
   if (currentDiaryDate === todayStr()) updateHomeDiarySummary();
   loadPlans();
+  loadMealPresets();
 }
 
 async function saveDiary() {
@@ -2212,12 +2377,123 @@ function diaryTotals() {
   }), {kcal:0,protein:0,carbs:0,fat:0});
 }
 
+// ══════════════════════════════════════════════
+// CARB DAY SYSTEM
+// ══════════════════════════════════════════════
+let carbDayMode = 'std';   // 'std' | 'hc' | 'lc'
+let userTargets = null;    // loaded from Firestore goals
+
+// Presets multipliers vs TDEE or base fallback
+const CARB_DAY_PRESETS = {
+  std: { kcalMult:1.00, protMult:1.00, carbMult:1.00, fatMult:1.00, label:'Standard' },
+  hc:  { kcalMult:1.15, protMult:1.00, carbMult:1.50, fatMult:0.70, label:'High Carb' },
+  lc:  { kcalMult:0.85, protMult:1.10, carbMult:0.40, fatMult:1.30, label:'Low Carb'  },
+};
+
+function getActiveTargets() {
+  // Base: from wizard TDEE or fallback 2000 kcal
+  const tdee  = (userTargets && userTargets.tdee) || 2000;
+  const prot  = (userTargets && userTargets.protein) || Math.round(tdee * 0.25 / 4);
+  const carbs = (userTargets && userTargets.carbs)   || Math.round(tdee * 0.50 / 4);
+  const fat   = (userTargets && userTargets.fat)     || Math.round(tdee * 0.25 / 9);
+  const m = CARB_DAY_PRESETS[carbDayMode];
+  return {
+    kcal:  Math.round(tdee  * m.kcalMult),
+    prot:  Math.round(prot  * m.protMult),
+    carbs: Math.round(carbs * m.carbMult),
+    fat:   Math.round(fat   * m.fatMult),
+  };
+}
+
+async function loadUserTargets() {
+  const {db, doc, getDoc} = window._fb;
+  try {
+    // Load from profile (wizard) or goals
+    const pSnap = await getDoc(doc(db,'users',uid(),'profile','main'));
+    const gSnap = await getDoc(doc(db,'users',uid(),'goals','main'));
+    userTargets = {};
+    if (pSnap.exists()) Object.assign(userTargets, pSnap.data());
+    if (gSnap.exists()) Object.assign(userTargets, gSnap.data());
+  } catch(e) { userTargets = {}; }
+  updateCarbDayUI();
+}
+
+function setCarbDay(mode) {
+  carbDayMode = mode;
+  ['std','hc','lc'].forEach(m => {
+    const btn = document.getElementById('cbd-'+m);
+    if (!btn) return;
+    btn.className = 'carb-day-btn' + (m===mode ? ' active-'+m : '');
+  });
+  updateCarbDayUI();
+  renderDiary();
+}
+
+function updateCarbDayUI() {
+  const t = getActiveTargets();
+  const lbl = document.getElementById('carb-day-tdee-label');
+  if (lbl) lbl.textContent = 'Target: '+t.kcal+' kcal';
+  // Show/hide progress card
+  const pc = document.getElementById('macro-progress-card');
+  if (pc) pc.style.display = 'block';
+  // Update target subtitles
+  const setT = (id, val, unit='') => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = 'Target: '+val+(unit?unit:'');
+  };
+  setT('d-kcal-target', t.kcal, ' kcal');
+  setT('d-prot-target', t.prot, 'g');
+  setT('d-carb-target', t.carbs, 'g');
+  setT('d-fat-target',  t.fat,  'g');
+}
+
 function renderDiary() {
   const totals = diaryTotals();
-  document.getElementById('d-kcal').textContent = totals.kcal;
-  document.getElementById('d-prot').textContent = totals.protein.toFixed(1)+'g';
-  document.getElementById('d-carb').textContent = totals.carbs.toFixed(1)+'g';
-  document.getElementById('d-fat').textContent  = totals.fat.toFixed(1)+'g';
+  const t = getActiveTargets();
+
+  // Helper: color based on % of target
+  function macroColor(val, target, defaultColor) {
+    if (!target) return defaultColor;
+    const pct = val / target;
+    if (pct >= 1.10) return 'var(--danger)';
+    if (pct >= 0.90) return 'var(--orange)';
+    return defaultColor;
+  }
+  function progressPct(val, target) {
+    if (!target) return 0;
+    return Math.min(100, (val/target)*100);
+  }
+
+  // Update macro boxes with color coding
+  const setMacro = (id, val, target, defaultColor, unit='g') => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = unit === 'kcal' ? val : val.toFixed(1)+unit;
+    el.style.color = macroColor(val, target, defaultColor);
+  };
+  setMacro('d-kcal', totals.kcal,    t.kcal,  'var(--green)', 'kcal');
+  setMacro('d-prot', totals.protein, t.prot,  'var(--orange)');
+  setMacro('d-carb', totals.carbs,   t.carbs, '#3b82f6');
+  setMacro('d-fat',  totals.fat,     t.fat,   '#ca8a04');
+
+  // Progress bars
+  const setBar = (fillId, valId, val, target, color) => {
+    const fill = document.getElementById(fillId);
+    const valEl = document.getElementById(valId);
+    if (!fill || !valEl) return;
+    const pct = progressPct(val, target);
+    fill.style.width = pct+'%';
+    const over = val > target * 1.05;
+    fill.style.background = over ? 'var(--danger)' : color;
+    valEl.textContent = Math.round(val)+' / '+target;
+    valEl.style.color = over ? 'var(--danger)' : (pct > 85 ? 'var(--orange)' : 'var(--muted)');
+  };
+  setBar('mpr-kcal','mpr-kcal-val', totals.kcal,    t.kcal,  'var(--green)');
+  setBar('mpr-prot','mpr-prot-val', totals.protein, t.prot,  'var(--orange)');
+  setBar('mpr-carb','mpr-carb-val', totals.carbs,   t.carbs, '#3b82f6');
+  setBar('mpr-fat', 'mpr-fat-val',  totals.fat,     t.fat,   '#ca8a04');
+
+  // Entries list
   const el = document.getElementById('diary-entries');
   if (!diaryEntries.length) {
     el.innerHTML='<div class="empty"><div class="empty-icon">🍽️</div><p>Nessun alimento nel diario di questa giornata.</p></div>';
@@ -2469,6 +2745,106 @@ async function loadMacroWeekChart() {
     macroWeekChart.data.datasets[0].data = values;
     macroWeekChart.update();
   }
+}
+
+
+// ══════════════════════════════════════════════
+// SPEED TRACK — Copia ieri + Pasti Preferiti
+// ══════════════════════════════════════════════
+
+async function copyYesterdayDiary() {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yStr = yesterday.toISOString().split('T')[0];
+  const {db, doc, getDoc} = window._fb;
+  const snap = await getDoc(doc(db,'users',uid(),'diary',yStr));
+  if (!snap.exists() || !(snap.data().entries||[]).length) {
+    toast('Nessun alimento nel diario di ieri!', 'var(--danger)'); return;
+  }
+  const yEntries = snap.data().entries || [];
+  const action = diaryEntries.length
+    ? confirm('Il diario di oggi ha già degli alimenti.
+OK = Aggiungi quelli di ieri
+Annulla = Sostituisci tutto')
+    : true;
+  if (action === null) return;
+  const reStamped = yEntries.map((e,i) => ({...e, id: Date.now()+i}));
+  diaryEntries = action ? [...diaryEntries, ...reStamped] : reStamped;
+  await saveDiary();
+  renderDiary();
+  updateHomeDiarySummary();
+  toast('📅 Copiati '+reStamped.length+' alimenti da ieri!');
+}
+
+async function saveMealPreset() {
+  if (!diaryEntries.length) { toast('Il diario è vuoto!', 'var(--danger)'); return; }
+  const name = prompt('Nome del pasto preferito (es. "Colazione standard"):');
+  if (!name || !name.trim()) return;
+  const {db, collection, addDoc} = window._fb;
+  await addDoc(collection(db,'users',uid(),'mealPresets'), {
+    name: name.trim(),
+    entries: diaryEntries,
+    createdAt: Date.now()
+  });
+  toast('⭐ Pasto preferito salvato!');
+  loadMealPresets();
+}
+
+async function loadMealPresets() {
+  const {db, collection, getDocs, query, orderBy} = window._fb;
+  try {
+    const snap = await getDocs(query(collection(db,'users',uid(),'mealPresets'), orderBy('createdAt','desc')));
+    const presets = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderMealPresets(presets);
+  } catch(e) { renderMealPresets([]); }
+}
+
+function renderMealPresets(presets) {
+  const el = document.getElementById('meal-presets-list');
+  if (!el) return;
+  if (!presets.length) {
+    el.innerHTML = '<div style="color:var(--muted);font-size:13px;padding:8px 0">Nessun pasto preferito salvato ancora.</div>';
+    return;
+  }
+  el.innerHTML = presets.map(p => {
+    const entries = p.entries || [];
+    const kcal  = entries.reduce((a,e)=>a+e.kcal,0);
+    const names = entries.slice(0,3).map(e=>e.name).join(', ')+(entries.length>3?'...':'');
+    return `
+    <div class="meal-preset-card">
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:14px">⭐ ${p.name}</div>
+        <div style="font-size:12px;color:var(--muted);margin-top:2px">${names}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+        <span class="macro-pill mp-kcal">${kcal} kcal</span>
+        <button class="btn btn-orange btn-sm" onclick="loadPresetIntoDiary('${p.id}')">Aggiungi al diario</button>
+        <button class="btn btn-danger btn-icon btn-sm" onclick="deleteMealPreset('${p.id}')">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function loadPresetIntoDiary(presetId) {
+  const {db, doc, getDoc} = window._fb;
+  const snap = await getDoc(doc(db,'users',uid(),'mealPresets',presetId));
+  if (!snap.exists()) return;
+  const entries = (snap.data().entries||[]).map((e,i) => ({...e, id: Date.now()+i}));
+  diaryEntries = [...diaryEntries, ...entries];
+  await saveDiary();
+  renderDiary();
+  updateHomeDiarySummary();
+  toast('⭐ Pasto aggiunto al diario!');
+}
+
+async function deleteMealPreset(presetId) {
+  if (!confirm('Eliminare questo pasto preferito?')) return;
+  const {db, doc, deleteDoc} = window._fb;
+  await deleteDoc(doc(db,'users',uid(),'mealPresets',presetId));
+  toast('Pasto eliminato', 'var(--danger)');
+  loadMealPresets();
 }
 
 // close autocomplete on outside click
