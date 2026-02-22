@@ -722,9 +722,9 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .carb-day-bar { flex-wrap: wrap; gap: 6px; }
   .target-edit-grid { grid-template-columns: 1fr 1fr; }
-  .fab { bottom: 76px; right: 16px; }
-  .fab-menu { bottom: 148px; right: 16px; }
-  .pts-toast { bottom: 76px; }
+  .fab { bottom: 78px; right: 16px; z-index: 500; }
+  .fab-menu { bottom: 150px; right: 16px; z-index: 499; }
+  .pts-toast { bottom: 78px; }
   .card { padding: 16px; }
   h1 { font-size: 24px; }
   .modal-box { margin: 12px; padding: 20px; max-height: 85vh; overflow-y: auto; }
@@ -1024,7 +1024,7 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   font-size: 28px;
   cursor: pointer;
   box-shadow: 0 4px 20px rgba(74,122,53,0.4);
-  z-index: 150;
+  z-index: 500;
   display: flex; align-items: center; justify-content: center;
   transition: all 0.2s;
 }
@@ -1033,7 +1033,7 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   position: fixed;
   bottom: 98px; right: 28px;
   display: flex; flex-direction: column; gap: 10px;
-  z-index: 149;
+  z-index: 499;
   opacity: 0; transform: translateY(20px) scale(0.9);
   pointer-events: none;
   transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
