@@ -1045,6 +1045,22 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 }
 .offline-bar.show { transform: translateY(0); }
 
+/* ── REFERRAL CARD ── */
+.referral-card {
+  border-top: 3px solid var(--green);
+  position: relative;
+  overflow: hidden;
+}
+.referral-card::before {
+  content: '';
+  position: absolute;
+  top: -40px; right: -40px;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(74,122,53,0.12), transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
 /* ── API KEY SETTINGS ── */
 .settings-section {
   background: var(--cream); border-radius: 12px;
@@ -1897,7 +1913,81 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
           </div>
           <span class="pts-pill">+50 pts</span>
         </div>
+        <div class="points-activity-row">
+          <div>
+            <div style="font-weight:500;font-size:14px">👥 Porta un amico</div>
+            <div style="font-size:12px;color:var(--muted)">Il tuo amico si iscrive con il tuo codice referral</div>
+          </div>
+          <span class="pts-pill" style="background:var(--green);color:#fff">+100 pts</span>
+        </div>
+        <div class="points-activity-row" style="border-bottom:none">
+          <div>
+            <div style="font-weight:500;font-size:14px">🎁 Benvenuto amico</div>
+            <div style="font-size:12px;color:var(--muted)">Bonus per chi si iscrive tramite referral</div>
+          </div>
+          <span class="pts-pill" style="background:#7c3aed;color:#fff">+50 pts</span>
+        </div>
+      </div>
 
+      <!-- REFERRAL CARD -->
+      <div class="card referral-card" style="margin-bottom:20px">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+          <div style="width:44px;height:44px;background:linear-gradient(135deg,var(--green),#2d6a1f);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">👥</div>
+          <div>
+            <div style="font-family:var(--font-brand);font-weight:800;font-size:16px">Porta un Amico</div>
+            <div style="font-size:12px;color:var(--muted)">Tu +100 pts · Amico +50 pts al primo accesso</div>
+          </div>
+        </div>
+
+        <!-- Referral code display -->
+        <div style="background:var(--cream);border-radius:12px;padding:14px 16px;margin-bottom:14px;border:1.5px dashed var(--green)">
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-bottom:6px;letter-spacing:1px">IL TUO CODICE PERSONALE</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:26px;color:var(--green);letter-spacing:3px" id="referral-code-display">——</div>
+            <button onclick="copyReferralCode()" class="btn btn-ghost btn-sm" style="margin-left:auto">📋 Copia</button>
+          </div>
+        </div>
+
+        <!-- Share buttons -->
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+          <button class="btn btn-green" onclick="shareReferral('whatsapp')" style="flex:1;min-width:120px">
+            💬 WhatsApp
+          </button>
+          <button class="btn btn-ghost" onclick="shareReferral('copy')" style="flex:1;min-width:120px">
+            🔗 Copia Link
+          </button>
+          <button class="btn btn-ghost" onclick="shareReferral('native')" style="flex:1;min-width:120px">
+            📤 Condividi
+          </button>
+        </div>
+
+        <!-- Referral stats -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+          <div style="background:var(--cream);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:28px;color:var(--green)" id="referral-count">0</div>
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">AMICI INVITATI</div>
+          </div>
+          <div style="background:var(--cream);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:28px;color:#ca8a04" id="referral-pts-earned">0</div>
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">PUNTI DA REFERRAL</div>
+          </div>
+        </div>
+
+        <!-- Enter referral code (for new users) -->
+        <div id="referral-enter-section" style="display:none;border-top:1.5px solid var(--border);padding-top:14px">
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-bottom:8px;letter-spacing:1px">HAI UN CODICE DI UN AMICO?</div>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="referral-enter-input" placeholder="es. FLEX1234" style="flex:1;text-transform:uppercase;letter-spacing:2px;font-family:var(--font-brand);font-weight:700" maxlength="8" oninput="this.value=this.value.toUpperCase()">
+            <button class="btn btn-green" onclick="submitReferralCode()">✓ Usa</button>
+          </div>
+          <div id="referral-enter-status" style="font-size:11px;margin-top:6px;color:var(--muted)"></div>
+        </div>
+
+        <!-- List of referred friends -->
+        <div id="referral-friends-list" style="display:none;border-top:1.5px solid var(--border);padding-top:14px;margin-top:4px">
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-bottom:10px;letter-spacing:1px">AMICI ISCRITTI</div>
+          <div id="referral-friends-inner"></div>
+        </div>
       </div>
 
       <!-- Points history -->
@@ -2414,7 +2504,7 @@ function goPage(id) {
   if (id === 'goals') loadGoal();
   if (id === 'diary') { setDiaryToday(); }
   if (id === 'home') { loadMacroWeekChart(); updateHomeDiarySummary(); }
-  if (id === 'rewards') { renderPointsUI(); }
+  if (id === 'rewards') { renderPointsUI(); loadReferralData(); }
 }
 
 // ══════════════════════════════════
@@ -2549,6 +2639,7 @@ function showApp() {
   loadNutriPoints();
   initNotifications();
   initOfflineMode();
+  loadReferralData();
   updateHomeDiarySummary();
   loadMacroWeekChart();
   // Show FAB
@@ -4358,6 +4449,7 @@ function scheduleNotifications() {
 // ══════════════════════════════════════════════════════
 // FEATURE 4: PHOTO → AI FOOD ANALYSIS
 // ══════════════════════════════════════════════════════
+const ANTHROPIC_API_KEY = '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';
 let aiAnalyzedFood = null;
 let currentPhotoBase64 = null;
 
@@ -4367,8 +4459,8 @@ function openPhotoAnalysis() {
   document.getElementById('photo-ai-loading').style.display = 'none';
   document.getElementById('photo-ai-error').style.display = 'none';
   // Show/hide API key section
-  const key = localStorage.getItem('nt-anthropic-key');
   const keySection = document.getElementById('apikey-section');
+  if (keySection) keySection.style.display = 'none';
   if (key) {
     if (keySection) keySection.style.display = 'none';
     document.getElementById('apikey-status').textContent = '✅ API Key salvata';
@@ -4381,14 +4473,7 @@ function closePhotoAnalysis() {
   document.getElementById('photo-modal').classList.remove('open');
 }
 
-function saveApiKey() {
-  const key = document.getElementById('apikey-input').value.trim();
-  if (!key.startsWith('sk-ant-')) { toast('Chiave non valida (deve iniziare con sk-ant-)', 'var(--danger)'); return; }
-  localStorage.setItem('nt-anthropic-key', key);
-  document.getElementById('apikey-status').textContent = '✅ API Key salvata!';
-  document.getElementById('apikey-section').style.display = 'none';
-  toast('🔑 API Key salvata con successo!');
-}
+function saveApiKey() { /* key pre-configured */ }
 
 async function handlePhotoSelected(event) {
   const file = event.target.files[0];
@@ -4405,20 +4490,13 @@ async function handlePhotoSelected(event) {
     preview.classList.add('show');
     document.getElementById('photo-ai-result').style.display = 'none';
     document.getElementById('photo-ai-error').style.display = 'none';
-    // Check API key
-    const apiKey = localStorage.getItem('nt-anthropic-key');
-    if (!apiKey) {
-      document.getElementById('apikey-section').style.display = 'block';
-      toast('⚠️ Inserisci prima l\'API Key Anthropic', 'var(--orange)');
-      return;
-    }
     await analyzePhotoWithAI(base64, file.type || 'image/jpeg');
   };
   reader.readAsDataURL(file);
 }
 
 async function analyzePhotoWithAI(base64, mediaType) {
-  const apiKey = localStorage.getItem('nt-anthropic-key');
+  const apiKey = ANTHROPIC_API_KEY;
   if (!apiKey) { toast('API Key mancante', 'var(--danger)'); return; }
   document.getElementById('photo-ai-loading').style.display = 'block';
   document.getElementById('photo-ai-result').style.display = 'none';
@@ -4679,6 +4757,215 @@ async function processOfflineQueue() {
   try { localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(offlineQueue)); } catch(e) {}
   if (processed.length) toast(`✅ Sincronizzati ${processed.length} record offline`);
 }
+
+// ══════════════════════════════════════════════════════
+// REFERRAL SYSTEM
+// ══════════════════════════════════════════════════════
+let referralData = { code: null, usedCode: null, referrals: [], ptsEarned: 0 };
+
+function generateReferralCode(userId) {
+  // Deterministic 8-char code from uid
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = 'FLX';
+  for (let i = 0; i < 5; i++) {
+    const charCode = userId.charCodeAt(i % userId.length) + i * 7;
+    code += chars[charCode % chars.length];
+  }
+  return code;
+}
+
+async function loadReferralData() {
+  const {db, doc, getDoc, getDocs, collection, query, where} = window._fb;
+  try {
+    // Load this user's referral doc
+    const snap = await getDoc(doc(db, 'referrals', uid()));
+    if (snap.exists()) {
+      referralData = { ...referralData, ...snap.data() };
+    } else {
+      // First time: generate code and save
+      const code = generateReferralCode(uid());
+      referralData.code = code;
+      const {setDoc} = window._fb;
+      await setDoc(doc(db, 'referrals', uid()), {
+        code,
+        uid: uid(),
+        email: window._currentUser?.email || '',
+        usedCode: null,
+        referrals: [],
+        ptsEarned: 0,
+        createdAt: Date.now()
+      });
+    }
+
+    // Check if this user hasn't used a referral code yet (show input section)
+    if (!referralData.usedCode) {
+      const sec = document.getElementById('referral-enter-section');
+      if (sec) sec.style.display = 'block';
+    }
+
+    renderReferralUI();
+
+    // Award welcome bonus if came via referral and not yet awarded
+    const urlParams = new URLSearchParams(window.location.search);
+    const refCode = urlParams.get('ref') || sessionStorage.getItem('nt-ref-code');
+    if (refCode && !referralData.usedCode) {
+      sessionStorage.removeItem('nt-ref-code');
+      await applyReferralCode(refCode, true);
+    }
+  } catch(e) {
+    console.warn('Referral load error:', e);
+    // Still show generated code offline
+    if (!referralData.code) referralData.code = generateReferralCode(uid());
+    renderReferralUI();
+  }
+}
+
+function renderReferralUI() {
+  const codeEl = document.getElementById('referral-code-display');
+  if (codeEl) codeEl.textContent = referralData.code || '——';
+
+  const countEl = document.getElementById('referral-count');
+  if (countEl) countEl.textContent = (referralData.referrals || []).length;
+
+  const ptsEl = document.getElementById('referral-pts-earned');
+  if (ptsEl) ptsEl.textContent = referralData.ptsEarned || 0;
+
+  // Friends list
+  const friendsList = document.getElementById('referral-friends-list');
+  const friendsInner = document.getElementById('referral-friends-inner');
+  if (referralData.referrals && referralData.referrals.length > 0) {
+    if (friendsList) friendsList.style.display = 'block';
+    if (friendsInner) {
+      friendsInner.innerHTML = referralData.referrals.map(r =>
+        `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+          <div style="width:32px;height:32px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px">${(r.email||'?')[0].toUpperCase()}</div>
+          <div style="flex:1">
+            <div style="font-size:13px;font-weight:600">${r.email || 'Amico'}</div>
+            <div style="font-size:11px;color:var(--muted)">${new Date(r.joinedAt||Date.now()).toLocaleDateString('it-IT')}</div>
+          </div>
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--green);font-weight:700">+100 pts</span>
+        </div>`
+      ).join('');
+    }
+  }
+}
+
+function copyReferralCode() {
+  const code = referralData.code;
+  if (!code) return;
+  navigator.clipboard.writeText(code).then(() => toast('📋 Codice copiato!'));
+}
+
+function getReferralLink() {
+  const base = window.location.href.split('?')[0];
+  return `${base}?ref=${referralData.code}`;
+}
+
+function shareReferral(mode) {
+  const code = referralData.code;
+  const link = getReferralLink();
+  const msg = `🌱 Sto usando NutriTrack per tracciare i miei macro e progressi in palestra!\nIscriviti con il mio codice *${code}* e ottieni subito +50 punti bonus 💪\n\n${link}`;
+
+  if (mode === 'whatsapp') {
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank');
+  } else if (mode === 'copy') {
+    navigator.clipboard.writeText(msg).then(() => toast('🔗 Link copiato!'));
+  } else if (mode === 'native') {
+    if (navigator.share) {
+      navigator.share({ title: 'NutriTrack — Porta un Amico', text: msg, url: link })
+        .catch(() => {});
+    } else {
+      navigator.clipboard.writeText(msg).then(() => toast('🔗 Link copiato!'));
+    }
+  }
+}
+
+async function submitReferralCode() {
+  const input = document.getElementById('referral-enter-input');
+  const statusEl = document.getElementById('referral-enter-status');
+  const code = (input?.value || '').trim().toUpperCase();
+  if (!code || code.length < 6) {
+    if (statusEl) { statusEl.textContent = '⚠️ Codice non valido'; statusEl.style.color = 'var(--danger)'; }
+    return;
+  }
+  if (code === referralData.code) {
+    if (statusEl) { statusEl.textContent = '⚠️ Non puoi usare il tuo stesso codice!'; statusEl.style.color = 'var(--danger)'; }
+    return;
+  }
+  if (statusEl) { statusEl.textContent = '🔍 Verifica in corso...'; statusEl.style.color = 'var(--muted)'; }
+  await applyReferralCode(code, false);
+}
+
+async function applyReferralCode(code, fromUrl) {
+  const {db, doc, getDoc, setDoc, updateDoc, getDocs, collection, query, where} = window._fb;
+  const statusEl = document.getElementById('referral-enter-status');
+  try {
+    // Find owner of this code
+    const allRefs = await getDocs(collection(db, 'referrals'));
+    let ownerDoc = null;
+    let ownerId = null;
+    allRefs.forEach(d => {
+      if (d.data().code === code && d.id !== uid()) {
+        ownerDoc = d.data();
+        ownerId = d.id;
+      }
+    });
+
+    if (!ownerDoc) {
+      if (statusEl) { statusEl.textContent = '❌ Codice non trovato'; statusEl.style.color = 'var(--danger)'; }
+      return;
+    }
+
+    // Update: mark this user as having used the code
+    referralData.usedCode = code;
+    await updateDoc(doc(db, 'referrals', uid()), { usedCode: code });
+
+    // Award +50 pts to this user (welcome bonus)
+    await awardPoints(50, '🎁 Bonus benvenuto — codice amico ' + code, '🎁');
+
+    // Award +100 pts to the referrer
+    const referrerRefs = ownerDoc.referrals || [];
+    const alreadyReferred = referrerRefs.some(r => r.uid === uid());
+    if (!alreadyReferred) {
+      const newReferrals = [...referrerRefs, {
+        uid: uid(),
+        email: window._currentUser?.email || 'Amico',
+        joinedAt: Date.now()
+      }];
+      const newPts = (ownerDoc.ptsEarned || 0) + 100;
+      await updateDoc(doc(db, 'referrals', ownerId), {
+        referrals: newReferrals,
+        ptsEarned: newPts
+      });
+
+      // Award points to referrer's nutripoints
+      // Load referrer points and update
+      const refPtsSnap = await getDoc(doc(db, 'users', ownerId, 'nutripoints', 'main'));
+      const refPts = refPtsSnap.exists() ? refPtsSnap.data() : { total: 0, history: [] };
+      refPts.total = (refPts.total || 0) + 100;
+      refPts.history = [{ pts: 100, reason: '👥 Amico ' + (window._currentUser?.email||'nuovo') + ' si è iscritto!', icon: '👥', date: todayStr(), ts: Date.now() }, ...(refPts.history||[])].slice(0, 100);
+      await setDoc(doc(db, 'users', ownerId, 'nutripoints', 'main'), refPts);
+    }
+
+    // Hide enter section
+    const sec = document.getElementById('referral-enter-section');
+    if (sec) sec.style.display = 'none';
+    if (statusEl) { statusEl.textContent = '✅ Codice applicato! +50 pts ricevuti'; statusEl.style.color = 'var(--green)'; }
+
+    toast('🎁 Benvenuto! +50 NutriPoints bonus!');
+    await loadReferralData();
+
+  } catch(e) {
+    if (statusEl) { statusEl.textContent = '⚠️ Errore: ' + (e.message || 'riprova'); statusEl.style.color = 'var(--danger)'; }
+  }
+}
+
+// Check ref code in URL on page load (before auth)
+(function checkRefInUrl() {
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref');
+  if (ref) sessionStorage.setItem('nt-ref-code', ref);
+})();
 
 // ══════════════════════════════════════════════════════
 // DARK MODE
