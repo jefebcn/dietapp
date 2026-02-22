@@ -678,6 +678,186 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   .fab-menu { bottom: 90px; right: 20px; }
 }
 
+/* ── TARGET EDIT MODAL ── */
+.target-edit-panel {
+  display: none;
+  background: var(--cream);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 16px 18px;
+  margin-top: 10px;
+  animation: pageIn 0.2s ease;
+}
+.target-edit-panel.open { display: block; }
+.target-edit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+@media(max-width:600px){ .target-edit-grid{ grid-template-columns:1fr 1fr; } }
+.target-edit-field label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1.5px;
+  display: block;
+  margin-bottom: 4px;
+}
+.target-edit-field input {
+  width: 100%;
+  font-size: 14px;
+  padding: 8px 10px;
+}
+
+/* ── NUTRIPOINTS ── */
+.points-bar-wrap {
+  background: var(--cream);
+  border-radius: 100px;
+  height: 8px;
+  overflow: hidden;
+  margin: 6px 0 2px;
+}
+.points-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), #a3e635);
+  border-radius: 100px;
+  transition: width 0.6s cubic-bezier(.4,0,.2,1);
+}
+.badge-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-family: var(--font-brand);
+  font-weight: 700;
+  font-size: 11px;
+  border: 1.5px solid;
+}
+.badge-chip.bronze { background: rgba(205,127,50,0.15); color:#cd7f32; border-color:#cd7f32; }
+.badge-chip.silver { background: rgba(192,192,192,0.15); color:#a0a0a0; border-color:#a0a0a0; }
+.badge-chip.gold   { background: rgba(255,215,0,0.15);   color:#ca8a04; border-color:#ca8a04; }
+.badge-chip.platinum { background: rgba(100,200,255,0.15); color:#38bdf8; border-color:#38bdf8; }
+
+.points-activity-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+}
+.points-activity-row:last-child { border-bottom: none; }
+.pts-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--green-bg);
+  color: var(--green);
+}
+.pts-pill.earned { background: linear-gradient(90deg, var(--green), #a3e635); color: white; }
+
+/* ── MACRO DONUT ── */
+.macro-donut-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  margin: 8px 0;
+}
+.macro-donut-wrap canvas { display: block; }
+.donut-center-label {
+  position: absolute;
+  text-align: center;
+  pointer-events: none;
+}
+.donut-center-label .dc-val {
+  font-family: var(--font-brand);
+  font-weight: 900;
+  font-size: 20px;
+  color: var(--text);
+  line-height: 1;
+}
+.donut-center-label .dc-sub {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+
+/* ── RING COMPLETE ANIMATION ── */
+@keyframes ringGlow {
+  0%   { filter: drop-shadow(0 0 0px var(--green)); }
+  50%  { filter: drop-shadow(0 0 18px var(--green)); }
+  100% { filter: drop-shadow(0 0 0px var(--green)); }
+}
+.ring-complete { animation: ringGlow 1.2s ease 3; }
+
+/* ── REWARDS HUB NAV ── */
+.rewards-btn-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+/* ── POINTS TOAST ── */
+.pts-toast {
+  position: fixed;
+  bottom: 90px;
+  right: 28px;
+  background: linear-gradient(135deg, var(--green), #a3e635);
+  color: white;
+  font-family: var(--font-brand);
+  font-weight: 800;
+  font-size: 16px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  z-index: 200;
+  opacity: 0;
+  transform: translateY(20px) scale(0.9);
+  transition: all 0.3s cubic-bezier(.4,0,.2,1);
+  pointer-events: none;
+  box-shadow: 0 4px 20px rgba(74,122,53,0.4);
+}
+.pts-toast.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* ── CATALOG REWARD CARD ── */
+.reward-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 10px;
+  transition: border-color 0.15s;
+}
+.reward-card:hover { border-color: var(--green); }
+.reward-card.locked { opacity: 0.6; }
+.reward-card.unlocked { border-color: var(--green); background: var(--green-bg); }
+.reward-icon { font-size: 32px; flex-shrink: 0; }
+.reward-cost {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--green);
+  margin-top: 2px;
+}
+
+/* ── STREAK FLAME ── */
+.streak-fire {
+  font-size: 18px;
+  animation: pulse 1.5s ease infinite;
+}
+
 /* ── WIZARD ACTIVITY OPTION ── */
 .wz-activity-opt {
   padding: 12px 16px;
@@ -960,6 +1140,16 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
       <span>LEGENDA</span>
     </button>
+    <button class="nav-btn" id="nav-rewards" onclick="goPage('rewards')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+      <span>REWARDS</span>
+    </button>
+
+    <button class="nav-btn" id="nav-rewards" onclick="goPage('rewards')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+      <span>REWARDS</span>
+    </button>
+
     <!-- Admin only -->
     <button class="nav-btn" id="nav-admin" onclick="goPage('admin')" style="display:none">
       <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
@@ -1030,6 +1220,31 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         </div>
       </div>
 
+      <!-- NutriPoints Preview -->
+      <div class="card" style="margin-bottom:20px;border-top:3px solid #ca8a04" id="home-points-card">
+        <div class="sec-header">
+          <div style="display:flex;align-items:center;gap:10px">
+            <h3>🪙 NutriPoints</h3>
+            <span id="home-points-badge" class="badge-chip bronze">🥉 Sprinter</span>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="goPage('rewards')">Rewards Hub →</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:10px">
+          <div style="text-align:center">
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:32px;color:#ca8a04" id="home-pts-total">0</div>
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">PUNTI TOTALI</div>
+          </div>
+          <div style="flex:1;min-width:160px">
+            <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-bottom:4px">
+              <span id="home-pts-next-label">Prossimo premio</span>
+              <span id="home-pts-next-val"></span>
+            </div>
+            <div class="points-bar-wrap"><div class="points-bar-fill" id="home-pts-bar" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div id="home-pts-today" style="font-size:12px;color:var(--muted)">Nessun punto guadagnato oggi.</div>
+      </div>
+
       <!-- Chart -->
       <div class="card" style="margin-bottom:20px">
         <div class="sec-header"><h3>📈 Andamento peso</h3>
@@ -1091,7 +1306,41 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         <button class="carb-day-btn active-std" id="cbd-std" onclick="setCarbDay('std')">🟢 Standard</button>
         <button class="carb-day-btn" id="cbd-hc"  onclick="setCarbDay('hc')">🔵 High Carb</button>
         <button class="carb-day-btn" id="cbd-lc"  onclick="setCarbDay('lc')">🟠 Low Carb</button>
-        <span id="carb-day-tdee-label" style="margin-left:auto;font-family:var(--font-mono);font-size:11px;color:var(--muted)"></span>
+        <button class="btn btn-ghost btn-sm" style="margin-left:auto;font-size:11px" onclick="toggleTargetEditor()">✏️ Modifica target</button>
+        <span id="carb-day-tdee-label" style="font-family:var(--font-mono);font-size:11px;color:var(--muted)"></span>
+      </div>
+
+      <!-- Target Editor Panel -->
+      <div class="target-edit-panel" id="target-edit-panel">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div>
+            <div style="font-weight:700;font-size:14px" id="target-edit-title">✏️ Target Giorno Standard</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">Imposta i valori per questo tipo di giornata</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-ghost btn-sm" onclick="resetTargetToDefault()">↩ Ripristina default</button>
+            <button class="btn btn-green btn-sm" onclick="saveCustomTarget()">💾 Salva</button>
+          </div>
+        </div>
+        <div class="target-edit-grid">
+          <div class="target-edit-field">
+            <label>KCAL / GIORNO</label>
+            <input type="number" id="te-kcal" placeholder="es. 2000" min="500" max="6000" step="10">
+          </div>
+          <div class="target-edit-field">
+            <label>PROTEINE (g)</label>
+            <input type="number" id="te-prot" placeholder="es. 150" min="10" max="500" step="1">
+          </div>
+          <div class="target-edit-field">
+            <label>CARBOIDRATI (g)</label>
+            <input type="number" id="te-carb" placeholder="es. 200" min="10" max="800" step="1">
+          </div>
+          <div class="target-edit-field">
+            <label>GRASSI (g)</label>
+            <input type="number" id="te-fat" placeholder="es. 60" min="5" max="300" step="1">
+          </div>
+        </div>
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted)" id="te-kcal-check"></div>
       </div>
 
       <!-- Macro totals + progress bars -->
@@ -1402,6 +1651,96 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       </div>
     </div>
 
+    <!-- ═══ REWARDS HUB PAGE ═══ -->
+    <div class="page" id="page-rewards">
+      <div class="page-header">
+        <div>
+          <div class="page-title-tag">// sistema premi</div>
+          <h1>🪙 Rewards Hub</h1>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div style="text-align:right">
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:28px;color:#ca8a04" id="rh-pts-total">0</div>
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">PUNTI TOTALI</div>
+          </div>
+          <span id="rh-badge" class="badge-chip bronze" style="font-size:13px;padding:6px 14px">🥉 Sprinter</span>
+        </div>
+      </div>
+
+      <!-- Points progress to next badge -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="sec-header" style="margin-bottom:12px">
+          <h3>📊 Progressione Badge</h3>
+          <span id="rh-next-badge-label" style="font-family:var(--font-mono);font-size:11px;color:var(--muted)"></span>
+        </div>
+        <div class="points-bar-wrap" style="height:12px;margin-bottom:8px"><div class="points-bar-fill" id="rh-pts-bar" style="width:0%"></div></div>
+        <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;color:var(--muted)">
+          <span id="rh-pts-current-lbl"></span>
+          <span id="rh-pts-next-lbl"></span>
+        </div>
+
+        <!-- Badge grid -->
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px" id="rh-badge-grid">
+        </div>
+      </div>
+
+      <!-- How to earn points -->
+      <div class="card" style="margin-bottom:20px">
+        <h3 style="margin-bottom:16px">⚡ Come guadagnare punti</h3>
+        <div class="points-activity-row">
+          <div>
+            <div style="font-weight:600">⚖️ Peso giornaliero</div>
+            <div style="font-size:12px;color:var(--muted)">Registra il tuo peso ogni giorno</div>
+          </div>
+          <span class="pts-pill">+10 pts</span>
+        </div>
+        <div class="points-activity-row">
+          <div>
+            <div style="font-weight:600">🎯 Ring Closure</div>
+            <div style="font-size:12px;color:var(--muted)">Completa i macro entro ±5% del target giornaliero</div>
+          </div>
+          <span class="pts-pill">+30 pts</span>
+        </div>
+        <div class="points-activity-row">
+          <div>
+            <div style="font-weight:600">🔥 Streak 7 giorni</div>
+            <div style="font-size:12px;color:var(--muted)">Pesati 7 giorni consecutivi (ogni multiplo di 7)</div>
+          </div>
+          <span class="pts-pill">+50 pts</span>
+        </div>
+        <div class="points-activity-row">
+          <div>
+            <div style="font-weight:600">⚡ Speed Track</div>
+            <div style="font-size:12px;color:var(--muted)">Usa "Copia da ieri" o un Pasto Preferito</div>
+          </div>
+          <span class="pts-pill">+15 pts</span>
+        </div>
+      </div>
+
+      <!-- Points history -->
+      <div class="card" style="margin-bottom:20px">
+        <div class="sec-header" style="margin-bottom:14px">
+          <h3>📋 Storico punti</h3>
+          <span id="rh-history-total" style="font-family:var(--font-mono);font-size:11px;color:var(--muted)"></span>
+        </div>
+        <div id="rh-history-list">
+          <div class="empty"><div class="empty-icon">🪙</div><p>Nessun punto guadagnato ancora.<br>Inizia pesandoti oggi!</p></div>
+        </div>
+      </div>
+
+      <!-- Flexeno Fitness Catalog -->
+      <div class="card">
+        <div class="sec-header" style="margin-bottom:16px">
+          <h3>🛍️ Catalogo Premi — Flexeno Fitness</h3>
+          <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">Riscatta i tuoi punti</span>
+        </div>
+        <div id="rh-catalog"></div>
+        <div style="margin-top:16px;padding:12px 16px;background:var(--cream);border-radius:10px;font-size:12px;color:var(--muted);text-align:center">
+          🔜 Premi aggiuntivi in arrivo. Contatta <strong>Flexeno Fitness</strong> per riscattare i tuoi premi.
+        </div>
+      </div>
+    </div>
+
     <!-- ═══ ADMIN PAGE ═══ -->
     <div class="page" id="page-admin">
       <div class="page-header">
@@ -1539,6 +1878,10 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 
 <!-- TOAST -->
 <div id="toast"><div class="t-dot"></div><span id="toast-msg">Salvato!</span></div>
+<!-- POINTS TOAST -->
+<div class="pts-toast" id="pts-toast">+0 pts 🪙</div>
+<!-- POINTS TOAST -->
+<div class="pts-toast" id="pts-toast">+0 pts 🪙</div>
 
 <!-- ══ FAB ══ -->
 <div class="fab-menu" id="fab-menu">
@@ -1783,6 +2126,8 @@ function goPage(id) {
   if (id === 'goals') loadGoal();
   if (id === 'diary') { setDiaryToday(); }
   if (id === 'home') { loadMacroWeekChart(); updateHomeDiarySummary(); }
+  if (id === 'rewards') { renderPointsUI(); }
+  if (id === 'rewards') { renderPointsUI(); }
 }
 
 // ══════════════════════════════════
@@ -1913,6 +2258,8 @@ function showApp() {
   loadUserFoods();
   loadGoal();
   loadUserTargets();
+  loadCustomTargets();
+  loadNutriPoints();
   updateHomeDiarySummary();
   loadMacroWeekChart();
 }
@@ -3189,6 +3536,354 @@ function closeUserDetail() {
   document.getElementById('admin-user-detail').style.display='none';
   adminCurrentUid = null;
   adminUserFoods  = [];
+}
+
+// ══════════════════════════════════════════════════════
+// CUSTOM TARGETS PER CARB DAY
+// ══════════════════════════════════════════════════════
+let customTargets = { std: null, hc: null, lc: null };  // per-mode overrides
+
+async function loadCustomTargets() {
+  const {db, doc, getDoc} = window._fb;
+  try {
+    const snap = await getDoc(doc(db,'users',uid(),'customTargets','main'));
+    if (snap.exists()) customTargets = {...{std:null,hc:null,lc:null}, ...snap.data()};
+  } catch(e) {}
+}
+
+async function saveCustomTarget() {
+  const kcal = parseInt(document.getElementById('te-kcal').value);
+  const prot = parseInt(document.getElementById('te-prot').value);
+  const carb = parseInt(document.getElementById('te-carb').value);
+  const fat  = parseInt(document.getElementById('te-fat').value);
+  if (!kcal || !prot || !carb || !fat) { toast('Compila tutti i campi!','var(--danger)'); return; }
+  customTargets[carbDayMode] = { kcal, prot, carbs: carb, fat };
+  const {db, doc, setDoc} = window._fb;
+  await setDoc(doc(db,'users',uid(),'customTargets','main'), customTargets);
+  toggleTargetEditor(false);
+  updateCarbDayUI();
+  renderDiary();
+  toast('✅ Target ' + CARB_DAY_PRESETS[carbDayMode].label + ' salvato!');
+}
+
+function resetTargetToDefault() {
+  customTargets[carbDayMode] = null;
+  const t = getActiveTargets();
+  document.getElementById('te-kcal').value = t.kcal;
+  document.getElementById('te-prot').value = t.prot;
+  document.getElementById('te-carb').value = t.carbs;
+  document.getElementById('te-fat').value  = t.fat;
+  updateTeKcalCheck();
+  toast('Target ripristinato ai valori default');
+}
+
+function toggleTargetEditor(forceOpen) {
+  const panel = document.getElementById('target-edit-panel');
+  const open = forceOpen !== undefined ? forceOpen : !panel.classList.contains('open');
+  panel.classList.toggle('open', open);
+  if (open) {
+    // Populate with current targets
+    const t = getActiveTargets();
+    document.getElementById('te-kcal').value = t.kcal;
+    document.getElementById('te-prot').value = t.prot;
+    document.getElementById('te-carb').value = t.carbs;
+    document.getElementById('te-fat').value  = t.fat;
+    const names = { std:'Standard', hc:'High Carb 🔵', lc:'Low Carb 🟠' };
+    document.getElementById('target-edit-title').textContent = '✏️ Target Giorno ' + names[carbDayMode];
+    updateTeKcalCheck();
+    // Live kcal check on input
+    ['te-kcal','te-prot','te-carb','te-fat'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.oninput = updateTeKcalCheck;
+    });
+  }
+}
+
+function updateTeKcalCheck() {
+  const p = parseFloat(document.getElementById('te-prot').value) || 0;
+  const c = parseFloat(document.getElementById('te-carb').value) || 0;
+  const f = parseFloat(document.getElementById('te-fat').value)  || 0;
+  const kcalFromMacros = Math.round(p*4 + c*4 + f*9);
+  const kcal = parseFloat(document.getElementById('te-kcal').value) || 0;
+  const diff = Math.abs(kcal - kcalFromMacros);
+  const el = document.getElementById('te-kcal-check');
+  if (!el) return;
+  if (kcal === 0) { el.textContent = ''; return; }
+  el.textContent = 'Kcal dai macro: ' + kcalFromMacros + ' kcal' + (diff > 50 ? ' ⚠️ differenza di '+diff+' kcal' : ' ✅');
+  el.style.color = diff > 50 ? 'var(--danger)' : 'var(--green)';
+}
+
+// Override getActiveTargets to use custom values if set
+const _origGetActiveTargets = getActiveTargets;
+function getActiveTargets() {
+  if (customTargets[carbDayMode]) return customTargets[carbDayMode];
+  return _origGetActiveTargets();
+}
+
+// ══════════════════════════════════════════════════════
+// NUTRIPOINTS SYSTEM
+// ══════════════════════════════════════════════════════
+let nutriPoints = { total: 0, history: [], lastWeighDate: null };
+
+const BADGES = [
+  { id:'sprinter_bronze', name:'Sprinter Bronze', icon:'🥉', pts: 0,    cls:'bronze' },
+  { id:'sprinter_silver', name:'Sprinter Silver', icon:'🥈', pts: 100,  cls:'silver' },
+  { id:'sprinter_gold',   name:'Sprinter Gold',   icon:'🥇', pts: 300,  cls:'gold'   },
+  { id:'marathon_silver', name:'Marathon Silver', icon:'🎽', pts: 600,  cls:'silver' },
+  { id:'marathon_gold',   name:'Marathon Gold',   icon:'🏅', pts: 1000, cls:'gold'   },
+  { id:'flexeno_elite',   name:'Flexeno Elite',   icon:'👑', pts: 2000, cls:'platinum'},
+];
+
+const CATALOG = [
+  { id:'disc5',   name:'Sconto 5% Flexeno Fitness',  icon:'🏷️',  pts: 200,  desc:'Valido su qualsiasi prodotto nel negozio online' },
+  { id:'disc10',  name:'Sconto 10% Flexeno Fitness', icon:'🎁',  pts: 500,  desc:'Valido su tutti i prodotti e abbigliamento' },
+  { id:'bottle',  name:'Borraccia Flexeno Fitness',  icon:'🚰',  pts: 800,  desc:'Borraccia brandizzata 700ml, spedizione inclusa' },
+  { id:'call',    name:'Consulenza Nutrizione 30min',icon:'📞',  pts: 1200, desc:'Sessione personalizzata con il team Flexeno' },
+  { id:'shirt',   name:'T-Shirt Flexeno Fitness',    icon:'👕',  pts: 1500, desc:'T-shirt tecnica esclusiva per i top performer' },
+  { id:'premium', name:'Premium Plan 1 Mese',        icon:'⭐',  pts: 2500, desc:'Accesso premium con funzionalità avanzate' },
+];
+
+function currentBadge(pts) {
+  let badge = BADGES[0];
+  for (const b of BADGES) { if (pts >= b.pts) badge = b; }
+  return badge;
+}
+
+function nextBadge(pts) {
+  for (const b of BADGES) { if (pts < b.pts) return b; }
+  return null;
+}
+
+async function loadNutriPoints() {
+  const {db, doc, getDoc} = window._fb;
+  try {
+    const snap = await getDoc(doc(db,'users',uid(),'nutripoints','main'));
+    if (snap.exists()) nutriPoints = snap.data();
+    else nutriPoints = { total: 0, history: [], lastWeighDate: null };
+  } catch(e) { nutriPoints = { total: 0, history: [], lastWeighDate: null }; }
+  renderPointsUI();
+}
+
+async function awardPoints(amount, reason, icon='🪙') {
+  if (!nutriPoints.history) nutriPoints.history = [];
+  nutriPoints.total = (nutriPoints.total || 0) + amount;
+  nutriPoints.history.unshift({
+    pts: amount, reason, icon,
+    date: todayStr(), ts: Date.now()
+  });
+  // Keep last 100 entries
+  if (nutriPoints.history.length > 100) nutriPoints.history = nutriPoints.history.slice(0,100);
+  const {db, doc, setDoc} = window._fb;
+  try {
+    await setDoc(doc(db,'users',uid(),'nutripoints','main'), nutriPoints);
+  } catch(e) {}
+  renderPointsUI();
+  showPtsToast('+' + amount + ' pts — ' + reason);
+}
+
+function showPtsToast(msg) {
+  const el = document.getElementById('pts-toast');
+  if (!el) return;
+  el.textContent = msg + ' 🪙';
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+function renderPointsUI() {
+  const pts = nutriPoints.total || 0;
+  const badge = currentBadge(pts);
+  const next  = nextBadge(pts);
+
+  // Home widget
+  const homeTotal = document.getElementById('home-pts-total');
+  if (homeTotal) homeTotal.textContent = pts;
+  const homeBadge = document.getElementById('home-points-badge');
+  if (homeBadge) { homeBadge.textContent = badge.icon + ' ' + badge.name; homeBadge.className = 'badge-chip ' + badge.cls; }
+  const homeBar  = document.getElementById('home-pts-bar');
+  const homeNext = document.getElementById('home-pts-next-val');
+  const homeNextLbl = document.getElementById('home-pts-next-label');
+  if (next && homeBar) {
+    const prev = BADGES[BADGES.indexOf(badge)];
+    const pct  = Math.min(100, ((pts - badge.pts) / (next.pts - badge.pts)) * 100);
+    homeBar.style.width = pct + '%';
+    if (homeNext) homeNext.textContent = next.pts + ' pts';
+    if (homeNextLbl) homeNextLbl.textContent = 'Verso ' + next.icon + ' ' + next.name;
+  } else if (homeBar) {
+    homeBar.style.width = '100%';
+    if (homeNextLbl) homeNextLbl.textContent = '🏆 Badge massimo raggiunto!';
+  }
+
+  // Today's points log
+  const todayEntries = (nutriPoints.history||[]).filter(h => h.date === todayStr());
+  const todayPts = todayEntries.reduce((a,h) => a+h.pts, 0);
+  const homePtsToday = document.getElementById('home-pts-today');
+  if (homePtsToday) {
+    homePtsToday.textContent = todayEntries.length
+      ? todayEntries.map(h => h.icon + ' ' + h.reason + ' (+' + h.pts + ' pts)').join('  ·  ')
+      : 'Nessun punto guadagnato oggi.';
+  }
+
+  // Rewards Hub page
+  const rhTotal = document.getElementById('rh-pts-total');
+  if (!rhTotal) return;
+  rhTotal.textContent = pts;
+  const rhBadge = document.getElementById('rh-badge');
+  if (rhBadge) { rhBadge.textContent = badge.icon + ' ' + badge.name; rhBadge.className = 'badge-chip ' + badge.cls + ' '; rhBadge.style.fontSize='13px'; rhBadge.style.padding='6px 14px'; }
+
+  const rhBar = document.getElementById('rh-pts-bar');
+  if (rhBar && next) {
+    const pct = Math.min(100, ((pts - badge.pts) / (next.pts - badge.pts)) * 100);
+    rhBar.style.width = pct + '%';
+    document.getElementById('rh-next-badge-label').textContent = 'Verso ' + next.icon + ' ' + next.name;
+    document.getElementById('rh-pts-current-lbl').textContent = pts + ' pts';
+    document.getElementById('rh-pts-next-lbl').textContent = next.pts + ' pts';
+  }
+
+  // Badge grid
+  const badgeGrid = document.getElementById('rh-badge-grid');
+  if (badgeGrid) {
+    badgeGrid.innerHTML = BADGES.map(b => {
+      const unlocked = pts >= b.pts;
+      return `<div style="text-align:center;padding:12px 8px;background:var(--${unlocked?'green-bg':'cream'});border:1.5px solid var(--${unlocked?'green':'border'});border-radius:12px;opacity:${unlocked?1:0.45}">
+        <div style="font-size:28px;margin-bottom:4px">${b.icon}</div>
+        <div style="font-family:var(--font-brand);font-weight:700;font-size:11px">${b.name}</div>
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:2px">${b.pts} pts</div>
+        ${unlocked ? '<div style="font-size:9px;color:var(--green);margin-top:3px">✅ Sbloccato</div>' : ''}
+      </div>`;
+    }).join('');
+  }
+
+  // History
+  const histEl = document.getElementById('rh-history-list');
+  if (histEl) {
+    const hist = nutriPoints.history || [];
+    const histTotal = document.getElementById('rh-history-total');
+    if (histTotal) histTotal.textContent = hist.length + ' eventi';
+    if (!hist.length) {
+      histEl.innerHTML = '<div class="empty"><div class="empty-icon">🪙</div><p>Nessun punto guadagnato ancora.</p></div>';
+    } else {
+      histEl.innerHTML = hist.slice(0,30).map(h => `
+        <div class="points-activity-row">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:20px">${h.icon}</span>
+            <div>
+              <div style="font-size:13px;font-weight:600">${h.reason}</div>
+              <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${formatDate(h.date)}</div>
+            </div>
+          </div>
+          <span class="pts-pill earned">+${h.pts} pts</span>
+        </div>`).join('');
+    }
+  }
+
+  // Catalog
+  const catEl = document.getElementById('rh-catalog');
+  if (catEl) {
+    catEl.innerHTML = CATALOG.map(r => {
+      const unlocked = pts >= r.pts;
+      return `<div class="reward-card ${unlocked?'unlocked':'locked'}">
+        <div class="reward-icon">${r.icon}</div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:14px">${r.name}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:2px">${r.desc}</div>
+          <div class="reward-cost">${r.pts} pts ${unlocked ? '✅ Sbloccato!' : ''}</div>
+        </div>
+        ${unlocked ? `<button class="btn btn-green btn-sm" onclick="redeemReward('${r.id}')">Riscatta</button>` : `<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">-${r.pts-pts} pts</div>`}
+      </div>`;
+    }).join('');
+  }
+}
+
+function redeemReward(id) {
+  const r = CATALOG.find(c => c.id === id);
+  if (!r) return;
+  toast('🎁 Hai riscattato: ' + r.name + '! Contatta Flexeno Fitness per il tuo premio.');
+}
+
+// ── AWARD POINTS ON ACTIONS ──
+// Hook into saveWeight to award daily weigh-in points
+const _origSaveWeight = saveWeight;
+async function saveWeight() {
+  const result = await _origSaveWeight.apply(this, arguments);
+  const today = todayStr();
+  if (nutriPoints.lastWeighDate !== today) {
+    nutriPoints.lastWeighDate = today;
+    await awardPoints(10, 'Peso giornaliero registrato', '⚖️');
+    // Check 7-day streak bonus
+    const streak = calcWeightStreak();
+    if (streak > 0 && streak % 7 === 0) {
+      await awardPoints(50, 'Streak ' + streak + ' giorni consecutivi! 🔥', '🔥');
+    }
+  }
+  return result;
+}
+
+function calcWeightStreak() {
+  if (!weightsData || !weightsData.length) return 0;
+  const sorted = [...weightsData].sort((a,b) => b.date.localeCompare(a.date));
+  let streak = 0;
+  let check = new Date();
+  for (const w of sorted) {
+    const d = w.date;
+    const checkStr = check.toISOString().split('T')[0];
+    if (d === checkStr) { streak++; check.setDate(check.getDate()-1); }
+    else break;
+  }
+  return streak;
+}
+
+// Hook into addToDiary to check ring closure
+const _origAddToDiary = addToDiary;
+async function addToDiary() {
+  await _origAddToDiary.apply(this, arguments);
+  checkRingClosure();
+}
+
+const _origRemoveDiaryEntry = removeDiaryEntry;
+async function removeDiaryEntry(id) {
+  await _origRemoveDiaryEntry.apply(this, arguments);
+  checkRingClosure();
+}
+
+async function checkRingClosure() {
+  const totals = diaryTotals();
+  const target = getActiveTargets();
+  const today  = todayStr();
+  const withinRange = (val, tgt) => tgt > 0 && Math.abs(val - tgt) / tgt <= 0.05;
+  if (
+    withinRange(totals.kcal,    target.kcal) &&
+    withinRange(totals.protein, target.prot) &&
+    withinRange(totals.carbs,   target.carbs) &&
+    withinRange(totals.fat,     target.fat)
+  ) {
+    // Only award once per day
+    const alreadyAwarded = (nutriPoints.history||[]).some(
+      h => h.date === today && h.reason.includes('Ring Closure')
+    );
+    if (!alreadyAwarded) {
+      await awardPoints(30, 'Ring Closure — macro centrati ±5%!', '🎯');
+      // Animate the progress bars with a glow
+      const pc = document.getElementById('macro-progress-card');
+      if (pc) { pc.classList.add('ring-complete'); setTimeout(() => pc.classList.remove('ring-complete'), 4000); }
+    }
+  }
+}
+
+// Hook into copyYesterdayDiary and loadPresetIntoDiary for Speed Track bonus
+const _origCopyYesterday = copyYesterdayDiary;
+async function copyYesterdayDiary() {
+  await _origCopyYesterday.apply(this, arguments);
+  const today = todayStr();
+  const alreadyAwarded = (nutriPoints.history||[]).some(h => h.date === today && h.reason.includes('Speed Track'));
+  if (!alreadyAwarded) await awardPoints(15, 'Speed Track — Copia da ieri', '⚡');
+}
+
+const _origLoadPreset = loadPresetIntoDiary;
+async function loadPresetIntoDiary(id) {
+  await _origLoadPreset.apply(this, arguments);
+  const today = todayStr();
+  const alreadyAwarded = (nutriPoints.history||[]).some(h => h.date === today && h.reason.includes('Speed Track'));
+  if (!alreadyAwarded) await awardPoints(15, 'Speed Track — Pasto preferito', '⚡');
 }
 
 // ══════════════════════════════════════════════════════
