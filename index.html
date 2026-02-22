@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>NutriTrack</title>
 <meta name="description" content="Traccia peso, dieta e macro ogni giorno">
 <meta name="theme-color" content="#4a7a35">
@@ -125,12 +125,20 @@ onAuthStateChanged(auth, async user => {
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+html {
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   background: var(--cream);
   color: var(--text);
   font-family: var(--font-body);
   min-height: 100vh;
   overflow-x: hidden;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* ── SCROLLBAR ── */
@@ -722,8 +730,8 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .carb-day-bar { flex-wrap: wrap; gap: 6px; }
   .target-edit-grid { grid-template-columns: 1fr 1fr; }
-  .fab { bottom: 78px; right: 14px; width: 40px; height: 40px; font-size: 20px; z-index: 500; }
-  .fab-menu { bottom: 130px; right: 14px; z-index: 499; }
+  .fab { display: none !important; }
+  .fab-menu { display: none !important; }
   .pts-toast { bottom: 78px; }
   .card { padding: 16px; }
   h1 { font-size: 24px; }
@@ -1293,7 +1301,7 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
             <div style="font-family:var(--font-brand);font-weight:900;font-size:32px;color:#ca8a04" id="home-pts-total">0</div>
             <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">PUNTI TOTALI</div>
           </div>
-          <div style="flex:1;min-width:160px">
+          <div style="flex:1;min-width:0">
             <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-bottom:4px">
               <span id="home-pts-next-label">Prossimo premio</span>
               <span id="home-pts-next-val"></span>
@@ -1454,7 +1462,7 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       <div class="card" style="margin-bottom:20px">
         <h3 style="margin-bottom:14px">➕ Aggiungi alimento</h3>
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
-          <div style="flex:2;min-width:200px">
+          <div style="flex:2;min-width:0">
             <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--font-brand);font-weight:700">ALIMENTO</div>
             <div class="ac-wrap">
               <input type="text" id="diary-food-search" placeholder="Cerca nei tuoi alimenti o nel database..." onfocus="searchDiaryFoodEnhanced()" oninput="searchDiaryFoodEnhanced()" autocomplete="off">
