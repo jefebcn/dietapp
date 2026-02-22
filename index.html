@@ -11,7 +11,7 @@
 <meta name="apple-mobile-web-app-title" content="NutriTrack">
 <link rel="manifest" id="pwa-manifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <!-- ═══ FIREBASE ═══ -->
@@ -669,6 +669,7 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 .macro-box .mval { font-family: var(--font-brand); font-weight: 900; font-size: 22px; }
 .macro-box .mlbl { font-family: var(--font-mono); font-size: 9px; color: var(--muted); letter-spacing: 1.5px; margin-top: 2px; }
 
+/* ── TABLET ── */
 @media (max-width: 768px) {
   .sidebar { width: 58px; }
   .main { margin-left: 58px; padding: 16px; }
@@ -676,6 +677,60 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   .macro-summary { grid-template-columns: 1fr 1fr; }
   .fab { bottom: 20px; right: 20px; }
   .fab-menu { bottom: 90px; right: 20px; }
+  .target-edit-grid { grid-template-columns: 1fr 1fr; }
+}
+
+/* ── MOBILE: sidebar diventa bottom nav ── */
+@media (max-width: 520px) {
+  .sidebar {
+    width: 100% !important;
+    height: 64px;
+    flex-direction: row;
+    position: fixed;
+    bottom: 0; left: 0; top: auto;
+    border-right: none;
+    border-top: 1.5px solid var(--border);
+    z-index: 200;
+    padding: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    justify-content: space-around;
+    align-items: center;
+    gap: 0;
+  }
+  .sidebar .logo-wrap { display: none; }
+  .sidebar .sidebar-bottom {
+    display: none;
+  }
+  .nav-btn {
+    flex-direction: column;
+    padding: 6px 10px;
+    gap: 2px;
+    min-width: 52px;
+    border-radius: 10px;
+    font-size: 9px;
+  }
+  .nav-btn svg { width: 20px; height: 20px; }
+  .nav-btn span { font-size: 8px; }
+  .main {
+    margin-left: 0 !important;
+    padding: 14px 12px 80px 12px;
+  }
+  .page-header { flex-wrap: wrap; gap: 8px; }
+  .macro-summary { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  .carb-day-bar { flex-wrap: wrap; gap: 6px; }
+  .target-edit-grid { grid-template-columns: 1fr 1fr; }
+  .fab { bottom: 76px; right: 16px; }
+  .fab-menu { bottom: 148px; right: 16px; }
+  .pts-toast { bottom: 76px; }
+  .card { padding: 16px; }
+  h1 { font-size: 24px; }
+  .modal-box { margin: 12px; padding: 20px; max-height: 85vh; overflow-y: auto; }
+  .auth-wrap { padding: 12px; }
+  .auth-box { padding: 24px 20px; }
+  .stat-chip { padding: 12px; }
+  .reward-card { flex-wrap: wrap; }
 }
 
 /* ── TARGET EDIT MODAL ── */
@@ -727,18 +782,20 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 .badge-chip {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-family: var(--font-brand);
-  font-weight: 700;
-  font-size: 11px;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 0.3px;
   border: 1.5px solid;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
-.badge-chip.bronze { background: rgba(205,127,50,0.15); color:#cd7f32; border-color:#cd7f32; }
-.badge-chip.silver { background: rgba(192,192,192,0.15); color:#a0a0a0; border-color:#a0a0a0; }
-.badge-chip.gold   { background: rgba(255,215,0,0.15);   color:#ca8a04; border-color:#ca8a04; }
-.badge-chip.platinum { background: rgba(100,200,255,0.15); color:#38bdf8; border-color:#38bdf8; }
+.badge-chip.bronze  { background: linear-gradient(135deg,rgba(205,127,50,0.18),rgba(205,127,50,0.05)); color:#b8742a; border-color:rgba(205,127,50,0.4); }
+.badge-chip.silver  { background: linear-gradient(135deg,rgba(160,160,160,0.18),rgba(160,160,160,0.05)); color:#888; border-color:rgba(160,160,160,0.4); }
+.badge-chip.gold    { background: linear-gradient(135deg,rgba(255,200,0,0.22),rgba(255,200,0,0.05)); color:#b8860b; border-color:rgba(255,200,0,0.5); }
+.badge-chip.platinum{ background: linear-gradient(135deg,rgba(56,189,248,0.18),rgba(56,189,248,0.05)); color:#0ea5e9; border-color:rgba(56,189,248,0.4); }
 
 .points-activity-row {
   display: flex;
@@ -752,11 +809,12 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 .pts-pill {
   font-family: var(--font-mono);
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 500;
   padding: 3px 10px;
   border-radius: 20px;
   background: var(--green-bg);
   color: var(--green);
+  letter-spacing: 0.5px;
 }
 .pts-pill.earned { background: linear-gradient(90deg, var(--green), #a3e635); color: white; }
 
@@ -1140,11 +1198,6 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
       <span>LEGENDA</span>
     </button>
-    <button class="nav-btn" id="nav-rewards" onclick="goPage('rewards')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
-      <span>REWARDS</span>
-    </button>
-
     <button class="nav-btn" id="nav-rewards" onclick="goPage('rewards')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
       <span>REWARDS</span>
@@ -1689,32 +1742,26 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         <h3 style="margin-bottom:16px">⚡ Come guadagnare punti</h3>
         <div class="points-activity-row">
           <div>
-            <div style="font-weight:600">⚖️ Peso giornaliero</div>
+            <div style="font-weight:500;font-size:14px">⚖️ Peso giornaliero</div>
             <div style="font-size:12px;color:var(--muted)">Registra il tuo peso ogni giorno</div>
           </div>
           <span class="pts-pill">+10 pts</span>
         </div>
         <div class="points-activity-row">
           <div>
-            <div style="font-weight:600">🎯 Ring Closure</div>
+            <div style="font-weight:500;font-size:14px">🎯 Ring Closure</div>
             <div style="font-size:12px;color:var(--muted)">Completa i macro entro ±5% del target giornaliero</div>
           </div>
           <span class="pts-pill">+30 pts</span>
         </div>
         <div class="points-activity-row">
           <div>
-            <div style="font-weight:600">🔥 Streak 7 giorni</div>
+            <div style="font-weight:500;font-size:14px">🔥 Streak 7 giorni</div>
             <div style="font-size:12px;color:var(--muted)">Pesati 7 giorni consecutivi (ogni multiplo di 7)</div>
           </div>
           <span class="pts-pill">+50 pts</span>
         </div>
-        <div class="points-activity-row">
-          <div>
-            <div style="font-weight:600">⚡ Speed Track</div>
-            <div style="font-size:12px;color:var(--muted)">Usa "Copia da ieri" o un Pasto Preferito</div>
-          </div>
-          <span class="pts-pill">+15 pts</span>
-        </div>
+
       </div>
 
       <!-- Points history -->
@@ -1735,8 +1782,9 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
           <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">Riscatta i tuoi punti</span>
         </div>
         <div id="rh-catalog"></div>
-        <div style="margin-top:16px;padding:12px 16px;background:var(--cream);border-radius:10px;font-size:12px;color:var(--muted);text-align:center">
-          🔜 Premi aggiuntivi in arrivo. Contatta <strong>Flexeno Fitness</strong> per riscattare i tuoi premi.
+        <div style="margin-top:16px;padding:12px 16px;background:var(--cream);border-radius:10px;font-size:12px;color:var(--muted);text-align:center;line-height:1.6">
+          🛒 I premi aprono direttamente il sito <strong><a href="https://flexenofitness.com" target="_blank" style="color:var(--green)">flexenofitness.com</a></strong><br>
+          Per coupon e premi digitali contatta il team Flexeno via WhatsApp o email.
         </div>
       </div>
     </div>
@@ -1879,9 +1927,7 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 <!-- TOAST -->
 <div id="toast"><div class="t-dot"></div><span id="toast-msg">Salvato!</span></div>
 <!-- POINTS TOAST -->
-<div class="pts-toast" id="pts-toast">+0 pts 🪙</div>
-<!-- POINTS TOAST -->
-<div class="pts-toast" id="pts-toast">+0 pts 🪙</div>
+<div class="pts-toast" id="pts-toast"></div>
 
 <!-- ══ FAB ══ -->
 <div class="fab-menu" id="fab-menu">
@@ -2127,7 +2173,6 @@ function goPage(id) {
   if (id === 'diary') { setDiaryToday(); }
   if (id === 'home') { loadMacroWeekChart(); updateHomeDiarySummary(); }
   if (id === 'rewards') { renderPointsUI(); }
-  if (id === 'rewards') { renderPointsUI(); }
 }
 
 // ══════════════════════════════════
@@ -2262,6 +2307,11 @@ function showApp() {
   loadNutriPoints();
   updateHomeDiarySummary();
   loadMacroWeekChart();
+  // Show FAB
+  const fabBtn = document.getElementById('fab-btn');
+  if (fabBtn) fabBtn.style.display = 'flex';
+  // Onboarding (skip for admin)
+  checkOnboarding();
 }
 
 // ══════════════════════════════════
@@ -2308,6 +2358,18 @@ async function saveWeight() {
   });
   document.getElementById('weight-today').value = '';
   toast('Peso salvato: '+val+' kg');
+  // NutriPoints: peso giornaliero
+  if (typeof nutriPoints !== 'undefined' && typeof awardPoints === 'function') {
+    if ((nutriPoints.lastWeighDate || '') !== today) {
+      nutriPoints.lastWeighDate = today;
+      await awardPoints(10, 'Peso giornaliero registrato', '⚖️');
+      // Streak 7-day bonus
+      const streak = calcWeightStreak();
+      if (streak > 0 && streak % 7 === 0) {
+        await awardPoints(50, '🔥 Streak ' + streak + ' giorni consecutivi!', '🔥');
+      }
+    }
+  }
 }
 
 async function deleteWeight(dateId) {
@@ -2706,6 +2768,7 @@ async function addToDiary() {
   renderDiary();
   if (currentDiaryDate===todayStr()) updateHomeDiarySummary();
   toast('Aggiunto al diario!');
+  if (currentDiaryDate===todayStr()) checkRingClosure();
 }
 
 async function removeDiaryEntry(id) {
@@ -2713,6 +2776,7 @@ async function removeDiaryEntry(id) {
   await saveDiary();
   renderDiary();
   if (currentDiaryDate===todayStr()) updateHomeDiarySummary();
+  if (currentDiaryDate===todayStr()) checkRingClosure();
 }
 
 function diaryTotals() {
@@ -2738,6 +2802,10 @@ const CARB_DAY_PRESETS = {
 };
 
 function getActiveTargets() {
+  // Check for custom targets first
+  if (typeof customTargets !== 'undefined' && customTargets && customTargets[carbDayMode]) {
+    return customTargets[carbDayMode];
+  }
   // Base: from wizard TDEE or fallback 2000 kcal
   const tdee  = (userTargets && userTargets.tdee) || 2000;
   const prot  = (userTargets && userTargets.protein) || Math.round(tdee * 0.25 / 4);
@@ -3119,6 +3187,7 @@ async function copyYesterdayDiary() {
   renderDiary();
   updateHomeDiarySummary();
   toast('📅 Copiati '+reStamped.length+' alimenti da ieri!');
+  // (no NutriPoints per copia da ieri)
 }
 
 async function saveMealPreset() {
@@ -3182,6 +3251,7 @@ async function loadPresetIntoDiary(presetId) {
   renderDiary();
   updateHomeDiarySummary();
   toast('⭐ Pasto aggiunto al diario!');
+  // (no NutriPoints per pasto preferito)
 }
 
 async function deleteMealPreset(presetId) {
@@ -3613,12 +3683,7 @@ function updateTeKcalCheck() {
   el.style.color = diff > 50 ? 'var(--danger)' : 'var(--green)';
 }
 
-// Override getActiveTargets to use custom values if set
-const _origGetActiveTargets = getActiveTargets;
-function getActiveTargets() {
-  if (customTargets[carbDayMode]) return customTargets[carbDayMode];
-  return _origGetActiveTargets();
-}
+// getActiveTargets override — merged into original above
 
 // ══════════════════════════════════════════════════════
 // NUTRIPOINTS SYSTEM
@@ -3635,12 +3700,13 @@ const BADGES = [
 ];
 
 const CATALOG = [
-  { id:'disc5',   name:'Sconto 5% Flexeno Fitness',  icon:'🏷️',  pts: 200,  desc:'Valido su qualsiasi prodotto nel negozio online' },
-  { id:'disc10',  name:'Sconto 10% Flexeno Fitness', icon:'🎁',  pts: 500,  desc:'Valido su tutti i prodotti e abbigliamento' },
-  { id:'bottle',  name:'Borraccia Flexeno Fitness',  icon:'🚰',  pts: 800,  desc:'Borraccia brandizzata 700ml, spedizione inclusa' },
-  { id:'call',    name:'Consulenza Nutrizione 30min',icon:'📞',  pts: 1200, desc:'Sessione personalizzata con il team Flexeno' },
-  { id:'shirt',   name:'T-Shirt Flexeno Fitness',    icon:'👕',  pts: 1500, desc:'T-shirt tecnica esclusiva per i top performer' },
-  { id:'premium', name:'Premium Plan 1 Mese',        icon:'⭐',  pts: 2500, desc:'Accesso premium con funzionalità avanzate' },
+  { id:'disc5',    name:'Sconto 5% su Flexeno',       icon:'🏷️',  pts: 150,  desc:'Coupon 5% su tutto il negozio flexenofitness.com', url:'https://flexenofitness.com/collections/all' },
+  { id:'straps',   name:'Lifting Straps',             icon:'💪',  pts: 300,  desc:'Cinghie da sollevamento — sale €8,90 (reg. €21,95)', url:'https://flexenofitness.com/products/lifting-straps' },
+  { id:'disc10',   name:'Sconto 10% su Flexeno',      icon:'🎁',  pts: 400,  desc:'Coupon 10% su tutto il negozio flexenofitness.com', url:'https://flexenofitness.com/collections/all' },
+  { id:'roller',   name:'Fitness Foam Roller Black',  icon:'🔵',  pts: 600,  desc:'Foam roller professionale — sale €12,90 (reg. €23,90)', url:'https://flexenofitness.com/products/fitness-foam-roller-black' },
+  { id:'flexlamp', name:'FlexLamp',                   icon:'💡',  pts: 800,  desc:'Lampada fitness premium — sale €16,90 (reg. €49,99)', url:'https://flexenofitness.com/products/flexlamp' },
+  { id:'bag',      name:'Magnet Gym Bag',             icon:'🎒',  pts: 1200, desc:'Borsa palestra magnetica — sale €15,90 (reg. €34,90)', url:'https://flexenofitness.com/products/magnet-gym-bag' },
+  { id:'fw2526',   name:'Prodotto FW 25/26 a scelta', icon:'👕',  pts: 2000, desc:'Un capo della nuova collezione autunno/inverno Flexeno a tua scelta', url:'https://flexenofitness.com/collections/frontpage' },
 ];
 
 function currentBadge(pts) {
@@ -3746,7 +3812,7 @@ function renderPointsUI() {
       const unlocked = pts >= b.pts;
       return `<div style="text-align:center;padding:12px 8px;background:var(--${unlocked?'green-bg':'cream'});border:1.5px solid var(--${unlocked?'green':'border'});border-radius:12px;opacity:${unlocked?1:0.45}">
         <div style="font-size:28px;margin-bottom:4px">${b.icon}</div>
-        <div style="font-family:var(--font-brand);font-weight:700;font-size:11px">${b.name}</div>
+        <div style="font-size:12px;font-weight:600;letter-spacing:0.3px;margin-top:2px">${b.name}</div>
         <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:2px">${b.pts} pts</div>
         ${unlocked ? '<div style="font-size:9px;color:var(--green);margin-top:3px">✅ Sbloccato</div>' : ''}
       </div>`;
@@ -3767,7 +3833,7 @@ function renderPointsUI() {
           <div style="display:flex;align-items:center;gap:10px">
             <span style="font-size:20px">${h.icon}</span>
             <div>
-              <div style="font-size:13px;font-weight:600">${h.reason}</div>
+              <div style="font-size:13px;font-weight:500">${h.reason}</div>
               <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${formatDate(h.date)}</div>
             </div>
           </div>
@@ -3781,14 +3847,23 @@ function renderPointsUI() {
   if (catEl) {
     catEl.innerHTML = CATALOG.map(r => {
       const unlocked = pts >= r.pts;
+      const missing = r.pts - pts;
       return `<div class="reward-card ${unlocked?'unlocked':'locked'}">
         <div class="reward-icon">${r.icon}</div>
-        <div style="flex:1">
-          <div style="font-weight:700;font-size:14px">${r.name}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:2px">${r.desc}</div>
-          <div class="reward-cost">${r.pts} pts ${unlocked ? '✅ Sbloccato!' : ''}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            ${r.name}
+            ${r.price ? `<span style="color:var(--green);font-size:12px;font-family:var(--font-mono)">${r.price}</span>` : ''}
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4">${r.desc}</div>
+          <div class="reward-cost" style="margin-top:5px">${r.pts} pts ${unlocked ? '— <span style="color:var(--green)">✅ Sbloccato</span>' : '— mancano <strong>'+missing+' pts</strong>'}</div>
         </div>
-        ${unlocked ? `<button class="btn btn-green btn-sm" onclick="redeemReward('${r.id}')">Riscatta</button>` : `<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">-${r.pts-pts} pts</div>`}
+        <div style="flex-shrink:0;text-align:center;margin-left:8px">
+          ${unlocked
+            ? `<button class="btn btn-green btn-sm" onclick="redeemReward('${r.id}')">🛒 Riscatta</button>`
+            : `<div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);text-align:center;padding:4px 0">🔒<br>${missing} pts</div>`
+          }
+        </div>
       </div>`;
     }).join('');
   }
@@ -3797,52 +3872,24 @@ function renderPointsUI() {
 function redeemReward(id) {
   const r = CATALOG.find(c => c.id === id);
   if (!r) return;
-  toast('🎁 Hai riscattato: ' + r.name + '! Contatta Flexeno Fitness per il tuo premio.');
-}
-
-// ── AWARD POINTS ON ACTIONS ──
-// Hook into saveWeight to award daily weigh-in points
-const _origSaveWeight = saveWeight;
-async function saveWeight() {
-  const result = await _origSaveWeight.apply(this, arguments);
-  const today = todayStr();
-  if (nutriPoints.lastWeighDate !== today) {
-    nutriPoints.lastWeighDate = today;
-    await awardPoints(10, 'Peso giornaliero registrato', '⚖️');
-    // Check 7-day streak bonus
-    const streak = calcWeightStreak();
-    if (streak > 0 && streak % 7 === 0) {
-      await awardPoints(50, 'Streak ' + streak + ' giorni consecutivi! 🔥', '🔥');
-    }
+  if (window.confirm('🎁 Stai per riscattare: "' + r.name + '"\n\nVerrai reindirizzato al sito Flexeno Fitness. Mostra questo schermo all\'assistente per ricevere il tuo premio!')) {
+    window.open(r.url || 'https://flexenofitness.com', '_blank');
+    toast('🎁 ' + r.name + ' — Buona fortuna!');
   }
-  return result;
 }
 
+// ── PUNTI: funzioni helper standalone ──
 function calcWeightStreak() {
-  if (!weightsData || !weightsData.length) return 0;
-  const sorted = [...weightsData].sort((a,b) => b.date.localeCompare(a.date));
+  if (!weightData || !weightData.length) return 0;
+  const sorted = [...weightData].sort((a,b) => b.date.localeCompare(a.date));
   let streak = 0;
   let check = new Date();
   for (const w of sorted) {
-    const d = w.date;
     const checkStr = check.toISOString().split('T')[0];
-    if (d === checkStr) { streak++; check.setDate(check.getDate()-1); }
+    if (w.date === checkStr) { streak++; check.setDate(check.getDate()-1); }
     else break;
   }
   return streak;
-}
-
-// Hook into addToDiary to check ring closure
-const _origAddToDiary = addToDiary;
-async function addToDiary() {
-  await _origAddToDiary.apply(this, arguments);
-  checkRingClosure();
-}
-
-const _origRemoveDiaryEntry = removeDiaryEntry;
-async function removeDiaryEntry(id) {
-  await _origRemoveDiaryEntry.apply(this, arguments);
-  checkRingClosure();
 }
 
 async function checkRingClosure() {
@@ -3856,34 +3903,15 @@ async function checkRingClosure() {
     withinRange(totals.carbs,   target.carbs) &&
     withinRange(totals.fat,     target.fat)
   ) {
-    // Only award once per day
     const alreadyAwarded = (nutriPoints.history||[]).some(
       h => h.date === today && h.reason.includes('Ring Closure')
     );
     if (!alreadyAwarded) {
       await awardPoints(30, 'Ring Closure — macro centrati ±5%!', '🎯');
-      // Animate the progress bars with a glow
       const pc = document.getElementById('macro-progress-card');
       if (pc) { pc.classList.add('ring-complete'); setTimeout(() => pc.classList.remove('ring-complete'), 4000); }
     }
   }
-}
-
-// Hook into copyYesterdayDiary and loadPresetIntoDiary for Speed Track bonus
-const _origCopyYesterday = copyYesterdayDiary;
-async function copyYesterdayDiary() {
-  await _origCopyYesterday.apply(this, arguments);
-  const today = todayStr();
-  const alreadyAwarded = (nutriPoints.history||[]).some(h => h.date === today && h.reason.includes('Speed Track'));
-  if (!alreadyAwarded) await awardPoints(15, 'Speed Track — Copia da ieri', '⚡');
-}
-
-const _origLoadPreset = loadPresetIntoDiary;
-async function loadPresetIntoDiary(id) {
-  await _origLoadPreset.apply(this, arguments);
-  const today = todayStr();
-  const alreadyAwarded = (nutriPoints.history||[]).some(h => h.date === today && h.reason.includes('Speed Track'));
-  if (!alreadyAwarded) await awardPoints(15, 'Speed Track — Pasto preferito', '⚡');
 }
 
 // ══════════════════════════════════════════════════════
@@ -3990,92 +4018,6 @@ async function searchOpenFoodFacts(query) {
 }
 
 // Enhanced search — personal foods + INRAN + OpenFoodFacts
-async function searchDiaryFoodEnhanced() {
-  const q = document.getElementById('diary-food-search').value.toLowerCase().trim();
-  const ac = document.getElementById('diary-ac');
-
-  if (!q) {
-    // Show personal foods as suggestions on focus
-    if (userFoods.length) {
-      const recent = userFoods.slice(0,6);
-      ac.innerHTML = '<div style="padding:8px 14px;font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;background:var(--green-bg)">I TUOI ALIMENTI</div>'
-        + recent.map((f,i) => `
-          <div class="ac-item" onclick="selectDiaryFoodObj(${i},'personal')">
-            <div><span style="font-size:13px;font-weight:600">${f.name}</span>
-            <span class="badge badge-green" style="font-size:9px;margin-left:6px">mio</span></div>
-            <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${f.kcal} kcal/100g</span>
-          </div>`).join('');
-      ac._personal = recent; ac._inran = []; ac._off = [];
-      ac.classList.add('open');
-    }
-    selectedDiaryFood = null;
-    return;
-  }
-
-  // Immediate local results
-  const personalHits = userFoods.filter(f => f.name.toLowerCase().includes(q));
-  const inranHits = INRAN.filter(f => f.n.toLowerCase().includes(q) && !personalHits.find(p=>p.name===f.n))
-    .map(f => ({name:f.n, kcal:f.kcal, protein:f.p, carbs:f.c, fat:f.f, cat:f.cat, source:'inran'}));
-
-  let html = '';
-  if (personalHits.length) {
-    html += '<div style="padding:6px 14px;font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;background:var(--green-bg)">I TUOI ALIMENTI</div>';
-    html += personalHits.slice(0,4).map((f,i) => `
-      <div class="ac-item" onclick="selectDiaryFoodObj(${i},'personal')">
-        <div><span style="font-size:13px;font-weight:600">${f.name}</span>
-        <span class="badge badge-green" style="font-size:9px;margin-left:6px">mio</span></div>
-        <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${f.kcal} kcal/100g</span>
-      </div>`).join('');
-  }
-  if (inranHits.length) {
-    html += '<div style="padding:6px 14px;font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px">DATABASE INRAN</div>';
-    html += inranHits.slice(0,5).map((f,i) => `
-      <div class="ac-item" onclick="selectDiaryFoodObj(${i},'inran')">
-        <div><span style="font-size:13px">${f.name}</span>
-        ${f.cat?`<span style="font-size:10px;color:var(--muted);margin-left:5px">[${f.cat}]</span>`:''}</div>
-        <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${f.kcal} kcal/100g</span>
-      </div>`).join('');
-  }
-
-  html += '<div style="padding:6px 14px;font-family:var(--font-mono);font-size:9px;color:#3b82f6;letter-spacing:1.5px">🌍 OPENFOODFACTS <span style="color:var(--muted)">(ricerca in corso...)</span></div>';
-  html += '<div id="off-results-area" style="padding:8px 14px;color:var(--muted);font-size:12px">⏳ Ricerca nel database mondiale...</div>';
-
-  ac._personal = personalHits.slice(0,4);
-  ac._inran    = inranHits.slice(0,5);
-  ac._off      = [];
-  ac.classList.add('open');
-  ac.innerHTML = html;
-
-  // Debounced OFF search
-  clearTimeout(offSearchTimeout);
-  offSearchTimeout = setTimeout(async () => {
-    const offHits = await searchOpenFoodFacts(q);
-    const offArea = document.getElementById('off-results-area');
-    if (!offArea) return;
-    if (!offHits.length) {
-      offArea.textContent = 'Nessun risultato su OpenFoodFacts.';
-      return;
-    }
-    ac._off = offHits;
-    offArea.outerHTML = offHits.map((f,i) => `
-      <div class="ac-item" onclick="selectDiaryFoodObj(${i},'off')">
-        <div><span style="font-size:13px">${f.name}</span><span class="off-badge">OFF</span></div>
-        <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${f.kcal} kcal/100g</span>
-      </div>`).join('');
-  }, 600);
-}
-
-function selectDiaryFoodObj(idx, source) {
-  const ac = document.getElementById('diary-ac');
-  if (source === 'personal') selectedDiaryFood = ac._personal ? ac._personal[idx] : null;
-  else if (source === 'inran') selectedDiaryFood = ac._inran   ? ac._inran[idx]   : null;
-  else if (source === 'off')   selectedDiaryFood = ac._off     ? ac._off[idx]     : null;
-  if (selectedDiaryFood) {
-    document.getElementById('diary-food-search').value = selectedDiaryFood.name;
-    ac.classList.remove('open');
-  }
-}
-
 // ══════════════════════════════════════════════════════
 // ONBOARDING WIZARD
 // ══════════════════════════════════════════════════════
@@ -4256,25 +4198,6 @@ self.addEventListener('fetch', e => {
       .catch(e  => console.warn('SW non registrato:', e.message));
   }
 }
-
-// ══════════════════════════════════════════════════════
-// HOOK NUOVE FUNZIONI A showApp
-// ══════════════════════════════════════════════════════
-const _origShowApp = showApp;
-// Override showApp to also init new features
-// (patch at bottom since showApp is already defined above)
-function showAppExtended() {
-  _origShowApp();
-  // Show FAB
-  const fab = document.getElementById('fab-btn');
-  if (fab) fab.style.display = 'flex';
-  // Check onboarding
-  checkOnboarding();
-}
-
-// Patch: replace the showApp reference called by Firebase onAuthStateChanged
-// We do this by overriding window.showApp
-window.showApp = showAppExtended;
 
 // Init PWA immediately (no auth needed)
 initPWA();
