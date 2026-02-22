@@ -722,8 +722,8 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .carb-day-bar { flex-wrap: wrap; gap: 6px; }
   .target-edit-grid { grid-template-columns: 1fr 1fr; }
-  .fab { bottom: 78px; right: 16px; z-index: 500; }
-  .fab-menu { bottom: 150px; right: 16px; z-index: 499; }
+  .fab { bottom: 78px; right: 14px; width: 40px; height: 40px; font-size: 20px; z-index: 500; }
+  .fab-menu { bottom: 130px; right: 14px; z-index: 499; }
   .pts-toast { bottom: 78px; }
   .card { padding: 16px; }
   h1 { font-size: 24px; }
@@ -1015,49 +1015,54 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 /* ── FAB ── */
 .fab {
   position: fixed;
-  bottom: 28px; right: 28px;
-  width: 58px; height: 58px;
+  bottom: 28px; right: 20px;
+  width: 44px; height: 44px;
   border-radius: 50%;
-  background: var(--green);
+  background: rgba(74,122,53,0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   color: white;
-  border: none;
-  font-size: 28px;
+  border: 1.5px solid rgba(255,255,255,0.18);
+  font-size: 22px;
   cursor: pointer;
-  box-shadow: 0 4px 20px rgba(74,122,53,0.4);
+  box-shadow: 0 2px 12px rgba(74,122,53,0.3);
   z-index: 500;
   display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s;
+  transition: opacity 0.3s, transform 0.2s;
+  opacity: 0.72;
 }
-.fab:hover { background: var(--green-l); transform: scale(1.1); }
+.fab:hover, .fab:active { opacity: 1; transform: scale(1.08); }
+.fab.fab-hidden { opacity: 0 !important; pointer-events: none; transform: scale(0.8); }
 .fab-menu {
   position: fixed;
-  bottom: 98px; right: 28px;
-  display: flex; flex-direction: column; gap: 10px;
+  bottom: 82px; right: 20px;
+  display: flex; flex-direction: column; gap: 8px;
   z-index: 499;
-  opacity: 0; transform: translateY(20px) scale(0.9);
+  opacity: 0; transform: translateY(16px) scale(0.92);
   pointer-events: none;
-  transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+  transition: all 0.22s cubic-bezier(0.4,0,0.2,1);
 }
 .fab-menu.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
 .fab-item {
-  display: flex; align-items: center; gap: 10px;
+  display: flex; align-items: center; gap: 8px;
   justify-content: flex-end;
 }
 .fab-item button {
-  padding: 10px 18px;
-  border-radius: 24px;
+  padding: 8px 14px;
+  border-radius: 20px;
   border: none;
   background: var(--card);
   color: var(--text);
   font-family: var(--font-brand);
-  font-weight: 700; font-size: 13px;
+  font-weight: 600; font-size: 12px;
   cursor: pointer;
   box-shadow: var(--shadow-md);
-  border: 1.5px solid var(--border);
+  border: 1px solid var(--border);
   transition: all 0.15s;
   white-space: nowrap;
+  opacity: 0.92;
 }
-.fab-item button:hover { background: var(--green); color: white; border-color: var(--green); }
+.fab-item button:hover { background: var(--green); color: white; border-color: var(--green); opacity: 1; }
 
 /* ── DARK MODE TOGGLE ── */
 .dark-toggle {
@@ -3942,6 +3947,27 @@ initDarkMode();
 // FLOATING ACTION BUTTON (FAB)
 // ══════════════════════════════════════════════════════
 let fabOpen = false;
+let fabScrollTimer = null;
+
+// Auto-hide FAB while scrolling
+document.addEventListener('scroll', () => {
+  const fab = document.getElementById('fab-btn');
+  if (!fab || fabOpen) return;
+  fab.classList.add('fab-hidden');
+  clearTimeout(fabScrollTimer);
+  fabScrollTimer = setTimeout(() => fab.classList.remove('fab-hidden'), 800);
+}, { passive: true });
+// Also listen on main content scroll
+document.addEventListener('DOMContentLoaded', () => {
+  const main = document.querySelector('.main');
+  if (main) main.addEventListener('scroll', () => {
+    const fab = document.getElementById('fab-btn');
+    if (!fab || fabOpen) return;
+    fab.classList.add('fab-hidden');
+    clearTimeout(fabScrollTimer);
+    fabScrollTimer = setTimeout(() => fab.classList.remove('fab-hidden'), 800);
+  }, { passive: true });
+});
 
 function toggleFab() {
   fabOpen = !fabOpen;
