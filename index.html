@@ -2763,9 +2763,7 @@ async function copyYesterdayDiary() {
   }
   const yEntries = snap.data().entries || [];
   const action = diaryEntries.length
-    ? confirm('Il diario di oggi ha già degli alimenti.
-OK = Aggiungi quelli di ieri
-Annulla = Sostituisci tutto')
+    ? confirm('Il diario di oggi ha già degli alimenti.\nOK = Aggiungi quelli di ieri\nAnnulla = Sostituisci tutto')
     : true;
   if (action === null) return;
   const reStamped = yEntries.map((e,i) => ({...e, id: Date.now()+i}));
