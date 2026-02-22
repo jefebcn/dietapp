@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NutriTrack</title>
+<meta name="description" content="Traccia peso, dieta e macro ogni giorno">
+<meta name="theme-color" content="#4a7a35">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="NutriTrack">
+<link rel="manifest" id="pwa-manifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -82,6 +88,39 @@ onAuthStateChanged(auth, async user => {
   --font-body:  'DM Sans', sans-serif;
   --font-mono:  'DM Mono', monospace;
 }
+
+/* ── DARK MODE ── */
+[data-theme="dark"] {
+  --green:    #6aad55;
+  --green-l:  #7dc466;
+  --green-bg: #1a2e16;
+  --orange:   #f08030;
+  --orange-l: #f59040;
+  --orange-bg:#2e1e0a;
+  --cream:    #1e1a16;
+  --cream2:   #252118;
+  --white:    #2a2520;
+  --card:     #2a2520;
+  --border:   #3d3830;
+  --text:     #f0ebe3;
+  --text2:    #c8bfb5;
+  --muted:    #8a8075;
+  --danger:   #f06050;
+  --danger-bg:#2e1510;
+  --shadow:   0 2px 12px rgba(0,0,0,0.3);
+  --shadow-md:0 4px 20px rgba(0,0,0,0.4);
+}
+[data-theme="dark"] body { background: #161310; }
+[data-theme="dark"] .auth-box { background: var(--card); }
+[data-theme="dark"] .sidebar { background: var(--card); }
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea { background: var(--cream); color: var(--text); border-color: var(--border); }
+[data-theme="dark"] input:focus,
+[data-theme="dark"] select:focus { background: var(--white); border-color: var(--green); }
+[data-theme="dark"] .ac-list { background: var(--card); }
+[data-theme="dark"] .modal-box { background: var(--card); }
+[data-theme="dark"] .legenda-table tr:nth-child(even) td { background: var(--cream); }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -635,10 +674,136 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   .main { margin-left: 58px; padding: 16px; }
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
   .macro-summary { grid-template-columns: 1fr 1fr; }
+  .fab { bottom: 20px; right: 20px; }
+  .fab-menu { bottom: 90px; right: 20px; }
+}
+
+/* ── WIZARD ACTIVITY OPTION ── */
+.wz-activity-opt {
+  padding: 12px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.15s;
+}
+.wz-activity-opt:hover { border-color: var(--green); background: var(--green-bg); }
+.wz-activity-opt.selected { border-color: var(--green); background: var(--green-bg); color: var(--green); }
+
+/* ── OPENFOODFACTS BADGE ── */
+.off-badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: rgba(59,130,246,0.1);
+  color: #3b82f6;
+  margin-left: 5px;
 }
 
 /* pulse animation */
 @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.7;transform:scale(1.12)} }
+
+/* ── FAB ── */
+.fab {
+  position: fixed;
+  bottom: 28px; right: 28px;
+  width: 58px; height: 58px;
+  border-radius: 50%;
+  background: var(--green);
+  color: white;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(74,122,53,0.4);
+  z-index: 150;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.fab:hover { background: var(--green-l); transform: scale(1.1); }
+.fab-menu {
+  position: fixed;
+  bottom: 98px; right: 28px;
+  display: flex; flex-direction: column; gap: 10px;
+  z-index: 149;
+  opacity: 0; transform: translateY(20px) scale(0.9);
+  pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+}
+.fab-menu.open { opacity: 1; transform: translateY(0) scale(1); pointer-events: all; }
+.fab-item {
+  display: flex; align-items: center; gap: 10px;
+  justify-content: flex-end;
+}
+.fab-item button {
+  padding: 10px 18px;
+  border-radius: 24px;
+  border: none;
+  background: var(--card);
+  color: var(--text);
+  font-family: var(--font-brand);
+  font-weight: 700; font-size: 13px;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  border: 1.5px solid var(--border);
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.fab-item button:hover { background: var(--green); color: white; border-color: var(--green); }
+
+/* ── DARK MODE TOGGLE ── */
+.dark-toggle {
+  width: 36px; height: 20px;
+  background: var(--border);
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.dark-toggle.on { background: var(--green); }
+.dark-toggle::after {
+  content: '';
+  position: absolute;
+  width: 14px; height: 14px;
+  background: white;
+  border-radius: 50%;
+  top: 3px; left: 3px;
+  transition: transform 0.2s;
+}
+.dark-toggle.on::after { transform: translateX(16px); }
+
+/* ── ONBOARDING WIZARD ── */
+.wizard-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  z-index: 300;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px;
+}
+.wizard-box {
+  background: var(--white);
+  border-radius: 24px;
+  padding: 40px;
+  width: 100%; max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  animation: fadeUp 0.3s ease;
+}
+.wizard-step { display: none; }
+.wizard-step.active { display: block; }
+.wizard-dots {
+  display: flex; gap: 6px; justify-content: center; margin-bottom: 28px;
+}
+.wizard-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: all 0.2s;
+}
+.wizard-dot.active { background: var(--green); transform: scale(1.3); }
+.wizard-dot.done { background: var(--green-bg); border: 2px solid var(--green); }
 </style>
 </head>
 <body>
@@ -733,6 +898,7 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
     </button>
 
     <div class="sidebar-bottom">
+      <button class="dark-toggle" id="dark-toggle-btn" onclick="toggleDarkMode()" title="Tema chiaro/scuro"></button>
       <div class="user-avatar" id="user-avatar" title="Profilo">?</div>
       <button class="logout-btn" onclick="doLogout()" title="Esci">
         <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -1213,6 +1379,116 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 
 <!-- TOAST -->
 <div id="toast"><div class="t-dot"></div><span id="toast-msg">Salvato!</span></div>
+
+<!-- ══ FAB ══ -->
+<div class="fab-menu" id="fab-menu">
+  <div class="fab-item">
+    <button onclick="fabQuickWeight()">⚖️ Inserisci peso</button>
+  </div>
+  <div class="fab-item">
+    <button onclick="fabQuickFood()">🍽️ Aggiungi al diario</button>
+  </div>
+  <div class="fab-item">
+    <button onclick="fabQuickFood('alimento')">🥗 Nuovo alimento</button>
+  </div>
+</div>
+<button class="fab" id="fab-btn" onclick="toggleFab()" style="display:none">
+  <span id="fab-icon">+</span>
+</button>
+
+<!-- ══ ONBOARDING WIZARD ══ -->
+<div class="wizard-overlay" id="wizard-overlay" style="display:none">
+  <div class="wizard-box">
+    <div class="wizard-dots" id="wizard-dots">
+      <div class="wizard-dot active" id="wd-0"></div>
+      <div class="wizard-dot" id="wd-1"></div>
+      <div class="wizard-dot" id="wd-2"></div>
+      <div class="wizard-dot" id="wd-3"></div>
+    </div>
+
+    <!-- Step 0: Benvenuto -->
+    <div class="wizard-step active" id="wstep-0">
+      <div style="text-align:center;margin-bottom:24px">
+        <div style="font-size:56px;margin-bottom:12px">👋</div>
+        <h2 style="font-size:24px;margin-bottom:8px">Benvenuto su NutriTrack!</h2>
+        <p style="color:var(--muted);font-size:14px;line-height:1.6">Configuriamo il tuo profilo in 3 passi per calcolare automaticamente il tuo fabbisogno calorico giornaliero.</p>
+      </div>
+      <button class="btn btn-green" style="width:100%" onclick="wizardNext(0)">Iniziamo →</button>
+    </div>
+
+    <!-- Step 1: Dati fisici -->
+    <div class="wizard-step" id="wstep-1">
+      <h2 style="margin-bottom:6px">📏 I tuoi dati</h2>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:20px">Servono per calcolare il tuo BMI e fabbisogno calorico.</p>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div>
+          <div class="form-label" style="margin-bottom:5px">DATA DI NASCITA</div>
+          <input type="date" id="wz-dob" style="width:100%">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div>
+            <div class="form-label" style="margin-bottom:5px">ALTEZZA (cm)</div>
+            <input type="number" id="wz-height" placeholder="es. 175" min="100" max="250">
+          </div>
+          <div>
+            <div class="form-label" style="margin-bottom:5px">PESO ATTUALE (kg)</div>
+            <input type="number" id="wz-weight" placeholder="es. 75" step="0.1" min="20" max="300">
+          </div>
+        </div>
+        <div>
+          <div class="form-label" style="margin-bottom:5px">SESSO</div>
+          <select id="wz-sex">
+            <option value="">Seleziona...</option>
+            <option value="m">Maschio</option>
+            <option value="f">Femmina</option>
+          </select>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button class="btn btn-ghost" style="flex:1" onclick="wizardBack(1)">← Indietro</button>
+        <button class="btn btn-green" style="flex:2" onclick="wizardNext(1)">Avanti →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Livello attività -->
+    <div class="wizard-step" id="wstep-2">
+      <h2 style="margin-bottom:6px">🏃 Livello di attività</h2>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Quante volte ti alleni a settimana?</p>
+      <div style="display:flex;flex-direction:column;gap:8px" id="wz-activity-opts">
+        <div class="wz-activity-opt" data-val="1.2" onclick="selectActivity(this)">
+          <strong>Sedentario</strong> <span style="color:var(--muted);font-size:12px">— poco o nessun esercizio</span>
+        </div>
+        <div class="wz-activity-opt" data-val="1.375" onclick="selectActivity(this)">
+          <strong>Leggero</strong> <span style="color:var(--muted);font-size:12px">— 1-3 giorni/settimana</span>
+        </div>
+        <div class="wz-activity-opt" data-val="1.55" onclick="selectActivity(this)">
+          <strong>Moderato</strong> <span style="color:var(--muted);font-size:12px">— 3-5 giorni/settimana</span>
+        </div>
+        <div class="wz-activity-opt" data-val="1.725" onclick="selectActivity(this)">
+          <strong>Attivo</strong> <span style="color:var(--muted);font-size:12px">— 6-7 giorni/settimana</span>
+        </div>
+        <div class="wz-activity-opt" data-val="1.9" onclick="selectActivity(this)">
+          <strong>Molto attivo</strong> <span style="color:var(--muted);font-size:12px">— allenamento intenso 2x/giorno</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:20px">
+        <button class="btn btn-ghost" style="flex:1" onclick="wizardBack(2)">← Indietro</button>
+        <button class="btn btn-green" style="flex:2" onclick="wizardNext(2)">Avanti →</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Risultato TDEE -->
+    <div class="wizard-step" id="wstep-3">
+      <div style="text-align:center">
+        <div style="font-size:48px;margin-bottom:12px">🎯</div>
+        <h2 style="margin-bottom:8px">Il tuo fabbisogno</h2>
+        <div id="wz-result" style="margin:20px 0"></div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:24px">Questi valori sono stati salvati nel tuo profilo. Puoi modificarli in qualsiasi momento dalla sezione Obiettivi.</p>
+        <button class="btn btn-green" style="width:100%" onclick="wizardFinish()">Inizia a usare NutriTrack 🚀</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- ══════════════════════════════════
      INRAN FOOD DATABASE (per 100g)
@@ -2540,6 +2816,399 @@ function closeUserDetail() {
   adminCurrentUid = null;
   adminUserFoods  = [];
 }
+
+// ══════════════════════════════════════════════════════
+// DARK MODE
+// ══════════════════════════════════════════════════════
+function initDarkMode() {
+  const saved = localStorage.getItem('nt-theme') || 'light';
+  applyTheme(saved);
+}
+
+function toggleDarkMode() {
+  const current = document.documentElement.getAttribute('data-theme') || 'light';
+  applyTheme(current === 'dark' ? 'light' : 'dark');
+}
+
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('nt-theme', theme);
+  const btn = document.getElementById('dark-toggle-btn');
+  if (btn) btn.classList.toggle('on', theme === 'dark');
+}
+
+// Call on page load immediately
+initDarkMode();
+
+// ══════════════════════════════════════════════════════
+// FLOATING ACTION BUTTON (FAB)
+// ══════════════════════════════════════════════════════
+let fabOpen = false;
+
+function toggleFab() {
+  fabOpen = !fabOpen;
+  document.getElementById('fab-menu').classList.toggle('open', fabOpen);
+  document.getElementById('fab-icon').textContent = fabOpen ? '✕' : '+';
+}
+
+function closeFab() {
+  fabOpen = false;
+  const m = document.getElementById('fab-menu');
+  if (m) m.classList.remove('open');
+  const i = document.getElementById('fab-icon');
+  if (i) i.textContent = '+';
+}
+
+function fabQuickWeight() {
+  closeFab();
+  goPage('home');
+  setTimeout(() => {
+    const inp = document.getElementById('weight-today');
+    if (inp) { inp.focus(); inp.scrollIntoView({behavior:'smooth', block:'center'}); }
+  }, 200);
+}
+
+function fabQuickFood(type) {
+  closeFab();
+  if (type === 'alimento') {
+    goPage('foods');
+    setTimeout(() => openFoodModal(), 200);
+  } else {
+    goPage('diary');
+    setTimeout(() => {
+      const inp = document.getElementById('diary-food-search');
+      if (inp) { inp.focus(); inp.scrollIntoView({behavior:'smooth', block:'center'}); }
+    }, 200);
+  }
+}
+
+// Close FAB on outside click
+document.addEventListener('click', e => {
+  const fab = document.getElementById('fab-btn');
+  const menu = document.getElementById('fab-menu');
+  if (fab && menu && !fab.contains(e.target) && !menu.contains(e.target)) {
+    closeFab();
+  }
+});
+
+// ══════════════════════════════════════════════════════
+// OPENFOODFACTS API
+// ══════════════════════════════════════════════════════
+let offSearchTimeout = null;
+let offResults = [];
+
+async function searchOpenFoodFacts(query) {
+  if (!query || query.length < 3) return [];
+  try {
+    const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(query)}&search_simple=1&action=process&json=1&page_size=8&fields=product_name,nutriments,brands`;
+    const res = await fetch(url);
+    const data = await res.json();
+    return (data.products || [])
+      .filter(p => p.product_name && p.nutriments)
+      .map(p => ({
+        name:    p.product_name + (p.brands ? ' ('+p.brands.split(',')[0]+')' : ''),
+        kcal:    Math.round(p.nutriments['energy-kcal_100g'] || p.nutriments['energy-kcal'] || 0),
+        protein: parseFloat((p.nutriments['proteins_100g'] || 0).toFixed(1)),
+        carbs:   parseFloat((p.nutriments['carbohydrates_100g'] || 0).toFixed(1)),
+        fat:     parseFloat((p.nutriments['fat_100g'] || 0).toFixed(1)),
+        source:  'off'
+      }))
+      .filter(p => p.kcal > 0);
+  } catch(e) {
+    console.warn('OpenFoodFacts error:', e);
+    return [];
+  }
+}
+
+// Enhanced search — personal foods + INRAN + OpenFoodFacts
+async function searchDiaryFoodEnhanced() {
+  const q = document.getElementById('diary-food-search').value.toLowerCase().trim();
+  const ac = document.getElementById('diary-ac');
+
+  if (!q) {
+    // Show personal foods as suggestions on focus
+    if (userFoods.length) {
+      const recent = userFoods.slice(0,6);
+      ac.innerHTML = '<div style="padding:8px 14px;font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;background:var(--green-bg)">I TUOI ALIMENTI</div>'
+        + recent.map((f,i) => `
+          <div class="ac-item" onclick="selectDiaryFoodObj(${i},'personal')">
+            <div><span style="font-size:13px;font-weight:600">${f.name}</span>
+            <span class="badge badge-green" style="font-size:9px;margin-left:6px">mio</span></div>
+            <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${f.kcal} kcal/100g</span>
+          </div>`).join('');
+      ac._personal = recent; ac._inran = []; ac._off = [];
+      ac.classList.add('open');
+    }
+    selectedDiaryFood = null;
+    return;
+  }
+
+  // Immediate local results
+  const personalHits = userFoods.filter(f => f.name.toLowerCase().includes(q));
+  const inranHits = INRAN.filter(f => f.n.toLowerCase().includes(q) && !personalHits.find(p=>p.name===f.n))
+    .map(f => ({name:f.n, kcal:f.kcal, protein:f.p, carbs:f.c, fat:f.f, cat:f.cat, source:'inran'}));
+
+  let html = '';
+  if (personalHits.length) {
+    html += '<div style="padding:6px 14px;font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;background:var(--green-bg)">I TUOI ALIMENTI</div>';
+    html += personalHits.slice(0,4).map((f,i) => `
+      <div class="ac-item" onclick="selectDiaryFoodObj(${i},'personal')">
+        <div><span style="font-size:13px;font-weight:600">${f.name}</span>
+        <span class="badge badge-green" style="font-size:9px;margin-left:6px">mio</span></div>
+        <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${f.kcal} kcal/100g</span>
+      </div>`).join('');
+  }
+  if (inranHits.length) {
+    html += '<div style="padding:6px 14px;font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px">DATABASE INRAN</div>';
+    html += inranHits.slice(0,5).map((f,i) => `
+      <div class="ac-item" onclick="selectDiaryFoodObj(${i},'inran')">
+        <div><span style="font-size:13px">${f.name}</span>
+        ${f.cat?`<span style="font-size:10px;color:var(--muted);margin-left:5px">[${f.cat}]</span>`:''}</div>
+        <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${f.kcal} kcal/100g</span>
+      </div>`).join('');
+  }
+
+  html += '<div style="padding:6px 14px;font-family:var(--font-mono);font-size:9px;color:#3b82f6;letter-spacing:1.5px">🌍 OPENFOODFACTS <span style="color:var(--muted)">(ricerca in corso...)</span></div>';
+  html += '<div id="off-results-area" style="padding:8px 14px;color:var(--muted);font-size:12px">⏳ Ricerca nel database mondiale...</div>';
+
+  ac._personal = personalHits.slice(0,4);
+  ac._inran    = inranHits.slice(0,5);
+  ac._off      = [];
+  ac.classList.add('open');
+  ac.innerHTML = html;
+
+  // Debounced OFF search
+  clearTimeout(offSearchTimeout);
+  offSearchTimeout = setTimeout(async () => {
+    const offHits = await searchOpenFoodFacts(q);
+    const offArea = document.getElementById('off-results-area');
+    if (!offArea) return;
+    if (!offHits.length) {
+      offArea.textContent = 'Nessun risultato su OpenFoodFacts.';
+      return;
+    }
+    ac._off = offHits;
+    offArea.outerHTML = offHits.map((f,i) => `
+      <div class="ac-item" onclick="selectDiaryFoodObj(${i},'off')">
+        <div><span style="font-size:13px">${f.name}</span><span class="off-badge">OFF</span></div>
+        <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${f.kcal} kcal/100g</span>
+      </div>`).join('');
+  }, 600);
+}
+
+function selectDiaryFoodObj(idx, source) {
+  const ac = document.getElementById('diary-ac');
+  if (source === 'personal') selectedDiaryFood = ac._personal ? ac._personal[idx] : null;
+  else if (source === 'inran') selectedDiaryFood = ac._inran   ? ac._inran[idx]   : null;
+  else if (source === 'off')   selectedDiaryFood = ac._off     ? ac._off[idx]     : null;
+  if (selectedDiaryFood) {
+    document.getElementById('diary-food-search').value = selectedDiaryFood.name;
+    ac.classList.remove('open');
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// ONBOARDING WIZARD
+// ══════════════════════════════════════════════════════
+let wizardActivity = null;
+
+async function checkOnboarding() {
+  // Show wizard only if user has no profile data saved
+  const {db, doc, getDoc} = window._fb;
+  try {
+    const snap = await getDoc(doc(db,'users',uid(),'profile','main'));
+    if (!snap.exists() && window._currentUser.role !== 'admin') {
+      document.getElementById('wizard-overlay').style.display = 'flex';
+    }
+  } catch(e) {
+    console.warn('Onboarding check:', e);
+  }
+}
+
+function wizardSetDots(step) {
+  for (let i = 0; i < 4; i++) {
+    const d = document.getElementById('wd-'+i);
+    if (!d) continue;
+    d.className = 'wizard-dot' + (i < step ? ' done' : i === step ? ' active' : '');
+  }
+}
+
+function wizardNext(from) {
+  if (from === 1) {
+    const dob    = document.getElementById('wz-dob').value;
+    const height = document.getElementById('wz-height').value;
+    const weight = document.getElementById('wz-weight').value;
+    const sex    = document.getElementById('wz-sex').value;
+    if (!dob || !height || !weight || !sex) {
+      toast('Compila tutti i campi per continuare.', 'var(--danger)'); return;
+    }
+  }
+  if (from === 2) {
+    if (!wizardActivity) { toast('Seleziona il livello di attività.', 'var(--danger)'); return; }
+    computeWizardResult();
+  }
+  document.getElementById('wstep-'+from).classList.remove('active');
+  document.getElementById('wstep-'+(from+1)).classList.add('active');
+  wizardSetDots(from+1);
+}
+
+function wizardBack(from) {
+  document.getElementById('wstep-'+from).classList.remove('active');
+  document.getElementById('wstep-'+(from-1)).classList.add('active');
+  wizardSetDots(from-1);
+}
+
+function selectActivity(el) {
+  document.querySelectorAll('.wz-activity-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  wizardActivity = parseFloat(el.dataset.val);
+}
+
+function computeWizardResult() {
+  const dob    = document.getElementById('wz-dob').value;
+  const height = parseFloat(document.getElementById('wz-height').value);
+  const weight = parseFloat(document.getElementById('wz-weight').value);
+  const sex    = document.getElementById('wz-sex').value;
+
+  const age = Math.floor((new Date() - new Date(dob)) / (365.25 * 24*3600*1000));
+  // Mifflin-St Jeor formula
+  let bmr = sex === 'm'
+    ? 10*weight + 6.25*height - 5*age + 5
+    : 10*weight + 6.25*height - 5*age - 161;
+  const tdee = Math.round(bmr * wizardActivity);
+  const bmi  = (weight / ((height/100)**2)).toFixed(1);
+
+  // Save to state for wizardFinish
+  window._wizardData = { dob, height, weight, sex, age, bmr:Math.round(bmr), tdee, bmi, activity: wizardActivity };
+
+  let bmiLabel = '', bmiColor = 'var(--green)';
+  if(bmi<18.5){bmiLabel='Sottopeso';bmiColor='#3b82f6';}
+  else if(bmi<25){bmiLabel='Normopeso';bmiColor='var(--green)';}
+  else if(bmi<30){bmiLabel='Sovrappeso';bmiColor='var(--orange)';}
+  else{bmiLabel='Obesità';bmiColor='var(--danger)';}
+
+  document.getElementById('wz-result').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div class="stat-chip">
+        <div class="val" style="color:var(--green)">${tdee}</div>
+        <div class="lbl">KCAL/GIORNO (TDEE)</div>
+      </div>
+      <div class="stat-chip">
+        <div class="val" style="color:${bmiColor}">${bmi}</div>
+        <div class="lbl">BMI — ${bmiLabel}</div>
+      </div>
+    </div>
+    <div style="padding:12px 16px;background:var(--cream);border-radius:10px;font-size:13px;color:var(--text2)">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span>Età</span><strong>${age} anni</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span>BMR (a riposo)</span><strong>${Math.round(bmr)} kcal</strong>
+      </div>
+      <div style="display:flex;justify-content:space-between">
+        <span>Deficit consigliato (-15%)</span><strong>${Math.round(tdee*0.85)} kcal</strong>
+      </div>
+    </div>`;
+}
+
+async function wizardFinish() {
+  const d = window._wizardData;
+  if (!d) { document.getElementById('wizard-overlay').style.display='none'; return; }
+  const {db, doc, setDoc} = window._fb;
+  try {
+    await setDoc(doc(db,'users',uid(),'profile','main'), {
+      dob: document.getElementById('wz-dob').value,
+      height: parseFloat(document.getElementById('wz-height').value),
+      sex: document.getElementById('wz-sex').value,
+      activity: wizardActivity,
+      tdee: d.tdee, bmr: d.bmr,
+      updatedAt: Date.now()
+    });
+    // Pre-fill goal with TDEE
+    document.getElementById('goal-start').value = d.weight;
+    toast('Profilo salvato! TDEE: '+d.tdee+' kcal/giorno', 'var(--green)');
+  } catch(e) { console.warn('Wizard save:', e); }
+  document.getElementById('wizard-overlay').style.display = 'none';
+}
+
+// ══════════════════════════════════════════════════════
+// PWA — SERVICE WORKER + MANIFEST
+// ══════════════════════════════════════════════════════
+function initPWA() {
+  // Inline manifest via blob URL
+  const manifest = {
+    name: "NutriTrack",
+    short_name: "NutriTrack",
+    description: "Traccia peso, dieta e macro ogni giorno",
+    start_url: "./",
+    display: "standalone",
+    background_color: "#f3ede2",
+    theme_color: "#4a7a35",
+    orientation: "portrait-primary",
+    icons: [
+      { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234a7a35'/><text y='.9em' font-size='80' x='10'>🥗</text></svg>", sizes: "192x192", type: "image/svg+xml" },
+      { src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%234a7a35'/><text y='.9em' font-size='80' x='10'>🥗</text></svg>", sizes: "512x512", type: "image/svg+xml" }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  const url  = URL.createObjectURL(blob);
+  document.getElementById('pwa-manifest').setAttribute('href', url);
+
+  // Register Service Worker (only if on HTTPS/Firebase/GitHub Pages)
+  if ('serviceWorker' in navigator && location.protocol === 'https:') {
+    // Create SW as blob since we're single-file
+    const swCode = `
+const CACHE = 'nutritrack-v1';
+const ASSETS = ['/'];
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
+  self.skipWaiting();
+});
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys =>
+    Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))
+  ));
+  self.clients.claim();
+});
+self.addEventListener('fetch', e => {
+  if (e.request.method !== 'GET') return;
+  e.respondWith(
+    fetch(e.request).then(res => {
+      const clone = res.clone();
+      caches.open(CACHE).then(c => c.put(e.request, clone));
+      return res;
+    }).catch(() => caches.match(e.request))
+  );
+});`;
+    const swBlob = new Blob([swCode], {type:'application/javascript'});
+    const swUrl  = URL.createObjectURL(swBlob);
+    navigator.serviceWorker.register(swUrl, {scope: '/'})
+      .then(()  => console.log('✅ Service Worker registrato'))
+      .catch(e  => console.warn('SW non registrato:', e.message));
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// HOOK NUOVE FUNZIONI A showApp
+// ══════════════════════════════════════════════════════
+const _origShowApp = showApp;
+// Override showApp to also init new features
+// (patch at bottom since showApp is already defined above)
+function showAppExtended() {
+  _origShowApp();
+  // Show FAB
+  const fab = document.getElementById('fab-btn');
+  if (fab) fab.style.display = 'flex';
+  // Check onboarding
+  checkOnboarding();
+}
+
+// Patch: replace the showApp reference called by Firebase onAuthStateChanged
+// We do this by overriding window.showApp
+window.showApp = showAppExtended;
+
+// Init PWA immediately (no auth needed)
+initPWA();
 </script>
 </body>
 </html>
