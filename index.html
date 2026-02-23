@@ -1062,20 +1062,6 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 }
 .offline-bar.show { transform: translateY(0); }
 
-/* ── UPDATE BANNER ── */
-.update-bar {
-  position: fixed; bottom: 72px; left: 12px; right: 12px;
-  background: #1e40af;
-  color: white; border-radius: 14px;
-  padding: 12px 16px;
-  display: flex; align-items: center; gap: 12px;
-  z-index: 600;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-  transform: translateY(120%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
-}
-.update-bar.show { transform: translateY(0); }
-.update-bar-text { flex: 1; font-size: 13px; line-height: 1.4; }
-.update-bar-text strong { display: block; font-size: 14px; margin-bottom: 1px; }
 
 /* ── REFERRAL CARD ── */
 .referral-card {
@@ -2200,16 +2186,6 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 <!-- OFFLINE BAR -->
 <div class="offline-bar" id="offline-bar">📵 Modalità offline — i dati verranno sincronizzati quando torni online</div>
 
-<!-- UPDATE BANNER -->
-<div class="update-bar" id="update-bar">
-  <div style="font-size:22px">🆕</div>
-  <div class="update-bar-text">
-    <strong>Aggiornamento disponibile!</strong>
-    Nuova versione di NutriTrack pronta.
-  </div>
-  <button class="btn btn-green btn-sm" onclick="applyUpdate()" style="flex-shrink:0;white-space:nowrap">Aggiorna ora</button>
-  <button onclick="document.getElementById('update-bar').classList.remove('show')" style="background:none;border:none;color:rgba(255,255,255,0.6);font-size:18px;cursor:pointer;flex-shrink:0;padding:4px">✕</button>
-</div>
 
 <!-- ══ BARCODE SCANNER MODAL ══ -->
 <div class="scanner-modal" id="scanner-modal">
@@ -5353,42 +5329,13 @@ function initPWA() {
   document.getElementById('pwa-manifest').setAttribute('href', url);
 
   // Register Service Worker (only if on HTTPS/Firebase/GitHub Pages)
-  // Controlla aggiornamenti via ETag (GitHub Pages aggiorna l'ETag ad ogni push)
-  checkForHtmlUpdate();
 }
 
-async function checkForHtmlUpdate() {
-  try {
-    const savedEtag = localStorage.getItem('nt-html-etag');
-    const res = await fetch(window.location.href, { method: 'HEAD', cache: 'no-store' });
-    const newEtag = res.headers.get('etag') || res.headers.get('last-modified');
-    if (!newEtag) return;
-    if (savedEtag && savedEtag !== newEtag) {
-      // File cambiato su GitHub → mostra banner aggiornamento
-      const bar = document.getElementById('update-bar');
-      if (bar) bar.classList.add('show');
-    }
-    // Aggiorna il valore salvato (ma solo se non c'è un banner attivo)
-    // così al prossimo reload confrontiamo correttamente
-    if (!document.getElementById('update-bar')?.classList.contains('show')) {
-      localStorage.setItem('nt-html-etag', newEtag);
-    }
-  } catch(e) { /* offline — ignora */ }
-}
 
 // Init PWA immediately (no auth needed)
 initPWA();
 
-// Controlla aggiornamenti anche ogni 10 minuti mentre l'app è aperta
-setInterval(checkForHtmlUpdate, 10 * 60 * 1000);
 
-function applyUpdate() {
-  const bar = document.getElementById('update-bar');
-  if (bar) bar.innerHTML = '<div style="font-size:22px">⏳</div><div class="update-bar-text"><strong>Aggiornamento in corso...</strong></div>';
-  // Salva il nuovo etag e ricarica prendendo il file fresco dal server
-  localStorage.removeItem('nt-html-etag');
-  window.location.reload(true);
-}
 </script>
 </body>
 </html>
