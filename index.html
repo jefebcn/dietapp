@@ -5353,95 +5353,7 @@ function initPWA() {
   document.getElementById('pwa-manifest').setAttribute('href', url);
 
   // Register Service Worker (only if on HTTPS/Firebase/GitHub Pages)
-  if ('serviceWorker' in navigator && location.protocol === 'https:') {
-
-    const swCode = `
-const CACHE = 'nutritrack-v1';
-const ASSETS = ['/'];
-
-self.addEventListener('install', e => {
-  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
-  self.skipWaiting();
-});
-
-self.addEventListener('activate', e => {
-  e.waitUntil(caches.keys().then(keys =>
-    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
-  ));
-  self.clients.claim();
-});
-
-// Network-first per il file HTML principale → aggiornamenti immediati
-// Cache-first per tutto il resto (fonts, firebase, ecc.)
-self.addEventListener('fetch', e => {
-  if (e.request.method !== 'GET') return;
-  const url = new URL(e.request.url);
-  const isHtmlPage = url.pathname === '/' || url.pathname.endsWith('.html');
-
-  if (isHtmlPage) {
-    // Sempre rete per l'HTML — se offline usa cache
-    e.respondWith(
-      fetch(e.request).then(res => {
-        const clone = res.clone();
-        caches.open(CACHE).then(c => c.put(e.request, clone));
-        return res;
-      }).catch(() => caches.match(e.request))
-    );
-  } else {
-    // Cache-first per risorse statiche
-    e.respondWith(
-      caches.match(e.request).then(cached => {
-        if (cached) return cached;
-        return fetch(e.request).then(res => {
-          const clone = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, clone));
-          return res;
-        }).catch(() => cached);
-      })
-    );
-  }
-});
-
-self.addEventListener('message', e => {
-  if (e.data === 'skipWaiting') self.skipWaiting();
-});`;
-
-    const swBlob = new Blob([swCode], { type: 'application/javascript' });
-    const swUrl  = URL.createObjectURL(swBlob);
-
-    navigator.serviceWorker.register(swUrl, { scope: '/' })
-      .then(reg => {
-        console.log('✅ Service Worker registrato');
-
-        // Controlla aggiornamenti ogni 5 minuti
-        setInterval(() => reg.update(), 5 * 60 * 1000);
-
-        reg.addEventListener('updatefound', () => {
-          const newWorker = reg.installing;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              window._pendingSW = newWorker;
-              const bar = document.getElementById('update-bar');
-              if (bar) bar.classList.add('show');
-            }
-          });
-        });
-
-        if (reg.waiting && navigator.serviceWorker.controller) {
-          window._pendingSW = reg.waiting;
-          const bar = document.getElementById('update-bar');
-          if (bar) bar.classList.add('show');
-        }
-      })
-      .catch(e => console.warn('SW non registrato:', e.message));
-
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      window.location.reload();
-    });
-  }
-
-  // ── Controllo aggiornamenti via ETag/Last-Modified ──
-  // Controlla se il file HTML su GitHub è cambiato rispetto a quello in cache
+  // Controlla aggiornamenti via ETag (GitHub Pages aggiorna l'ETag ad ogni push)
   checkForHtmlUpdate();
 }
 
@@ -5452,27 +5364,30 @@ async function checkForHtmlUpdate() {
     const newEtag = res.headers.get('etag') || res.headers.get('last-modified');
     if (!newEtag) return;
     if (savedEtag && savedEtag !== newEtag) {
-      // File cambiato su GitHub → mostra banner
+      // File cambiato su GitHub → mostra banner aggiornamento
       const bar = document.getElementById('update-bar');
       if (bar) bar.classList.add('show');
     }
-    localStorage.setItem('nt-html-etag', newEtag);
-  } catch(e) { /* offline, ignora */ }
+    // Aggiorna il valore salvato (ma solo se non c'è un banner attivo)
+    // così al prossimo reload confrontiamo correttamente
+    if (!document.getElementById('update-bar')?.classList.contains('show')) {
+      localStorage.setItem('nt-html-etag', newEtag);
+    }
+  } catch(e) { /* offline — ignora */ }
 }
 
 // Init PWA immediately (no auth needed)
 initPWA();
 
+// Controlla aggiornamenti anche ogni 10 minuti mentre l'app è aperta
+setInterval(checkForHtmlUpdate, 10 * 60 * 1000);
+
 function applyUpdate() {
   const bar = document.getElementById('update-bar');
   if (bar) bar.innerHTML = '<div style="font-size:22px">⏳</div><div class="update-bar-text"><strong>Aggiornamento in corso...</strong></div>';
-  if (window._pendingSW) {
-    window._pendingSW.postMessage('skipWaiting');
-  } else {
-    // ETag-based update: just reload fresh from network
-    localStorage.removeItem('nt-html-etag');
-    window.location.reload(true);
-  }
+  // Salva il nuovo etag e ricarica prendendo il file fresco dal server
+  localStorage.removeItem('nt-html-etag');
+  window.location.reload(true);
 }
 </script>
 </body>
