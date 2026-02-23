@@ -1062,6 +1062,21 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 }
 .offline-bar.show { transform: translateY(0); }
 
+/* ── UPDATE BANNER ── */
+.update-bar {
+  position: fixed; bottom: 72px; left: 12px; right: 12px;
+  background: #1e40af;
+  color: white; border-radius: 14px;
+  padding: 12px 16px;
+  display: flex; align-items: center; gap: 12px;
+  z-index: 600;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  transform: translateY(120%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.update-bar.show { transform: translateY(0); }
+.update-bar-text { flex: 1; font-size: 13px; line-height: 1.4; }
+.update-bar-text strong { display: block; font-size: 14px; margin-bottom: 1px; }
+
 /* ── REFERRAL CARD ── */
 .referral-card {
   border-top: 3px solid var(--green);
@@ -1319,8 +1334,23 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
       </div>
       <button class="btn btn-green" onclick="doLogin()" id="login-btn">Accedi →</button>
-      <div class="forgot-link" onclick="doForgot()">Password dimenticata?</div>
+      <div class="forgot-link" onclick="openForgotFlow()">Password dimenticata?</div>
     </div>
+
+    <!-- FORGOT PASSWORD PANEL -->
+    <div class="auth-form hidden" id="form-forgot">
+      <div style="text-align:center;margin-bottom:18px">
+        <div style="font-size:36px;margin-bottom:8px">🔑</div>
+        <div style="font-family:var(--font-brand);font-weight:800;font-size:18px;margin-bottom:4px">Recupera Password</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.5">Inserisci la tua email e ti mandiamo un link per reimpostare la password.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input type="email" id="forgot-email" placeholder="la-tua@email.com" autocomplete="email" onkeydown="if(event.key==='Enter')doForgot()">
+      </div>
+      <div id="forgot-status" style="display:none;padding:12px 14px;border-radius:10px;font-size:13px;margin-bottom:12px;line-height:1.5"></div>
+      <button class="btn btn-green" onclick="doForgot()" id="forgot-btn">📧 Invia link di recupero</button>
+      <div class="forgot-link" onclick="closeForgotFlow()" style="margin-top:12px">← Torna al login</div>
 
     <!-- REGISTER FORM -->
     <div class="auth-form hidden" id="form-register">
@@ -2170,6 +2200,17 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 <!-- OFFLINE BAR -->
 <div class="offline-bar" id="offline-bar">📵 Modalità offline — i dati verranno sincronizzati quando torni online</div>
 
+<!-- UPDATE BANNER -->
+<div class="update-bar" id="update-bar">
+  <div style="font-size:22px">🆕</div>
+  <div class="update-bar-text">
+    <strong>Aggiornamento disponibile!</strong>
+    Nuova versione di NutriTrack pronta.
+  </div>
+  <button class="btn btn-green btn-sm" onclick="applyUpdate()" style="flex-shrink:0;white-space:nowrap">Aggiorna ora</button>
+  <button onclick="document.getElementById('update-bar').classList.remove('show')" style="background:none;border:none;color:rgba(255,255,255,0.6);font-size:18px;cursor:pointer;flex-shrink:0;padding:4px">✕</button>
+</div>
+
 <!-- ══ BARCODE SCANNER MODAL ══ -->
 <div class="scanner-modal" id="scanner-modal">
   <div class="scanner-box">
@@ -2586,16 +2627,63 @@ async function doRegister() {
   }
 }
 
+function openForgotFlow() {
+  // Pre-fill email if already typed in login
+  const loginEmail = document.getElementById('login-email').value.trim();
+  if (loginEmail) document.getElementById('forgot-email').value = loginEmail;
+  document.getElementById('forgot-status').style.display = 'none';
+  document.getElementById('forgot-btn').textContent = '📧 Invia link di recupero';
+  document.getElementById('forgot-btn').disabled = false;
+  // Hide login, show forgot
+  document.getElementById('form-login').classList.add('hidden');
+  document.getElementById('form-forgot').classList.remove('hidden');
+  document.getElementById('forgot-email').focus();
+  clearAuthError();
+}
+
+function closeForgotFlow() {
+  document.getElementById('form-forgot').classList.add('hidden');
+  document.getElementById('form-login').classList.remove('hidden');
+  clearAuthError();
+}
+
 async function doForgot() {
-  const email = document.getElementById('login-email').value.trim();
-  if (!email) { showAuthError('Inserisci la tua email nel campo sopra.'); return; }
+  const email = document.getElementById('forgot-email').value.trim();
+  const statusEl = document.getElementById('forgot-status');
+  const btn = document.getElementById('forgot-btn');
+
+  if (!email) {
+    statusEl.textContent = '⚠️ Inserisci la tua email.';
+    statusEl.style.background = 'rgba(239,68,68,0.08)';
+    statusEl.style.color = 'var(--danger)';
+    statusEl.style.border = '1px solid rgba(239,68,68,0.2)';
+    statusEl.style.display = 'block';
+    document.getElementById('forgot-email').focus();
+    return;
+  }
+
+  btn.textContent = '⏳ Invio in corso...';
+  btn.disabled = true;
+
   try {
     await window._fb.sendPasswordResetEmail(window._fb.auth, email);
-    showAuthError('✅ Email di recupero inviata!');
-    document.getElementById('auth-error').style.background = 'var(--green-bg)';
-    document.getElementById('auth-error').style.color = 'var(--green)';
-    document.getElementById('auth-error').style.borderColor = 'rgba(74,122,53,0.3)';
-  } catch(e) { showAuthError(firebaseErrMsg(e.code)); }
+    statusEl.innerHTML = '✅ <strong>Email inviata!</strong><br>Controlla la casella di posta (e la cartella spam). Il link è valido per 1 ora.';
+    statusEl.style.background = 'var(--green-bg)';
+    statusEl.style.color = 'var(--green)';
+    statusEl.style.border = '1px solid rgba(74,122,53,0.3)';
+    statusEl.style.display = 'block';
+    btn.textContent = '✅ Email inviata';
+    // Auto-back to login after 4s
+    setTimeout(() => closeForgotFlow(), 4000);
+  } catch(e) {
+    statusEl.textContent = '⚠️ ' + firebaseErrMsg(e.code);
+    statusEl.style.background = 'rgba(239,68,68,0.08)';
+    statusEl.style.color = 'var(--danger)';
+    statusEl.style.border = '1px solid rgba(239,68,68,0.2)';
+    statusEl.style.display = 'block';
+    btn.textContent = '📧 Invia link di recupero';
+    btn.disabled = false;
+  }
 }
 
 async function doLogout() {
@@ -5266,40 +5354,126 @@ function initPWA() {
 
   // Register Service Worker (only if on HTTPS/Firebase/GitHub Pages)
   if ('serviceWorker' in navigator && location.protocol === 'https:') {
-    // Create SW as blob since we're single-file
+
     const swCode = `
 const CACHE = 'nutritrack-v1';
 const ASSETS = ['/'];
+
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
   self.skipWaiting();
 });
+
 self.addEventListener('activate', e => {
   e.waitUntil(caches.keys().then(keys =>
-    Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))
+    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
   ));
   self.clients.claim();
 });
+
+// Network-first per il file HTML principale → aggiornamenti immediati
+// Cache-first per tutto il resto (fonts, firebase, ecc.)
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
-  e.respondWith(
-    fetch(e.request).then(res => {
-      const clone = res.clone();
-      caches.open(CACHE).then(c => c.put(e.request, clone));
-      return res;
-    }).catch(() => caches.match(e.request))
-  );
-});`;
-    const swBlob = new Blob([swCode], {type:'application/javascript'});
-    const swUrl  = URL.createObjectURL(swBlob);
-    navigator.serviceWorker.register(swUrl, {scope: '/'})
-      .then(()  => console.log('✅ Service Worker registrato'))
-      .catch(e  => console.warn('SW non registrato:', e.message));
+  const url = new URL(e.request.url);
+  const isHtmlPage = url.pathname === '/' || url.pathname.endsWith('.html');
+
+  if (isHtmlPage) {
+    // Sempre rete per l'HTML — se offline usa cache
+    e.respondWith(
+      fetch(e.request).then(res => {
+        const clone = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+        return res;
+      }).catch(() => caches.match(e.request))
+    );
+  } else {
+    // Cache-first per risorse statiche
+    e.respondWith(
+      caches.match(e.request).then(cached => {
+        if (cached) return cached;
+        return fetch(e.request).then(res => {
+          const clone = res.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+          return res;
+        }).catch(() => cached);
+      })
+    );
   }
+});
+
+self.addEventListener('message', e => {
+  if (e.data === 'skipWaiting') self.skipWaiting();
+});`;
+
+    const swBlob = new Blob([swCode], { type: 'application/javascript' });
+    const swUrl  = URL.createObjectURL(swBlob);
+
+    navigator.serviceWorker.register(swUrl, { scope: '/' })
+      .then(reg => {
+        console.log('✅ Service Worker registrato');
+
+        // Controlla aggiornamenti ogni 5 minuti
+        setInterval(() => reg.update(), 5 * 60 * 1000);
+
+        reg.addEventListener('updatefound', () => {
+          const newWorker = reg.installing;
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              window._pendingSW = newWorker;
+              const bar = document.getElementById('update-bar');
+              if (bar) bar.classList.add('show');
+            }
+          });
+        });
+
+        if (reg.waiting && navigator.serviceWorker.controller) {
+          window._pendingSW = reg.waiting;
+          const bar = document.getElementById('update-bar');
+          if (bar) bar.classList.add('show');
+        }
+      })
+      .catch(e => console.warn('SW non registrato:', e.message));
+
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      window.location.reload();
+    });
+  }
+
+  // ── Controllo aggiornamenti via ETag/Last-Modified ──
+  // Controlla se il file HTML su GitHub è cambiato rispetto a quello in cache
+  checkForHtmlUpdate();
+}
+
+async function checkForHtmlUpdate() {
+  try {
+    const savedEtag = localStorage.getItem('nt-html-etag');
+    const res = await fetch(window.location.href, { method: 'HEAD', cache: 'no-store' });
+    const newEtag = res.headers.get('etag') || res.headers.get('last-modified');
+    if (!newEtag) return;
+    if (savedEtag && savedEtag !== newEtag) {
+      // File cambiato su GitHub → mostra banner
+      const bar = document.getElementById('update-bar');
+      if (bar) bar.classList.add('show');
+    }
+    localStorage.setItem('nt-html-etag', newEtag);
+  } catch(e) { /* offline, ignora */ }
 }
 
 // Init PWA immediately (no auth needed)
 initPWA();
+
+function applyUpdate() {
+  const bar = document.getElementById('update-bar');
+  if (bar) bar.innerHTML = '<div style="font-size:22px">⏳</div><div class="update-bar-text"><strong>Aggiornamento in corso...</strong></div>';
+  if (window._pendingSW) {
+    window._pendingSW.postMessage('skipWaiting');
+  } else {
+    // ETag-based update: just reload fresh from network
+    localStorage.removeItem('nt-html-etag');
+    window.location.reload(true);
+  }
+}
 </script>
 </body>
 </html>
