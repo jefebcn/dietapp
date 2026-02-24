@@ -68,11 +68,13 @@ onAuthStateChanged(auth, async user => {
     } else {
       window._currentUser = { uid: user.uid, email: user.email, name: user.email.split('@')[0], role: 'user' };
     }
-    showApp();
+    window._pendingAuthState = 'app';
   } else {
     window._currentUser = null;
-    showAuth();
+    window._pendingAuthState = 'auth';
   }
+  // Dispatch a custom event so the main script can pick it up
+  document.dispatchEvent(new CustomEvent('fb-auth-ready'));
 });
 </script>
 
@@ -1635,10 +1637,15 @@ window.SPRINTY = {
 (function(){
   function hideSplash(){
     const el = document.getElementById('splash-screen');
-    if(el){ el.style.opacity='0'; setTimeout(()=>el.remove(),500); }
+    if(el){ el.style.opacity='0'; setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); },500); }
   }
   // Fallback: rimuovi dopo 4s se auth non risponde
   setTimeout(hideSplash, 4000);
+  // Safety: rimuovi comunque dopo 6s (blocca i click se rimane)
+  setTimeout(function(){
+    const el = document.getElementById('splash-screen');
+    if(el && el.parentNode) el.parentNode.removeChild(el);
+  }, 6000);
   window._hideSplash = hideSplash;
 })();
 </script>
@@ -3231,6 +3238,15 @@ let chartRange  = 30;
 let currentDiaryDate = '';
 let selectedDiaryFood = null;
 let editingFoodId = null;
+
+// ══════════════════════════════════
+// FIREBASE AUTH BRIDGE
+// Ascolta l'evento dal modulo ES6 e chiama showApp/showAuth
+// ══════════════════════════════════
+document.addEventListener('fb-auth-ready', function() {
+  if (window._pendingAuthState === 'app') showApp();
+  else showAuth();
+});
 
 // ══════════════════════════════════
 // NAVIGATION
