@@ -928,6 +928,81 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   transform: translateY(0) scale(1);
 }
 
+/* ── LEAGUES ── */
+.league-tier-banner {
+  display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:14px;
+  background:linear-gradient(135deg,var(--green-bg),rgba(74,122,53,0.08));
+  border:1.5px solid rgba(74,122,53,0.2);margin-bottom:16px;
+}
+.league-tier-banner .tier-icon { font-size:34px;line-height:1; }
+.league-tier-banner .tier-info { flex:1;min-width:0; }
+.league-tier-banner .tier-name {
+  font-family:var(--font-brand);font-weight:900;font-size:18px;color:var(--dark);
+}
+.league-tier-banner .tier-sub {
+  font-family:var(--font-mono);font-size:10px;color:var(--muted);letter-spacing:1px;margin-top:2px;
+}
+.league-tier-banner .tier-week {
+  font-family:var(--font-mono);font-size:10px;color:var(--muted);text-align:right;white-space:nowrap;
+}
+.league-board { border-radius:12px;overflow:hidden;border:1.5px solid var(--border); }
+.league-row {
+  display:flex;align-items:center;gap:10px;padding:10px 14px;
+  border-bottom:1px solid var(--border);transition:background .15s;
+}
+.league-row:last-child { border-bottom:none; }
+.league-row.is-me { background:var(--green-bg); }
+.league-row.promote-zone { background:rgba(74,122,53,0.04); }
+.league-row.relegate-zone { background:rgba(220,80,60,0.04); }
+.league-rank {
+  width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-brand);font-weight:900;font-size:12px;color:#fff;flex-shrink:0;
+}
+.league-rank.gold-rank { background:linear-gradient(135deg,#f59e0b,#d97706); }
+.league-rank.silver-rank { background:linear-gradient(135deg,#94a3b8,#64748b); }
+.league-rank.bronze-rank { background:linear-gradient(135deg,#cd7f32,#a0522d); }
+.league-rank.normal-rank { background:var(--muted);opacity:0.6; }
+.league-rank.relegate-rank { background:linear-gradient(135deg,#ef4444,#dc2626); }
+.league-user-name {
+  flex:1;min-width:0;font-weight:600;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.league-user-pts {
+  font-family:var(--font-brand);font-weight:800;font-size:15px;color:var(--green);white-space:nowrap;
+}
+.league-zone-tag {
+  display:inline-block;font-family:var(--font-mono);font-size:8px;letter-spacing:1.2px;
+  padding:2px 8px;border-radius:20px;margin-left:6px;vertical-align:middle;
+}
+.league-zone-tag.promo { background:rgba(74,122,53,0.12);color:var(--green); }
+.league-zone-tag.releg { background:rgba(220,80,60,0.12);color:#dc3545; }
+.league-countdown {
+  text-align:center;padding:12px;font-family:var(--font-mono);font-size:11px;
+  color:var(--muted);background:var(--cream);border-radius:10px;margin-top:14px;
+}
+.league-promo-toast {
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.8);
+  background:#fff;border-radius:20px;padding:32px 40px;text-align:center;
+  box-shadow:0 20px 60px rgba(0,0,0,0.25);z-index:9999;opacity:0;
+  transition:all .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;
+}
+.league-promo-toast.show { opacity:1;transform:translate(-50%,-50%) scale(1);pointer-events:auto; }
+.league-promo-toast .promo-icon { font-size:52px;margin-bottom:12px; }
+.league-promo-toast .promo-title {
+  font-family:var(--font-brand);font-weight:900;font-size:22px;margin-bottom:6px;
+}
+.league-promo-toast .promo-sub { font-size:13px;color:var(--muted); }
+.league-promo-overlay {
+  position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:9998;opacity:0;
+  transition:opacity .3s;pointer-events:none;
+}
+.league-promo-overlay.show { opacity:1;pointer-events:auto; }
+@media(prefers-color-scheme:dark){
+  .league-tier-banner{background:linear-gradient(135deg,rgba(74,122,53,0.15),rgba(74,122,53,0.06));border-color:rgba(74,122,53,0.25)}
+  .league-row.is-me{background:rgba(74,122,53,0.12)}
+  .league-row.promote-zone{background:rgba(74,122,53,0.06)}
+  .league-row.relegate-zone{background:rgba(220,80,60,0.06)}
+}
+
 /* ── CATALOG REWARD CARD ── */
 .reward-card {
   display: flex;
@@ -1591,6 +1666,34 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         <div id="home-pts-today" style="font-size:12px;color:var(--muted)">Nessun punto guadagnato oggi.</div>
       </div>
 
+      <!-- League Widget -->
+      <div class="card" style="margin-bottom:20px;border-top:3px solid #7c3aed" id="home-league-card">
+        <div class="sec-header">
+          <div style="display:flex;align-items:center;gap:10px">
+            <h3>🏆 La tua Lega</h3>
+            <span id="home-league-tier-chip" class="badge-chip bronze" style="font-size:11px;padding:3px 10px">🌱 Rookie</span>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="goPage('rewards');setTimeout(()=>document.getElementById('league-full-section')?.scrollIntoView({behavior:'smooth'}),200)">Classifica →</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">
+          <div style="text-align:center">
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:32px;color:#7c3aed" id="home-league-rank">—</div>
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">POSIZIONE</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:24px;color:var(--green)" id="home-league-week-pts">0</div>
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">PTS SETTIMANA</div>
+          </div>
+          <div style="flex:1;text-align:right">
+            <div id="home-league-status-tag" style="font-family:var(--font-mono);font-size:10px;color:var(--muted)"></div>
+          </div>
+        </div>
+        <div id="home-league-mini-board" style="font-size:13px;color:var(--muted);text-align:center">
+          Caricamento classifica...
+        </div>
+        <div class="league-countdown" id="home-league-countdown">—</div>
+      </div>
+
       <!-- Chart -->
       <div class="card" style="margin-bottom:20px">
         <div class="sec-header"><h3>📈 Andamento peso</h3>
@@ -1601,15 +1704,6 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
           </div>
         </div>
         <div class="chart-wrap"><canvas id="weight-chart"></canvas></div>
-      </div>
-
-      <!-- Weekly Macro Chart -->
-      <div class="card" style="margin-bottom:20px">
-        <div class="sec-header">
-          <h3>🍽️ Kcal settimana corrente</h3>
-          <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">ultimi 7 giorni</span>
-        </div>
-        <div style="height:180px"><canvas id="macro-week-chart"></canvas></div>
       </div>
 
       <!-- Weekly Macro Chart -->
@@ -1717,7 +1811,7 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       </div>
 
       <!-- Macro progress bars -->
-      <div class="card macro-progress-wrap" style="margin-bottom:18px;padding:16px 20px" id="macro-progress-card" style="display:none">
+      <div class="card macro-progress-wrap" style="margin-bottom:18px;padding:16px 20px" id="macro-progress-card">
         <div class="macro-progress-row">
           <span class="mpr-label">KCAL</span>
           <div class="mpr-track"><div class="mpr-fill" id="mpr-kcal" style="background:var(--green)"></div></div>
@@ -2008,6 +2102,48 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 
         <!-- Badge grid -->
         <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px" id="rh-badge-grid">
+        </div>
+      </div>
+
+      <!-- LEAGUE FULL SECTION -->
+      <div class="card" style="margin-bottom:20px;border-top:3px solid #7c3aed" id="league-full-section">
+        <div class="sec-header" style="margin-bottom:14px">
+          <h3>🏆 Lega Settimanale</h3>
+          <span id="league-week-label" style="font-family:var(--font-mono);font-size:10px;color:var(--muted)"></span>
+        </div>
+
+        <!-- Tier banner -->
+        <div class="league-tier-banner" id="league-tier-banner">
+          <div class="tier-icon" id="league-tier-icon">🌱</div>
+          <div class="tier-info">
+            <div class="tier-name" id="league-tier-name">Rookie</div>
+            <div class="tier-sub" id="league-tier-sub">LEGA 1 DI 6</div>
+          </div>
+          <div class="tier-week" id="league-tier-week"></div>
+        </div>
+
+        <!-- Zone legend -->
+        <div style="display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)">
+            <span style="width:10px;height:10px;border-radius:50%;background:var(--green);display:inline-block"></span> Top 3 — Promozione
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)">
+            <span style="width:10px;height:10px;border-radius:50%;background:#ef4444;display:inline-block"></span> Ultimi 3 — Retrocessione
+          </div>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="league-board" id="league-full-board">
+          <div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">Caricamento classifica...</div>
+        </div>
+
+        <!-- Countdown -->
+        <div class="league-countdown" id="league-full-countdown">—</div>
+
+        <!-- Tier progression -->
+        <div style="margin-top:16px">
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;margin-bottom:10px">PROGRESSIONE LEGHE</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap" id="league-tier-progression"></div>
         </div>
       </div>
 
@@ -2546,6 +2682,13 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 <div id="toast"><div class="t-dot"></div><span id="toast-msg">Salvato!</span></div>
 <!-- POINTS TOAST -->
 <div class="pts-toast" id="pts-toast"></div>
+<div class="league-promo-overlay" id="league-promo-overlay" onclick="closeLeaguePromoToast()"></div>
+<div class="league-promo-toast" id="league-promo-toast">
+  <div class="promo-icon" id="league-promo-icon">⬆️</div>
+  <div class="promo-title" id="league-promo-title">Promosso!</div>
+  <div class="promo-sub" id="league-promo-sub">Sali alla lega successiva</div>
+  <button class="btn btn-green" style="margin-top:18px;min-width:120px" onclick="closeLeaguePromoToast()">OK!</button>
+</div>
 
 <!-- ══ FAB ══ -->
 <div class="fab-menu" id="fab-menu">
@@ -2686,6 +2829,11 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
            allow read, write: if request.auth.uid == userId || isAdmin();
          }
        }
+
+       // League groups — tutti gli autenticati possono leggere e scrivere
+       match /leagueGroups/{groupId} {
+         allow read, write: if request.auth != null;
+       }
      }
    }
 ══════════════════════════════════════════════════════════= */
@@ -2790,7 +2938,7 @@ function goPage(id) {
   if (id === 'goals') loadGoal();
   if (id === 'diary') { setDiaryToday(); }
   if (id === 'home') { loadMacroWeekChart(); updateHomeDiarySummary(); }
-  if (id === 'rewards') { renderPointsUI(); loadReferralData(); }
+  if (id === 'rewards') { renderPointsUI(); loadReferralData(); refreshLeagueGroup().then(()=>renderLeagueUI()).catch(()=>{}); }
 }
 
 // ══════════════════════════════════
@@ -2979,6 +3127,7 @@ function showApp() {
   loadPremiumStatus();
   updateHomeDiarySummary();
   loadMacroWeekChart();
+  initLeague();
   // Show FAB
   const fabBtn = document.getElementById('fab-btn');
   if (fabBtn) fabBtn.style.display = 'flex';
@@ -3177,7 +3326,7 @@ function setChartRange(days) {
   ['30','90','all'].forEach(r => {
     document.getElementById('cr-'+r).className = 'btn btn-ghost btn-xs';
   });
-  const map = {30:'30',90:'90',365:'all'};
+  const map = {30:'30',90:'90',99999:'all'};
   if(document.getElementById('cr-'+map[days]))
     document.getElementById('cr-'+map[days]).className = 'btn btn-green btn-xs';
   updateChart();
@@ -4564,6 +4713,10 @@ async function awardPoints(amount, reason, icon='🪙') {
   } catch(e) {}
   renderPointsUI();
   showPtsToast('+' + amount + ' pts — ' + reason);
+  // Update league weekly points
+  if (leagueData.currentGroup) {
+    updateMyWeeklyPts().then(() => renderLeagueUI()).catch(()=>{});
+  }
 }
 
 function showPtsToast(msg) {
@@ -4788,6 +4941,429 @@ function updateDiaryDateLabel() {
 // updateDiaryDateLabel is called directly from the patched originals below
 
 // ══════════════════════════════════════════════════════
+// LEAGUE SYSTEM (Sistema a Leghe)
+// Weekly leaderboards — groups of 15, promote top 3, relegate bottom 3
+// ══════════════════════════════════════════════════════
+
+const LEAGUE_TIERS = [
+  { id:0, name:'Rookie',        icon:'🌱', color:'#78716c' },
+  { id:1, name:'Sprinter',      icon:'🏃', color:'#ca8a04' },
+  { id:2, name:'Pro Sprinter',  icon:'⚡', color:'#f59e0b' },
+  { id:3, name:'Gold Tracker',  icon:'🔥', color:'#ea580c' },
+  { id:4, name:'Diamond',       icon:'💎', color:'#3b82f6' },
+  { id:5, name:'Champion',      icon:'👑', color:'#7c3aed' },
+];
+const LEAGUE_GROUP_SIZE = 15;
+const LEAGUE_PROMOTE_COUNT = 3;
+const LEAGUE_RELEGATE_COUNT = 3;
+
+let leagueData = {
+  tier: 0,
+  currentGroup: null,   // { week, tier, groupNum, members[] }
+  processed: null        // last processed week key
+};
+
+function getISOWeekKey(d) {
+  const date = new Date(d);
+  date.setHours(0,0,0,0);
+  date.setDate(date.getDate() + 3 - ((date.getDay() + 6) % 7));
+  const week1 = new Date(date.getFullYear(), 0, 4);
+  const weekNum = 1 + Math.round(((date - week1) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
+  return date.getFullYear() + '-W' + String(weekNum).padStart(2, '0');
+}
+
+function currentWeekKey() { return getISOWeekKey(new Date()); }
+
+function previousWeekKey() {
+  const d = new Date();
+  d.setDate(d.getDate() - 7);
+  return getISOWeekKey(d);
+}
+
+function weekEndDate() {
+  // Next Monday 00:00
+  const now = new Date();
+  const day = now.getDay();
+  const daysUntilMonday = day === 0 ? 1 : (8 - day);
+  const end = new Date(now);
+  end.setDate(now.getDate() + daysUntilMonday);
+  end.setHours(0,0,0,0);
+  return end;
+}
+
+function leagueCountdownText() {
+  const end = weekEndDate();
+  const now = new Date();
+  const diff = end - now;
+  if (diff <= 0) return 'La settimana si è conclusa!';
+  const days = Math.floor(diff / 86400000);
+  const hrs  = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  if (days > 0) return `⏱️ Reset tra ${days}g ${hrs}h ${mins}m`;
+  return `⏱️ Reset tra ${hrs}h ${mins}m`;
+}
+
+function calcWeeklyPts() {
+  // Sum NutriPoints earned in the current ISO week
+  if (!nutriPoints.history) return 0;
+  const wk = currentWeekKey();
+  let sum = 0;
+  for (const h of nutriPoints.history) {
+    if (!h.date) continue;
+    if (getISOWeekKey(h.date) === wk) sum += (h.pts || 0);
+  }
+  return sum;
+}
+
+function leagueGroupDocId(week, tier, groupNum) {
+  return `${week}_T${tier}_G${groupNum}`;
+}
+
+async function initLeague() {
+  const {db, doc, getDoc, setDoc} = window._fb;
+  // Load user's league data
+  try {
+    const snap = await getDoc(doc(db, 'users', uid(), 'league', 'status'));
+    if (snap.exists()) {
+      const d = snap.data();
+      leagueData.tier = d.tier ?? 0;
+      leagueData.processed = d.processed ?? null;
+    }
+  } catch(e) { console.log('League load err:', e); }
+
+  const wk = currentWeekKey();
+  const prevWk = previousWeekKey();
+
+  // Process previous week results (promotion/relegation) if not yet done
+  if (leagueData.processed !== prevWk) {
+    await processLeagueWeekEnd(prevWk);
+  }
+
+  // Join or load current week group
+  await joinOrLoadLeagueGroup(wk);
+
+  // Render
+  renderLeagueUI();
+  startLeagueCountdown();
+}
+
+async function processLeagueWeekEnd(prevWeek) {
+  const {db, doc, getDoc, setDoc, collection, query, where, getDocs} = window._fb;
+  const myUid = uid();
+  const tier = leagueData.tier;
+
+  // Find my group from last week
+  try {
+    const q = query(
+      collection(db, 'leagueGroups'),
+      where('week', '==', prevWeek),
+      where('tier', '==', tier),
+      where('memberUids', 'array-contains', myUid)
+    );
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const groupDoc = snap.docs[0];
+      const gData = groupDoc.data();
+      const members = (gData.members || []).sort((a,b) => (b.weekPts||0) - (a.weekPts||0));
+      const myIdx = members.findIndex(m => m.uid === myUid);
+
+      if (myIdx >= 0) {
+        const rank = myIdx + 1;
+        const total = members.length;
+        let newTier = tier;
+
+        // Promote top 3 (if not already max)
+        if (rank <= LEAGUE_PROMOTE_COUNT && tier < LEAGUE_TIERS.length - 1) {
+          newTier = tier + 1;
+          showLeaguePromoToast('promote', newTier);
+        }
+        // Relegate bottom 3 (if not already min)
+        else if (rank > total - LEAGUE_RELEGATE_COUNT && tier > 0 && total > LEAGUE_RELEGATE_COUNT) {
+          newTier = tier - 1;
+          showLeaguePromoToast('relegate', newTier);
+        }
+
+        leagueData.tier = newTier;
+      }
+    }
+  } catch(e) { console.log('League weekEnd err:', e); }
+
+  // Mark as processed
+  leagueData.processed = prevWeek;
+  try {
+    await setDoc(doc(db, 'users', uid(), 'league', 'status'), {
+      tier: leagueData.tier,
+      processed: prevWeek
+    });
+  } catch(e) {}
+}
+
+async function joinOrLoadLeagueGroup(week) {
+  const {db, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs} = window._fb;
+  const myUid = uid();
+  const tier = leagueData.tier;
+  const myName = (window._currentUser?.name || window._currentUser?.email?.split('@')[0] || 'Utente');
+
+  // Check if I'm already in a group this week
+  try {
+    const q = query(
+      collection(db, 'leagueGroups'),
+      where('week', '==', week),
+      where('tier', '==', tier),
+      where('memberUids', 'array-contains', myUid)
+    );
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      // Already in a group — load it
+      const gDoc = snap.docs[0];
+      leagueData.currentGroup = { id: gDoc.id, ...gDoc.data() };
+      await updateMyWeeklyPts();
+      return;
+    }
+  } catch(e) { console.log('League check err:', e); }
+
+  // Find an open group at my tier
+  try {
+    const q = query(
+      collection(db, 'leagueGroups'),
+      where('week', '==', week),
+      where('tier', '==', tier),
+      where('full', '==', false)
+    );
+    const snap = await getDocs(q);
+
+    let targetDoc = null;
+    for (const d of snap.docs) {
+      const data = d.data();
+      if ((data.memberUids || []).length < LEAGUE_GROUP_SIZE) {
+        targetDoc = d;
+        break;
+      }
+    }
+
+    const weekPts = calcWeeklyPts();
+    const myMember = { uid: myUid, name: myName, weekPts };
+
+    if (targetDoc) {
+      // Join existing group
+      const gData = targetDoc.data();
+      const members = [...(gData.members||[]), myMember];
+      const memberUids = [...(gData.memberUids||[]), myUid];
+      const full = memberUids.length >= LEAGUE_GROUP_SIZE;
+      await updateDoc(doc(db, 'leagueGroups', targetDoc.id), { members, memberUids, full });
+      leagueData.currentGroup = { id: targetDoc.id, week, tier, members, memberUids, full };
+    } else {
+      // Create new group
+      const groupNum = Date.now();
+      const docId = leagueGroupDocId(week, tier, groupNum);
+      const groupData = {
+        week, tier, groupNum,
+        members: [myMember],
+        memberUids: [myUid],
+        full: false,
+        createdAt: Date.now()
+      };
+      await setDoc(doc(db, 'leagueGroups', docId), groupData);
+      leagueData.currentGroup = { id: docId, ...groupData };
+    }
+  } catch(e) { console.log('League join err:', e); }
+}
+
+async function updateMyWeeklyPts() {
+  if (!leagueData.currentGroup) return;
+  const {db, doc, updateDoc} = window._fb;
+  const myUid = uid();
+  const weekPts = calcWeeklyPts();
+
+  const members = leagueData.currentGroup.members || [];
+  const idx = members.findIndex(m => m.uid === myUid);
+  if (idx >= 0) {
+    members[idx].weekPts = weekPts;
+    members[idx].name = window._currentUser?.name || members[idx].name;
+  }
+
+  try {
+    await updateDoc(doc(db, 'leagueGroups', leagueData.currentGroup.id), { members });
+  } catch(e) {}
+
+  leagueData.currentGroup.members = members;
+}
+
+async function refreshLeagueGroup() {
+  if (!leagueData.currentGroup) return;
+  const {db, doc, getDoc} = window._fb;
+  try {
+    const snap = await getDoc(doc(db, 'leagueGroups', leagueData.currentGroup.id));
+    if (snap.exists()) {
+      leagueData.currentGroup = { id: snap.id, ...snap.data() };
+    }
+  } catch(e) {}
+}
+
+function renderLeagueUI() {
+  const tier = LEAGUE_TIERS[leagueData.tier] || LEAGUE_TIERS[0];
+  const members = (leagueData.currentGroup?.members || [])
+    .sort((a,b) => (b.weekPts||0) - (a.weekPts||0));
+  const myUid = uid();
+  const myRank = members.findIndex(m => m.uid === myUid) + 1;
+  const totalMembers = members.length;
+  const weekPts = calcWeeklyPts();
+
+  // ─── Home widget ───
+  const homeTierChip = document.getElementById('home-league-tier-chip');
+  if (homeTierChip) {
+    homeTierChip.textContent = `${tier.icon} ${tier.name}`;
+    homeTierChip.style.background = tier.color + '18';
+    homeTierChip.style.color = tier.color;
+    homeTierChip.style.borderColor = tier.color + '40';
+  }
+  const homeRank = document.getElementById('home-league-rank');
+  if (homeRank) homeRank.textContent = myRank > 0 ? `#${myRank}` : '—';
+
+  const homeWeekPts = document.getElementById('home-league-week-pts');
+  if (homeWeekPts) homeWeekPts.textContent = weekPts;
+
+  const homeStatus = document.getElementById('home-league-status-tag');
+  if (homeStatus && myRank > 0) {
+    if (myRank <= LEAGUE_PROMOTE_COUNT && leagueData.tier < LEAGUE_TIERS.length-1) {
+      homeStatus.innerHTML = '<span class="league-zone-tag promo">▲ PROMOZIONE</span>';
+    } else if (myRank > totalMembers - LEAGUE_RELEGATE_COUNT && leagueData.tier > 0 && totalMembers > LEAGUE_RELEGATE_COUNT) {
+      homeStatus.innerHTML = '<span class="league-zone-tag releg">▼ RETROCESSIONE</span>';
+    } else {
+      homeStatus.innerHTML = '<span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">━ ZONA SICURA</span>';
+    }
+  }
+
+  // Mini board (top 5 on home)
+  const miniBoard = document.getElementById('home-league-mini-board');
+  if (miniBoard) {
+    if (members.length === 0) {
+      miniBoard.innerHTML = '<div style="font-size:12px;color:var(--muted)">In attesa di altri partecipanti...</div>';
+    } else {
+      const top5 = members.slice(0, 5);
+      miniBoard.innerHTML = '<div class="league-board" style="border:none">' + top5.map((m,i) => renderLeagueRow(m, i+1, totalMembers, myUid, true)).join('') + '</div>';
+      if (myRank > 5) {
+        miniBoard.innerHTML += `<div style="padding:6px 14px;font-size:11px;color:var(--muted);text-align:center;border-top:1px dashed var(--border)">···  Tu sei #${myRank} su ${totalMembers}</div>`;
+      }
+    }
+  }
+
+  // ─── Rewards page full board ───
+  const weekLabel = document.getElementById('league-week-label');
+  if (weekLabel) weekLabel.textContent = 'SETTIMANA ' + currentWeekKey();
+
+  const tierIcon = document.getElementById('league-tier-icon');
+  if (tierIcon) tierIcon.textContent = tier.icon;
+
+  const tierName = document.getElementById('league-tier-name');
+  if (tierName) tierName.textContent = tier.name;
+
+  const tierSub = document.getElementById('league-tier-sub');
+  if (tierSub) tierSub.textContent = `LEGA ${tier.id+1} DI ${LEAGUE_TIERS.length}`;
+
+  const tierWeek = document.getElementById('league-tier-week');
+  if (tierWeek) tierWeek.textContent = `${totalMembers}/${LEAGUE_GROUP_SIZE} giocatori`;
+
+  // Full board
+  const fullBoard = document.getElementById('league-full-board');
+  if (fullBoard) {
+    if (members.length === 0) {
+      fullBoard.innerHTML = '<div style="padding:24px;text-align:center;color:var(--muted);font-size:13px">In attesa di altri partecipanti nella tua lega...</div>';
+    } else {
+      fullBoard.innerHTML = members.map((m,i) => renderLeagueRow(m, i+1, totalMembers, myUid, false)).join('');
+    }
+  }
+
+  // Tier progression
+  const tierProg = document.getElementById('league-tier-progression');
+  if (tierProg) {
+    tierProg.innerHTML = LEAGUE_TIERS.map(t => {
+      const active = t.id === leagueData.tier;
+      return `<div style="display:flex;align-items:center;gap:5px;padding:6px 12px;border-radius:20px;font-size:12px;
+        background:${active ? t.color+'18' : 'var(--cream)'};
+        border:1.5px solid ${active ? t.color+'50' : 'var(--border)'};
+        color:${active ? t.color : 'var(--muted)'};
+        font-weight:${active ? '700' : '400'}">
+        <span>${t.icon}</span><span>${t.name}</span></div>`;
+    }).join('');
+  }
+}
+
+function renderLeagueRow(member, rank, total, myUid, compact) {
+  const isMe = member.uid === myUid;
+  const isPromote = rank <= LEAGUE_PROMOTE_COUNT && leagueData.tier < LEAGUE_TIERS.length-1;
+  const isRelegate = rank > total - LEAGUE_RELEGATE_COUNT && leagueData.tier > 0 && total > LEAGUE_RELEGATE_COUNT;
+
+  let zoneClass = '';
+  if (isPromote) zoneClass = ' promote-zone';
+  else if (isRelegate) zoneClass = ' relegate-zone';
+
+  let rankClass = 'normal-rank';
+  if (rank === 1) rankClass = 'gold-rank';
+  else if (rank === 2) rankClass = 'silver-rank';
+  else if (rank === 3) rankClass = 'bronze-rank';
+  else if (isRelegate) rankClass = 'relegate-rank';
+
+  const zoneTag = !compact ? (
+    isPromote ? ' <span class="league-zone-tag promo">▲</span>' :
+    isRelegate ? ' <span class="league-zone-tag releg">▼</span>' : ''
+  ) : '';
+
+  const py = compact ? 'padding:7px 12px;' : '';
+
+  return `<div class="league-row${isMe?' is-me':''}${zoneClass}" style="${py}">
+    <div class="league-rank ${rankClass}">${rank}</div>
+    <div class="league-user-name">${isMe ? '⭐ ' : ''}${member.name || 'Utente'}${zoneTag}</div>
+    <div class="league-user-pts">${member.weekPts || 0} <span style="font-size:10px;color:var(--muted)">pts</span></div>
+  </div>`;
+}
+
+function startLeagueCountdown() {
+  function update() {
+    const txt = leagueCountdownText();
+    const el1 = document.getElementById('home-league-countdown');
+    const el2 = document.getElementById('league-full-countdown');
+    if (el1) el1.textContent = txt;
+    if (el2) el2.textContent = txt;
+  }
+  update();
+  setInterval(update, 60000);
+}
+
+function showLeaguePromoToast(type, newTier) {
+  const t = LEAGUE_TIERS[newTier];
+  if (!t) return;
+  const overlay = document.getElementById('league-promo-overlay');
+  const toast = document.getElementById('league-promo-toast');
+  const icon = document.getElementById('league-promo-icon');
+  const title = document.getElementById('league-promo-title');
+  const sub = document.getElementById('league-promo-sub');
+  if (!toast) return;
+
+  if (type === 'promote') {
+    icon.textContent = '🎉';
+    title.textContent = 'Promosso!';
+    title.style.color = t.color;
+    sub.textContent = `Sali in ${t.icon} ${t.name}! Continua così!`;
+  } else {
+    icon.textContent = '😤';
+    title.textContent = 'Retrocesso';
+    title.style.color = '#ef4444';
+    sub.textContent = `Scendi in ${t.icon} ${t.name}. La prossima settimana farai meglio!`;
+  }
+
+  overlay.classList.add('show');
+  toast.classList.add('show');
+}
+
+function closeLeaguePromoToast() {
+  document.getElementById('league-promo-overlay')?.classList.remove('show');
+  document.getElementById('league-promo-toast')?.classList.remove('show');
+}
+
+// Refresh league points whenever awardPoints is called (hooked below)
+
+// ══════════════════════════════════════════════════════
 // FEATURE 2: BARCODE SCANNER
 // ══════════════════════════════════════════════════════
 let html5QrCode = null;
@@ -4955,7 +5531,7 @@ function openPhotoAnalysis() {
   // Show/hide API key section
   const keySection = document.getElementById('apikey-section');
   if (keySection) keySection.style.display = 'none';
-  if (key) {
+  if (ANTHROPIC_API_KEY) {
     if (keySection) keySection.style.display = 'none';
     document.getElementById('apikey-status').textContent = '✅ API Key salvata';
   } else {
