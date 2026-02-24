@@ -49,9 +49,7 @@ onAuthStateChanged(auth, user => {
     window.location.replace('app.html');
   } else {
     // Non loggato → mostra la landing (rimuove il loader)
-    document.getElementById('page-loader').style.display = 'none';
-    document.getElementById('page-content').style.opacity = '1';
-  }
+      }
 });
 </script>
 
@@ -658,6 +656,11 @@ footer {
   .food-item { width: 56px; height: 56px; font-size: 26px; }
   .stat-float { display: none; }
 }
+
+/* Override: remove landing loader to avoid double loading (keep only app loader with Sprinty) */
+#page-loader{display:none !important;}
+#page-content{opacity:1 !important;}
+
 </style>
 </head>
 <body>
