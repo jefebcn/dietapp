@@ -5422,42 +5422,56 @@ async function adminSetPremium(targetUid, value) {
     if (!ok) return;
   }
 
+  const now = Date.now();
+
+  // ── 1. Aggiorna campo premium sull'utente (operazione principale) ──
   try {
-    const now = Date.now();
-
-    // Aggiorna il documento utente
     await updateDoc(doc(db, 'users', targetUid), {
-      premium:            value,
-      premiumSetAt:       value ? now : null,
-      premiumSetBy:       uid(),
-      premiumRemovedAt:   value ? null : now,
-      premiumRemovedBy:   value ? null : uid(),
+      premium:          value,
+      premiumSetAt:     value ? now : null,
+      premiumSetBy:     value ? uid() : null,
+      premiumRemovedAt: value ? null : now,
+      premiumRemovedBy: value ? null : uid(),
     });
-
-    // Salva log nello storico admin_actions
-    await addDoc(collection(db, 'admin_actions'), {
-      type:       value ? 'premium_activate' : 'premium_remove',
-      targetUid,
-      adminUid:   uid(),
-      timestamp:  now,
-      note:       value ? 'Attivato manualmente da admin' : 'Rimosso manualmente da admin'
-    });
-
-    toast(
-      value ? '⭐ Premium attivato!' : '🔓 Premium rimosso',
-      value ? 'var(--green)' : 'var(--orange)'
-    );
-    await loadAdminUsers();
-
-    // Se il pannello dettaglio è aperto per questo utente, ricaricalo
-    const panel = document.getElementById('user-detail-panel');
-    if (panel && panel.dataset.uid === targetUid) {
-      const name = panel.dataset.name || '';
-      viewUserDetail(targetUid, name);
-    }
-
   } catch(e) {
-    toast('Errore: ' + e.message, 'var(--danger)');
+    // Errore principale → mostra e fermati
+    toast('Errore permessi: ' + e.message + ' — Controlla le Firestore Rules (vedi console)', 'var(--danger)');
+    console.error('adminSetPremium updateDoc failed:', e);
+    console.warn('👉 Soluzione: vai su Firebase Console → Firestore → Regole e aggiungi:\n\nmatch /users/{userId} {\n  allow write: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == "admin";\n}');
+    return;
+  }
+
+  // ── 2. Log in admin_actions (operazione secondaria — non blocca se fallisce) ──
+  try {
+    await addDoc(collection(db, 'admin_actions'), {
+      type:      value ? 'premium_activate' : 'premium_remove',
+      targetUid,
+      adminUid:  uid(),
+      timestamp: now,
+      note:      value ? 'Attivato manualmente da admin' : 'Rimosso manualmente da admin'
+    });
+  } catch(e) {
+    // Non critico — solo un log, non blocca l'attivazione
+    console.warn('Log admin_actions non salvato (permessi mancanti, non critico):', e.message);
+  }
+
+  // ── 3. Feedback e refresh UI ──
+  toast(
+    value ? '⭐ Premium attivato!' : '🔓 Premium rimosso',
+    value ? 'var(--green)' : 'var(--orange)'
+  );
+
+  // Ricarica tabella utenti
+  await loadAdminUsers();
+
+  // Se il pannello dettaglio è aperto per questo utente, ricarica la premium card
+  const panel = document.getElementById('admin-user-detail');
+  if (panel && panel.dataset.uid === targetUid) {
+    try {
+      const {getDoc} = window._fb;
+      const usnap = await getDoc(doc(db, 'users', targetUid));
+      if (usnap.exists()) updateAdminPremiumCard(targetUid, usnap.data());
+    } catch(e) { /* silenzioso */ }
   }
 }
 
