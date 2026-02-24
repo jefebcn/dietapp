@@ -2034,7 +2034,7 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         <button onclick="openPayPalCheckout()" class="btn btn-green" style="display:block;text-align:center;width:100%;border-radius:10px;border:none;cursor:pointer;font-weight:700">
           🚀 Diventa Premium — 2,99€/mese
         </button>
-        <p style="font-size:10px;color:rgba(255,255,255,0.4);text-align:center;margin-top:10px;font-family:var(--font-mono)">Pagamento via PayPal · Attivazione automatica</p>
+        <p style="font-size:10px;color:rgba(255,255,255,0.4);text-align:center;margin-top:10px;font-family:var(--font-mono)">Pagamento sicuro via Stripe · Attivazione automatica</p>
       </div>
 
       <!-- PREMIUM ACTIVE BADGE -->
@@ -2384,8 +2384,8 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
     <button onclick="closeUpgradeModal();openPayPalCheckout()" class="btn btn-green" style="width:100%;display:block;text-align:center;font-size:16px;padding:16px;border-radius:12px;border:none;cursor:pointer;font-weight:700">
       🚀 Diventa Premium — 2,99€/mese
     </button>
-    <p style="font-size:11px;color:var(--muted);margin-top:12px;font-family:var(--font-mono)">
-      Pagamento sicuro via PayPal · Attivazione automatica entro pochi minuti
+    <p style="font-size:11px;color:var(--muted);margin-top:12px;font-family:var(--font-mono);text-align:center">
+      Pagamento sicuro via Stripe · Attivazione entro poche ore
     </p>
   </div>
 </div>
@@ -5121,88 +5121,66 @@ async function processOfflineQueue() {
 let isPremium = false;
 let _premiumListener = null; // riferimento al listener per poterlo cancellare al logout
 
-// ──────────────────────────────────────────────────────
-// PAYPAL CHECKOUT DINAMICO — passa l'UID utente come
-// campo "custom" così il webhook sa chi attivare.
-//
-// ⚠️  Sostituisci PAYPAL_BUSINESS_EMAIL con la tua
-//     email account PayPal Business (gratuita).
-// ──────────────────────────────────────────────────────
-const PAYPAL_BUSINESS_EMAIL = 'info@flexenofitness.com'; // ← cambia con la tua
-const PAYPAL_IPN_URL        = 'https://YOUR_PIPEDREAM_URL_HERE'; // ← da Pipedream
-const PAYPAL_RETURN_URL     = 'https://jefebcn.github.io/dietapp/app.html?premium_pending=1';
-const PAYPAL_CANCEL_URL     = 'https://jefebcn.github.io/dietapp/app.html';
+// ══════════════════════════════════════════════════════════════
+// STRIPE CHECKOUT
+// Stripe Payment Link con client_reference_id = Firebase UID
+// Il webhook Pipedream legge questo campo e attiva il premium.
+// ══════════════════════════════════════════════════════════════
+const STRIPE_PAYMENT_LINK   = 'https://buy.stripe.com/7sY6oG8VqckA5kfcgj6Na00';
+const STRIPE_SUCCESS_URL    = 'https://jefebcn.github.io/dietapp/app.html?stripe_success=1';
 
-function openPayPalCheckout() {
+function openStripeCheckout() {
   trackUpgradeClick();
   const userUid = uid();
   if (!userUid) { toast('Effettua il login prima', 'var(--danger)'); return; }
 
-  // Costruisce form PayPal standard con UID nel campo custom
-  const form = document.createElement('form');
-  form.method = 'post';
-  form.action = 'https://www.paypal.com/cgi-bin/webscr';
-  form.target = '_blank';
+  // Stripe Payment Links accettano ?client_reference_id= per passare dati custom
+  // Il webhook riceverà questo valore nel campo client_reference_id della session
+  const url = new URL(STRIPE_PAYMENT_LINK);
+  url.searchParams.set('client_reference_id', userUid);
+  url.searchParams.set('success_url',         STRIPE_SUCCESS_URL);
 
-  const fields = {
-    cmd:           '_xclick',
-    business:      PAYPAL_BUSINESS_EMAIL,
-    item_name:     'NutriTrack Premium – 1 mese',
-    amount:        '2.99',
-    currency_code: 'EUR',
-    custom:        userUid,          // ← Firebase UID → identifica l'utente nel webhook
-    notify_url:    PAYPAL_IPN_URL,   // ← Pipedream riceve IPN qui
-    return:        PAYPAL_RETURN_URL,
-    cancel_return: PAYPAL_CANCEL_URL,
-    no_shipping:   '1',
-    no_note:       '1',
-  };
-
-  Object.entries(fields).forEach(([name, value]) => {
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = name;
-    input.value = value;
-    form.appendChild(input);
-  });
-
-  document.body.appendChild(form);
-  form.submit();
-  document.body.removeChild(form);
+  window.location.href = url.toString();
 }
 
-// Gestisce il ritorno da PayPal dopo pagamento
-(function checkPayPalReturn() {
-  if (!window.location.search.includes('premium_pending=1')) return;
-  // Rimuovi il param dall'URL senza ricaricare
+// Alias per compatibilità con i bottoni già nel DOM
+function openPayPalCheckout() { openStripeCheckout(); }
+
+// ── Gestisce il ritorno da Stripe dopo pagamento completato ──
+(function checkStripeReturn() {
+  if (!window.location.search.includes('stripe_success=1')) return;
   window.history.replaceState({}, '', window.location.pathname);
-  // Mostra banner "attivazione in corso"
+
+  // Mostra banner — il listener onSnapshot aggiornerà isPremium
+  // in automatico non appena Pipedream scrive su Firestore (pochi secondi)
   setTimeout(() => {
     const banner = document.createElement('div');
+    banner.id = 'stripe-success-banner';
     banner.style.cssText = `
       position:fixed;top:70px;left:12px;right:12px;z-index:9000;
       background:linear-gradient(135deg,#3a6b27,#5a9e3a);color:#fff;
-      border-radius:16px;padding:16px 20px;box-shadow:0 8px 32px rgba(0,0,0,0.2);
-      display:flex;align-items:center;gap:14px;animation:slideDown 0.4s ease;
+      border-radius:16px;padding:16px 20px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.25);
+      display:flex;align-items:center;gap:14px;
+      animation:slideUp 0.4s ease;
       font-family:var(--font-body,sans-serif);
     `;
     banner.innerHTML = `
-      <span style="font-size:28px">🎉</span>
-      <div>
-        <div style="font-weight:700;font-size:15px">Pagamento ricevuto!</div>
-        <div style="font-size:13px;opacity:0.85">Il tuo Premium verrà attivato entro pochi minuti.</div>
+      <span style="font-size:32px">🎉</span>
+      <div style="flex:1">
+        <div style="font-weight:700;font-size:16px;margin-bottom:3px">Pagamento completato!</div>
+        <div style="font-size:13px;opacity:0.9">Riceverai la conferma di attivazione Premium entro breve. Grazie! 🌿</div>
       </div>
     `;
     document.body.appendChild(banner);
+    // Rimuovi dopo 10s (o prima se onSnapshot attiva il premium)
     setTimeout(() => {
-      banner.style.transition='opacity 0.5s';
-      banner.style.opacity='0';
+      banner.style.transition = 'opacity 0.5s';
+      banner.style.opacity = '0';
       setTimeout(() => banner.remove(), 500);
-    }, 6000);
-  }, 2000); // aspetta che l'app sia caricata
+    }, 10000);
+  }, 1500);
 })();
-
-const STRIPE_LINK = 'https://paypal.me/flexeno'; // compatibilità pregressa
 
 function loadPremiumStatus() {
   // Cancella eventuale listener precedente (es. dopo logout/login)
@@ -5417,7 +5395,7 @@ function updateAdminPremiumCard(targetUid, userData) {
     const byEl   = document.getElementById('adm-prem-by');
     const expEl  = document.getElementById('adm-prem-expires');
     if (dateEl) dateEl.textContent = setAt ? new Date(setAt).toLocaleDateString('it-IT') : '—';
-    if (byEl)   byEl.textContent   = userData.premiumSetBy === targetUid ? 'PayPal' : 'Admin';
+    if (byEl)   byEl.textContent   = userData.premiumTxnId ? 'Stripe' : 'Admin';
     if (expEl)  expEl.textContent  = expiresAt ? expiresAt.toLocaleDateString('it-IT') : '∞ Nessuna';
   }
 }
