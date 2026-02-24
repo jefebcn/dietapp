@@ -2870,6 +2870,9 @@ async function doForgot() {
 }
 
 async function doLogout() {
+  // Cancella il listener premium prima del logout per evitare errori di permesso
+  if (_premiumListener) { _premiumListener(); _premiumListener = null; }
+  isPremium = false;
   await window._fb.signOut(window._fb.auth);
 }
 
@@ -5116,6 +5119,7 @@ async function processOfflineQueue() {
 // PREMIUM SYSTEM
 // ══════════════════════════════════════════════════════
 let isPremium = false;
+let _premiumListener = null; // riferimento al listener per poterlo cancellare al logout
 
 // ──────────────────────────────────────────────────────
 // PAYPAL CHECKOUT DINAMICO — passa l'UID utente come
@@ -5200,20 +5204,38 @@ function openPayPalCheckout() {
 
 const STRIPE_LINK = 'https://paypal.me/flexeno'; // compatibilità pregressa
 
-async function loadPremiumStatus() {
-  try {
-    const {db, doc, getDoc} = window._fb;
-    const snap = await getDoc(doc(db, 'users', uid()));
+function loadPremiumStatus() {
+  // Cancella eventuale listener precedente (es. dopo logout/login)
+  if (_premiumListener) { _premiumListener(); _premiumListener = null; }
+
+  const {db, doc, onSnapshot} = window._fb;
+  const userRef = doc(db, 'users', uid());
+
+  // onSnapshot si richiama AUTOMATICAMENTE ogni volta che Firestore cambia
+  // → se l'admin attiva il premium, l'utente lo vede subito senza refresh
+  _premiumListener = onSnapshot(userRef, (snap) => {
+    const wasAlreadyPremium = isPremium;
     isPremium = snap.exists() && snap.data().premium === true;
     updatePremiumUI();
-    // ── Nudge premium dopo 3 giorni ──
-    if (!isPremium) {
+
+    // Se è appena diventato premium (cambio da false → true) mostra notifica di benvenuto
+    if (!wasAlreadyPremium && isPremium) {
+      toast('🎉 Premium attivato! Tutte le funzioni sono sbloccate.', 'var(--green)');
+      // Rimuovi eventuali banner/nudge promozionali ancora aperti
+      const nudgeBanner = document.getElementById('premium-nudge-banner');
+      if (nudgeBanner) nudgeBanner.remove();
+    }
+
+    // Nudge solo se free e prima lettura (wasAlreadyPremium === false all'inizio)
+    if (!isPremium && !wasAlreadyPremium) {
       const createdAt = snap.exists() ? snap.data().createdAt : null;
       checkPremiumNudge(createdAt);
     }
-  } catch(e) {
+  }, (e) => {
+    // Errore listener (es. permessi) → fallback silenzioso
+    console.warn('Premium listener error:', e.message);
     isPremium = false;
-  }
+  });
 }
 
 // ══════════════════════════════════════════════════════
