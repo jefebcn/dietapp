@@ -6246,11 +6246,10 @@ function openStripeCheckout() {
   const userUid = uid();
   if (!userUid) { toast('Effettua il login prima', 'var(--danger)'); return; }
 
-  // Stripe Payment Links accettano ?client_reference_id= per passare dati custom
-  // Il webhook riceverà questo valore nel campo client_reference_id della session
+  // Stripe Payment Links accettano solo ?client_reference_id= come param custom
+  // success_url va configurato nel Dashboard Stripe, non passato via URL
   const url = new URL(STRIPE_PAYMENT_LINK);
   url.searchParams.set('client_reference_id', userUid);
-  url.searchParams.set('success_url',         STRIPE_SUCCESS_URL);
 
   window.location.href = url.toString();
 }
