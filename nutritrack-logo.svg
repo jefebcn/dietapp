@@ -1,0 +1,21 @@
+<svg width="300" height="80" viewBox="0 0 300 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+<desc>NutriTrack Full Logo - Landing Page Version</desc>
+<defs>
+<linearGradient id="pitGradient" x1="20" y1="20" x2="60" y2="60" gradientUnits="userSpaceOnUse">
+<stop stop-color="#FDD835"/>
+<stop offset="1" stop-color="#FBC02D"/>
+</linearGradient>
+</defs>
+<g transform="translate(10, 10)">
+<path d="M30 0C18.9543 0 10 8.9543 10 20C10 28.1 14.6 35.1 21.5 38.5L30 60L38.5 38.5C45.4 35.1 50 28.1 50 20C50 8.9543 41.0457 0 30 0Z" fill="#2E7D32"/>
+<path d="M30 5C21.7157 5 15 11.7157 15 20C15 26.1 18.4 31.3 23.5 33.8L30 50L36.5 33.8C41.6 31.3 45 26.1 45 20C45 11.7157 38.2843 5 30 5Z" fill="#81C784"/>
+<circle cx="30" cy="21" r="11" fill="url(#pitGradient)"/>
+<path d="M23 24L26.5 20.5L29.5 23.5L36 17" stroke="#1B5E20" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M35 17H36.5V18.5" stroke="#1B5E20" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
+<g transform="translate(75, 53)">
+<text font-family="Arial, sans-serif" font-weight="bold" font-size="42">
+<tspan fill="#43A047">Nutri</tspan><tspan fill="#1B5E20">Track</tspan>
+</text>
+</g>
+</svg>
