@@ -52,9 +52,19 @@ onAuthStateChanged(auth, user => {
     const loader = document.getElementById('page-loader');
     const content = document.getElementById('page-content');
     if (loader) loader.style.display = 'none';
-    if (content) { content.style.opacity = '1'; }
+    if (content) content.style.opacity = '1';
   }
 });
+
+// Timeout di sicurezza: se Firebase non risponde entro 5s, mostra la landing comunque
+setTimeout(() => {
+  const loader = document.getElementById('page-loader');
+  const content = document.getElementById('page-content');
+  if (loader && loader.style.display !== 'none') {
+    loader.style.display = 'none';
+    if (content) content.style.opacity = '1';
+  }
+}, 5000);
 </script>
 
 <style>
@@ -721,7 +731,7 @@ footer {
 
 /* Landing loader: nasconde contenuto finché Firebase non risponde */
 #page-loader { display:flex !important; }
-#page-content { opacity:0 !important; }
+#page-content { opacity:0; transition: opacity 0.4s; }
 
 </style>
 </head>
