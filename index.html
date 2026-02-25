@@ -114,9 +114,17 @@ nav {
   border-bottom: 1px solid var(--border);
 }
 .nav-logo {
-  display: flex; align-items: center;
+  display: flex; align-items: center; gap: 8px;
   text-decoration: none;
 }
+.nav-logo-icon { height: 38px; width: auto; display: block; flex-shrink: 0; }
+.nav-logo-text {
+  font-family: var(--font-serif);
+  font-size: 22px; font-weight: 700; line-height: 1;
+  color: var(--bark);
+  white-space: nowrap;
+}
+.nav-logo-text span { color: var(--green); }
 /* nav-logo-icon removed */
 .nav-links { display: flex; gap: 28px; list-style: none; }
 .nav-links a {
@@ -695,6 +703,8 @@ footer {
   .nav-links { display: none; }
   .nav-cta { display: none; }
   .nav-burger { display: flex; }
+  .nav-logo-icon { height: 32px; }
+  .nav-logo-text { font-size: 19px; }
   footer { flex-direction: column; text-align: center; }
 }
 @media (max-width: 540px) {
@@ -722,8 +732,9 @@ footer {
 
 <!-- NAV -->
 <nav>
-  <a href="#" class="nav-logo" style="padding:0">
-    <img src="nutritrack-logo.svg" alt="NutriTrack" style="height:48px;width:auto;display:block">
+  <a href="#" class="nav-logo">
+    <img src="nutritrack-icon.svg" alt="" class="nav-logo-icon">
+    <span class="nav-logo-text">Nutri<span>Track</span></span>
   </a>
   <ul class="nav-links">
     <li><a href="#features">Funzioni</a></li>
@@ -771,8 +782,8 @@ footer {
     <div class="hero-right">
       <div class="food-orbit">
         <!-- Center logo -->
-        <div class="orbit-center" style="background:#fff;box-shadow:0 20px 60px rgba(58,107,39,0.25), 0 0 0 16px rgba(58,107,39,0.08), 0 0 0 32px rgba(58,107,39,0.04);flex-direction:column;gap:4px">
-          <img src="nutritrack-logo.svg" alt="NutriTrack" style="width:170px;height:auto;display:block">
+        <div class="orbit-center" style="background:#fff;box-shadow:0 20px 60px rgba(58,107,39,0.25), 0 0 0 16px rgba(58,107,39,0.08), 0 0 0 32px rgba(58,107,39,0.04);">
+          <img src="nutritrack-icon.svg" alt="NutriTrack" style="width:110px;height:110px;object-fit:contain;">
         </div>
         <!-- Orbiting food items -->
         <div class="food-item">🥗</div>
@@ -1074,7 +1085,10 @@ footer {
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo"><img src="nutritrack-logo.svg" alt="NutriTrack" style="height:36px;width:auto;display:block;filter:brightness(0) invert(1)"></div>
+  <div class="footer-logo">
+    <img src="nutritrack-icon.svg" alt="" style="height:32px;width:auto;display:block;filter:brightness(0) invert(1)">
+    <span style="font-family:var(--font-serif);font-size:18px;color:#fff;font-weight:700">NutriTrack</span>
+  </div>
   <div class="footer-copy">© 2025 Flexeno Fitness</div>
   <div class="footer-links">
     <a href="#">Privacy</a>
