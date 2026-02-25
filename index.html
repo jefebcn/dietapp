@@ -138,6 +138,52 @@ nav {
 }
 .nav-cta:hover { background: var(--green2); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(58,107,39,0.3); }
 
+/* ── HAMBURGER ── */
+.nav-burger {
+  display: none;
+  flex-direction: column; justify-content: center; gap: 5px;
+  width: 40px; height: 40px;
+  background: none; border: none; cursor: pointer; padding: 4px;
+  z-index: 200;
+}
+.nav-burger span {
+  display: block; height: 2px; width: 24px;
+  background: var(--bark); border-radius: 2px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+.nav-burger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-burger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.nav-burger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Mobile menu overlay */
+.nav-mobile {
+  display: none;
+  position: fixed; inset: 0; top: 73px;
+  background: rgba(245,239,228,0.97);
+  backdrop-filter: blur(20px);
+  z-index: 99;
+  flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px;
+  padding: 40px 24px;
+}
+.nav-mobile.open { display: flex; }
+.nav-mobile a {
+  font-size: 22px; font-weight: 600;
+  color: var(--bark); text-decoration: none;
+  padding: 16px 40px; border-radius: 16px;
+  width: 100%; max-width: 320px; text-align: center;
+  transition: background 0.2s, color 0.2s;
+}
+.nav-mobile a:hover { background: var(--green-lt); color: var(--green); }
+.nav-mobile .nav-mobile-cta {
+  margin-top: 16px;
+  background: var(--green); color: #fff;
+  font-size: 18px; font-weight: 700;
+  border-radius: 100px;
+}
+.nav-mobile .nav-mobile-cta:hover { background: var(--green2); }
+
 /* ── HERO ── */
 .hero {
   min-height: 100vh;
@@ -647,6 +693,8 @@ footer {
   .reviews-grid { grid-template-columns: 1fr; }
   nav { padding: 14px 20px; }
   .nav-links { display: none; }
+  .nav-cta { display: none; }
+  .nav-burger { display: flex; }
   footer { flex-direction: column; text-align: center; }
 }
 @media (max-width: 540px) {
@@ -684,7 +732,19 @@ footer {
     <li><a href="#reviews">Recensioni</a></li>
   </ul>
   <a href="app.html" class="nav-cta">Inizia Gratis →</a>
+  <button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
 </nav>
+
+<!-- MOBILE MENU -->
+<div class="nav-mobile" id="nav-mobile">
+  <a href="#features" class="nav-mobile-link">✨ Funzioni</a>
+  <a href="#how" class="nav-mobile-link">🏃‍♂️ Come funziona</a>
+  <a href="#pricing" class="nav-mobile-link">💰 Prezzi</a>
+  <a href="#reviews" class="nav-mobile-link">💬 Recensioni</a>
+  <a href="app.html" class="nav-mobile-cta">🚀 Inizia Gratis</a>
+</div>
 
 <!-- HERO -->
 <section style="background:var(--cream);padding-bottom:0">
@@ -1014,7 +1074,7 @@ footer {
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo"><img src="nutritrack-logo.svg" alt="NutriTrack" style="height:36px;width:auto;display:block"></div>
+  <div class="footer-logo"><img src="nutritrack-logo.svg" alt="NutriTrack" style="height:36px;width:auto;display:block;filter:brightness(0) invert(1)"></div>
   <div class="footer-copy">© 2025 Flexeno Fitness</div>
   <div class="footer-links">
     <a href="#">Privacy</a>
@@ -1145,6 +1205,28 @@ function toggleGdprDetail(e) {
   detail.style.display = open ? 'none' : 'block';
   link.textContent = open ? 'Leggi di più ▾' : 'Nascondi ▴';
 }
+</script>
+<script>
+// Hamburger menu
+const burger = document.getElementById('nav-burger');
+const mobileMenu = document.getElementById('nav-mobile');
+
+burger.addEventListener('click', () => {
+  const isOpen = mobileMenu.classList.toggle('open');
+  burger.classList.toggle('open', isOpen);
+  burger.setAttribute('aria-expanded', isOpen);
+  document.body.style.overflow = isOpen ? 'hidden' : '';
+});
+
+// Close on link click
+document.querySelectorAll('#nav-mobile a').forEach(link => {
+  link.addEventListener('click', () => {
+    mobileMenu.classList.remove('open');
+    burger.classList.remove('open');
+    burger.setAttribute('aria-expanded', false);
+    document.body.style.overflow = '';
+  });
+});
 </script>
 </body>
 </html>
