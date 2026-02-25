@@ -727,6 +727,391 @@ footer {
 #page-loader { display:none !important; }
 #page-content { opacity:1 !important; }
 
+
+/* ── HERO STATS ── */
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 20px;
+  padding: 16px 20px;
+  background: #fff;
+  border-radius: 16px;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 4px 20px rgba(44,31,14,0.06);
+  width: fit-content;
+}
+.hero-stat { text-align: center; padding: 0 20px; }
+.hero-stat-num {
+  font-family: var(--font-serif);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--bark);
+  line-height: 1;
+}
+.hero-stat-lbl {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+  font-family: var(--font-mono);
+}
+.hero-stat-divider {
+  width: 1px;
+  height: 36px;
+  background: var(--border);
+  flex-shrink: 0;
+}
+
+/* ── PHONE MOCKUP ── */
+.phone-wrap {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 40px;
+}
+.phone-frame {
+  width: 240px;
+  background: #1a1a1a;
+  border-radius: 40px;
+  padding: 12px;
+  box-shadow:
+    0 40px 80px rgba(44,31,14,0.25),
+    0 0 0 1px rgba(255,255,255,0.08),
+    inset 0 0 0 1px rgba(255,255,255,0.04);
+  position: relative;
+  z-index: 2;
+}
+.phone-notch {
+  width: 80px;
+  height: 22px;
+  background: #1a1a1a;
+  border-radius: 0 0 16px 16px;
+  margin: 0 auto 6px;
+  position: relative;
+  z-index: 10;
+}
+.phone-screen {
+  background: var(--cream);
+  border-radius: 28px;
+  overflow: hidden;
+  height: 460px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 14px 14px 10px;
+  background: var(--cream);
+}
+.app-greeting {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--bark);
+}
+.app-date {
+  font-size: 9px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+}
+.app-streak {
+  font-size: 11px;
+  font-weight: 700;
+  background: #fff3e0;
+  color: #d4622a;
+  padding: 4px 8px;
+  border-radius: 20px;
+  font-family: var(--font-mono);
+}
+.app-macro-card {
+  margin: 0 10px 8px;
+  background: #fff;
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 2px 8px rgba(44,31,14,0.06);
+}
+.app-macro-ring { position: relative; flex-shrink: 0; }
+.app-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.app-ring-kcal {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--bark);
+  line-height: 1;
+}
+.app-ring-lbl {
+  font-size: 7px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+.app-macro-pills {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+.app-mpill {
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--muted);
+  background: var(--cream);
+  padding: 3px 8px;
+  border-radius: 8px;
+}
+.app-mpill strong { font-weight: 700; }
+.app-section-label {
+  font-size: 9px;
+  font-family: var(--font-mono);
+  color: var(--muted);
+  letter-spacing: 1px;
+  padding: 0 14px 4px;
+  text-transform: uppercase;
+}
+.app-entry {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.app-entry-icon { font-size: 18px; }
+.app-entry-info { flex: 1; min-width: 0; }
+.app-entry-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--bark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.app-entry-sub {
+  font-size: 9px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  margin-top: 1px;
+}
+.app-entry-kcal {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--green);
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+.app-bottom-bar {
+  margin-top: auto;
+  background: #fff;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0 14px;
+  border-top: 1px solid var(--border);
+}
+.app-tab { font-size: 18px; opacity: 0.4; cursor: pointer; }
+.app-tab.active { opacity: 1; }
+
+/* Phone floating badges */
+.phone-badge {
+  position: absolute;
+  background: #fff;
+  border-radius: 14px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 8px 32px rgba(44,31,14,0.15);
+  font-size: 20px;
+  animation: float-badge 3s ease-in-out infinite;
+  white-space: nowrap;
+  border: 1.5px solid var(--border);
+  z-index: 3;
+}
+.phone-badge-1 { left: -10px; top: 80px; animation-delay: 0s; }
+.phone-badge-2 { right: -10px; top: 200px; animation-delay: 1s; }
+.phone-badge-3 { left: 0px; bottom: 80px; animation-delay: 2s; }
+.pb-val {
+  font-family: var(--font-serif);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--bark);
+  line-height: 1;
+}
+.pb-lbl {
+  font-size: 9px;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+@keyframes float-badge {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+/* ── BILLING TOGGLE ── */
+.billing-toggle {
+  display: flex;
+  gap: 6px;
+  background: rgba(255,255,255,0.12);
+  padding: 5px;
+  border-radius: 40px;
+  width: fit-content;
+  margin: 0 auto 36px;
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.bill-btn {
+  padding: 9px 22px;
+  border-radius: 30px;
+  border: none;
+  background: transparent;
+  color: rgba(255,255,255,0.6);
+  font-size: 14px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.bill-btn.active {
+  background: #fff;
+  color: var(--bark);
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.bill-save {
+  font-size: 10px;
+  background: #4e8f34;
+  color: #fff;
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+/* ── VS COMPARISON TABLE ── */
+#vs { padding: 80px 0; }
+.vs-table-wrap {
+  overflow-x: auto;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  box-shadow: 0 8px 40px rgba(44,31,14,0.08);
+  margin-top: 40px;
+}
+.vs-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 20px;
+  overflow: hidden;
+}
+.vs-table thead tr {
+  background: var(--bark);
+}
+.vs-table th {
+  padding: 16px 20px;
+  text-align: center;
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+.vs-th-us {
+  background: var(--green) !important;
+  color: #fff !important;
+  font-size: 15px !important;
+}
+.vs-badge-us {
+  display: inline-block;
+  margin-left: 6px;
+  font-size: 16px;
+}
+.vs-th-them { background: rgba(255,255,255,0.05); }
+.vs-table td {
+  padding: 13px 20px;
+  font-size: 13px;
+  color: var(--bark2);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-sans);
+}
+.vs-table tr:last-child td { border-bottom: none; }
+.vs-table td:first-child { font-weight: 500; color: var(--bark); }
+.vs-table td:not(:first-child) { text-align: center; }
+.vs-yes { color: var(--green); font-weight: 600; }
+.vs-no { color: var(--muted); }
+.vs-table tbody tr:nth-child(even) { background: var(--cream); }
+.vs-table tbody tr:hover { background: var(--green-lt); transition: background 0.15s; }
+.vs-table td:nth-child(2) { background: rgba(58,107,39,0.04) !important; }
+
+/* ── FAQ ── */
+#faq { padding: 80px 0; background: var(--cream); }
+.faq-list { max-width: 720px; margin: 48px auto 0; display: flex; flex-direction: column; gap: 12px; }
+.faq-item {
+  background: #fff;
+  border-radius: 16px;
+  border: 1.5px solid var(--border);
+  overflow: hidden;
+  cursor: pointer;
+  transition: box-shadow 0.2s;
+}
+.faq-item:hover { box-shadow: 0 4px 20px rgba(58,107,39,0.10); }
+.faq-item.open { border-color: var(--green); }
+.faq-q {
+  padding: 18px 22px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--bark);
+  user-select: none;
+}
+.faq-arrow {
+  color: var(--green);
+  font-size: 20px;
+  transition: transform 0.25s;
+  flex-shrink: 0;
+}
+.faq-item.open .faq-arrow { transform: rotate(180deg); }
+.faq-a {
+  max-height: 0;
+  overflow: hidden;
+  padding: 0 22px;
+  font-size: 14px;
+  color: var(--bark2);
+  line-height: 1.7;
+  transition: max-height 0.35s ease, padding 0.25s;
+}
+.faq-item.open .faq-a { max-height: 200px; padding: 0 22px 18px; }
+
+/* ── NAV link for new sections ── */
+
+/* ── RESPONSIVE phone mockup ── */
+@media (max-width: 768px) {
+  .phone-wrap { padding: 10px 20px; }
+  .phone-frame { width: 200px; }
+  .phone-screen { height: 380px; }
+  .phone-badge-1 { left: -5px; top: 60px; }
+  .phone-badge-2 { right: -5px; top: 170px; }
+  .phone-badge-3 { display: none; }
+  .hero-stats { flex-wrap: wrap; gap: 8px; padding: 12px 14px; }
+  .hero-stat { padding: 0 12px; }
+  .vs-table th, .vs-table td { padding: 10px 12px; font-size: 12px; }
+}
 </style>
 </head>
 <body>
@@ -763,6 +1148,7 @@ footer {
     <li><a href="#how">Come funziona</a></li>
     <li><a href="#pricing">Prezzi</a></li>
     <li><a href="#reviews">Recensioni</a></li>
+    <li><a href="#faq">FAQ</a></li>
   </ul>
   <a href="app.html" class="nav-cta">Inizia Gratis →</a>
   <button class="nav-burger" id="nav-burger" aria-label="Menu" aria-expanded="false">
@@ -794,56 +1180,122 @@ footer {
         <a href="app.html" class="btn-main">🚀 Inizia Gratis</a>
         <a href="#features" class="btn-ghost">Scopri come →</a>
       </div>
+      <!-- Stats numerici -->
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-num" data-target="2400">0</div>
+          <div class="hero-stat-lbl">utenti attivi</div>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <div class="hero-stat-num" data-target="18000" data-suffix=" kg">0</div>
+          <div class="hero-stat-lbl">persi totali</div>
+        </div>
+        <div class="hero-stat-divider"></div>
+        <div class="hero-stat">
+          <div class="hero-stat-num" data-target="49" data-prefix="4." data-raw="4.9">4.9</div>
+          <div class="hero-stat-lbl">⭐ rating medio</div>
+        </div>
+      </div>
       <div class="hero-trust">
-        <div class="hero-trust-item"><div class="hero-trust-dot"></div>800+ alimenti italiani</div>
+        <div class="hero-trust-item"><div class="hero-trust-dot"></div>800+ alimenti INRAN</div>
         <div class="hero-trust-item"><div class="hero-trust-dot"></div>Barcode scanner</div>
         <div class="hero-trust-item"><div class="hero-trust-dot"></div>Funziona offline</div>
       </div>
     </div>
 
     <div class="hero-right">
-      <div class="food-orbit">
-        <!-- Center logo -->
-        <div class="orbit-center" style="background:#fff;box-shadow:0 20px 60px rgba(58,107,39,0.25), 0 0 0 16px rgba(58,107,39,0.08), 0 0 0 32px rgba(58,107,39,0.04);">
-          <svg width="110" height="110" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="hb-bg" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#2E7D32"/><stop offset="1" stop-color="#1a4d1e"/>
-              </linearGradient>
-            </defs>
-            <rect width="48" height="48" rx="14" fill="url(#hb-bg)"/>
-            <circle cx="24" cy="25" r="14" stroke="rgba(255,255,255,0.12)" stroke-width="4" fill="none"/>
-            <circle cx="24" cy="25" r="14" stroke="#A5D63A" stroke-width="4" fill="none" stroke-dasharray="35 53" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 24 25)"/>
-            <circle cx="24" cy="25" r="14" stroke="#FFD740" stroke-width="4" fill="none" stroke-dasharray="22 66" stroke-dashoffset="-37" stroke-linecap="round" transform="rotate(-90 24 25)"/>
-            <circle cx="24" cy="25" r="14" stroke="#FF8A50" stroke-width="4" fill="none" stroke-dasharray="14 74" stroke-dashoffset="-60" stroke-linecap="round" transform="rotate(-90 24 25)"/>
-            <path d="M24 19C24 19 20 21.5 20 25C20 27.2 21.8 29 24 29C26.2 29 28 27.2 28 25C28 21.5 24 19 24 19Z" fill="white" opacity="0.95"/>
-            <path d="M24 28.5V21" stroke="#1a4d1e" stroke-width="1" stroke-linecap="round"/>
-            <circle cx="24" cy="11" r="2.5" fill="#A5D63A"/>
-          </svg>
+      <!-- Phone mockup showing app UI -->
+      <div class="phone-wrap">
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <!-- App header -->
+            <div class="app-header">
+              <div>
+                <div class="app-greeting">Ciao, Marco 👋</div>
+                <div class="app-date">Mercoledì 25 Feb</div>
+              </div>
+              <div class="app-streak">🔥 14</div>
+            </div>
+            <!-- Macro ring -->
+            <div class="app-macro-card">
+              <div class="app-macro-ring">
+                <svg viewBox="0 0 80 80" width="80" height="80">
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#e8f3e2" stroke-width="7"/>
+                  <circle cx="40" cy="40" r="32" fill="none" stroke="#3a6b27" stroke-width="7"
+                    stroke-dasharray="140 201" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 40 40)"/>
+                  <circle cx="40" cy="40" r="22" fill="none" stroke="#e8f3e2" stroke-width="5"/>
+                  <circle cx="40" cy="40" r="22" fill="none" stroke="#ca8a04" stroke-width="5"
+                    stroke-dasharray="88 138" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 40 40)"/>
+                </svg>
+                <div class="app-ring-center">
+                  <div class="app-ring-kcal">1.840</div>
+                  <div class="app-ring-lbl">kcal</div>
+                </div>
+              </div>
+              <div class="app-macro-pills">
+                <div class="app-mpill" style="color:#3a6b27">P <strong>142g</strong></div>
+                <div class="app-mpill" style="color:#ca8a04">C <strong>188g</strong></div>
+                <div class="app-mpill" style="color:#d4622a">G <strong>51g</strong></div>
+              </div>
+            </div>
+            <!-- Today entries -->
+            <div class="app-section-label">Oggi</div>
+            <div class="app-entry">
+              <span class="app-entry-icon">🥚</span>
+              <div class="app-entry-info">
+                <div class="app-entry-name">Uova strapazzate</div>
+                <div class="app-entry-sub">3 uova · 220 kcal</div>
+              </div>
+              <div class="app-entry-kcal">220</div>
+            </div>
+            <div class="app-entry">
+              <span class="app-entry-icon">🍗</span>
+              <div class="app-entry-info">
+                <div class="app-entry-name">Petto di pollo</div>
+                <div class="app-entry-sub">150g · 248 kcal</div>
+              </div>
+              <div class="app-entry-kcal">248</div>
+            </div>
+            <div class="app-entry">
+              <span class="app-entry-icon">🍚</span>
+              <div class="app-entry-info">
+                <div class="app-entry-name">Riso basmati</div>
+                <div class="app-entry-sub">80g · 270 kcal</div>
+              </div>
+              <div class="app-entry-kcal">270</div>
+            </div>
+            <!-- Bottom bar -->
+            <div class="app-bottom-bar">
+              <div class="app-tab active">🏠</div>
+              <div class="app-tab">📔</div>
+              <div class="app-tab">⚖️</div>
+              <div class="app-tab">🏆</div>
+            </div>
+          </div>
         </div>
-        <!-- Orbiting food items -->
-        <div class="food-item">🥗</div>
-        <div class="food-item">💪</div>
-        <div class="food-item">🍗</div>
-        <div class="food-item">🏃‍♂️</div>
-        <div class="food-item">🥦</div>
-        <div class="food-item">⚖️</div>
-        <div class="food-item">🍳</div>
-        <div class="food-item">🎯</div>
-      </div>
-      <!-- Floating stat cards -->
-      <div class="stat-float stat-float-1">
-        <span class="stat-float-icon">🔥</span>
-        <div>
-          <div class="stat-float-val">-3.2 kg</div>
-          <div class="stat-float-lbl">questo mese</div>
+        <!-- Floating badges -->
+        <div class="phone-badge phone-badge-1">
+          <span>🔥</span>
+          <div>
+            <div class="pb-val">-3.2 kg</div>
+            <div class="pb-lbl">questo mese</div>
+          </div>
         </div>
-      </div>
-      <div class="stat-float stat-float-2">
-        <span class="stat-float-icon">🪙</span>
-        <div>
-          <div class="stat-float-val">1.240 pts</div>
-          <div class="stat-float-lbl">NutriPoints</div>
+        <div class="phone-badge phone-badge-2">
+          <span>🪙</span>
+          <div>
+            <div class="pb-val">1.240 pts</div>
+            <div class="pb-lbl">NutriPoints</div>
+          </div>
+        </div>
+        <div class="phone-badge phone-badge-3">
+          <span>📷</span>
+          <div>
+            <div class="pb-val">AI foto</div>
+            <div class="pb-lbl">analisi istantanea</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1003,6 +1455,14 @@ footer {
       <h2 class="section-title">Semplice e onesto</h2>
       <p class="section-sub">Inizia gratis. Upgradi solo se vuoi di più. Meno di un caffè al mese.</p>
     </div>
+    <!-- Billing toggle -->
+    <div class="billing-toggle reveal" id="billing-toggle">
+      <button class="bill-btn active" id="bill-monthly" onclick="setBilling('monthly')">Mensile</button>
+      <button class="bill-btn" id="bill-annual" onclick="setBilling('annual')">
+        Annuale
+        <span class="bill-save">Risparmia 44%</span>
+      </button>
+    </div>
     <div class="pricing-grid reveal">
       <div class="plan-card">
         <div class="plan-name">Free Forever</div>
@@ -1023,8 +1483,10 @@ footer {
       <div class="plan-card featured">
         <div class="plan-tag">🌟 Più Popolare</div>
         <div class="plan-name">Premium</div>
-        <div class="plan-price"><sup>€</sup>2<span style="font-size:36px">.99</span><span class="period">/mese</span></div>
-        <div class="plan-desc">Tutto il Free + funzioni avanzate.</div>
+        <div class="plan-price" id="premium-price-display">
+          <sup>€</sup><span id="premium-price-num">2<span style="font-size:36px">.99</span></span><span class="period" id="premium-period">/mese</span>
+        </div>
+        <div class="plan-desc" id="premium-price-sub">Tutto il Free + funzioni avanzate.</div>
         <ul class="plan-feats">
           <li class="on">✅ Tutto il piano Free</li>
           <li class="on">🤖 Foto AI illimitata</li>
@@ -1035,7 +1497,7 @@ footer {
           <li class="on">🚀 Accesso anticipato</li>
           <li class="on">💬 Supporto prioritario</li>
         </ul>
-        <a href="https://buy.stripe.com/9B64gy8eo3O4bID0xB6Na01" target="_blank" class="plan-btn featured-btn">🚀 Diventa Premium — 2,99€/mese</a>
+        <a href="https://buy.stripe.com/9B64gy8eo3O4bID0xB6Na01" target="_blank" class="plan-btn featured-btn" id="premium-cta-btn">🚀 Diventa Premium — 2,99€/mese</a>
         <p style="font-size:11px;color:rgba(255,255,255,0.3);text-align:center;margin-top:12px;font-family:var(--font-mono)">
           💳 Pagamento sicuro con Stripe · Attivazione immediata
         </p>
@@ -1054,15 +1516,18 @@ footer {
     <div class="reviews-grid">
       <div class="review-card reveal reveal-delay-1">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
-          <div class="review-stars">★★★★★</div>
-          <div style="font-size:10px;font-weight:600;letter-spacing:0.8px;color:var(--green);background:var(--green-lt);padding:3px 10px;border-radius:100px">✅ Verificato</div>
+          <div>
+            <div class="review-stars">★★★★★</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px">14 febbraio 2025</div>
+          </div>
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.8px;color:var(--green);background:var(--green-lt);padding:3px 10px;border-radius:100px">✅ Utente verificato</div>
         </div>
-        <p class="review-text">"Finalmente un'app italiana seria. Il database INRAN è completo e non devo più cercare i valori su Google. I NutriPoints mi hanno fatto andare avanti anche nei giorni difficili."</p>
+        <p class="review-text">"Finalmente un'app italiana seria. Il database INRAN è completo e non devo più cercare i valori su Google. I NutriPoints mi hanno fatto andare avanti anche nei giorni difficili. Unica cosa: vorrei più piani pasto predefiniti."</p>
         <div style="margin:16px 0;padding:12px 16px;background:var(--green-lt);border-radius:12px;font-size:13px;color:var(--green);font-weight:600">
           🏆 -8 kg in 3 mesi · Streak 47 giorni
         </div>
         <div class="review-author">
-          <div class="review-av" style="background:linear-gradient(135deg,#3a6b27,#7db560);color:#fff;font-weight:700">LM</div>
+          <div class="review-av" style="background:linear-gradient(135deg,#3a6b27,#7db560);color:#fff;font-weight:700;font-size:15px">LM</div>
           <div>
             <div class="review-name">Luca M.</div>
             <div class="review-meta">Personal trainer · Milano</div>
@@ -1071,15 +1536,18 @@ footer {
       </div>
       <div class="review-card reveal reveal-delay-2">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
-          <div class="review-stars">★★★★★</div>
-          <div style="font-size:10px;font-weight:600;letter-spacing:0.8px;color:var(--orange);background:var(--orange-lt);padding:3px 10px;border-radius:100px">⭐ Premium</div>
+          <div>
+            <div class="review-stars">★★★★★</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px">3 gennaio 2025</div>
+          </div>
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.8px;color:var(--orange);background:var(--orange-lt);padding:3px 10px;border-radius:100px">⭐ Premium 4 mesi</div>
         </div>
-        <p class="review-text">"La foto AI è una cosa di un altro livello. Scatto il piatto e in pochi secondi ho calorie e macro calcolati. Ho preso subito Premium — vale 10 volte i 3 euro che costa."</p>
+        <p class="review-text">"La foto AI è una cosa di un altro livello. Scatto il piatto e in pochi secondi ho calorie e macro calcolati. Ho preso Premium dopo una settimana di free — vale molto più dei 3 euro al mese."</p>
         <div style="margin:16px 0;padding:12px 16px;background:var(--orange-lt);border-radius:12px;font-size:13px;color:var(--orange);font-weight:600">
           🤖 500+ foto AI analizzate · 4 mesi Premium
         </div>
         <div class="review-author">
-          <div class="review-av" style="background:linear-gradient(135deg,#d4622a,#f0956a);color:#fff;font-weight:700">SA</div>
+          <div class="review-av" style="background:linear-gradient(135deg,#d4622a,#f0956a);color:#fff;font-weight:700;font-size:15px">SA</div>
           <div>
             <div class="review-name">Sara A.</div>
             <div class="review-meta">Nutrizionista · Torino</div>
@@ -1088,21 +1556,144 @@ footer {
       </div>
       <div class="review-card reveal reveal-delay-3">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
-          <div class="review-stars">★★★★★</div>
+          <div>
+            <div class="review-stars">★★★★☆</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px">20 dicembre 2024</div>
+          </div>
           <div style="font-size:10px;font-weight:600;letter-spacing:0.8px;color:var(--gold);background:#fff8e8;padding:3px 10px;border-radius:100px">🪙 Top Referral</div>
         </div>
-        <p class="review-text">"Ho invitato 6 amici con il mio codice e guadagnato 600 NutriPoints. Li ho usati per uno sconto da Flexeno. Il sistema premi funziona davvero, non è solo marketing."</p>
+        <p class="review-text">"Ho invitato 6 amici con il mio codice e guadagnato 600 NutriPoints. Li ho riscattati per uno sconto da Flexeno. Il sistema premi funziona davvero. Tolgo una stella perché vorrei una versione dark mode."</p>
         <div style="margin:16px 0;padding:12px 16px;background:#fff8e8;border-radius:12px;font-size:13px;color:var(--gold);font-weight:600">
           👥 6 amici invitati · 1.340 NutriPoints totali
         </div>
         <div class="review-author">
-          <div class="review-av" style="background:linear-gradient(135deg,#c8861a,#e8a835);color:#fff;font-weight:700">MR</div>
+          <div class="review-av" style="background:linear-gradient(135deg,#c8861a,#e8a835);color:#fff;font-weight:700;font-size:15px">MR</div>
           <div>
             <div class="review-name">Marco R.</div>
             <div class="review-meta">Appassionato calisthenics · Roma</div>
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- VS COMPARISON -->
+<section id="vs" style="background:var(--cream2)">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-chip">⚡ Confronto</div>
+      <h2 class="section-title">Perché NutriTrack<br>e non le altre?</h2>
+      <p class="section-sub">Se usi già MyFitnessPal o Yazio, ecco cosa cambia davvero.</p>
+    </div>
+    <div class="vs-table-wrap reveal">
+      <table class="vs-table">
+        <thead>
+          <tr>
+            <th></th>
+            <th class="vs-th-us">NutriTrack <span class="vs-badge-us">🇮🇹</span></th>
+            <th class="vs-th-them">MyFitnessPal</th>
+            <th class="vs-th-them">Yazio</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Database italiano INRAN</td>
+            <td class="vs-yes">✅</td>
+            <td class="vs-no">❌ Solo generico</td>
+            <td class="vs-no">⚠️ Parziale</td>
+          </tr>
+          <tr>
+            <td>Interfaccia in italiano</td>
+            <td class="vs-yes">✅ Nativa</td>
+            <td class="vs-no">⚠️ Tradotta</td>
+            <td class="vs-no">⚠️ Tradotta</td>
+          </tr>
+          <tr>
+            <td>Barcode scanner</td>
+            <td class="vs-yes">✅ Gratis</td>
+            <td class="vs-no">🔒 Premium</td>
+            <td class="vs-yes">✅ Gratis</td>
+          </tr>
+          <tr>
+            <td>AI analisi foto</td>
+            <td class="vs-yes">✅ Premium</td>
+            <td class="vs-no">❌</td>
+            <td class="vs-no">🔒 Premium</td>
+          </tr>
+          <tr>
+            <td>Sistema punti & premi</td>
+            <td class="vs-yes">✅ NutriPoints</td>
+            <td class="vs-no">❌</td>
+            <td class="vs-no">❌</td>
+          </tr>
+          <tr>
+            <td>Classifica settimanale</td>
+            <td class="vs-yes">✅ Leghe</td>
+            <td class="vs-no">❌</td>
+            <td class="vs-no">❌</td>
+          </tr>
+          <tr>
+            <td>Prezzo base</td>
+            <td class="vs-yes" style="color:var(--green);font-weight:700">€0 forever</td>
+            <td class="vs-no">$19.99/mese</td>
+            <td class="vs-no">€9.99/mese</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="container">
+    <div class="reveal">
+      <div class="section-chip">❓ Domande frequenti</div>
+      <h2 class="section-title">Hai dubbi?<br>Noi abbiamo risposte.</h2>
+    </div>
+    <div class="faq-list reveal">
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <span>Devo scaricare qualcosa dall'App Store?</span>
+          <span class="faq-arrow">▾</span>
+        </div>
+        <div class="faq-a">No. NutriTrack è una <strong>PWA (Progressive Web App)</strong>: si apre dal browser e puoi aggiungerla alla schermata Home come se fosse un'app nativa. Su iPhone: Safari → "Condividi" → "Aggiungi alla schermata Home". Funziona anche offline.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <span>Posso cancellare il Premium quando voglio?</span>
+          <span class="faq-arrow">▾</span>
+        </div>
+        <div class="faq-a">Sì, in qualsiasi momento. Il pagamento è gestito da <strong>Stripe</strong> — puoi cancellare dall'email di conferma o scrivendoci. Nessun vincolo, nessuna penale. I tuoi dati rimangono comunque salvi.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <span>I miei dati sono al sicuro?</span>
+          <span class="faq-arrow">▾</span>
+        </div>
+        <div class="faq-a">Sì. I dati sono salvati su <strong>Firebase (Google Cloud)</strong>, crittografati e mai condivisi o venduti a terzi. Puoi richiedere la cancellazione totale del tuo account in qualsiasi momento.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <span>Come funziona la foto AI?</span>
+          <span class="faq-arrow">▾</span>
+        </div>
+        <div class="faq-a">Scatti una foto al tuo piatto e l'AI (basata su GPT-4o Vision) riconosce gli alimenti, stima le grammature e calcola calorie e macro in pochi secondi. Non è perfetto al 100% ma è preciso per il 90% dei pasti comuni. Disponibile con <strong>Piano Premium</strong>.</div>
+      </div>
+
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q">
+          <span>Cosa sono i NutriPoints e come si riscattano?</span>
+          <span class="faq-arrow">▾</span>
+        </div>
+        <div class="faq-a">I NutriPoints sono punti che guadagni completando obiettivi: pesarti ogni giorno, raggiungere i macro, mantenere lo streak. Accumuli punti, sali di lega e puoi riscattarli per <strong>sconti reali su Flexeno Fitness</strong> — abbigliamento, attrezzatura, integratori.</div>
+      </div>
+
     </div>
   </div>
 </section>
@@ -1286,5 +1877,64 @@ document.querySelectorAll('#nav-mobile a').forEach(link => {
   });
 });
 </script>
+
+<script>
+// ── ANIMATED COUNTERS ──
+function animateCounter(el) {
+  const target = parseInt(el.dataset.target);
+  const suffix = el.dataset.suffix || '';
+  const rawVal = el.dataset.raw;
+  if (rawVal) return; // static value like 4.9
+  const duration = 1800;
+  const step = Math.ceil(target / (duration / 16));
+  let current = 0;
+  const timer = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = current.toLocaleString('it-IT') + suffix;
+    if (current >= target) clearInterval(timer);
+  }, 16);
+}
+
+const counterObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      animateCounter(e.target);
+      counterObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+document.querySelectorAll('.hero-stat-num[data-target]').forEach(el => {
+  if (!el.dataset.raw) counterObs.observe(el);
+});
+
+// ── FAQ TOGGLE ──
+function toggleFaq(item) {
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(i => i.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+// ── BILLING TOGGLE ──
+function setBilling(mode) {
+  const priceEl = document.getElementById('premium-price-num');
+  const periodEl = document.getElementById('premium-period');
+  const subEl = document.getElementById('premium-price-sub');
+  const btnEl = document.getElementById('premium-cta-btn');
+  document.getElementById('bill-monthly').classList.toggle('active', mode === 'monthly');
+  document.getElementById('bill-annual').classList.toggle('active', mode === 'annual');
+  if (mode === 'annual') {
+    priceEl.innerHTML = '19<span style="font-size:36px">.99</span>';
+    periodEl.textContent = '/anno';
+    subEl.textContent = 'Equivale a 1,67€/mese — risparmi 44%.';
+    if (btnEl) btnEl.textContent = '🚀 Diventa Premium — 19,99€/anno';
+  } else {
+    priceEl.innerHTML = '2<span style="font-size:36px">.99</span>';
+    periodEl.textContent = '/mese';
+    subEl.textContent = 'Tutto il Free + funzioni avanzate.';
+    if (btnEl) btnEl.textContent = '🚀 Diventa Premium — 2,99€/mese';
+  }
+}
+</script>
+
 </body>
 </html>
