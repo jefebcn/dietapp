@@ -43,14 +43,29 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-onAuthStateChanged(auth, user => {
-  if (user) {
-    window.location.replace('app.html');
-  } else {
-    document.getElementById('page-loader').style.display = 'none';
-    document.getElementById('page-content').style.opacity = '1';
-  }
-});
+try {
+  let redirected = false;
+  // Fallback: make sure landing remains usable even if auth listener stalls
+  setTimeout(() => { 
+    if (!redirected) { 
+      const pc = document.getElementById('page-content'); 
+      if (pc) pc.style.opacity = '1'; 
+      const pl = document.getElementById('page-loader'); 
+      if (pl) pl.style.display = 'none'; 
+    }
+  }, 900);
+
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      redirected = true;
+      window.location.replace('app.html');
+      return;
+    }
+    // not logged: landing stays visible (no loader gating)
+  });
+} catch(e) {
+  console.warn('Auth init failed:', e);
+}
 </script>
 
 <style>
@@ -658,6 +673,11 @@ footer {
 }
 
 
+
+
+/* Landing: no blocking loader (avoid infinite loading) */
+#page-loader{display:none !important;}
+#page-content{opacity:1 !important;}
 
 </style>
 </head>
