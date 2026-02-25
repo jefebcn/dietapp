@@ -3660,7 +3660,7 @@ async function doLogin() {
     await window._fb.signInWithEmailAndPassword(window._fb.auth, email, pass);
     // onAuthStateChanged chiamerà showApp() — l'auth-screen sparirà, btn irrilevante
   } catch(e) {
-    showAuthError(firebaseErrMsg(e.code));
+    showAuthError(firebaseErrMsg(e.code, e.message));
   } finally {
     // Garantisce sempre il reset del bottone (errore o eccezione inattesa)
     btn.disabled = false; btn.textContent = 'Accedi →';
@@ -3693,7 +3693,7 @@ async function doRegister() {
     });
     // onAuthStateChanged chiamerà showApp() — btn irrilevante sul percorso felice
   } catch(e) {
-    showAuthError(firebaseErrMsg(e.code));
+    showAuthError(firebaseErrMsg(e.code, e.message));
   } finally {
     // Garantisce sempre il reset del bottone (errore o eccezione inattesa)
     btn.disabled = false; btn.textContent = 'Crea account →';
@@ -3751,7 +3751,7 @@ async function doForgot() {
     // Auto-back to login after 4s
     setTimeout(() => closeForgotFlow(), 4000);
   } catch(e) {
-    statusEl.textContent = '⚠️ ' + firebaseErrMsg(e.code);
+    statusEl.textContent = '⚠️ ' + firebaseErrMsg(e.code, e.message);
     statusEl.style.background = 'rgba(239,68,68,0.08)';
     statusEl.style.color = 'var(--danger)';
     statusEl.style.border = '1px solid rgba(239,68,68,0.2)';
@@ -3773,17 +3773,22 @@ async function doLogout() {
   await window._fb.signOut(window._fb.auth);
 }
 
-function firebaseErrMsg(code) {
+function firebaseErrMsg(code, fallback) {
   const map = {
-    'auth/user-not-found': 'Nessun account trovato con questa email.',
-    'auth/wrong-password': 'Password errata.',
-    'auth/invalid-email': 'Email non valida.',
-    'auth/email-already-in-use': 'Email già in uso.',
-    'auth/weak-password': 'Password troppo debole (min. 6 caratteri).',
-    'auth/invalid-credential': 'Credenziali non valide.',
-    'auth/too-many-requests': 'Troppi tentativi. Riprova più tardi.',
+    'auth/user-not-found':         'Nessun account trovato con questa email.',
+    'auth/wrong-password':         'Password errata.',
+    'auth/invalid-email':          'Email non valida.',
+    'auth/email-already-in-use':   'Email già in uso.',
+    'auth/weak-password':          'Password troppo debole (min. 6 caratteri).',
+    'auth/invalid-credential':     'Credenziali non valide. Controlla email e password.',
+    'auth/too-many-requests':      'Troppi tentativi. Riprova più tardi.',
+    'auth/network-request-failed': 'Errore di rete. Controlla la connessione.',
+    'auth/user-disabled':          'Account disabilitato.',
   };
-  return map[code] || 'Errore: ' + code;
+  if (code && map[code]) return map[code];
+  if (fallback) return fallback;
+  if (code) return 'Errore autenticazione: ' + code;
+  return 'Errore sconosciuto. Riprova.';
 }
 
 // ══════════════════════════════════
