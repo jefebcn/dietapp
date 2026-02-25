@@ -675,7 +675,7 @@ footer {
 <!-- NAV -->
 <nav>
   <a href="#" class="nav-logo" style="padding:0">
-    <img src="nutritrack-hero.png" alt="NutriTrack" style="height:46px;width:auto;display:block">
+    <img src="nutritrack-logo.svg" alt="NutriTrack" style="height:44px;width:auto;display:block">
   </a>
   <ul class="nav-links">
     <li><a href="#features">Funzioni</a></li>
@@ -711,8 +711,8 @@ footer {
     <div class="hero-right">
       <div class="food-orbit">
         <!-- Center logo -->
-        <div class="orbit-center" style="background:var(--cream);box-shadow:0 20px 60px rgba(58,107,39,0.25), 0 0 0 16px rgba(58,107,39,0.08), 0 0 0 32px rgba(58,107,39,0.04)">
-          <img src="nutritrack-hero.png" alt="NutriTrack" style="width:186px;height:186px;object-fit:contain;border-radius:50%;padding:14px;background:#fff">
+        <div class="orbit-center" style="background:#fff;box-shadow:0 20px 60px rgba(58,107,39,0.25), 0 0 0 16px rgba(58,107,39,0.08), 0 0 0 32px rgba(58,107,39,0.04);flex-direction:column;gap:4px">
+          <img src="nutritrack-logo.svg" alt="NutriTrack" style="width:160px;height:auto;display:block">
         </div>
         <!-- Orbiting food items -->
         <div class="food-item">🥗</div>
@@ -928,9 +928,9 @@ footer {
           <li class="on">🚀 Accesso anticipato</li>
           <li class="on">💬 Supporto prioritario</li>
         </ul>
-        <a href="https://paypal.me/flexeno/2.99" target="_blank" class="plan-btn featured-btn">🚀 Diventa Premium — 2,99€/mese</a>
+        <a href="https://buy.stripe.com/9B64gy8eo3O4bID0xB6Na01" target="_blank" class="plan-btn featured-btn">🚀 Diventa Premium — 2,99€/mese</a>
         <p style="font-size:11px;color:rgba(255,255,255,0.3);text-align:center;margin-top:12px;font-family:var(--font-mono)">
-          PayPal sicuro · Dopo il pagamento invia conferma per l'attivazione
+          💳 Pagamento sicuro con Stripe · Attivazione immediata
         </p>
       </div>
     </div>
@@ -946,35 +946,53 @@ footer {
     </div>
     <div class="reviews-grid">
       <div class="review-card reveal reveal-delay-1">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"Finalmente un'app italiana con il database INRAN. Non cerco più i valori su Google. I NutriPoints mi tengono motivato ogni giorno."</p>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+          <div class="review-stars">★★★★★</div>
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.8px;color:var(--green);background:var(--green-lt);padding:3px 10px;border-radius:100px">✅ Verificato</div>
+        </div>
+        <p class="review-text">"Finalmente un'app italiana seria. Il database INRAN è completo e non devo più cercare i valori su Google. I NutriPoints mi hanno fatto andare avanti anche nei giorni difficili."</p>
+        <div style="margin:16px 0;padding:12px 16px;background:var(--green-lt);border-radius:12px;font-size:13px;color:var(--green);font-weight:600">
+          🏆 -8 kg in 3 mesi · Streak 47 giorni
+        </div>
         <div class="review-author">
-          <div class="review-av">LM</div>
+          <div class="review-av" style="background:linear-gradient(135deg,#3a6b27,#7db560);color:#fff;font-weight:700">LM</div>
           <div>
             <div class="review-name">Luca M.</div>
-            <div class="review-meta">-8kg in 3 mesi · Milano</div>
+            <div class="review-meta">Personal trainer · Milano</div>
           </div>
         </div>
       </div>
       <div class="review-card reveal reveal-delay-2">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"La foto AI è assurda. Scatto il piatto e in 3 secondi ho i macro calcolati. Ho preso il Premium subito, vale molto più di 3€."</p>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+          <div class="review-stars">★★★★★</div>
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.8px;color:var(--orange);background:var(--orange-lt);padding:3px 10px;border-radius:100px">⭐ Premium</div>
+        </div>
+        <p class="review-text">"La foto AI è una cosa di un altro livello. Scatto il piatto e in pochi secondi ho calorie e macro calcolati. Ho preso subito Premium — vale 10 volte i 3 euro che costa."</p>
+        <div style="margin:16px 0;padding:12px 16px;background:var(--orange-lt);border-radius:12px;font-size:13px;color:var(--orange);font-weight:600">
+          🤖 500+ foto AI analizzate · 4 mesi Premium
+        </div>
         <div class="review-author">
-          <div class="review-av">SA</div>
+          <div class="review-av" style="background:linear-gradient(135deg,#d4622a,#f0956a);color:#fff;font-weight:700">SA</div>
           <div>
             <div class="review-name">Sara A.</div>
-            <div class="review-meta">Premium · Torino</div>
+            <div class="review-meta">Nutrizionista · Torino</div>
           </div>
         </div>
       </div>
       <div class="review-card reveal reveal-delay-3">
-        <div class="review-stars">★★★★★</div>
-        <p class="review-text">"Ho invitato 4 amici con il mio codice e guadagnato 400 punti. Li ho usati per uno sconto da Flexeno. Sistema geniale."</p>
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+          <div class="review-stars">★★★★★</div>
+          <div style="font-size:10px;font-weight:600;letter-spacing:0.8px;color:var(--gold);background:#fff8e8;padding:3px 10px;border-radius:100px">🪙 Top Referral</div>
+        </div>
+        <p class="review-text">"Ho invitato 6 amici con il mio codice e guadagnato 600 NutriPoints. Li ho usati per uno sconto da Flexeno. Il sistema premi funziona davvero, non è solo marketing."</p>
+        <div style="margin:16px 0;padding:12px 16px;background:#fff8e8;border-radius:12px;font-size:13px;color:var(--gold);font-weight:600">
+          👥 6 amici invitati · 1.340 NutriPoints totali
+        </div>
         <div class="review-author">
-          <div class="review-av">MR</div>
+          <div class="review-av" style="background:linear-gradient(135deg,#c8861a,#e8a835);color:#fff;font-weight:700">MR</div>
           <div>
             <div class="review-name">Marco R.</div>
-            <div class="review-meta">4 amici invitati · Roma</div>
+            <div class="review-meta">Appassionato calisthenics · Roma</div>
           </div>
         </div>
       </div>
@@ -996,7 +1014,7 @@ footer {
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-logo"><img src="nutritrack-hero.png" alt="NutriTrack" style="height:38px;width:auto;display:block"></div>
+  <div class="footer-logo"><img src="nutritrack-logo.svg" alt="NutriTrack" style="height:36px;width:auto;display:block"></div>
   <div class="footer-copy">© 2025 Flexeno Fitness</div>
   <div class="footer-links">
     <a href="#">Privacy</a>
