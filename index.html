@@ -26,7 +26,14 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
-<!-- Firebase Auth redirect — se già loggato va diretto all'app -->
+<!-- Redirect istantaneo se l'utente era già loggato nella sessione precedente -->
+<script>
+if (sessionStorage.getItem('nt_logged_in') === '1') {
+  window.location.replace('app.html');
+}
+</script>
+
+<!-- Firebase Auth: verifica in background, redirect se loggato, pulisce flag se no -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -45,26 +52,13 @@ const auth = getAuth(app);
 
 onAuthStateChanged(auth, user => {
   if (user) {
-    // Utente loggato → redirect immediato, senza mai mostrare la landing
+    sessionStorage.setItem('nt_logged_in', '1');
     window.location.replace('app.html');
   } else {
-    // Non loggato → nascondi loader e mostra la landing
-    const loader = document.getElementById('page-loader');
-    const content = document.getElementById('page-content');
-    if (loader) loader.style.display = 'none';
-    if (content) content.style.opacity = '1';
+    // Sessione scaduta o logout: pulisce il flag
+    sessionStorage.removeItem('nt_logged_in');
   }
 });
-
-// Timeout di sicurezza: se Firebase non risponde entro 5s, mostra la landing comunque
-setTimeout(() => {
-  const loader = document.getElementById('page-loader');
-  const content = document.getElementById('page-content');
-  if (loader && loader.style.display !== 'none') {
-    loader.style.display = 'none';
-    if (content) content.style.opacity = '1';
-  }
-}, 5000);
 </script>
 
 <style>
@@ -729,9 +723,9 @@ footer {
   .stat-float { display: none; }
 }
 
-/* Landing loader: nasconde contenuto finché Firebase non risponde */
-#page-loader { display:flex !important; }
-#page-content { opacity:0; transition: opacity 0.4s; }
+/* Landing: nessun loader, pagina sempre visibile */
+#page-loader { display:none !important; }
+#page-content { opacity:1 !important; }
 
 </style>
 </head>
