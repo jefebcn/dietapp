@@ -1,21 +1,26 @@
-<svg width="300" height="80" viewBox="0 0 300 80" fill="none" xmlns="http://www.w3.org/2000/svg">
-<desc>NutriTrack Full Logo - Landing Page Version</desc>
+<svg width="400" height="120" viewBox="0 0 400 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+<desc>NutriTrack Full Logo - High Fidelity</desc>
 <defs>
-<linearGradient id="pitGradient" x1="20" y1="20" x2="60" y2="60" gradientUnits="userSpaceOnUse">
-<stop stop-color="#FDD835"/>
-<stop offset="1" stop-color="#FBC02D"/>
+<linearGradient id="fleshGradient" x1="50" y1="10" x2="50" y2="110" gradientUnits="userSpaceOnUse">
+<stop offset="0" stop-color="#C6E67A"/>
+<stop offset="1" stop-color="#A4D65E"/>
 </linearGradient>
+<radialGradient id="pitGlowingGradient" cx="50" cy="65" r="30" gradientUnits="userSpaceOnUse">
+<stop offset="0" stop-color="#FFF59D"/>
+<stop offset="0.6" stop-color="#FFEB3B"/>
+<stop offset="1" stop-color="#FBC02D"/>
+</radialGradient>
 </defs>
 <g transform="translate(10, 10)">
-<path d="M30 0C18.9543 0 10 8.9543 10 20C10 28.1 14.6 35.1 21.5 38.5L30 60L38.5 38.5C45.4 35.1 50 28.1 50 20C50 8.9543 41.0457 0 30 0Z" fill="#2E7D32"/>
-<path d="M30 5C21.7157 5 15 11.7157 15 20C15 26.1 18.4 31.3 23.5 33.8L30 50L36.5 33.8C41.6 31.3 45 26.1 45 20C45 11.7157 38.2843 5 30 5Z" fill="#81C784"/>
-<circle cx="30" cy="21" r="11" fill="url(#pitGradient)"/>
-<path d="M23 24L26.5 20.5L29.5 23.5L36 17" stroke="#1B5E20" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M35 17H36.5V18.5" stroke="#1B5E20" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M50 0C30 0 15 15 15 35C15 50 22 65 35 75L50 100L65 75C78 65 85 50 85 35C85 15 70 0 50 0Z" fill="#2E7D32"/>
+<path d="M50 8C34 8 22 20 22 36C22 48 28 60 38 68L50 88L62 68C72 60 78 48 78 36C78 20 66 8 50 8Z" fill="url(#fleshGradient)"/>
+<circle cx="50" cy="58" r="22" fill="url(#pitGlowingGradient)"/>
+<path d="M38 65L45 58L52 65L60 52" stroke="#1B5E20" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M60 52L58 59M60 52L53 54" stroke="#1B5E20" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
 </g>
-<g transform="translate(75, 53)">
-<text font-family="Arial, sans-serif" font-weight="bold" font-size="42">
-<tspan fill="#43A047">Nutri</tspan><tspan fill="#1B5E20">Track</tspan>
+<g transform="translate(115, 80)">
+<text font-family="Helvetica, Arial, sans-serif" font-weight="bold" font-size="64">
+<tspan fill="#689F38">Nutri</tspan><tspan fill="#1B5E20">Track</tspan>
 </text>
 </g>
 </svg>
