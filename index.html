@@ -741,7 +741,27 @@ footer {
 <!-- NAV -->
 <nav>
   <a href="#" class="nav-logo">
-    <img src="nutritrack-icon.svg" alt="" class="nav-logo-icon">
+    <svg class="nav-logo-icon" viewBox="0 0 60 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="ng-flesh" x1="30" y1="8" x2="30" y2="62" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#D4ED8A"/>
+          <stop offset="1" stop-color="#9CCC52"/>
+        </linearGradient>
+        <radialGradient id="ng-pit" cx="30" cy="44" r="13" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stop-color="#FFF9C4"/>
+          <stop offset="0.5" stop-color="#FFD740"/>
+          <stop offset="1" stop-color="#F9A825"/>
+        </radialGradient>
+      </defs>
+      <!-- Outer shell -->
+      <path d="M30 2C18 2 9 12 9 24C9 34 14 44 22 52L30 68L38 52C46 44 51 34 51 24C51 12 42 2 30 2Z" fill="#2E7D32"/>
+      <!-- Inner flesh -->
+      <path d="M30 8C20 8 13 17 13 27C13 35 17 43 24 49L30 60L36 49C43 43 47 35 47 27C47 17 40 8 30 8Z" fill="url(#ng-flesh)"/>
+      <!-- Pit -->
+      <circle cx="30" cy="44" r="13" fill="url(#ng-pit)"/>
+      <!-- Checkmark on pit -->
+      <path d="M23 44L27.5 48.5L37 38" stroke="#1B5E20" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
     <span class="nav-logo-text">Nutri<span>Track</span></span>
   </a>
   <ul class="nav-links">
@@ -791,7 +811,23 @@ footer {
       <div class="food-orbit">
         <!-- Center logo -->
         <div class="orbit-center" style="background:#fff;box-shadow:0 20px 60px rgba(58,107,39,0.25), 0 0 0 16px rgba(58,107,39,0.08), 0 0 0 32px rgba(58,107,39,0.04);">
-          <img src="nutritrack-icon.svg" alt="NutriTrack" style="width:110px;height:110px;object-fit:contain;">
+          <svg width="108" height="126" viewBox="0 0 60 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="hg-flesh" x1="30" y1="8" x2="30" y2="62" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#D4ED8A"/>
+                <stop offset="1" stop-color="#9CCC52"/>
+              </linearGradient>
+              <radialGradient id="hg-pit" cx="30" cy="44" r="13" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#FFF9C4"/>
+                <stop offset="0.5" stop-color="#FFD740"/>
+                <stop offset="1" stop-color="#F9A825"/>
+              </radialGradient>
+            </defs>
+            <path d="M30 2C18 2 9 12 9 24C9 34 14 44 22 52L30 68L38 52C46 44 51 34 51 24C51 12 42 2 30 2Z" fill="#2E7D32"/>
+            <path d="M30 8C20 8 13 17 13 27C13 35 17 43 24 49L30 60L36 49C43 43 47 35 47 27C47 17 40 8 30 8Z" fill="url(#hg-flesh)"/>
+            <circle cx="30" cy="44" r="13" fill="url(#hg-pit)"/>
+            <path d="M23 44L27.5 48.5L37 38" stroke="#1B5E20" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
         </div>
         <!-- Orbiting food items -->
         <div class="food-item">🥗</div>
@@ -1094,7 +1130,12 @@ footer {
 <!-- FOOTER -->
 <footer>
   <div class="footer-logo">
-    <img src="nutritrack-icon.svg" alt="" style="height:32px;width:auto;display:block;filter:brightness(0) invert(1)">
+    <svg width="30" height="36" viewBox="0 0 60 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M30 2C18 2 9 12 9 24C9 34 14 44 22 52L30 68L38 52C46 44 51 34 51 24C51 12 42 2 30 2Z" fill="rgba(255,255,255,0.9)"/>
+      <path d="M30 8C20 8 13 17 13 27C13 35 17 43 24 49L30 60L36 49C43 43 47 35 47 27C47 17 40 8 30 8Z" fill="rgba(255,255,255,0.4)"/>
+      <circle cx="30" cy="44" r="13" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.6)" stroke-width="1.5"/>
+      <path d="M23 44L27.5 48.5L37 38" stroke="rgba(255,255,255,0.9)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
     <span style="font-family:var(--font-serif);font-size:18px;color:#fff;font-weight:700">NutriTrack</span>
   </div>
   <div class="footer-copy">© 2025 Flexeno Fitness</div>
