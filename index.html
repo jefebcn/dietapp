@@ -45,11 +45,15 @@ const auth = getAuth(app);
 
 onAuthStateChanged(auth, user => {
   if (user) {
-    // Utente già loggato → vai diretto all'app senza vedere la landing
+    // Utente loggato → redirect immediato, senza mai mostrare la landing
     window.location.replace('app.html');
   } else {
-    // Non loggato → mostra la landing (rimuove il loader)
-      }
+    // Non loggato → nascondi loader e mostra la landing
+    const loader = document.getElementById('page-loader');
+    const content = document.getElementById('page-content');
+    if (loader) loader.style.display = 'none';
+    if (content) { content.style.opacity = '1'; }
+  }
 });
 </script>
 
@@ -715,9 +719,9 @@ footer {
   .stat-float { display: none; }
 }
 
-/* Override: remove landing loader to avoid double loading (keep only app loader with Sprinty) */
-#page-loader{display:none !important;}
-#page-content{opacity:1 !important;}
+/* Landing loader: nasconde contenuto finché Firebase non risponde */
+#page-loader { display:flex !important; }
+#page-content { opacity:0 !important; }
 
 </style>
 </head>
