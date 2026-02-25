@@ -1,26 +1,21 @@
-<svg width="400" height="120" viewBox="0 0 400 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-<desc>NutriTrack Full Logo - High Fidelity</desc>
+<svg width="128" height="128" viewBox="0 0 100 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+<desc>NutriTrack Icon Only - High Fidelity</desc>
 <defs>
-<linearGradient id="fleshGradient" x1="50" y1="10" x2="50" y2="110" gradientUnits="userSpaceOnUse">
+<linearGradient id="fleshGradientIcon" x1="50" y1="10" x2="50" y2="110" gradientUnits="userSpaceOnUse">
 <stop offset="0" stop-color="#C6E67A"/>
 <stop offset="1" stop-color="#A4D65E"/>
 </linearGradient>
-<radialGradient id="pitGlowingGradient" cx="50" cy="65" r="30" gradientUnits="userSpaceOnUse">
+<radialGradient id="pitGlowingGradientIcon" cx="50" cy="65" r="30" gradientUnits="userSpaceOnUse">
 <stop offset="0" stop-color="#FFF59D"/>
 <stop offset="0.6" stop-color="#FFEB3B"/>
 <stop offset="1" stop-color="#FBC02D"/>
 </radialGradient>
 </defs>
-<g transform="translate(10, 10)">
-<path d="M50 0C30 0 15 15 15 35C15 50 22 65 35 75L50 100L65 75C78 65 85 50 85 35C85 15 70 0 50 0Z" fill="#2E7D32"/>
-<path d="M50 8C34 8 22 20 22 36C22 48 28 60 38 68L50 88L62 68C72 60 78 48 78 36C78 20 66 8 50 8Z" fill="url(#fleshGradient)"/>
-<circle cx="50" cy="58" r="22" fill="url(#pitGlowingGradient)"/>
-<path d="M38 65L45 58L52 65L60 52" stroke="#1B5E20" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M60 52L58 59M60 52L53 54" stroke="#1B5E20" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-</g>
-<g transform="translate(115, 80)">
-<text font-family="Helvetica, Arial, sans-serif" font-weight="bold" font-size="64">
-<tspan fill="#689F38">Nutri</tspan><tspan fill="#1B5E20">Track</tspan>
-</text>
+<g>
+<path d="M50 2C30 2 15 17 15 37C15 52 22 67 35 77L50 102L65 77C78 67 85 52 85 37C85 17 70 2 50 2Z" fill="#2E7D32"/>
+<path d="M50 10C34 10 22 22 22 38C22 50 28 62 38 70L50 90L62 70C72 62 78 50 78 38C78 22 66 10 50 10Z" fill="url(#fleshGradientIcon)"/>
+<circle cx="50" cy="60" r="22" fill="url(#pitGlowingGradientIcon)"/>
+<path d="M38 67L45 60L52 67L60 54" stroke="#1B5E20" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M60 54L58 61M60 54L53 56" stroke="#1B5E20" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
 </g>
 </svg>
