@@ -61,6 +61,7 @@ window._fb = { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassw
 // Auth state listener → bootstrap app
 onAuthStateChanged(auth, async user => {
   if (user) {
+    sessionStorage.setItem('nt_logged_in', '1');
     const snap = await getDoc(doc(db, 'users', user.uid));
     if (snap.exists()) {
       window._currentUser = { uid: user.uid, email: user.email, ...snap.data() };
@@ -69,6 +70,7 @@ onAuthStateChanged(auth, async user => {
     }
     showApp();
   } else {
+    sessionStorage.removeItem('nt_logged_in');
     window._currentUser = null;
     showAuth();
   }
@@ -3465,6 +3467,7 @@ async function doLogout() {
   // Cancella il listener premium prima del logout per evitare errori di permesso
   if (_premiumListener) { _premiumListener(); _premiumListener = null; }
   isPremium = false;
+  sessionStorage.removeItem('nt_logged_in');
   await window._fb.signOut(window._fb.auth);
 }
 
