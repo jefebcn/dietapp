@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>NutriTrack</title>
-<meta name="description" content="Traccia peso, dieta e macro ogni giorno">
+<meta name="description" content="NutriTrack: traccia peso, calorie e macro ogni giorno. Barcode scanner, AI foto, classifiche settimanali e NutriPoints. Gratis, in italiano.">
 <meta name="theme-color" content="#4a7a35">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -34,7 +34,7 @@
 <!-- ═══ FIREBASE ═══ -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, GoogleAuthProvider, OAuthProvider, signInWithPopup }
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, browserLocalPersistence, setPersistence }
   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc, query, orderBy, onSnapshot,
          updateDoc, deleteDoc, where, serverTimestamp, limit }
@@ -55,23 +55,48 @@ const db    = getFirestore(app);
 
 window._fb = { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassword,
                sendPasswordResetEmail, signOut, onAuthStateChanged,
-               GoogleAuthProvider, OAuthProvider, signInWithPopup,
+               GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
                collection, doc, setDoc, getDoc, getDocs, addDoc, query,
                orderBy, onSnapshot, updateDoc, deleteDoc, where, serverTimestamp, limit };
 
 // Auth state listener → bootstrap app
+// Gestione risultato redirect (necessario per iOS PWA / mobile Safari)
+(async () => {
+  try {
+    await setPersistence(auth, browserLocalPersistence);
+    const result = await getRedirectResult(auth);
+    if (result?.user) {
+      const user = result.user;
+      const { db, doc, setDoc, getDoc } = window._fb;
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists()) {
+        await setDoc(userRef, {
+          name: user.displayName || user.email?.split('@')[0] || 'Utente',
+          email: user.email || '',
+          role: 'user',
+          createdAt: Date.now()
+        });
+      }
+    }
+  } catch(e) {
+    // getRedirectResult fallisce silenziosamente se non c'è redirect in corso
+    if (e.code !== 'auth/null-user') console.log('Redirect result:', e.code);
+  }
+})();
+
 onAuthStateChanged(auth, async user => {
   if (user) {
-    sessionStorage.setItem('nt_logged_in', '1');
+    localStorage.setItem('nt_logged_in', '1');
     const snap = await getDoc(doc(db, 'users', user.uid));
     if (snap.exists()) {
       window._currentUser = { uid: user.uid, email: user.email, ...snap.data() };
     } else {
-      window._currentUser = { uid: user.uid, email: user.email, name: user.email.split('@')[0], role: 'user' };
+      window._currentUser = { uid: user.uid, email: user.email, name: (user.email||'').split('@')[0] || 'Utente', role: 'user' };
     }
     showApp();
   } else {
-    sessionStorage.removeItem('nt_logged_in');
+    localStorage.removeItem('nt_logged_in');
     window._currentUser = null;
     showAuth();
   }
@@ -315,8 +340,7 @@ textarea { resize: vertical; min-height: 80px; }
 .social-btn:active { transform:scale(0.98); }
 .social-btn svg { flex-shrink:0; }
 .social-btn.google-btn { }
-.social-btn.apple-btn { background:#000;color:#fff;border-color:#000; }
-.social-btn.apple-btn:hover { background:#222;border-color:#222; }
+
 
 .auth-error {
   padding: 10px 14px;
@@ -1546,10 +1570,6 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.77-4.59l-7.98-6.19A23.99 23.99 0 0 0 0 24c0 3.77.9 7.35 2.56 10.53l7.97-5.94z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 5.94C6.51 42.62 14.62 48 24 48z"/></svg>
         Continua con Google
       </button>
-      <button class="social-btn apple-btn" onclick="doAppleSignIn()" type="button">
-        <svg width="18" height="22" viewBox="0 0 17 20" fill="white"><path d="M13.05 10.34c-.02-2.25 1.83-3.33 1.92-3.39-1.05-1.53-2.68-1.74-3.26-1.76-1.38-.14-2.71.82-3.41.82-.71 0-1.79-.8-2.95-.78-1.51.02-2.92.89-3.7 2.25-1.58 2.75-.41 6.82 1.14 9.05.75 1.09 1.65 2.32 2.83 2.27 1.14-.04 1.57-.74 2.94-.74 1.37 0 1.76.74 2.96.71 1.23-.02 2-1.11 2.74-2.2.87-1.26 1.22-2.49 1.24-2.55-.03-.01-2.38-.91-2.4-3.63zM10.86 3.54c.62-.77 1.04-1.83.93-2.89-.9.04-2 .6-2.64 1.36-.58.67-1.09 1.75-.96 2.79 1.01.08 2.04-.51 2.67-1.26z"/></svg>
-        Continua con Apple
-      </button>
     </div>
 
     <!-- FORGOT PASSWORD PANEL -->
@@ -1590,12 +1610,15 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59A14.5 14.5 0 0 1 9.5 24c0-1.59.28-3.14.77-4.59l-7.98-6.19A23.99 23.99 0 0 0 0 24c0 3.77.9 7.35 2.56 10.53l7.97-5.94z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 5.94C6.51 42.62 14.62 48 24 48z"/></svg>
         Registrati con Google
       </button>
-      <button class="social-btn apple-btn" onclick="doAppleSignIn()" type="button">
-        <svg width="18" height="22" viewBox="0 0 17 20" fill="white"><path d="M13.05 10.34c-.02-2.25 1.83-3.33 1.92-3.39-1.05-1.53-2.68-1.74-3.26-1.76-1.38-.14-2.71.82-3.41.82-.71 0-1.79-.8-2.95-.78-1.51.02-2.92.89-3.7 2.25-1.58 2.75-.41 6.82 1.14 9.05.75 1.09 1.65 2.32 2.83 2.27 1.14-.04 1.57-.74 2.94-.74 1.37 0 1.76.74 2.96.71 1.23-.02 2-1.11 2.74-2.2.87-1.26 1.22-2.49 1.24-2.55-.03-.01-2.38-.91-2.4-3.63zM10.86 3.54c.62-.77 1.04-1.83.93-2.89-.9.04-2 .6-2.64 1.36-.58.67-1.09 1.75-.96 2.79 1.01.08 2.04-.51 2.67-1.26z"/></svg>
-        Registrati con Apple
-      </button>
     </div>
   </div>
+</div>
+
+<!-- Overlay di caricamento durante redirect social auth -->
+<div id="social-redirect-loading" style="display:none;position:fixed;inset:0;background:var(--white);z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px">
+  <div style="width:48px;height:48px;border:4px solid var(--green-bg);border-top-color:var(--green);border-radius:50%;animation:spin 0.8s linear infinite"></div>
+  <div id="social-redirect-msg" style="font-family:var(--font-brand);font-weight:700;font-size:16px;color:var(--text)">Accesso in corso…</div>
+  <div style="font-size:13px;color:var(--muted)">Verrai reindirizzato e poi riportato qui</div>
 </div>
 
 <!-- ══════════════════════════════════
@@ -1716,6 +1739,11 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         </div>
         <div id="home-today-entries" style="color:var(--muted);font-size:13px;text-align:center;padding:8px 0">
           Nessun alimento registrato oggi.
+        </div>
+        <!-- Barre progresso obiettivi macro giornalieri -->
+        <div id="home-macro-targets" style="display:none;margin-top:12px">
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;margin-bottom:8px">OBIETTIVO GIORNALIERO</div>
+          <div style="display:flex;flex-direction:column;gap:8px" id="home-macro-bars"></div>
         </div>
       </div>
 
@@ -3507,15 +3535,33 @@ async function doRegister() {
   }
 }
 
-/* ── SOCIAL AUTH: Google & Apple ── */
+/* ── SOCIAL AUTH: Google ── */
+// Rileva se siamo su mobile / PWA installed (popup bloccati)
+function isMobileOrPWA() {
+  const standalone = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true;
+  const mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  return standalone || mobile;
+}
+
 async function doGoogleSignIn() {
   clearAuthError();
   try {
-    const { auth, db, GoogleAuthProvider, signInWithPopup, doc, setDoc, getDoc } = window._fb;
+    const { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, doc, setDoc, getDoc } = window._fb;
     const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+
+    if (isMobileOrPWA()) {
+      // Su mobile/PWA usa redirect — il risultato viene gestito al riavvio in getRedirectResult
+      const rl = document.getElementById('social-redirect-loading');
+      if (rl) { rl.style.display = 'flex'; document.getElementById('social-redirect-msg').textContent = 'Accesso con Google…'; }
+      await signInWithRedirect(auth, provider);
+      return; // la pagina verrà ricaricata dopo il redirect
+    }
+
+    // Desktop: usa popup
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
-    // Se l'utente non esiste ancora in Firestore, crea il profilo
     const userRef = doc(db, 'users', user.uid);
     const userSnap = await getDoc(userRef);
     if (!userSnap.exists()) {
@@ -3527,39 +3573,13 @@ async function doGoogleSignIn() {
       });
     }
   } catch(e) {
-    if (e.code === 'auth/popup-closed-by-user') return; // utente ha chiuso il popup
+    if (e.code === 'auth/popup-closed-by-user') return;
     if (e.code === 'auth/cancelled-popup-request') return;
     showAuthError(firebaseErrMsg(e.code) || 'Errore accesso Google. Riprova.');
   }
 }
 
-async function doAppleSignIn() {
-  clearAuthError();
-  try {
-    const { auth, db, OAuthProvider, signInWithPopup, doc, setDoc, getDoc } = window._fb;
-    const provider = new OAuthProvider('apple.com');
-    provider.addScope('email');
-    provider.addScope('name');
-    provider.setCustomParameters({ locale: 'it' });
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-    // Se l'utente non esiste ancora in Firestore, crea il profilo
-    const userRef = doc(db, 'users', user.uid);
-    const userSnap = await getDoc(userRef);
-    if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        name: user.displayName || 'Utente Apple',
-        email: user.email || '',
-        role: 'user',
-        createdAt: Date.now()
-      });
-    }
-  } catch(e) {
-    if (e.code === 'auth/popup-closed-by-user') return;
-    if (e.code === 'auth/cancelled-popup-request') return;
-    showAuthError(firebaseErrMsg(e.code) || 'Errore accesso Apple. Riprova.');
-  }
-}
+
 
 function openForgotFlow() {
   // Pre-fill email if already typed in login
@@ -4328,6 +4348,43 @@ async function updateHomeDiarySummary() {
     <div class="macro-box"><div class="mval" style="color:#ca8a04">${t.fat.toFixed(1)}g</div><div class="mlbl">GRASSI</div></div>`;
   const te = document.getElementById('home-today-entries');
   if (te) te.textContent = entries.length ? entries.slice(0,3).map(e=>e.name).join(', ') + (entries.length>3?` +${entries.length-3} altri`:'') : 'Nessun alimento registrato oggi.';
+
+  // Barre progresso obiettivi macro
+  const targetsSection = document.getElementById('home-macro-targets');
+  const barsEl = document.getElementById('home-macro-bars');
+  if (!userTargets) try { await loadUserTargets(); } catch(e) {}
+  const tKcal = (userTargets?.tdee) || 0;
+  const tProt = (userTargets?.protein) || 0;
+  const tCarbs = (userTargets?.carbs) || 0;
+  const tFat = (userTargets?.fat) || 0;
+
+  if (targetsSection && barsEl && tKcal > 0) {
+    targetsSection.style.display = 'block';
+    const bars = [
+      { label:'Kcal', val:Math.round(t.kcal), target:tKcal, color:'var(--green)', unit:'' },
+      { label:'Proteine', val:Math.round(t.protein), target:tProt, color:'var(--orange)', unit:'g' },
+      { label:'Carboidrati', val:Math.round(t.carbs), target:tCarbs, color:'#3b82f6', unit:'g' },
+      { label:'Grassi', val:Math.round(t.fat), target:tFat, color:'#ca8a04', unit:'g' },
+    ];
+    barsEl.innerHTML = bars.map(b => {
+      const pct = Math.min(100, tgt > 0 ? Math.round((b.val/b.target)*100) : 0);
+      const tgt = b.target;
+      const pctCalc = tgt > 0 ? Math.min(100, Math.round((b.val/tgt)*100)) : 0;
+      const over = tgt > 0 && b.val > tgt;
+      const barColor = over ? '#ef4444' : b.color;
+      return `<div>
+        <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:10px;margin-bottom:3px">
+          <span style="color:var(--text-primary)">${b.label}</span>
+          <span style="color:${over?'#ef4444':b.color};font-weight:700">${b.val}${b.unit} <span style="color:var(--muted);font-weight:400">/ ${tgt}${b.unit}</span></span>
+        </div>
+        <div style="height:7px;background:var(--cream);border-radius:4px;overflow:hidden">
+          <div style="height:100%;width:${pctCalc}%;background:${barColor};border-radius:4px;transition:width 0.5s ease"></div>
+        </div>
+      </div>`;
+    }).join('');
+  } else if (targetsSection) {
+    targetsSection.style.display = 'none';
+  }
 }
 
 
@@ -4701,6 +4758,43 @@ function renderGoalProgress() {
     else if (dv<0) { statusText=`Ancora ${Math.abs(dv)} kg da perdere`; statusColor='var(--orange)'; }
     else { statusText=`+${dv} kg sopra l'obiettivo`; statusColor='var(--danger)'; }
   }
+  // Stima data raggiungimento obiettivo basata sul trend degli ultimi 14 giorni
+  let estimatedDateHtml = '';
+  if (current && start !== target && weightData.length >= 2) {
+    const sorted = [...weightData].sort((a,b) => a.date.localeCompare(b.date));
+    // Usa gli ultimi 14 giorni per il trend
+    const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-14);
+    const cutoffStr = cutoff.toISOString().slice(0,10);
+    const recent = sorted.filter(w => w.date >= cutoffStr);
+    const trendData = recent.length >= 2 ? recent : sorted.slice(-2);
+    const firstW = trendData[0];
+    const lastW = trendData[trendData.length-1];
+    const daysDiff = Math.max(1, (new Date(lastW.date) - new Date(firstW.date)) / 86400000);
+    const kgPerDay = (lastW.weight - firstW.weight) / daysDiff; // negativo = perdita peso
+    const kgToGoal = target - current;
+    const isGoingRight = (kgToGoal < 0 && kgPerDay < 0) || (kgToGoal > 0 && kgPerDay > 0);
+    const rateLabel = Math.abs(kgPerDay * 7).toFixed(2);
+
+    if (Math.abs(kgPerDay) > 0.001 && isGoingRight) {
+      const daysToGoal = Math.abs(kgToGoal / kgPerDay);
+      const estDate = new Date();
+      estDate.setDate(estDate.getDate() + Math.round(daysToGoal));
+      const dateStr = estDate.toLocaleDateString('it-IT', { day:'numeric', month:'long', year:'numeric' });
+      const weeks = Math.round(daysToGoal / 7);
+      estimatedDateHtml = `
+        <div style="margin-top:16px;padding:14px 16px;background:linear-gradient(135deg,rgba(74,122,53,0.07),rgba(74,122,53,0.03));border:1.5px solid rgba(74,122,53,0.2);border-radius:12px">
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;margin-bottom:6px">📅 DATA STIMATA OBIETTIVO</div>
+          <div style="font-family:var(--font-brand);font-weight:900;font-size:20px;color:var(--green)">${dateStr}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">al ritmo attuale di <strong style="color:var(--text-primary)">${rateLabel} kg/settimana</strong> — ancora <strong style="color:var(--text-primary)">${weeks > 0 ? weeks + ' settimane' : 'pochi giorni'}</strong></div>
+        </div>`;
+    } else if (!isGoingRight && Math.abs(kgPerDay) > 0.001) {
+      estimatedDateHtml = `
+        <div style="margin-top:16px;padding:12px 16px;background:rgba(220,80,60,0.05);border:1.5px solid rgba(220,80,60,0.2);border-radius:12px">
+          <div style="font-size:12px;color:var(--danger)">⚠️ Il trend attuale (${kgPerDay>0?'+':''}${(kgPerDay*7).toFixed(2)} kg/sett.) si allontana dall'obiettivo. Rivedi la strategia!</div>
+        </div>`;
+    }
+  }
+
   el.innerHTML = `
     <div class="card">
       <h3 style="margin-bottom:16px">📊 I tuoi progressi</h3>
@@ -4720,6 +4814,7 @@ function renderGoalProgress() {
         <div style="display:flex;justify-content:space-between;margin-top:6px;font-family:var(--font-mono);font-size:10px;color:var(--muted)">
           <span>${start} kg</span><span>${target} kg</span>
         </div>
+        ${estimatedDateHtml}
       `:'<p style="color:var(--muted);font-size:13px">Inserisci il peso per vedere i progressi.</p>'}
       ${note?`<div style="margin-top:16px;padding:12px;background:var(--cream);border-radius:10px;font-size:13px;color:var(--text2)">${note}</div>`:''}
     </div>`;
@@ -5634,8 +5729,8 @@ async function processLeagueWeekEnd(prevWeek) {
     const snap = await getDocs(q);
     if (!snap.empty) {
       const groupDoc = snap.docs[0];
-      const gData = groupDoc.data();
-      const members = (gData.members || []).sort((a,b) => (b.weekPts||0) - (a.weekPts||0));
+      const gData = normalizeGroupDoc(groupDoc.data());
+      const members = getMembersArray(gData).sort((a,b) => (b.weekPts||0) - (a.weekPts||0));
       const myIdx = members.findIndex(m => m.uid === myUid);
 
       if (myIdx >= 0) {
@@ -5670,13 +5765,32 @@ async function processLeagueWeekEnd(prevWeek) {
   } catch(e) {}
 }
 
+// Helper: normalizza il documento Firestore — supporta vecchio formato (array) e nuovo (mappa per UID)
+function normalizeGroupDoc(gDocData) {
+  const data = { ...gDocData };
+  if (!data.memberData) {
+    data.memberData = {};
+    for (const m of (data.members || [])) {
+      if (m.uid) data.memberData[m.uid] = { name: m.name || 'Utente', weekPts: m.weekPts || 0 };
+    }
+  }
+  return data;
+}
+
+// Helper: converte memberData map in array ordinabile per la UI
+function getMembersArray(group) {
+  const md = group?.memberData || {};
+  return Object.entries(md).map(([uid, d]) => ({ uid, name: d.name || 'Utente', weekPts: d.weekPts || 0 }));
+}
+
 async function joinOrLoadLeagueGroup(week) {
   const {db, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs} = window._fb;
   const myUid = uid();
   const tier = leagueData.tier;
   const myName = leagueData.username || window._currentUser?.name || window._currentUser?.email?.split('@')[0] || 'Utente';
+  const weekPts = calcWeeklyPts();
 
-  // Check if I'm already in a group this week
+  // Sono già in un gruppo questa settimana?
   try {
     const q = query(
       collection(db, 'leagueGroups'),
@@ -5686,15 +5800,14 @@ async function joinOrLoadLeagueGroup(week) {
     );
     const snap = await getDocs(q);
     if (!snap.empty) {
-      // Already in a group — load it
       const gDoc = snap.docs[0];
-      leagueData.currentGroup = { id: gDoc.id, ...gDoc.data() };
+      leagueData.currentGroup = { id: gDoc.id, ...normalizeGroupDoc(gDoc.data()) };
       await updateMyWeeklyPts();
       return;
     }
   } catch(e) { console.log('League check err:', e); }
 
-  // Find an open group at my tier
+  // Trova un gruppo aperto al mio tier
   try {
     const q = query(
       collection(db, 'leagueGroups'),
@@ -5713,24 +5826,28 @@ async function joinOrLoadLeagueGroup(week) {
       }
     }
 
-    const weekPts = calcWeeklyPts();
-    const myMember = { uid: myUid, name: myName, weekPts };
-
     if (targetDoc) {
-      // Join existing group
-      const gData = targetDoc.data();
-      const members = [...(gData.members||[]), myMember];
-      const memberUids = [...(gData.memberUids||[]), myUid];
-      const full = memberUids.length >= LEAGUE_GROUP_SIZE;
-      await updateDoc(doc(db, 'leagueGroups', targetDoc.id), { members, memberUids, full });
-      leagueData.currentGroup = { id: targetDoc.id, week, tier, members, memberUids, full };
+      // Entra nel gruppo esistente — aggiorna SOLO il proprio campo UID (nessuna race condition!)
+      const gData = normalizeGroupDoc(targetDoc.data());
+      const newMemberUids = [...(gData.memberUids || []), myUid];
+      const full = newMemberUids.length >= LEAGUE_GROUP_SIZE;
+      // Field path update: ogni utente scrive solo memberData.{proprio_uid}
+      await updateDoc(doc(db, 'leagueGroups', targetDoc.id), {
+        [`memberData.${myUid}`]: { name: myName, weekPts },
+        memberUids: newMemberUids,
+        full
+      });
+      gData.memberData[myUid] = { name: myName, weekPts };
+      gData.memberUids = newMemberUids;
+      gData.full = full;
+      leagueData.currentGroup = { id: targetDoc.id, week, tier, ...gData };
     } else {
-      // Create new group
+      // Crea nuovo gruppo
       const groupNum = Date.now();
       const docId = leagueGroupDocId(week, tier, groupNum);
       const groupData = {
         week, tier, groupNum,
-        members: [myMember],
+        memberData: { [myUid]: { name: myName, weekPts } },
         memberUids: [myUid],
         full: false,
         createdAt: Date.now()
@@ -5746,19 +5863,19 @@ async function updateMyWeeklyPts() {
   const {db, doc, updateDoc} = window._fb;
   const myUid = uid();
   const weekPts = calcWeeklyPts();
+  const myName = leagueData.username || window._currentUser?.name || 'Utente';
 
-  const members = leagueData.currentGroup.members || [];
-  const idx = members.findIndex(m => m.uid === myUid);
-  if (idx >= 0) {
-    members[idx].weekPts = weekPts;
-    members[idx].name = leagueData.username || window._currentUser?.name || members[idx].name;
-  }
-
+  // Aggiornamento atomico solo sul campo del proprio UID — nessuna race condition!
   try {
-    await updateDoc(doc(db, 'leagueGroups', leagueData.currentGroup.id), { members });
+    await updateDoc(doc(db, 'leagueGroups', leagueData.currentGroup.id), {
+      [`memberData.${myUid}.weekPts`]: weekPts,
+      [`memberData.${myUid}.name`]: myName
+    });
   } catch(e) {}
 
-  leagueData.currentGroup.members = members;
+  // Aggiorna la copia locale
+  if (!leagueData.currentGroup.memberData) leagueData.currentGroup.memberData = {};
+  leagueData.currentGroup.memberData[myUid] = { weekPts, name: myName };
 }
 
 async function refreshLeagueGroup() {
@@ -5767,14 +5884,16 @@ async function refreshLeagueGroup() {
   try {
     const snap = await getDoc(doc(db, 'leagueGroups', leagueData.currentGroup.id));
     if (snap.exists()) {
-      leagueData.currentGroup = { id: snap.id, ...snap.data() };
+      // normalizeGroupDoc gestisce sia il vecchio formato array che il nuovo map
+      leagueData.currentGroup = { id: snap.id, ...normalizeGroupDoc(snap.data()) };
     }
   } catch(e) {}
 }
 
 function renderLeagueUI() {
   const tier = LEAGUE_TIERS[leagueData.tier] || LEAGUE_TIERS[0];
-  const members = (leagueData.currentGroup?.members || [])
+  // Usa getMembersArray() che legge dal formato mappa (memberData) — compatibile anche con vecchio array
+  const members = getMembersArray(leagueData.currentGroup)
     .sort((a,b) => (b.weekPts||0) - (a.weekPts||0));
   const myUid = uid();
   const myRank = members.findIndex(m => m.uid === myUid) + 1;
