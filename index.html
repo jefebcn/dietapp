@@ -45,11 +45,11 @@ const auth = getAuth(app);
 
 onAuthStateChanged(auth, user => {
   if (user) {
-    // Utente già loggato → vai diretto all'app senza vedere la landing
     window.location.replace('app.html');
   } else {
-    // Non loggato → mostra la landing (rimuove il loader)
-      }
+    document.getElementById('page-loader').style.display = 'none';
+    document.getElementById('page-content').style.opacity = '1';
+  }
 });
 </script>
 
