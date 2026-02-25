@@ -930,6 +930,35 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   transform: translateY(0) scale(1);
 }
 
+/* ── LEAGUE USERNAME ── */
+.league-username-overlay {
+  position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:9998;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+.league-username-overlay.show { opacity:1;pointer-events:auto; }
+.league-username-modal {
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0.92);
+  background:var(--card);border-radius:20px;padding:32px 24px;width:min(360px,90vw);
+  box-shadow:0 20px 60px rgba(0,0,0,0.25);z-index:9999;
+  opacity:0;pointer-events:none;transition:all .25s;text-align:center;
+}
+.league-username-modal.show { opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1); }
+.league-username-modal h3 { font-family:var(--font-brand);font-size:20px;margin-bottom:6px; }
+.league-username-modal p { font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.5; }
+.league-username-modal input {
+  width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:12px;
+  font-size:16px;font-family:var(--font-brand);font-weight:700;text-align:center;
+  background:var(--cream);color:var(--text);outline:none;transition:border-color .2s;
+  letter-spacing:0.5px;
+}
+.league-username-modal input:focus { border-color:#7c3aed; }
+.league-username-modal .username-error { color:#ef4444;font-size:11px;margin-top:6px;min-height:16px; }
+.league-username-edit-btn {
+  display:inline-flex;align-items:center;gap:5px;padding:4px 12px;border-radius:8px;
+  font-size:11px;color:#7c3aed;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);
+  cursor:pointer;font-family:var(--font-mono);letter-spacing:0.5px;transition:all .15s;
+}
+.league-username-edit-btn:hover { background:rgba(124,58,237,0.15); }
 /* ── LEAGUES ── */
 .league-tier-banner {
   display:flex;align-items:center;gap:14px;padding:14px 18px;border-radius:14px;
@@ -1677,6 +1706,11 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
           </div>
           <button class="btn btn-ghost btn-sm" onclick="goPage('rewards');setTimeout(()=>document.getElementById('league-full-section')?.scrollIntoView({behavior:'smooth'}),200)">Classifica →</button>
         </div>
+        <div id="home-league-username-bar" style="display:flex;align-items:center;gap:6px;margin-bottom:10px;padding:6px 10px;background:rgba(124,58,237,0.05);border-radius:8px;cursor:pointer" onclick="openLeagueUsernameModal(true)">
+          <span style="font-size:12px">👤</span>
+          <span id="home-league-username" style="font-family:var(--font-brand);font-weight:700;font-size:13px;color:#7c3aed">—</span>
+          <span style="font-size:10px;color:var(--muted);margin-left:auto">✏️</span>
+        </div>
         <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">
           <div style="text-align:center">
             <div style="font-family:var(--font-brand);font-weight:900;font-size:32px;color:#7c3aed" id="home-league-rank">—</div>
@@ -2122,6 +2156,16 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
             <div class="tier-sub" id="league-tier-sub">LEGA 1 DI 6</div>
           </div>
           <div class="tier-week" id="league-tier-week"></div>
+        </div>
+
+        <!-- Username display -->
+        <div id="league-username-bar" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(124,58,237,0.05);border-radius:10px;margin-bottom:14px;border:1px solid rgba(124,58,237,0.12)">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:14px">👤</span>
+            <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted);letter-spacing:1px">IL TUO NOME</span>
+            <span id="league-my-username" style="font-family:var(--font-brand);font-weight:700;font-size:14px;color:#7c3aed">—</span>
+          </div>
+          <button class="league-username-edit-btn" onclick="openLeagueUsernameModal(true)">✏️ Modifica</button>
         </div>
 
         <!-- Zone legend -->
@@ -2690,6 +2734,18 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   <div class="promo-title" id="league-promo-title">Promosso!</div>
   <div class="promo-sub" id="league-promo-sub">Sali alla lega successiva</div>
   <button class="btn btn-green" style="margin-top:18px;min-width:120px" onclick="closeLeaguePromoToast()">OK!</button>
+</div>
+
+<!-- League Username Modal -->
+<div class="league-username-overlay" id="league-username-overlay" onclick="closeLeagueUsernameModal(true)"></div>
+<div class="league-username-modal" id="league-username-modal">
+  <div style="font-size:40px;margin-bottom:8px">🏆</div>
+  <h3 id="league-username-title">Scegli il tuo Username</h3>
+  <p id="league-username-desc">Questo nome ti identificherà nella classifica della lega. Gli altri giocatori lo vedranno!</p>
+  <input type="text" id="league-username-input" placeholder="Es: SuperTracker99" maxlength="20" autocomplete="off" onkeydown="if(event.key==='Enter')saveLeagueUsername()">
+  <div class="username-error" id="league-username-error"></div>
+  <button class="btn btn-green" style="width:100%;margin-top:14px" onclick="saveLeagueUsername()">Conferma ✓</button>
+  <button class="btn btn-ghost btn-sm" style="margin-top:8px;display:none" id="league-username-cancel" onclick="closeLeagueUsernameModal(true)">Annulla</button>
 </div>
 
 <!-- ══ FAB ══ -->
@@ -5362,7 +5418,8 @@ const LEAGUE_RELEGATE_COUNT = 3;
 let leagueData = {
   tier: 0,
   currentGroup: null,   // { week, tier, groupNum, members[] }
-  processed: null        // last processed week key
+  processed: null,       // last processed week key
+  username: null         // league display username
 };
 
 function getISOWeekKey(d) {
@@ -5430,9 +5487,20 @@ async function initLeague() {
       const d = snap.data();
       leagueData.tier = d.tier ?? 0;
       leagueData.processed = d.processed ?? null;
+      leagueData.username = d.username ?? null;
     }
   } catch(e) { console.log('League load err:', e); }
 
+  // If no username set, prompt user
+  if (!leagueData.username) {
+    openLeagueUsernameModal(false);
+    return; // will continue init after username is saved
+  }
+
+  await continueLeagueInit();
+}
+
+async function continueLeagueInit() {
   const wk = currentWeekKey();
   const prevWk = previousWeekKey();
 
@@ -5495,7 +5563,8 @@ async function processLeagueWeekEnd(prevWeek) {
   try {
     await setDoc(doc(db, 'users', uid(), 'league', 'status'), {
       tier: leagueData.tier,
-      processed: prevWeek
+      processed: prevWeek,
+      username: leagueData.username || null
     });
   } catch(e) {}
 }
@@ -5504,7 +5573,7 @@ async function joinOrLoadLeagueGroup(week) {
   const {db, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs} = window._fb;
   const myUid = uid();
   const tier = leagueData.tier;
-  const myName = (window._currentUser?.name || window._currentUser?.email?.split('@')[0] || 'Utente');
+  const myName = leagueData.username || window._currentUser?.name || window._currentUser?.email?.split('@')[0] || 'Utente';
 
   // Check if I'm already in a group this week
   try {
@@ -5581,7 +5650,7 @@ async function updateMyWeeklyPts() {
   const idx = members.findIndex(m => m.uid === myUid);
   if (idx >= 0) {
     members[idx].weekPts = weekPts;
-    members[idx].name = window._currentUser?.name || members[idx].name;
+    members[idx].name = leagueData.username || window._currentUser?.name || members[idx].name;
   }
 
   try {
@@ -5619,6 +5688,11 @@ function renderLeagueUI() {
     homeTierChip.style.color = tier.color;
     homeTierChip.style.borderColor = tier.color + '40';
   }
+
+  // Home username
+  const homeUsername = document.getElementById('home-league-username');
+  if (homeUsername) homeUsername.textContent = leagueData.username || '—';
+
   const homeRank = document.getElementById('home-league-rank');
   if (homeRank) homeRank.textContent = myRank > 0 ? `#${myRank}` : '—';
 
@@ -5665,6 +5739,10 @@ function renderLeagueUI() {
 
   const tierWeek = document.getElementById('league-tier-week');
   if (tierWeek) tierWeek.textContent = `${totalMembers}/${LEAGUE_GROUP_SIZE} giocatori`;
+
+  // Username bar
+  const myUsernameEl = document.getElementById('league-my-username');
+  if (myUsernameEl) myUsernameEl.textContent = leagueData.username || '—';
 
   // Full board
   const fullBoard = document.getElementById('league-full-board');
@@ -5718,6 +5796,89 @@ function renderLeagueRow(member, rank, total, myUid, compact) {
     <div class="league-user-name">${isMe ? '⭐ ' : ''}${member.name || 'Utente'}${zoneTag}</div>
     <div class="league-user-pts">${member.weekPts || 0} <span style="font-size:10px;color:var(--muted)">pts</span></div>
   </div>`;
+}
+
+function openLeagueUsernameModal(isEdit) {
+  const overlay = document.getElementById('league-username-overlay');
+  const modal = document.getElementById('league-username-modal');
+  const input = document.getElementById('league-username-input');
+  const cancelBtn = document.getElementById('league-username-cancel');
+  const title = document.getElementById('league-username-title');
+  const desc = document.getElementById('league-username-desc');
+  const errEl = document.getElementById('league-username-error');
+  if (!modal) return;
+
+  if (isEdit) {
+    title.textContent = 'Modifica Username';
+    desc.textContent = 'Il nuovo nome verrà aggiornato nella classifica della lega.';
+    cancelBtn.style.display = 'inline-flex';
+    input.value = leagueData.username || '';
+  } else {
+    title.textContent = 'Scegli il tuo Username';
+    desc.textContent = 'Questo nome ti identificherà nella classifica della lega. Gli altri giocatori lo vedranno!';
+    cancelBtn.style.display = 'none';
+    // Pre-fill with current user name or email prefix
+    input.value = window._currentUser?.name || window._currentUser?.email?.split('@')[0] || '';
+  }
+  errEl.textContent = '';
+  overlay.classList.add('show');
+  modal.classList.add('show');
+  setTimeout(() => input.focus(), 200);
+}
+
+function closeLeagueUsernameModal(force) {
+  // If no username and not forcing close, don't allow closing
+  if (!leagueData.username && !force) return;
+  document.getElementById('league-username-overlay')?.classList.remove('show');
+  document.getElementById('league-username-modal')?.classList.remove('show');
+}
+
+async function saveLeagueUsername() {
+  const input = document.getElementById('league-username-input');
+  const errEl = document.getElementById('league-username-error');
+  let name = (input?.value || '').trim();
+
+  // Validation
+  if (!name || name.length < 2) {
+    errEl.textContent = 'Il nome deve avere almeno 2 caratteri.';
+    return;
+  }
+  if (name.length > 20) {
+    errEl.textContent = 'Massimo 20 caratteri.';
+    return;
+  }
+  // Strip potentially offensive chars but allow letters, numbers, spaces, underscores, hyphens, emojis
+  name = name.replace(/[<>"'`;]/g, '');
+  if (name.length < 2) {
+    errEl.textContent = 'Nome non valido.';
+    return;
+  }
+
+  errEl.textContent = '';
+  const {db, doc, setDoc} = window._fb;
+  const wasFirst = !leagueData.username;
+  leagueData.username = name;
+
+  // Save to Firestore
+  try {
+    await setDoc(doc(db, 'users', uid(), 'league', 'status'), {
+      tier: leagueData.tier,
+      processed: leagueData.processed,
+      username: name
+    });
+  } catch(e) { console.log('Username save err:', e); }
+
+  closeLeagueUsernameModal(true);
+  toast('Username salvato: ' + name, '#7c3aed');
+
+  // If this was first-time setup, continue league init
+  if (wasFirst) {
+    await continueLeagueInit();
+  } else {
+    // Update existing group member name
+    await updateMyWeeklyPts();
+    renderLeagueUI();
+  }
 }
 
 function startLeagueCountdown() {
