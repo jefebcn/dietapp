@@ -37,7 +37,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, browserLocalPersistence, setPersistence }
   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 import { getFirestore, collection, doc, setDoc, getDoc, getDocs, addDoc, query, orderBy, onSnapshot,
-         updateDoc, deleteDoc, where, serverTimestamp, limit }
+         updateDoc, deleteDoc, where, serverTimestamp, limit, arrayUnion }
   from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -57,7 +57,7 @@ window._fb = { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassw
                sendPasswordResetEmail, signOut, onAuthStateChanged,
                GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
                collection, doc, setDoc, getDoc, getDocs, addDoc, query,
-               orderBy, onSnapshot, updateDoc, deleteDoc, where, serverTimestamp, limit };
+               orderBy, onSnapshot, updateDoc, deleteDoc, where, serverTimestamp, limit, arrayUnion };
 
 // Auth state listener → bootstrap app
 // Gestione risultato redirect (necessario per iOS PWA / mobile Safari)
@@ -2234,6 +2234,11 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         </div>
 
         <!-- Username display -->
+        <!-- Debug / Force Rejoin button -->
+        <div id="league-debug-bar" style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#fff3cd;border-radius:8px;margin-bottom:10px;border:1px solid #ffc107;font-size:12px;color:#856404">
+          <span id="league-debug-msg">🔍 Caricamento lega...</span>
+          <button onclick="leagueForceRejoin()" style="font-size:11px;padding:4px 10px;background:#7c3aed;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600">🔄 Ri-entra nella lega</button>
+        </div>
         <div id="league-username-bar" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:rgba(124,58,237,0.05);border-radius:10px;margin-bottom:14px;border:1px solid rgba(124,58,237,0.12)">
           <div style="display:flex;align-items:center;gap:8px">
             <span style="font-size:14px">👤</span>
@@ -5763,14 +5768,14 @@ function leagueSlotDocId(week, tier, slot) {
 }
 
 async function joinOrLoadLeagueGroup(week) {
-  const {db, doc, getDoc, setDoc, updateDoc, runTransaction} = window._fb;
-  const myUid  = uid();
-  const tier   = leagueData.tier;
-  const myName = leagueData.username || window._currentUser?.name || window._currentUser?.email?.split('@')[0] || 'Utente';
+  const {db, doc, getDoc, setDoc, updateDoc, arrayUnion} = window._fb;
+  const myUid   = uid();
+  const tier    = leagueData.tier;
+  const myName  = leagueData.username || window._currentUser?.name || window._currentUser?.email?.split('@')[0] || 'Utente';
   const weekPts = calcWeeklyPts();
-
-  // ── Cerca slot S1, S2, ... finché non troviamo il nostro o uno aperto ──
   const MAX_SLOTS = 20;
+
+  console.log(`[League] joinOrLoadLeagueGroup week=${week} tier=${tier} uid=${myUid}`);
 
   for (let slot = 1; slot <= MAX_SLOTS; slot++) {
     const slotId  = leagueSlotDocId(week, tier, slot);
@@ -5778,9 +5783,10 @@ async function joinOrLoadLeagueGroup(week) {
 
     try {
       const snap = await getDoc(slotRef);
+      console.log(`[League] slot ${slot} (${slotId}): exists=${snap.exists()}`);
 
       if (!snap.exists()) {
-        // Slot vuoto → creiamo il gruppo qui (siamo i primi)
+        // Slot vuoto — creiamo il gruppo (siamo i primi di questa settimana/tier)
         const groupData = {
           week, tier, slot,
           memberData: { [myUid]: { name: myName, weekPts } },
@@ -5789,48 +5795,62 @@ async function joinOrLoadLeagueGroup(week) {
           createdAt: Date.now()
         };
         await setDoc(slotRef, groupData);
-        leagueData.currentGroup = { id: slotId, ...groupData };
-        console.log(`League: creato nuovo slot ${slotId}`);
-        return;
+
+        // Verifica: rilegge per assicurarsi che il nostro UID sia nell'array
+        // (in caso di race condition due utenti creano contemporaneamente)
+        const verify = await getDoc(slotRef);
+        if (verify.exists() && (verify.data().memberUids || []).includes(myUid)) {
+          leagueData.currentGroup = { id: slotId, ...normalizeGroupDoc(verify.data()) };
+          console.log(`[League] creato e verificato slot ${slotId}`);
+          return;
+        } else {
+          // Race condition: qualcun altro ha sovrascritto → continua al prossimo slot
+          console.log(`[League] race condition su slot ${slot}, provo il prossimo`);
+          continue;
+        }
       }
 
       const dd      = snap.data();
       const members = dd.memberUids || [];
+      console.log(`[League] slot ${slot}: ${members.length} membri, full=${dd.full}, myUidPresent=${members.includes(myUid)}`);
 
       // Siamo già in questo slot?
       if (members.includes(myUid)) {
         leagueData.currentGroup = { id: slotId, ...normalizeGroupDoc(dd) };
         await updateMyWeeklyPts();
-        console.log(`League: già nello slot ${slotId} con ${members.length} membri`);
+        console.log(`[League] già nello slot ${slotId} (${members.length} membri)`);
         return;
       }
 
       // Slot pieno → prossimo slot
       if (dd.full || members.length >= LEAGUE_GROUP_SIZE) {
+        console.log(`[League] slot ${slot} pieno, prossimo...`);
         continue;
       }
 
-      // Slot aperto → entriamo con update atomico sul nostro campo
-      const newUids = [...members, myUid];
-      const full    = newUids.length >= LEAGUE_GROUP_SIZE;
+      // Slot aperto → entriamo
+      // arrayUnion è ATOMICO: nessuna race condition sull'array memberUids
+      const newCount = members.length + 1;
+      const full     = newCount >= LEAGUE_GROUP_SIZE;
       await updateDoc(slotRef, {
         [`memberData.${myUid}`]: { name: myName, weekPts },
-        memberUids: newUids,
-        full
+        memberUids: arrayUnion(myUid),   // ← atomico, sicuro con concurrent users
+        ...(full ? { full: true } : {})
       });
-      const merged = normalizeGroupDoc(dd);
-      merged.memberData[myUid] = { name: myName, weekPts };
-      merged.memberUids = newUids;
-      merged.full = full;
-      leagueData.currentGroup = { id: slotId, week, tier, ...merged };
-      console.log(`League: entrato nello slot ${slotId}, ora ${newUids.length} membri`);
+
+      // Rilegge per avere lo stato aggiornato
+      const fresh = await getDoc(slotRef);
+      const freshData = fresh.exists() ? normalizeGroupDoc(fresh.data()) : normalizeGroupDoc(dd);
+      freshData.memberData[myUid] = { name: myName, weekPts };
+      leagueData.currentGroup = { id: slotId, week, tier, ...freshData };
+      console.log(`[League] entrato nello slot ${slotId}, ora ~${newCount} membri`);
       return;
 
     } catch(e) {
-      console.error(`League slot ${slot} err:`, e);
-      // Continua al prossimo slot in caso di errore
+      console.error(`[League] slot ${slot} errore:`, e);
     }
   }
+  console.error(`[League] impossibile trovare/creare un gruppo dopo ${MAX_SLOTS} slot`);
 }
 
 async function updateMyWeeklyPts() {
@@ -5880,6 +5900,21 @@ function getMembersArray(group) {
 }
 
 
+async function leagueForceRejoin() {
+  // Azzera il gruppo corrente e riprova l'intera init
+  leagueData.currentGroup = null;
+  leagueData.processed    = null;
+  const wk = currentWeekKey();
+  const dbg = document.getElementById('league-debug-msg');
+  if (dbg) dbg.textContent = '⏳ Ri-accesso in corso...';
+  await joinOrLoadLeagueGroup(wk);
+  renderLeagueUI();
+  if (dbg) {
+    const members = getMembersArray(leagueData.currentGroup);
+    dbg.textContent = `✅ Slot: ${leagueData.currentGroup?.id || '?'} · ${members.length} utenti`;
+  }
+}
+
 function renderLeagueUI() {
   const tier = LEAGUE_TIERS[leagueData.tier] || LEAGUE_TIERS[0];
   // Usa getMembersArray() che legge dal formato mappa (memberData) — compatibile anche con vecchio array
@@ -5889,6 +5924,19 @@ function renderLeagueUI() {
   const myRank = members.findIndex(m => m.uid === myUid) + 1;
   const totalMembers = members.length;
   const weekPts = calcWeeklyPts();
+
+  // Update debug bar
+  const dbg = document.getElementById('league-debug-msg');
+  if (dbg) {
+    if (leagueData.currentGroup?.id) {
+      dbg.textContent = `📍 Slot: ${leagueData.currentGroup.id} · ${totalMembers} utenti in classifica`;
+      dbg.parentElement.style.background = totalMembers > 1 ? '#d4edda' : '#fff3cd';
+      dbg.parentElement.style.borderColor = totalMembers > 1 ? '#28a745' : '#ffc107';
+      dbg.parentElement.style.color = totalMembers > 1 ? '#155724' : '#856404';
+    } else {
+      dbg.textContent = '⚠️ Nessun gruppo trovato — premi Ri-entra';
+    }
+  }
 
   // ─── Home widget ───
   const homeTierChip = document.getElementById('home-league-tier-chip');
