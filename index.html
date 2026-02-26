@@ -1726,8 +1726,8 @@ footer {
   </div>
   <div class="footer-copy">© 2025 Flexeno Fitness</div>
   <div class="footer-links">
-    <a href="#">Privacy</a>
-    <a href="#">Termini</a>
+    <a href="https://www.iubenda.com/privacy-policy/36905399" class="iubenda-white iubenda-noiframe iubenda-embed" title="Privacy Policy">Privacy Policy</a>
+    <a href="https://www.iubenda.com/privacy-policy/36905399/cookie-policy" class="iubenda-white iubenda-noiframe iubenda-embed" title="Cookie Policy">Cookie Policy</a>
     <a href="https://flexenofitness.com" target="_blank">Flexeno.com</a>
   </div>
 </footer>
@@ -1745,116 +1745,9 @@ document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
 </script>
 
 <!-- ═══════════════════════════════════════════════════════════
-     GDPR COOKIE BANNER — conforme Reg. UE 2016/679
+     COOKIE CONSENT — powered by Iubenda (GDPR / ePrivacy)
      ═══════════════════════════════════════════════════════════ -->
-<div id="gdpr-banner" style="display:none" role="dialog" aria-live="polite" aria-label="Informativa cookie">
-  <div class="gdpr-inner">
-    <div class="gdpr-text">
-      <div class="gdpr-title">🍪 Informativa Cookie</div>
-      <p>
-        Utilizziamo <strong>cookie tecnici necessari</strong> per il funzionamento dell'autenticazione (Firebase Auth)
-        e cookie di <strong>analisi anonima</strong> per migliorare il servizio. Nessun dato viene venduto a terzi.
-        Puoi accettare tutti i cookie o limitarti ai soli tecnici necessari.
-        <a href="#gdpr-info" id="gdpr-more-link" onclick="toggleGdprDetail(event)">Leggi di più ▾</a>
-      </p>
-      <div id="gdpr-detail" style="display:none;margin-top:10px;font-size:12px;color:var(--muted);line-height:1.7;border-top:1px solid var(--border);padding-top:10px">
-        <strong>Cookie tecnici (sempre attivi)</strong><br>
-        Necessari per autenticazione Firebase, preferenze di sessione e funzionamento dell'app. Senza di essi il servizio non funziona.<br><br>
-        <strong>Cookie analitici (opzionali)</strong><br>
-        Utilizziamo dati aggregati e anonimi per capire come viene usata l'app e migliorarla. Nessuna profilazione personale.<br><br>
-        Titolare del trattamento: <strong>Flexeno Fitness</strong>. 
-        Puoi revocare il consenso in qualsiasi momento svuotando i cookie del browser.
-      </div>
-    </div>
-    <div class="gdpr-btns">
-      <button class="gdpr-btn-all"      onclick="acceptGdpr('all')">✅ Accetta tutti</button>
-      <button class="gdpr-btn-necessary" onclick="acceptGdpr('necessary')">Solo necessari</button>
-    </div>
-  </div>
-</div>
-
-<style>
-#gdpr-banner {
-  position: fixed; bottom: 0; left: 0; right: 0; z-index: 9999;
-  background: var(--white);
-  border-top: 2px solid var(--border);
-  box-shadow: 0 -8px 40px rgba(44,31,14,0.12);
-  padding: 20px 24px;
-  animation: slideUpGdpr 0.4s ease;
-}
-@keyframes slideUpGdpr {
-  from { transform: translateY(100%); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
-}
-.gdpr-inner {
-  max-width: 900px; margin: 0 auto;
-  display: flex; align-items: flex-start; gap: 24px; flex-wrap: wrap;
-}
-.gdpr-text { flex: 1; min-width: 260px; }
-.gdpr-title { font-weight: 700; font-size: 15px; color: var(--bark); margin-bottom: 6px; }
-.gdpr-text p { font-size: 13px; color: var(--muted); line-height: 1.6; }
-.gdpr-text a { color: var(--green); text-decoration: none; font-weight: 500; }
-.gdpr-btns {
-  display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; min-width: 160px;
-}
-.gdpr-btn-all {
-  background: var(--green); color: #fff;
-  border: none; border-radius: 100px;
-  font-weight: 700; font-size: 14px;
-  padding: 12px 20px; cursor: pointer;
-  transition: background 0.2s;
-}
-.gdpr-btn-all:hover { background: var(--green2); }
-.gdpr-btn-necessary {
-  background: transparent; color: var(--muted);
-  border: 1.5px solid var(--border); border-radius: 100px;
-  font-size: 13px; font-weight: 500;
-  padding: 10px 20px; cursor: pointer;
-  transition: all 0.2s;
-}
-.gdpr-btn-necessary:hover { border-color: var(--bark); color: var(--bark); }
-@media (max-width: 600px) {
-  .gdpr-btns { flex-direction: row; width: 100%; }
-  .gdpr-btn-all, .gdpr-btn-necessary { flex: 1; text-align: center; }
-}
-</style>
-
-<script>
-(function() {
-  const CONSENT_KEY = 'nt-gdpr-consent';
-  const existing = localStorage.getItem(CONSENT_KEY);
-  if (!existing) {
-    // Prima visita — mostra banner dopo 1s
-    setTimeout(() => {
-      document.getElementById('gdpr-banner').style.display = 'block';
-    }, 1000);
-  }
-})();
-
-function acceptGdpr(level) {
-  const CONSENT_KEY = 'nt-gdpr-consent';
-  localStorage.setItem(CONSENT_KEY, JSON.stringify({
-    level: level,         // 'all' | 'necessary'
-    date: new Date().toISOString(),
-    version: '1.0'
-  }));
-  const banner = document.getElementById('gdpr-banner');
-  banner.style.animation = 'none';
-  banner.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
-  banner.style.transform = 'translateY(100%)';
-  banner.style.opacity = '0';
-  setTimeout(() => banner.style.display = 'none', 320);
-}
-
-function toggleGdprDetail(e) {
-  e.preventDefault();
-  const detail = document.getElementById('gdpr-detail');
-  const link = document.getElementById('gdpr-more-link');
-  const open = detail.style.display === 'block';
-  detail.style.display = open ? 'none' : 'block';
-  link.textContent = open ? 'Leggi di più ▾' : 'Nascondi ▴';
-}
-</script>
+<script type="text/javascript" src="https://embeds.iubenda.com/widgets/0af97210-10ed-41d9-a531-3f17ed855268.js"></script>
 <script>
 // Hamburger menu
 const burger = document.getElementById('nav-burger');
@@ -1936,5 +1829,10 @@ function setBilling(mode) {
 }
 </script>
 
+
+<!-- Iubenda policy embed loader (una sola volta) -->
+<script type="text/javascript">
+(function(w,d){var loader=function(){var s=d.createElement("script"),tag=d.getElementsByTagName("script")[0];s.src="https://cdn.iubenda.com/iubenda.js";tag.parentNode.insertBefore(s,tag);};if(w.addEventListener){w.addEventListener("load",loader,false);}else if(w.attachEvent){w.attachEvent("onload",loader);}else{w.onload=loader;}})(window,document);
+</script>
 </body>
 </html>
