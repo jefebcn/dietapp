@@ -5670,114 +5670,198 @@ function calcWeeklyPts() {
   return sum;
 }
 
-function leagueGroupDocId(week, tier, groupNum) {
-  return `${week}_T${tier}_G${groupNum}`;
-}
+// leagueGroupDocId replaced by leagueSlotDocId
 
 async function initLeague() {
-  const {db, doc, getDoc, setDoc} = window._fb;
-  // Load user's league data
+  const {db, doc, getDoc} = window._fb;
   try {
     const snap = await getDoc(doc(db, 'users', uid(), 'league', 'status'));
     if (snap.exists()) {
       const d = snap.data();
-      leagueData.tier = d.tier ?? 0;
+      leagueData.tier      = d.tier      ?? 0;
       leagueData.processed = d.processed ?? null;
-      leagueData.username = d.username ?? null;
-      // Recupera group ID salvato per lookup diretto (evita query composte)
-      if (d.currentGroupId && d.currentWeek === currentWeekKey()) {
-        leagueData.currentGroup = { id: d.currentGroupId };
-      }
+      leagueData.username  = d.username  ?? null;
     }
   } catch(e) { console.log('League load err:', e); }
 
-  // If no username set, prompt user
   if (!leagueData.username) {
     openLeagueUsernameModal(false);
-    return; // will continue init after username is saved
+    return;
   }
-
   await continueLeagueInit();
 }
 
 async function continueLeagueInit() {
-  const wk = currentWeekKey();
+  const wk    = currentWeekKey();
   const prevWk = previousWeekKey();
 
-  // Process previous week results (promotion/relegation) if not yet done
   if (leagueData.processed !== prevWk) {
     await processLeagueWeekEnd(prevWk);
   }
 
-  // Join or load current week group
   await joinOrLoadLeagueGroup(wk);
-
-  // Tenta merge dei gruppi orfani (gruppi da 1 persona creati prima del fix)
-  await mergeOrphanLeagueGroups(wk);
-
-  // Render
   renderLeagueUI();
   startLeagueCountdown();
 }
 
 async function processLeagueWeekEnd(prevWeek) {
-  const {db, doc, getDoc, setDoc, collection, query, where, getDocs} = window._fb;
+  const {db, doc, getDoc, setDoc} = window._fb;
   const myUid = uid();
-  const tier = leagueData.tier;
+  const tier  = leagueData.tier;
 
-  // Find my group from last week
-  // NOTA: query singola (no indici compositi Firestore necessari) + filtro client-side
   try {
-    const q = query(
-      collection(db, 'leagueGroups'),
-      where('memberUids', 'array-contains', myUid)
-    );
-    const snap = await getDocs(q);
-    const matchDoc = snap.docs.find(d => {
-      const dd = d.data();
-      return dd.week === prevWeek; // filtro settimana lato client
-    });
-    if (matchDoc) {
-      const groupDoc = matchDoc; // alias per compatibilità con il codice sotto
-      if (true) {
-      const groupDoc = snap.docs[0];
-      const gData = normalizeGroupDoc(groupDoc.data());
-      const members = getMembersArray(gData).sort((a,b) => (b.weekPts||0) - (a.weekPts||0));
-      const myIdx = members.findIndex(m => m.uid === myUid);
+    // Cerca il gruppo della settimana scorsa tramite slot deterministici (no query)
+    let foundGroup = null;
+    for (let s = 1; s <= 20; s++) {
+      const slotId = leagueSlotDocId(prevWeek, tier, s);
+      const snap   = await getDoc(doc(db, 'leagueGroups', slotId));
+      if (!snap.exists()) break; // slot vuoto = fine dei gruppi
+      const dd = snap.data();
+      if ((dd.memberUids || []).includes(myUid)) {
+        foundGroup = { id: slotId, ...normalizeGroupDoc(dd) };
+        break;
+      }
+    }
 
+    if (foundGroup) {
+      const members = getMembersArray(foundGroup).sort((a,b)=>(b.weekPts||0)-(a.weekPts||0));
+      const myIdx   = members.findIndex(m => m.uid === myUid);
       if (myIdx >= 0) {
-        const rank = myIdx + 1;
+        const rank  = myIdx + 1;
         const total = members.length;
         let newTier = tier;
-
-        // Promote top 3 (if not already max)
         if (rank <= LEAGUE_PROMOTE_COUNT && tier < LEAGUE_TIERS.length - 1) {
           newTier = tier + 1;
           showLeaguePromoToast('promote', newTier);
-        }
-        // Relegate bottom 3 (if not already min)
-        else if (rank > total - LEAGUE_RELEGATE_COUNT && tier > 0 && total > LEAGUE_RELEGATE_COUNT) {
+        } else if (rank > total - LEAGUE_RELEGATE_COUNT && tier > 0 && total > LEAGUE_RELEGATE_COUNT) {
           newTier = tier - 1;
           showLeaguePromoToast('relegate', newTier);
         }
-
         leagueData.tier = newTier;
       }
-    }}
-  } catch(e) { console.error('League weekEnd err:', e); }
+    }
+  } catch(e) { console.log('League weekEnd err:', e); }
 
-  // Mark as processed
   leagueData.processed = prevWeek;
   try {
-    await setDoc(doc(db, 'users', uid(), 'league', 'status'), {
-      tier: leagueData.tier,
+    const {db: db2, doc: doc2, setDoc: setDoc2} = window._fb;
+    await setDoc2(doc2(db2, 'users', uid(), 'league', 'status'), {
+      tier:      leagueData.tier,
       processed: prevWeek,
-      username: leagueData.username || null
+      username:  leagueData.username || null
     });
   } catch(e) {}
 }
 
-// Helper: normalizza il documento Firestore — supporta vecchio formato (array) e nuovo (mappa per UID)
+// ────────────────────────────────────────────────────────────
+// ID GRUPPO DETERMINISTICO — es. "2025-W08_T0_S1"
+// Tutti gli utenti dello stesso week+tier provano gli stessi
+// slot in ordine → nessuna query necessaria, nessun indice.
+// ────────────────────────────────────────────────────────────
+function leagueSlotDocId(week, tier, slot) {
+  return `${week}_T${tier}_S${slot}`;
+}
+
+async function joinOrLoadLeagueGroup(week) {
+  const {db, doc, getDoc, setDoc, updateDoc, runTransaction} = window._fb;
+  const myUid  = uid();
+  const tier   = leagueData.tier;
+  const myName = leagueData.username || window._currentUser?.name || window._currentUser?.email?.split('@')[0] || 'Utente';
+  const weekPts = calcWeeklyPts();
+
+  // ── Cerca slot S1, S2, ... finché non troviamo il nostro o uno aperto ──
+  const MAX_SLOTS = 20;
+
+  for (let slot = 1; slot <= MAX_SLOTS; slot++) {
+    const slotId  = leagueSlotDocId(week, tier, slot);
+    const slotRef = doc(db, 'leagueGroups', slotId);
+
+    try {
+      const snap = await getDoc(slotRef);
+
+      if (!snap.exists()) {
+        // Slot vuoto → creiamo il gruppo qui (siamo i primi)
+        const groupData = {
+          week, tier, slot,
+          memberData: { [myUid]: { name: myName, weekPts } },
+          memberUids: [myUid],
+          full: false,
+          createdAt: Date.now()
+        };
+        await setDoc(slotRef, groupData);
+        leagueData.currentGroup = { id: slotId, ...groupData };
+        console.log(`League: creato nuovo slot ${slotId}`);
+        return;
+      }
+
+      const dd      = snap.data();
+      const members = dd.memberUids || [];
+
+      // Siamo già in questo slot?
+      if (members.includes(myUid)) {
+        leagueData.currentGroup = { id: slotId, ...normalizeGroupDoc(dd) };
+        await updateMyWeeklyPts();
+        console.log(`League: già nello slot ${slotId} con ${members.length} membri`);
+        return;
+      }
+
+      // Slot pieno → prossimo slot
+      if (dd.full || members.length >= LEAGUE_GROUP_SIZE) {
+        continue;
+      }
+
+      // Slot aperto → entriamo con update atomico sul nostro campo
+      const newUids = [...members, myUid];
+      const full    = newUids.length >= LEAGUE_GROUP_SIZE;
+      await updateDoc(slotRef, {
+        [`memberData.${myUid}`]: { name: myName, weekPts },
+        memberUids: newUids,
+        full
+      });
+      const merged = normalizeGroupDoc(dd);
+      merged.memberData[myUid] = { name: myName, weekPts };
+      merged.memberUids = newUids;
+      merged.full = full;
+      leagueData.currentGroup = { id: slotId, week, tier, ...merged };
+      console.log(`League: entrato nello slot ${slotId}, ora ${newUids.length} membri`);
+      return;
+
+    } catch(e) {
+      console.error(`League slot ${slot} err:`, e);
+      // Continua al prossimo slot in caso di errore
+    }
+  }
+}
+
+async function updateMyWeeklyPts() {
+  if (!leagueData.currentGroup) return;
+  const {db, doc, updateDoc} = window._fb;
+  const myUid   = uid();
+  const weekPts = calcWeeklyPts();
+  const myName  = leagueData.username || window._currentUser?.name || 'Utente';
+  try {
+    await updateDoc(doc(db, 'leagueGroups', leagueData.currentGroup.id), {
+      [`memberData.${myUid}.weekPts`]: weekPts,
+      [`memberData.${myUid}.name`]:    myName
+    });
+    if (leagueData.currentGroup.memberData) {
+      leagueData.currentGroup.memberData[myUid] = { name: myName, weekPts };
+    }
+  } catch(e) { console.log('updateMyWeeklyPts err:', e); }
+}
+
+async function refreshLeagueGroup() {
+  if (!leagueData.currentGroup?.id) return;
+  const {db, doc, getDoc} = window._fb;
+  try {
+    const snap = await getDoc(doc(db, 'leagueGroups', leagueData.currentGroup.id));
+    if (snap.exists()) {
+      leagueData.currentGroup = { id: snap.id, ...normalizeGroupDoc(snap.data()) };
+    }
+  } catch(e) { console.log('refreshLeagueGroup err:', e); }
+}
+
+// Helper: normalizza il documento (supporta vecchio formato array e nuovo mappa)
 function normalizeGroupDoc(gDocData) {
   const data = { ...gDocData };
   if (!data.memberData) {
@@ -5789,249 +5873,12 @@ function normalizeGroupDoc(gDocData) {
   return data;
 }
 
-// Helper: converte memberData map in array ordinabile per la UI
+// Helper: converte memberData map in array ordinabile
 function getMembersArray(group) {
   const md = group?.memberData || {};
   return Object.entries(md).map(([uid, d]) => ({ uid, name: d.name || 'Utente', weekPts: d.weekPts || 0 }));
 }
 
-async function joinOrLoadLeagueGroup(week) {
-  const {db, doc, getDoc, setDoc, updateDoc, collection, query, where, getDocs} = window._fb;
-  const myUid = uid();
-  const tier = leagueData.tier;
-  const myName = leagueData.username || window._currentUser?.name || window._currentUser?.email?.split('@')[0] || 'Utente';
-  const weekPts = calcWeeklyPts();
-
-  // ── STEP 1: sono già in un gruppo questa settimana? ──
-  // Prima controlla se abbiamo l'ID salvato localmente (più veloce, no query)
-  try {
-    const savedGroupId = leagueData.currentGroup?.id || null;
-    if (savedGroupId) {
-      const snap = await getDoc(doc(db, 'leagueGroups', savedGroupId));
-      if (snap.exists()) {
-        const dd = snap.data();
-        if (dd.week === week && dd.tier === tier && (dd.memberUids||[]).includes(myUid)) {
-          leagueData.currentGroup = { id: savedGroupId, ...normalizeGroupDoc(dd) };
-          await updateMyWeeklyPts();
-          return;
-        }
-      }
-    }
-  } catch(e) {}
-
-  // Fallback: cerca via query (array-contains non richiede indice composito)
-  try {
-    const q = query(
-      collection(db, 'leagueGroups'),
-      where('memberUids', 'array-contains', myUid)
-    );
-    const snap = await getDocs(q);
-    const myGroupDoc = snap.docs.find(d => {
-      const dd = d.data();
-      return dd.week === week && dd.tier === tier;
-    });
-    if (myGroupDoc) {
-      leagueData.currentGroup = { id: myGroupDoc.id, ...normalizeGroupDoc(myGroupDoc.data()) };
-      // Salva l'ID per accessi futuri
-      leagueData.currentGroupId = myGroupDoc.id;
-      await updateMyWeeklyPts();
-      return;
-    }
-  } catch(e) { console.error('League check err:', e); }
-
-  // ── STEP 2: trova un gruppo aperto del mio tier questa settimana ──
-  // Query per week soltanto → filtro tier e capienza lato client
-  try {
-    const q = query(
-      collection(db, 'leagueGroups'),
-      where('week', '==', week)
-    );
-    const snap = await getDocs(q);
-
-    // Filtra: stesso tier, non pieno, non già membro
-    let targetDoc = null;
-    for (const d of snap.docs) {
-      const data = d.data();
-      const members = data.memberUids || [];
-      if (
-        data.tier === tier &&
-        !data.full &&
-        members.length < LEAGUE_GROUP_SIZE &&
-        !members.includes(myUid)
-      ) {
-        targetDoc = d;
-        break;
-      }
-    }
-
-    if (targetDoc) {
-      // Entra nel gruppo — aggiorna solo il proprio campo UID (no race condition)
-      const gData = normalizeGroupDoc(targetDoc.data());
-      const newMemberUids = [...(gData.memberUids || []), myUid];
-      const full = newMemberUids.length >= LEAGUE_GROUP_SIZE;
-      await updateDoc(doc(db, 'leagueGroups', targetDoc.id), {
-        [`memberData.${myUid}`]: { name: myName, weekPts },
-        memberUids: newMemberUids,
-        full
-      });
-      gData.memberData[myUid] = { name: myName, weekPts };
-      gData.memberUids = newMemberUids;
-      gData.full = full;
-      leagueData.currentGroup = { id: targetDoc.id, week, tier, ...gData };
-      console.log(`League: entrato nel gruppo ${targetDoc.id} con ${newMemberUids.length} membri`);
-      // Salva l'ID del gruppo nel profilo utente
-      try {
-        const {setDoc: sd, doc: d2} = window._fb;
-        await sd(d2(db, 'users', myUid, 'league', 'status'), {
-          tier: leagueData.tier,
-          processed: leagueData.processed || null,
-          username: leagueData.username || null,
-          currentGroupId: targetDoc.id,
-          currentWeek: week
-        });
-      } catch(e) {}
-    } else {
-      // Crea nuovo gruppo
-      const groupNum = Date.now();
-      const docId = leagueGroupDocId(week, tier, groupNum);
-      const groupData = {
-        week, tier, groupNum,
-        memberData: { [myUid]: { name: myName, weekPts } },
-        memberUids: [myUid],
-        full: false,
-        createdAt: Date.now()
-      };
-      await setDoc(doc(db, 'leagueGroups', docId), groupData);
-      leagueData.currentGroup = { id: docId, ...groupData };
-      console.log(`League: creato nuovo gruppo ${docId}`);
-      // Salva l'ID del gruppo nel profilo utente per lookup veloce
-      try {
-        const {setDoc: sd, doc: d2} = window._fb;
-        await sd(d2(db, 'users', myUid, 'league', 'status'), {
-          tier: leagueData.tier,
-          processed: leagueData.processed || null,
-          username: leagueData.username || null,
-          currentGroupId: docId,
-          currentWeek: week
-        });
-      } catch(e) {}
-    }
-  } catch(e) { console.error('League join err:', e); }
-}
-
-async function updateMyWeeklyPts() {
-  if (!leagueData.currentGroup) return;
-  const {db, doc, updateDoc} = window._fb;
-  const myUid = uid();
-  const weekPts = calcWeeklyPts();
-  const myName = leagueData.username || window._currentUser?.name || 'Utente';
-
-  // Aggiornamento atomico solo sul campo del proprio UID — nessuna race condition!
-  try {
-    await updateDoc(doc(db, 'leagueGroups', leagueData.currentGroup.id), {
-      [`memberData.${myUid}.weekPts`]: weekPts,
-      [`memberData.${myUid}.name`]: myName
-    });
-  } catch(e) {}
-
-  // Aggiorna la copia locale
-  if (!leagueData.currentGroup.memberData) leagueData.currentGroup.memberData = {};
-  leagueData.currentGroup.memberData[myUid] = { weekPts, name: myName };
-}
-
-async function refreshLeagueGroup() {
-  if (!leagueData.currentGroup) return;
-  const {db, doc, getDoc} = window._fb;
-  try {
-    const snap = await getDoc(doc(db, 'leagueGroups', leagueData.currentGroup.id));
-    if (snap.exists()) {
-      // normalizeGroupDoc gestisce sia il vecchio formato array che il nuovo map
-      leagueData.currentGroup = { id: snap.id, ...normalizeGroupDoc(snap.data()) };
-    }
-  } catch(e) {}
-}
-
-
-async function mergeOrphanLeagueGroups(week) {
-  // Unisce i gruppi da 1 sola persona (creati prima del fix query composte)
-  // Solo se l'utente è attualmente in un gruppo da 1 persona
-  if (!leagueData.currentGroup) return;
-  const myMembers = getMembersArray(leagueData.currentGroup);
-  if (myMembers.length > 1) return; // già in un gruppo con altri, niente da fare
-
-  const {db, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, query, where, getDocs} = window._fb;
-  const myUid = uid();
-  const tier = leagueData.tier;
-
-  try {
-    // Cerca altri gruppi orfani (1 membro) della stessa settimana/tier
-    const q = query(collection(db, 'leagueGroups'), where('week', '==', week));
-    const snap = await getDocs(q);
-
-    // Raccogli tutti i gruppi da 1 persona dello stesso tier (escluso il mio)
-    const orphans = snap.docs.filter(d => {
-      const dd = d.data();
-      const uids = dd.memberUids || [];
-      return dd.tier === tier &&
-             uids.length === 1 &&
-             !uids.includes(myUid) &&
-             d.id !== leagueData.currentGroup.id;
-    });
-
-    if (orphans.length === 0) return;
-
-    console.log(`League merge: trovati ${orphans.length} gruppi orfani da unire`);
-
-    // Prendi il primo gruppo orfano come "gruppo target" dove tutti si uniscono
-    // (Se abbiamo più orfani li uniamo tutti al mio gruppo corrente)
-    const myGroupRef = doc(db, 'leagueGroups', leagueData.currentGroup.id);
-
-    for (const orphanDoc of orphans.slice(0, LEAGUE_GROUP_SIZE - 1)) {
-      const od = normalizeGroupDoc(orphanDoc.data());
-      const orphanUid = od.memberUids[0];
-      const orphanMemberData = od.memberData[orphanUid] || { name: 'Utente', weekPts: 0 };
-
-      // Aggiungi l'utente orfano al mio gruppo
-      const currentGroup = leagueData.currentGroup;
-      const currentUids = currentGroup.memberUids || [];
-      if (currentUids.includes(orphanUid)) continue;
-      if (currentUids.length >= LEAGUE_GROUP_SIZE) break;
-
-      const newUids = [...currentUids, orphanUid];
-      const full = newUids.length >= LEAGUE_GROUP_SIZE;
-
-      await updateDoc(myGroupRef, {
-        [`memberData.${orphanUid}`]: orphanMemberData,
-        memberUids: newUids,
-        full
-      });
-
-      // Aggiorna il gruppo corrente in memoria
-      leagueData.currentGroup.memberData[orphanUid] = orphanMemberData;
-      leagueData.currentGroup.memberUids = newUids;
-      leagueData.currentGroup.full = full;
-
-      // Aggiorna il profilo dell'utente orfano con il nuovo gruppo ID
-      try {
-        const orphanStatusRef = doc(db, 'users', orphanUid, 'league', 'status');
-        const orphanStatus = await getDoc(orphanStatusRef);
-        if (orphanStatus.exists()) {
-          await updateDoc(orphanStatusRef, {
-            currentGroupId: leagueData.currentGroup.id,
-            currentWeek: week
-          });
-        }
-      } catch(e) {}
-
-      // Elimina il vecchio gruppo orfano
-      try {
-        await deleteDoc(doc(db, 'leagueGroups', orphanDoc.id));
-      } catch(e) {}
-
-      console.log(`League merge: unito utente ${orphanUid} nel gruppo ${leagueData.currentGroup.id}`);
-    }
-  } catch(e) { console.error('League merge err:', e); }
-}
 
 function renderLeagueUI() {
   const tier = LEAGUE_TIERS[leagueData.tier] || LEAGUE_TIERS[0];
