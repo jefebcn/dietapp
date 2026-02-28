@@ -1782,18 +1782,9 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         </div>
       </div>
 
-      <!-- ③ ROW: ACQUA + DIGIUNO (fianco a fianco) -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
-        <!-- Acqua -->
-        <div class="card" style="margin-bottom:0;padding:14px">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-            <div style="font-weight:700;font-size:13px">💧 Acqua</div>
-            <button onclick="resetWater()" style="font-size:10px;color:var(--muted);background:none;border:none;cursor:pointer;padding:2px 6px">reset</button>
-          </div>
-          <div style="font-size:12px;color:var(--muted);margin-bottom:8px" id="water-label">0 / 8</div>
-          <div style="display:flex;gap:4px;flex-wrap:wrap" id="water-glasses"></div>
-        </div>
-        <!-- Digiuno — arco SVG -->
+      <!-- ③ DIGIUNO -->
+      <div style="margin-bottom:16px">
+        <!-- Digiuno — arco SVG, full width -->
         <div class="card" style="margin-bottom:0;padding:16px 14px" id="home-fasting-card">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
             <div style="font-weight:700;font-size:13px">⏱️ Digiuno</div>
@@ -1814,8 +1805,8 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
             style="width:100%;margin-top:6px;padding:8px;border-radius:12px;border:1.5px solid #7c3aed30;background:#7c3aed12;color:#7c3aed;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--font-brand);transition:all .2s">
             ▶ Inizia Digiuno
           </button>
-        </div>
-      </div>
+        </div><!-- /home-fasting-card -->
+      </div><!-- /③ digiuno wrapper -->
 
       <!-- ④ NUTRIPOINTS -->
       <div class="card" style="margin-bottom:16px;border-top:3px solid #ca8a04" id="home-points-card">
@@ -1909,16 +1900,35 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         <!-- ═══ DIARY + FOODS PAGE (unified) ═══ -->
     <div class="page" id="page-diary">
 
-      <!-- Internal tab bar -->
-      <div style="display:flex;gap:0;margin-bottom:18px;border-bottom:2px solid var(--border);background:var(--bg-card);border-radius:16px 16px 0 0;overflow:hidden">
-        <button id="dtab-diary" onclick="switchDiaryTab('diary')"
-          style="flex:1;padding:12px 8px;border:none;background:transparent;font-family:var(--font-brand);font-weight:700;font-size:13px;cursor:pointer;border-bottom:2px solid var(--green);color:var(--green);margin-bottom:-2px;transition:all .15s">
-          📔 Diario
-        </button>
-        <button id="dtab-foods" onclick="switchDiaryTab('foods')"
-          style="flex:1;padding:12px 8px;border:none;background:transparent;font-family:var(--font-brand);font-weight:700;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);margin-bottom:-2px;transition:all .15s">
-          🥗 Alimenti
-        </button>
+      <!-- Internal tab bar — gerarchia Diario > Alimenti -->
+      <div style="margin-bottom:20px">
+        <!-- Etichetta sezione -->
+        <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:8px;padding-left:2px;text-transform:uppercase">Sezione Diario</div>
+        <!-- Pill buttons -->
+        <div style="display:flex;gap:8px">
+          <button id="dtab-diary" onclick="switchDiaryTab('diary')"
+            style="flex:1;padding:11px 14px;border-radius:14px;border:2px solid var(--green);background:var(--green);color:#fff;font-family:var(--font-brand);font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;text-align:left">
+            <span style="font-size:20px;line-height:1;flex-shrink:0">📔</span>
+            <div>
+              <div style="font-size:13px;line-height:1.1">Diario</div>
+              <div style="font-size:9px;font-weight:400;opacity:.85;margin-top:1px">pasti del giorno</div>
+            </div>
+          </button>
+          <button id="dtab-foods" onclick="switchDiaryTab('foods')"
+            style="flex:1;padding:11px 14px;border-radius:14px;border:2px solid var(--border);background:transparent;color:var(--muted);font-family:var(--font-brand);font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:10px;text-align:left">
+            <span style="font-size:20px;line-height:1;flex-shrink:0">🥗</span>
+            <div>
+              <div style="font-size:13px;line-height:1.1">Alimenti</div>
+              <div style="font-size:9px;font-weight:400;opacity:.7;margin-top:1px">cerca &amp; aggiungi</div>
+            </div>
+          </button>
+        </div>
+        <!-- Breadcrumb dinamico -->
+        <div style="margin-top:8px;padding-left:4px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:4px">
+          <span>Diario</span>
+          <span style="opacity:.35">›</span>
+          <span id="dtab-crumb" style="color:var(--green);font-weight:600">Oggi</span>
+        </div>
       </div>
 
       <!-- ── TAB: DIARIO ── -->
@@ -2179,6 +2189,29 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
           </div>
         </div>
       </div>
+
+      <!-- ═══════════════════════════════════════ -->
+      <!-- RICETTE FIT                            -->
+      <!-- ═══════════════════════════════════════ -->
+      <div style="margin-top:32px;padding-bottom:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <div>
+            <h3 style="font-size:18px;margin:0">🥗 Ricette Fit</h3>
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:3px;letter-spacing:.5px">Facili, veloci e salutari</div>
+          </div>
+        </div>
+        <!-- Filtri categoria -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px">
+          <button class="cat-pill active" onclick="filterRicette('all',this)">✨ Tutte</button>
+          <button class="cat-pill" onclick="filterRicette('colazione',this)">☀️ Colazione</button>
+          <button class="cat-pill" onclick="filterRicette('pranzo',this)">🍽️ Pranzo</button>
+          <button class="cat-pill" onclick="filterRicette('cena',this)">🌙 Cena</button>
+          <button class="cat-pill" onclick="filterRicette('snack',this)">🍎 Snack</button>
+        </div>
+        <!-- Grid ricette -->
+        <div id="ricette-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px"></div>
+      </div>
+
     </div>
 
     <!-- ═══ LEGENDA PAGE ═══ -->
@@ -3711,7 +3744,7 @@ function goPage(id) {
   const nb = document.getElementById('nav-'+id);
   if (nb) nb.classList.add('active');
   if (id === 'admin') loadAdminUsers();
-  if (id === 'goals') loadGoal();
+  if (id === 'goals') { loadGoal(); renderRicette(); }
   if (id === 'diary') { setDiaryToday(); switchDiaryTab('diary'); }
   if (id === 'home') { loadMacroWeekChart(); updateHomeDiarySummary(); }
   if (id === 'rewards') { renderPointsUI(); loadReferralData(); refreshLeagueGroup().then(()=>renderLeagueUI()).catch(()=>{}); }
@@ -3957,7 +3990,6 @@ function showApp() {
   if (fabBtn) fabBtn.style.display = 'flex';
   // Onboarding (skip for admin)
   checkOnboarding();
-  renderWater();
   initFasting();
 }
 
@@ -7896,60 +7928,6 @@ async function confirmDeleteAccount() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// WATER TRACKER
-// ═══════════════════════════════════════════════════════════
-const WATER_KEY = 'nt_water_';
-const WATER_GOAL = 8;
-
-function waterKey() { return WATER_KEY + todayStr(); }
-
-function getWaterCount() {
-  return parseInt(localStorage.getItem(waterKey()) || '0');
-}
-
-function setWaterCount(n) {
-  localStorage.setItem(waterKey(), String(Math.max(0, Math.min(WATER_GOAL, n))));
-  renderWater();
-}
-
-function addWater() {
-  const cur = getWaterCount();
-  if (cur < WATER_GOAL) {
-    setWaterCount(cur + 1);
-    if (cur + 1 === WATER_GOAL) {
-      showPtsToast('💧 Obiettivo acqua raggiunto! +5 pts');
-      awardPoints(5, 'Obiettivo acqua raggiunto 💧', '💧');
-    }
-  }
-}
-
-function resetWater() { setWaterCount(0); }
-
-function renderWater() {
-  const container = document.getElementById('water-glasses');
-  const label     = document.getElementById('water-label');
-  if (!container) return;
-  const count = getWaterCount();
-  if (label) label.textContent = `${count} / ${WATER_GOAL} bicchieri`;
-  container.innerHTML = '';
-  for (let i = 0; i < WATER_GOAL; i++) {
-    const filled = i < count;
-    const btn = document.createElement('button');
-    btn.style.cssText = `width:32px;height:40px;border-radius:6px;border:2px solid ${filled ? '#3b82f6' : 'var(--border)'};background:${filled ? '#eff6ff' : 'transparent'};cursor:pointer;font-size:18px;transition:all .15s;display:flex;align-items:center;justify-content:center;padding:0`;
-    btn.textContent = filled ? '💧' : '○';
-    btn.title = filled ? `Rimuovi bicchiere ${i+1}` : `Aggiungi bicchiere ${i+1}`;
-    btn.onclick = () => {
-      if (!filled) { addWater(); }
-      else { setWaterCount(i); } // click su filled → rimuovi fino a quel punto
-    };
-    container.appendChild(btn);
-  }
-}
-
-// Init water on app load
-
-
-// ═══════════════════════════════════════════════════════════
 // EXPORT DATI CSV
 // ═══════════════════════════════════════════════════════════
 
@@ -8250,20 +8228,196 @@ function checkMacroBarCompletion(targets, totals) {
 // DIARY INTERNAL TABS (Diario / Alimenti)
 // ══════════════════════════════════
 function switchDiaryTab(tab) {
-  const tabs    = ['diary', 'foods'];
-  const colors  = { diary: 'var(--green)', foods: 'var(--orange)' };
-  tabs.forEach(t => {
-    const btn     = document.getElementById('dtab-' + t);
-    const content = document.getElementById('dtab-content-' + t);
-    const active  = t === tab;
+  const cfg = {
+    diary: { bg: 'var(--green)', border: 'var(--green)', color: '#fff' },
+    foods: { bg: 'var(--orange)', border: 'var(--orange)', color: '#fff' }
+  };
+  ['diary', 'foods'].forEach(t => {
+    const btn  = document.getElementById('dtab-' + t);
+    const pane = document.getElementById('dtab-content-' + t);
+    const active = t === tab;
     if (btn) {
-      btn.style.borderBottomColor = active ? colors[tab] : 'transparent';
-      btn.style.color             = active ? colors[tab] : 'var(--muted)';
+      btn.style.background  = active ? cfg[t].bg     : 'transparent';
+      btn.style.borderColor = active ? cfg[t].border : 'var(--border)';
+      btn.style.color       = active ? cfg[t].color  : 'var(--muted)';
     }
-    if (content) content.style.display = active ? 'block' : 'none';
+    if (pane) pane.style.display = active ? 'block' : 'none';
   });
-  // When switching to foods tab, refresh list
+  // Breadcrumb dinamico
+  const crumb = document.getElementById('dtab-crumb');
+  if (crumb) {
+    if (tab === 'foods') {
+      crumb.textContent = 'Alimenti';
+      crumb.style.color = 'var(--orange)';
+    } else {
+      const dateLbl = document.getElementById('diary-date-label');
+      crumb.textContent = dateLbl ? dateLbl.textContent : 'Oggi';
+      crumb.style.color = 'var(--green)';
+    }
+  }
   if (tab === 'foods') renderFoodsList();
+}
+
+// ══════════════════════════════════════════════════════════════
+// RICETTE FIT
+// ══════════════════════════════════════════════════════════════
+const RICETTE_FIT = [
+  { id:'rf01', cat:'colazione', nome:"Pancake Proteici all'Avena", emoji:'🥞',
+    tempo:'10 min', diff:'Facile', kcal:320, prot:24,
+    ing:["80g fiocchi d'avena","2 uova intere","1 banana matura","1 cucchiaino lievito"],
+    prep:"Frulla avena, uova e banana fino a ottenere un composto liscio. Scalda una padella antiaderente a fuoco medio e cuoci le frittelle 2 minuti per lato. Servi con frutti di bosco freschi.",
+    tag:['alto-proteico','senza-glutine'] },
+  { id:'rf02', cat:'colazione', nome:'Greek Yogurt Bowl', emoji:'🫙',
+    tempo:'5 min', diff:'Facilissimo', kcal:280, prot:20,
+    ing:['200g yogurt greco 0%','30g granola integrale','80g frutti di bosco','1 cucchiaio miele'],
+    prep:'Versa lo yogurt in una ciotola. Aggiungi granola e frutti di bosco. Finisci con un filo di miele. Consuma subito per mantenere la croccantezza.',
+    tag:['veloce','ricco-calcio'] },
+  { id:'rf03', cat:'colazione', nome:'Overnight Oats Proteici', emoji:'🌙',
+    tempo:'5 min + notte', diff:'Facilissimo', kcal:360, prot:22,
+    ing:["70g fiocchi d'avena","200ml latte scremato","100g yogurt greco","1 misurino proteine vaniglia","frutti di bosco","semi di chia"],
+    prep:"Mescola avena, latte, yogurt e proteine in un barattolo. Aggiungi un cucchiaio di chia, chiudi e riponi in frigo per tutta la notte. Al mattino guarnisci con i frutti di bosco.",
+    tag:['meal-prep','alto-proteico'] },
+  { id:'rf04', cat:'pranzo', nome:'Bowl Quinoa e Pollo', emoji:'🍲',
+    tempo:'20 min', diff:'Facile', kcal:480, prot:42,
+    ing:['150g petto di pollo','80g quinoa','spinacini freschi q.b.','½ avocado','limone, olio evo'],
+    prep:"Cuoci la quinoa in brodo vegetale 15 min. Griglia il pollo a cubetti con spezie a piacere. Componi la bowl: spinacini, quinoa, pollo e avocado a fette. Condisci con limone e olio.",
+    tag:['alto-proteico','meal-prep'] },
+  { id:'rf05', cat:'pranzo', nome:'Insalata Tonno e Ceci', emoji:'🥗',
+    tempo:'5 min', diff:'Facilissimo', kcal:380, prot:35,
+    ing:['160g tonno al naturale','200g ceci in lattina','pomodorini','½ cipolla rossa','prezzemolo','olio evo, limone'],
+    prep:'Scola e risciacqua i ceci. Unisci tonno, ceci, pomodorini tagliati, cipolla e prezzemolo. Condisci con olio e succo di limone. Nessuna cottura richiesta.',
+    tag:['veloce','senza-cottura'] },
+  { id:'rf06', cat:'pranzo', nome:'Wrap Integrale al Pollo', emoji:'🌯',
+    tempo:'15 min', diff:'Facile', kcal:420, prot:38,
+    ing:['1 piadina integrale','120g pollo grigliato','lattuga','pomodoro','yogurt greco + erbe aromatiche'],
+    prep:"Griglia il pollo con paprika e aglio. Prepara la salsa mescolando yogurt greco con erbe fresche. Stendi la salsa sulla piadina, aggiungi verdure e pollo, avvolgi stretto.",
+    tag:['meal-prep','alto-proteico'] },
+  { id:'rf07', cat:'cena', nome:'Salmone al Forno con Verdure', emoji:'🐟',
+    tempo:'25 min', diff:'Facile', kcal:390, prot:36,
+    ing:['180g filetto di salmone','zucchine','peperoni','aglio','olio evo','limone','rosmarino'],
+    prep:'Preriscalda il forno a 200°C. Disponi salmone e verdure su teglia, condisci con olio, aglio, limone e rosmarino. Cuoci 18-20 minuti.',
+    tag:['omega-3','anti-infiammatorio'] },
+  { id:'rf08', cat:'cena', nome:'Frittata di Albumi e Verdure', emoji:'🍳',
+    tempo:'15 min', diff:'Facile', kcal:230, prot:28,
+    ing:['6 albumi','1 uovo intero','spinaci','pomodorini','30g feta light','olio evo'],
+    prep:"Sbatti albumi e uovo. Aggiungi spinaci e pomodorini. Cuoci in padella antiaderente coperta 8 min, poi spolvera con feta.",
+    tag:['basso-calorie','alto-proteico'] },
+  { id:'rf09', cat:'cena', nome:'Pollo al Curry Leggero', emoji:'🍛',
+    tempo:'25 min', diff:'Facile', kcal:460, prot:40,
+    ing:['150g petto di pollo','80g riso basmati','100ml latte di cocco light','curry','cipolla','aglio','zenzero'],
+    prep:'Soffriggi cipolla, aglio e zenzero. Aggiungi pollo a cubetti e curry, poi il latte di cocco. Cuoci 12 min. Servi sul riso basmati cotto al vapore.',
+    tag:['esotico','meal-prep'] },
+  { id:'rf10', cat:'snack', nome:'Hummus Fatto in Casa', emoji:'🫘',
+    tempo:'10 min', diff:'Facilissimo', kcal:180, prot:8,
+    ing:['200g ceci cotti','2 cucchiai tahini','succo di 1 limone','1 spicchio aglio','cumino','olio evo'],
+    prep:'Frulla ceci, tahini, limone e aglio fino a ottenere una crema liscia. Regola con acqua se troppo denso. Condisci con olio e cumino. Conserva in frigo fino a 5 giorni.',
+    tag:['vegan','plant-based'] },
+  { id:'rf11', cat:'snack', nome:'Energy Balls al Cacao', emoji:'🍫',
+    tempo:'15 min', diff:'Facilissimo', kcal:140, prot:6,
+    ing:['100g datteri Medjool','60g fiocchi avena','2 cucchiai cacao amaro','30g mandorle','1 cucchiaio burro arachidi'],
+    prep:"Trita i datteri nel mixer. Aggiungi avena, cacao, mandorle tritate e burro d'arachidi. Impasta, forma palline da 20g. Riponi in frigo 30 min.",
+    tag:['pre-workout','senza-cottura'] },
+  { id:'rf12', cat:'snack', nome:'Smoothie Verde Proteico', emoji:'🥤',
+    tempo:'5 min', diff:'Facilissimo', kcal:220, prot:18,
+    ing:['200ml latte di mandorla','1 misurino proteine vaniglia','2 manciate spinaci freschi','½ banana','1 cucchiaio semi di chia'],
+    prep:'Inserisci tutti gli ingredienti nel mixer partendo dai liquidi. Frulla 45 secondi. Consuma subito o conserva max 1 ora in frigo.',
+    tag:['post-workout','veloce'] }
+];
+
+let _ricetteCat = 'all';
+
+function renderRicette() {
+  const grid = document.getElementById('ricette-grid');
+  if (!grid) return;
+  const list = _ricetteCat === 'all'
+    ? RICETTE_FIT
+    : RICETTE_FIT.filter(r => r.cat === _ricetteCat);
+
+  grid.innerHTML = list.map(r => `
+    <div class="card" onclick="apriRicetta('${r.id}')"
+      style="padding:0;overflow:hidden;cursor:pointer;transition:transform .15s,box-shadow .15s"
+      onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 24px rgba(0,0,0,.1)'"
+      onmouseout="this.style.transform='';this.style.boxShadow=''">
+      <div style="padding:16px 16px 14px">
+        <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px">
+          <span style="font-size:32px;line-height:1;flex-shrink:0">${r.emoji}</span>
+          <div style="min-width:0;flex:1">
+            <div style="font-family:var(--font-brand);font-weight:700;font-size:13px;line-height:1.3;color:var(--text)">${r.nome}</div>
+            <div style="font-size:11px;color:var(--muted);margin-top:3px">⏱ ${r.tempo} &nbsp;·&nbsp; ${r.diff}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <div style="flex:1;text-align:center;padding:8px 4px;border-radius:10px;background:var(--green-bg,#f0fdf4)">
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:18px;color:var(--green)">${r.kcal}</div>
+            <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1px;color:var(--muted)">KCAL</div>
+          </div>
+          <div style="flex:1;text-align:center;padding:8px 4px;border-radius:10px;background:#fff7ed">
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:18px;color:var(--orange)">${r.prot}g</div>
+            <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1px;color:var(--muted)">PROT</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap">
+          ${r.tag.map(t=>`<span style="font-size:9px;padding:2px 8px;border-radius:10px;border:1px solid var(--border);color:var(--muted);font-family:var(--font-mono)">#${t}</span>`).join('')}
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function filterRicette(cat, btn) {
+  _ricetteCat = cat;
+  document.querySelectorAll('[onclick*="filterRicette"]').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderRicette();
+}
+
+function apriRicetta(id) {
+  const r = RICETTE_FIT.find(x => x.id === id);
+  if (!r) return;
+  const ex = document.getElementById('ricetta-modal');
+  if (ex) ex.remove();
+  const m = document.createElement('div');
+  m.id = 'ricetta-modal';
+  m.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9500;display:flex;align-items:flex-end;justify-content:center;padding:0';
+  m.innerHTML = `
+    <div style="background:var(--bg-card);border-radius:24px 24px 0 0;padding:22px 20px 40px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto">
+      <div style="width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 22px"></div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+        <span style="font-size:44px;line-height:1">${r.emoji}</span>
+        <div>
+          <div style="font-family:var(--font-brand);font-weight:800;font-size:18px;line-height:1.25">${r.nome}</div>
+          <div style="font-size:12px;color:var(--muted);margin-top:4px">⏱ ${r.tempo} &nbsp;·&nbsp; ${r.diff}</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:20px">
+        <div style="flex:1;text-align:center;padding:12px;border-radius:14px;background:var(--green-bg,#f0fdf4)">
+          <div style="font-family:var(--font-brand);font-weight:900;font-size:24px;color:var(--green)">${r.kcal}</div>
+          <div style="font-size:11px;color:var(--muted)">KCAL</div>
+        </div>
+        <div style="flex:1;text-align:center;padding:12px;border-radius:14px;background:#fff7ed">
+          <div style="font-family:var(--font-brand);font-weight:900;font-size:24px;color:var(--orange)">${r.prot}g</div>
+          <div style="font-size:11px;color:var(--muted)">PROTEINE</div>
+        </div>
+      </div>
+      <div style="margin-bottom:18px">
+        <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:10px;text-transform:uppercase">Ingredienti</div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          ${r.ing.map(i=>`<div style="display:flex;align-items:baseline;gap:8px;font-size:13px;line-height:1.4"><span style="color:var(--green);font-size:16px;flex-shrink:0">·</span><span>${i}</span></div>`).join('')}
+        </div>
+      </div>
+      <div style="margin-bottom:22px">
+        <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:10px;text-transform:uppercase">Preparazione</div>
+        <p style="font-size:13px;line-height:1.8;color:var(--text);margin:0">${r.prep}</p>
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:22px">
+        ${r.tag.map(t=>`<span style="font-size:11px;padding:4px 12px;border-radius:12px;border:1.5px solid var(--border);color:var(--muted);font-family:var(--font-mono)">#${t}</span>`).join('')}
+      </div>
+      <button onclick="document.getElementById('ricetta-modal').remove()"
+        style="width:100%;padding:14px;border-radius:14px;border:1.5px solid var(--border);background:transparent;cursor:pointer;font-size:14px;font-weight:600;color:var(--text);font-family:var(--font-brand)">
+        Chiudi
+      </button>
+    </div>`;
+  m.addEventListener('click', e => { if (e.target === m) m.remove(); });
+  document.body.appendChild(m);
 }
 
 </script>
