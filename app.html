@@ -448,7 +448,7 @@ textarea { resize: vertical; min-height: 80px; }
   max-width: 1200px;
 }
 
-.page { display: none; }
+.page { display: none; isolation: isolate; }
 .page.active { display: block; animation: fadeUp 0.3s ease; }
 
 @keyframes fadeUp {
@@ -1391,11 +1391,11 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 
 /* ── FASTING ARC GLOW ── */
 #fasting-arc-fill {
-  filter: drop-shadow(0 0 3px #7c3aed60);
+  /* filter rimosso: crea stacking context che rompe i modal */
 }
 @keyframes fastingPulse {
-  0%, 100% { filter: drop-shadow(0 0 2px #7c3aed50); }
-  50%       { filter: drop-shadow(0 0 6px #7c3aed90); }
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.75; }
 }
 .fasting-active #fasting-arc-fill {
   animation: fastingPulse 2s ease-in-out infinite;
@@ -1715,10 +1715,10 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
     </div>
   </nav>
 
-  <main class="main">
+  <main class="main" style="isolation:isolate">
 
     <!-- ═══ HOME PAGE ═══ -->
-    <div class="page active" id="page-home">
+    <div class="page active" id="page-home" style="isolation:isolate">
       <div class="page-header" style="padding-bottom:12px">
         <div>
           <div class="page-title-tag">// dashboard</div>
