@@ -53,6 +53,7 @@ const app   = initializeApp(firebaseConfig);
 const auth  = getAuth(app);
 const db    = getFirestore(app);
 
+window._auth = auth;
 window._fb = { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassword,
                sendPasswordResetEmail, signOut, onAuthStateChanged,
                GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult,
@@ -1355,6 +1356,50 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.7;transform:scale(1.12)} }
 
 /* ── PAGE TRANSITION ── */
+
+/* ── CATEGORY PILLS ── */
+.cat-pill {
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+  font-family: var(--font-brand);
+}
+.cat-pill:hover { border-color: var(--green); color: var(--green); }
+.cat-pill.active {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+/* cat-chip = alias of cat-pill used in foods page */
+.cat-chip { padding:4px 10px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg-card);color:var(--muted);font-size:11px;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:var(--font-brand); }
+.cat-chip:hover { border-color:var(--green);color:var(--green); }
+.cat-chip.active { background:var(--green);border-color:var(--green);color:#fff; }
+/* ── HOME 2-COL GRID responsive ── */
+@media (max-width: 480px) {
+  #page-home [style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+
+/* ── FASTING ARC GLOW ── */
+#fasting-arc-fill {
+  filter: drop-shadow(0 0 3px #7c3aed60);
+}
+@keyframes fastingPulse {
+  0%, 100% { filter: drop-shadow(0 0 2px #7c3aed50); }
+  50%       { filter: drop-shadow(0 0 6px #7c3aed90); }
+}
+.fasting-active #fasting-arc-fill {
+  animation: fastingPulse 2s ease-in-out infinite;
+}
 @keyframes pageIn {
   from { opacity:0; transform:translateY(14px) scale(0.99); }
   to   { opacity:1; transform:translateY(0)    scale(1); }
@@ -1640,17 +1685,14 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/></svg>
       <span>DIARIO</span>
     </button>
-    <button class="nav-btn" id="nav-foods" onclick="goPage('foods')">
-      <svg viewBox="0 0 24 24"><path d="M12 2a3 3 0 013 3v1H9V5a3 3 0 013-3z"/><path d="M5 8h14l-1.5 10H6.5L5 8z"/><line x1="9" y1="13" x2="9" y2="17"/><line x1="12" y1="13" x2="12" y2="17"/><line x1="15" y1="13" x2="15" y2="17"/></svg>
-      <span>ALIMENTI</span>
-    </button>
+
     <button class="nav-btn" id="nav-goals" onclick="goPage('goals')">
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
       <span>OBIETTIVI</span>
     </button>
-    <button class="nav-btn" id="nav-legenda" onclick="goPage('legenda')">
-      <svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-      <span>LEGENDA</span>
+    <button class="nav-btn" id="nav-settings" onclick="goPage('settings')">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span>SETTINGS</span>
     </button>
     <button class="nav-btn" id="nav-rewards" onclick="goPage('rewards')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
@@ -1666,7 +1708,7 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
     <div class="sidebar-bottom">
       <button class="dark-toggle" id="dark-toggle-btn" onclick="toggleDarkMode()" title="Tema chiaro/scuro"></button>
       <span id="premium-nav-badge" style="display:none" class="premium-header-badge">⭐ PRO</span>
-      <div class="user-avatar" id="user-avatar" title="Profilo">?</div>
+      <div class="user-avatar" id="user-avatar" title="Impostazioni" onclick="goPage('settings')" style="cursor:pointer">?</div>
       <button class="logout-btn" onclick="doLogout()" title="Esci">
         <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
       </button>
@@ -1677,86 +1719,114 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 
     <!-- ═══ HOME PAGE ═══ -->
     <div class="page active" id="page-home">
-      <div class="page-header">
+      <div class="page-header" style="padding-bottom:12px">
         <div>
           <div class="page-title-tag">// dashboard</div>
           <h1 id="home-greeting">Ciao!</h1>
         </div>
         <div style="display:flex;align-items:center;gap:10px">
-          <button class="btn btn-ghost btn-sm" onclick="checkPremium('openShareCard','📤 Progress Card','Genera e condividi una card con i tuoi progressi — visibile sui social.')" title="Condividi progressi" style="font-size:18px;padding:6px 10px">📤</button>
+          <button class="btn btn-ghost btn-sm" onclick="checkPremium('openShareCard','📤 Progress Card','Genera e condividi una card con i tuoi progressi.')" title="Condividi progressi" style="font-size:18px;padding:6px 10px">📤</button>
           <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted)" id="home-date"></div>
         </div>
       </div>
 
-      <!-- Notification permission banner -->
+      <!-- Banners -->
       <div id="notif-permission-banner" style="display:none" class="notif-banner">
         <div class="notif-banner-icon">🔔</div>
-        <div class="notif-banner-text">
-          <strong>Attiva i reminder</strong>
-          Ricevi notifiche per pesarti e completare i macro ogni giorno.
-        </div>
+        <div class="notif-banner-text"><strong>Attiva i reminder</strong> Ricevi notifiche per pesarti e completare i macro ogni giorno.</div>
         <button class="btn btn-green btn-sm" onclick="requestNotifications()" style="flex-shrink:0">Attiva</button>
         <button onclick="document.getElementById('notif-permission-banner').style.display='none'" style="background:none;border:none;color:white;font-size:18px;cursor:pointer;flex-shrink:0;padding:4px">✕</button>
       </div>
-
-      <!-- Reminder banner -->
       <div id="weight-banner" style="display:none"></div>
 
-      <!-- Weight entry -->
-      <div class="card" style="margin-bottom:20px;border-top:3px solid var(--green)">
-        <div class="sec-header">
-          <h3>⚖️ Inserisci il peso di oggi</h3>
+      <!-- ① RIEPILOGO OGGI (dieta + barre) -->
+      <div class="card" style="margin-bottom:16px;border-top:3px solid var(--orange)">
+        <div class="sec-header" style="margin-bottom:12px">
+          <h3>🍽️ Oggi</h3>
+          <button class="btn btn-ghost btn-sm" onclick="goPage('diary')">Apri Diario →</button>
+        </div>
+        <div class="macro-summary" id="home-macro-summary">
+          <div class="macro-box"><div class="mval" style="color:var(--green)">0</div><div class="mlbl">KCAL</div></div>
+          <div class="macro-box"><div class="mval" style="color:var(--orange)">0g</div><div class="mlbl">PROT</div></div>
+          <div class="macro-box"><div class="mval" style="color:#3b82f6">0g</div><div class="mlbl">CARB</div></div>
+          <div class="macro-box"><div class="mval" style="color:#ca8a04">0g</div><div class="mlbl">GRASSI</div></div>
+        </div>
+        <div id="home-macro-targets" style="display:none;margin-top:12px">
+          <div style="display:flex;flex-direction:column;gap:6px" id="home-macro-bars"></div>
+        </div>
+        <div id="home-today-entries" style="color:var(--muted);font-size:13px;margin-top:8px;text-align:center;padding:4px 0">
+          Nessun alimento registrato oggi.
+        </div>
+      </div>
+
+      <!-- ② PESO + STATS -->
+      <div class="card" style="margin-bottom:16px;border-top:3px solid var(--green)">
+        <div class="sec-header" style="margin-bottom:10px">
+          <h3>⚖️ Peso</h3>
           <div id="weight-streak" style="font-family:var(--font-mono);font-size:12px;color:var(--muted)"></div>
         </div>
         <div class="weight-input-row">
           <input type="number" id="weight-today" placeholder="75.0" step="0.1" min="20" max="300">
           <span style="color:var(--muted);font-family:var(--font-mono);font-size:16px">kg</span>
-          <button class="btn btn-green" onclick="saveWeight()">Salva peso</button>
+          <button class="btn btn-green" onclick="saveWeight()">Salva</button>
         </div>
-        <div style="margin-top:14px;display:flex;gap:16px;flex-wrap:wrap">
-          <div><div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;margin-bottom:2px">ULTIMO PESO</div>
+        <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
+          <div><div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;margin-bottom:2px">ULTIMO</div>
             <div style="font-family:var(--font-brand);font-weight:900;font-size:22px;color:var(--green)" id="stat-last">—</div></div>
           <div><div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;margin-bottom:2px">VARIAZIONE</div>
             <div style="font-family:var(--font-brand);font-weight:800;font-size:20px" id="stat-delta">—</div></div>
-          <div><div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;margin-bottom:2px">MEDIA SETT.</div>
+          <div><div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;margin-bottom:2px">MEDIA 7gg</div>
             <div style="font-family:var(--font-brand);font-weight:900;font-size:22px" id="stat-weekly">—</div></div>
-          <div><div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;margin-bottom:2px">MEDIA MENS.</div>
+          <div><div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;margin-bottom:2px">MEDIA 30gg</div>
             <div style="font-family:var(--font-brand);font-weight:900;font-size:22px" id="stat-monthly">—</div></div>
         </div>
       </div>
 
-      <!-- Today's diary summary -->
-      <div class="card" style="margin-bottom:20px;border-top:3px solid var(--orange)">
-        <div class="sec-header">
-          <h3>🍽️ Riepilogo dieta di oggi</h3>
-          <button class="btn btn-ghost btn-sm" onclick="goPage('diary')">Apri Diario →</button>
+      <!-- ③ ROW: ACQUA + DIGIUNO (fianco a fianco) -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <!-- Acqua -->
+        <div class="card" style="margin-bottom:0;padding:14px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+            <div style="font-weight:700;font-size:13px">💧 Acqua</div>
+            <button onclick="resetWater()" style="font-size:10px;color:var(--muted);background:none;border:none;cursor:pointer;padding:2px 6px">reset</button>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:8px" id="water-label">0 / 8</div>
+          <div style="display:flex;gap:4px;flex-wrap:wrap" id="water-glasses"></div>
         </div>
-        <div class="macro-summary" id="home-macro-summary">
-          <div class="macro-box"><div class="mval" style="color:var(--green)">0</div><div class="mlbl">KCAL</div></div>
-          <div class="macro-box"><div class="mval" style="color:var(--orange)">0g</div><div class="mlbl">PROTEINE</div></div>
-          <div class="macro-box"><div class="mval" style="color:#3b82f6">0g</div><div class="mlbl">CARBOIDRATI</div></div>
-          <div class="macro-box"><div class="mval" style="color:#ca8a04">0g</div><div class="mlbl">GRASSI</div></div>
-        </div>
-        <div id="home-today-entries" style="color:var(--muted);font-size:13px;text-align:center;padding:8px 0">
-          Nessun alimento registrato oggi.
-        </div>
-        <!-- Barre progresso obiettivi macro giornalieri -->
-        <div id="home-macro-targets" style="display:none;margin-top:12px">
-          <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;margin-bottom:8px">OBIETTIVO GIORNALIERO</div>
-          <div style="display:flex;flex-direction:column;gap:8px" id="home-macro-bars"></div>
+        <!-- Digiuno — arco SVG -->
+        <div class="card" style="margin-bottom:0;padding:16px 14px" id="home-fasting-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+            <div style="font-weight:700;font-size:13px">⏱️ Digiuno</div>
+            <span id="fasting-home-label" style="font-size:10px;color:var(--muted);font-family:var(--font-mono)">Non attivo</span>
+          </div>
+          <div style="position:relative;display:flex;align-items:center;justify-content:center;height:104px">
+            <svg id="fasting-arc-svg" viewBox="0 0 120 68" width="144" height="82" style="position:absolute;top:0;left:50%;transform:translateX(-50%)">
+              <path d="M10,64 A54,54 0 0,1 110,64" fill="none" stroke="var(--border)" stroke-width="9" stroke-linecap="round"/>
+              <path id="fasting-arc-fill" d="M10,64 A54,54 0 0,1 110,64" fill="none" stroke="#7c3aed" stroke-width="9" stroke-linecap="round"
+                stroke-dasharray="170" stroke-dashoffset="170" style="transition:stroke-dashoffset 1s linear"/>
+            </svg>
+            <div style="position:relative;text-align:center;padding-top:30px">
+              <div id="fasting-home-elapsed" style="font-family:var(--font-brand);font-weight:900;font-size:17px;color:var(--text);letter-spacing:0.5px;line-height:1">00:00:00</div>
+              <div id="fasting-home-goal-label" style="font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:1.5px;margin-top:3px">TOCCA PER INIZIARE</div>
+            </div>
+          </div>
+          <button id="fasting-home-btn" onclick="toggleFasting()"
+            style="width:100%;margin-top:6px;padding:8px;border-radius:12px;border:1.5px solid #7c3aed30;background:#7c3aed12;color:#7c3aed;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--font-brand);transition:all .2s">
+            ▶ Inizia Digiuno
+          </button>
         </div>
       </div>
 
-      <!-- NutriPoints Preview -->
-      <div class="card" style="margin-bottom:20px;border-top:3px solid #ca8a04" id="home-points-card">
-        <div class="sec-header">
+      <!-- ④ NUTRIPOINTS -->
+      <div class="card" style="margin-bottom:16px;border-top:3px solid #ca8a04" id="home-points-card">
+        <div class="sec-header" style="margin-bottom:10px">
           <div style="display:flex;align-items:center;gap:10px">
             <h3>🪙 NutriPoints</h3>
             <span id="home-points-badge" class="badge-chip bronze">🥉 Sprinter</span>
           </div>
-          <button class="btn btn-ghost btn-sm" onclick="goPage('rewards')">Rewards Hub →</button>
+          <button class="btn btn-ghost btn-sm" onclick="goPage('rewards')">Rewards →</button>
         </div>
-        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:8px">
           <div style="text-align:center">
             <div style="font-family:var(--font-brand);font-weight:900;font-size:32px;color:#ca8a04" id="home-pts-total">0</div>
             <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">PUNTI TOTALI</div>
@@ -1769,14 +1839,14 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
             <div class="points-bar-wrap"><div class="points-bar-fill" id="home-pts-bar" style="width:0%"></div></div>
           </div>
         </div>
-        <div id="home-pts-today" style="font-size:12px;color:var(--muted)">Nessun punto guadagnato oggi.</div>
+        <div id="home-pts-today" style="font-size:12px;color:var(--muted)">Nessun punto oggi.</div>
       </div>
 
-      <!-- League Widget -->
-      <div class="card" style="margin-bottom:20px;border-top:3px solid #7c3aed" id="home-league-card">
-        <div class="sec-header">
+      <!-- ⑤ LEGA -->
+      <div class="card" style="margin-bottom:16px;border-top:3px solid #7c3aed" id="home-league-card">
+        <div class="sec-header" style="margin-bottom:10px">
           <div style="display:flex;align-items:center;gap:10px">
-            <h3>🏆 La tua Lega</h3>
+            <h3>🏆 Lega</h3>
             <span id="home-league-tier-chip" class="badge-chip bronze" style="font-size:11px;padding:3px 10px">🌱 Rookie</span>
           </div>
           <button class="btn btn-ghost btn-sm" onclick="goPage('rewards');setTimeout(()=>document.getElementById('league-full-section')?.scrollIntoView({behavior:'smooth'}),200)">Classifica →</button>
@@ -1786,7 +1856,7 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
           <span id="home-league-username" style="font-family:var(--font-brand);font-weight:700;font-size:13px;color:#7c3aed">—</span>
           <span style="font-size:10px;color:var(--muted);margin-left:auto">✏️</span>
         </div>
-        <div style="display:flex;align-items:center;gap:16px;margin-bottom:12px">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:10px">
           <div style="text-align:center">
             <div style="font-family:var(--font-brand);font-weight:900;font-size:32px;color:#7c3aed" id="home-league-rank">—</div>
             <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">POSIZIONE</div>
@@ -1799,48 +1869,61 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
             <div id="home-league-status-tag" style="font-family:var(--font-mono);font-size:10px;color:var(--muted)"></div>
           </div>
         </div>
-        <div id="home-league-mini-board" style="font-size:13px;color:var(--muted);text-align:center">
-          Caricamento classifica...
-        </div>
+        <div id="home-league-mini-board" style="font-size:13px;color:var(--muted);text-align:center">Caricamento classifica...</div>
         <div class="league-countdown" id="home-league-countdown">—</div>
       </div>
 
-      <!-- Chart -->
-      <div class="card" style="margin-bottom:20px">
-        <div class="sec-header"><h3>📈 Andamento peso</h3>
-          <div style="display:flex;gap:8px">
+      <!-- ⑥ GRAFICI -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="sec-header">
+          <h3>📈 Peso</h3>
+          <div style="display:flex;gap:6px">
             <button class="btn btn-ghost btn-xs" onclick="setChartRange(30)" id="cr-30">30gg</button>
-            <button class="btn btn-ghost btn-xs" onclick="setChartRange(90)" id="cr-90">3 mesi</button>
+            <button class="btn btn-ghost btn-xs" onclick="setChartRange(90)" id="cr-90">3m</button>
             <button class="btn btn-ghost btn-xs" onclick="setChartRange(99999)" id="cr-all">Tutto</button>
           </div>
         </div>
         <div class="chart-wrap"><canvas id="weight-chart"></canvas></div>
       </div>
 
-      <!-- Weekly Macro Chart -->
-      <div class="card" style="margin-bottom:20px">
+      <div class="card" style="margin-bottom:16px">
         <div class="sec-header">
-          <h3>🍽️ Kcal settimana corrente</h3>
+          <h3>🍽️ Kcal settimana</h3>
           <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">ultimi 7 giorni</span>
         </div>
-        <div style="height:180px"><canvas id="macro-week-chart"></canvas></div>
+        <div style="height:160px"><canvas id="macro-week-chart"></canvas></div>
       </div>
 
-      <!-- Weight History -->
+      <!-- ⑦ STORICO PESI -->
       <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:16px 22px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-          <h3>📋 Storico misurazioni</h3>
+        <div style="padding:14px 22px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <h3>📋 Storico pesi</h3>
           <span id="hist-count" style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">0 misurazioni</span>
         </div>
-        <div id="weight-history" style="max-height:380px;overflow-y:auto">
+        <div id="weight-history" style="max-height:340px;overflow-y:auto">
           <div class="empty"><div class="empty-icon">⚖️</div><p>Nessuna misurazione ancora.</p></div>
         </div>
       </div>
     </div>
 
-    <!-- ═══ DIARY PAGE ═══ -->
+        <!-- ═══ DIARY + FOODS PAGE (unified) ═══ -->
     <div class="page" id="page-diary">
-      <div class="page-header">
+
+      <!-- Internal tab bar -->
+      <div style="display:flex;gap:0;margin-bottom:18px;border-bottom:2px solid var(--border);background:var(--bg-card);border-radius:16px 16px 0 0;overflow:hidden">
+        <button id="dtab-diary" onclick="switchDiaryTab('diary')"
+          style="flex:1;padding:12px 8px;border:none;background:transparent;font-family:var(--font-brand);font-weight:700;font-size:13px;cursor:pointer;border-bottom:2px solid var(--green);color:var(--green);margin-bottom:-2px;transition:all .15s">
+          📔 Diario
+        </button>
+        <button id="dtab-foods" onclick="switchDiaryTab('foods')"
+          style="flex:1;padding:12px 8px;border:none;background:transparent;font-family:var(--font-brand);font-weight:700;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;color:var(--muted);margin-bottom:-2px;transition:all .15s">
+          🥗 Alimenti
+        </button>
+      </div>
+
+      <!-- ── TAB: DIARIO ── -->
+      <div id="dtab-content-diary">
+      <div class="page-header" style="padding-top:0">
         <div>
           <div class="page-title-tag">// diario alimentare</div>
           <h1>Diario</h1>
@@ -1947,23 +2030,41 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 
       <!-- Add food to diary -->
       <div class="card" style="margin-bottom:20px">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
           <h3>➕ Aggiungi alimento</h3>
           <div style="display:flex;gap:8px">
             <button class="btn btn-ghost btn-sm" onclick="openScanner()" title="Scansiona barcode">📷 Barcode</button>
             <button class="btn btn-ghost btn-sm" onclick="checkPremium('openPhotoAnalysis','🤖 Analisi Foto AI','Scatta una foto al piatto e l\'AI calcola automaticamente tutti i macro.')" title="Analizza foto con AI — Premium">🤖 Foto AI ⭐</button>
           </div>
         </div>
+
+        <!-- Categorie rapide -->
+        <div id="diary-cat-pills" style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)">
+          <button class="cat-pill active" onclick="setDiaryCat(null,this)">Tutti</button>
+          <button class="cat-pill" onclick="setDiaryCat('Carne',this)">🥩 Carne</button>
+          <button class="cat-pill" onclick="setDiaryCat('Pesce',this)">🐟 Pesce</button>
+          <button class="cat-pill" onclick="setDiaryCat('Uova',this)">🥚 Uova</button>
+          <button class="cat-pill" onclick="setDiaryCat('Latticini',this)">🧀 Latticini</button>
+          <button class="cat-pill" onclick="setDiaryCat('Cereali',this)">🍞 Cereali</button>
+          <button class="cat-pill" onclick="setDiaryCat('Verdure',this)">🥦 Verdure</button>
+          <button class="cat-pill" onclick="setDiaryCat('Frutta',this)">🍎 Frutta</button>
+          <button class="cat-pill" onclick="setDiaryCat('Legumi',this)">🫘 Legumi</button>
+          <button class="cat-pill" onclick="setDiaryCat('Salumi',this)">🍖 Salumi</button>
+          <button class="cat-pill" onclick="setDiaryCat('Dolci',this)">🍫 Dolci</button>
+          <button class="cat-pill" onclick="setDiaryCat('Bevande',this)">🥤 Bevande</button>
+          <button class="cat-pill" onclick="setDiaryCat('Frutta Secca',this)">🥜 F. Secca</button>
+          <button class="cat-pill" onclick="setDiaryCat('Condimenti',this)">🫒 Condimenti</button>
+          <button class="cat-pill" onclick="setDiaryCat('Integratori',this)">💊 Integrat.</button>
+        </div>
+
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
           <div style="flex:2;min-width:0">
-            <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--font-brand);font-weight:700">ALIMENTO</div>
             <div class="ac-wrap">
-              <input type="text" id="diary-food-search" placeholder="Cerca nei tuoi alimenti o nel database..." onfocus="searchDiaryFoodEnhanced()" oninput="searchDiaryFoodEnhanced()" autocomplete="off">
+              <input type="text" id="diary-food-search" placeholder="Cerca o sfoglia per categoria..." onfocus="searchDiaryFoodEnhanced()" oninput="searchDiaryFoodEnhanced()" autocomplete="off">
               <div class="ac-list" id="diary-ac"></div>
             </div>
           </div>
-          <div style="width:100px">
-            <div style="font-size:11px;color:var(--muted);margin-bottom:5px;font-family:var(--font-brand);font-weight:700">GRAMMI</div>
+          <div style="width:90px">
             <input type="number" id="diary-grams" placeholder="100" value="100" min="1" max="5000">
           </div>
           <button class="btn btn-green" onclick="addToDiary()">Aggiungi</button>
@@ -2004,27 +2105,44 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
           <div class="empty" style="padding:28px"><div class="empty-icon">📋</div><p>Nessun piano salvato ancora.<br>Compila il diario e salvalo come piano riutilizzabile!</p></div>
         </div>
       </div>
-    </div>
+    <
 
-    <!-- ═══ FOODS PAGE ═══ -->
-    <div class="page" id="page-foods">
-      <div class="page-header">
-        <div>
-          <div class="page-title-tag">// database personale</div>
-          <h1>I Miei Alimenti</h1>
+      </div><!-- /dtab-content-diary -->
+
+      <!-- ── TAB: ALIMENTI ── -->
+      <div id="dtab-content-foods" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div>
+            <div class="page-title-tag">// database personale</div>
+            <h1 style="font-size:26px;line-height:1.2">I Miei Alimenti</h1>
+          </div>
+          <button class="btn btn-green" onclick="openFoodModal()">➕ Nuovo</button>
         </div>
-        <button class="btn btn-green" onclick="openFoodModal()">➕ Nuovo alimento</button>
-      </div>
+        <div class="card" style="margin-bottom:12px;padding:14px 18px">
+          <input type="text" id="foods-search" placeholder="🔍  Cerca nei tuoi alimenti..." oninput="filterFoods()" style="border:none;background:transparent;font-size:15px;padding:0;box-shadow:none">
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px">
+          <button class="cat-chip active" onclick="setFoodsCat('')">Tutti</button>
+          <button class="cat-chip" onclick="setFoodsCat('Carne')">🥩 Carne</button>
+          <button class="cat-chip" onclick="setFoodsCat('Pesce')">🐟 Pesce</button>
+          <button class="cat-chip" onclick="setFoodsCat('Uova')">🥚 Uova</button>
+          <button class="cat-chip" onclick="setFoodsCat('Latticini')">🧀 Latticini</button>
+          <button class="cat-chip" onclick="setFoodsCat('Cereali')">🍞 Cereali</button>
+          <button class="cat-chip" onclick="setFoodsCat('Verdure')">🥦 Verdure</button>
+          <button class="cat-chip" onclick="setFoodsCat('Frutta')">🍎 Frutta</button>
+          <button class="cat-chip" onclick="setFoodsCat('Legumi')">🫘 Legumi</button>
+          <button class="cat-chip" onclick="setFoodsCat('Condimenti')">🫒 Condimenti</button>
+          <button class="cat-chip" onclick="setFoodsCat('Dolci')">🍫 Dolci</button>
+          <button class="cat-chip" onclick="setFoodsCat('Bevande')">🥤 Bevande</button>
+        </div>
+        <div id="foods-list">
+          <div class="empty"><div class="empty-icon">🥗</div><p>Nessun alimento creato ancora.</p></div>
+        </div>
+      </div><!-- /dtab-content-foods -->
 
-      <div class="card" style="margin-bottom:16px;padding:14px 18px">
-        <input type="text" id="foods-search" placeholder="🔍  Cerca nei tuoi alimenti..." oninput="filterFoods()" style="border:none;background:transparent;font-size:15px;padding:0;box-shadow:none">
-      </div>
+    </div><!-- /page-diary -->
 
-      <div id="foods-list">
-        <div class="empty"><div class="empty-icon">🥗</div><p>Nessun alimento creato ancora.<br>Inizia aggiungendo i tuoi alimenti preferiti!</p></div>
-      </div>
-    </div>
-
+    
     <!-- ═══ GOALS PAGE ═══ -->
     <div class="page" id="page-goals">
       <div class="page-header">
@@ -2064,12 +2182,126 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
     </div>
 
     <!-- ═══ LEGENDA PAGE ═══ -->
+    <!-- ═══ SETTINGS PAGE ═══ -->
+    <div class="page" id="page-settings">
+      <div class="page-header">
+        <div>
+          <div class="page-title-tag">// account & preferenze</div>
+          <h1>Impostazioni</h1>
+        </div>
+      </div>
+
+      <div style="max-width:560px;display:flex;flex-direction:column;gap:20px">
+
+        <!-- PROFILO -->
+        <div class="card">
+          <h3 style="margin-bottom:16px;font-size:16px">👤 Profilo</h3>
+          <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px">
+            <div id="settings-avatar" style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--leaf));display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#fff;flex-shrink:0">?</div>
+            <div>
+              <div id="settings-name" style="font-weight:700;font-size:16px;color:var(--text)">—</div>
+              <div id="settings-email" style="font-size:13px;color:var(--muted);margin-top:2px">—</div>
+              <div id="settings-plan-badge" style="font-size:11px;font-weight:700;margin-top:4px;color:var(--green)">Piano Free</div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div>
+              <label style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px">Nome visualizzato</label>
+              <div style="display:flex;gap:8px;margin-top:5px">
+                <input type="text" id="settings-name-input" placeholder="Il tuo nome" style="flex:1">
+                <button class="btn btn-sm" onclick="saveDisplayName()">Salva</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SICUREZZA -->
+        <div class="card">
+          <h3 style="margin-bottom:16px;font-size:16px">🔐 Sicurezza</h3>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <div>
+              <label style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.6px">Nuova password</label>
+              <div style="display:flex;gap:8px;margin-top:5px">
+                <input type="password" id="settings-new-pass" placeholder="Minimo 6 caratteri" style="flex:1">
+                <button class="btn btn-sm" onclick="saveNewPassword()">Cambia</button>
+              </div>
+            </div>
+            <div id="settings-pass-msg" style="font-size:12px;min-height:16px"></div>
+            <div style="padding-top:4px;border-top:1px solid var(--border)">
+              <button class="btn btn-ghost btn-sm" onclick="sendPasswordReset()" style="width:100%">📧 Invia email reset password</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- PREFERENZE -->
+        <div class="card">
+          <h3 style="margin-bottom:16px;font-size:16px">⚙️ Preferenze</h3>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div style="display:flex;align-items:center;justify-content:space-between">
+              <div>
+                <div style="font-weight:600;font-size:14px">Tema scuro</div>
+                <div style="font-size:12px;color:var(--muted)">Cambia aspetto dell'app</div>
+              </div>
+              <button id="settings-dark-toggle" onclick="toggleDarkMode();updateSettingsDarkBtn()" style="padding:6px 16px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg-card);cursor:pointer;font-size:13px;font-weight:600;color:var(--text)">—</button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border)">
+              <div>
+                <div style="font-weight:600;font-size:14px">Notifiche</div>
+                <div style="font-size:12px;color:var(--muted)">Promemoria giornaliero</div>
+              </div>
+              <button onclick="requestNotifications()" style="padding:6px 16px;border-radius:20px;border:1.5px solid var(--border);background:var(--bg-card);cursor:pointer;font-size:13px;font-weight:600;color:var(--text)" id="settings-notif-btn">Attiva</button>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border)">
+              <div>
+                <div style="font-weight:600;font-size:14px">Legenda & Conversioni</div>
+                <div style="font-size:12px;color:var(--muted)">Misure, porzioni, tabelle utili</div>
+              </div>
+              <button class="btn btn-ghost btn-sm" onclick="goPage('legenda')">Apri →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ABBONAMENTO -->
+        <div class="card" id="settings-premium-card">
+          <h3 style="margin-bottom:14px;font-size:16px">⭐ Abbonamento</h3>
+          <div id="settings-premium-status" style="font-size:14px;color:var(--muted);margin-bottom:14px">Caricamento...</div>
+          <button class="btn btn-sm" id="settings-premium-btn" onclick="openStripeCheckout()" style="width:100%">🚀 Passa a Premium</button>
+        </div>
+
+        <!-- EXPORT DATI -->
+        <div class="card">
+          <h3 style="margin-bottom:12px;font-size:16px">📤 Esporta i tuoi dati</h3>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.5">Scarica una copia di tutti i tuoi dati in formato CSV, compatibile con Excel e Google Sheets.</p>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn btn-sm" onclick="exportWeightsCSV()" style="background:var(--green);border-color:var(--green)">⚖️ Esporta storico pesi</button>
+            <button class="btn btn-sm" onclick="exportDiaryCSV()" style="background:#3b82f6;border-color:#3b82f6">📔 Esporta diario (ultimi 90 giorni)</button>
+            <button class="btn btn-sm btn-ghost" onclick="exportNutriPointsCSV()">🪙 Esporta storico NutriPoints</button>
+          </div>
+        </div>
+
+        <!-- ZONA PERICOLO -->
+        <div class="card" style="border:1.5px solid #fecaca">
+          <h3 style="margin-bottom:12px;font-size:16px;color:#dc2626">⚠️ Zona pericolo</h3>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:14px;line-height:1.6">L'eliminazione dell'account è definitiva. Tutti i tuoi dati (diario, pesi, NutriPoints) verranno cancellati e non potranno essere recuperati.</p>
+          <button class="btn btn-sm" onclick="confirmDeleteAccount()" style="background:#dc2626;border-color:#dc2626;width:100%">🗑️ Elimina account definitivamente</button>
+        </div>
+
+        <!-- VERSION -->
+        <div style="text-align:center;padding:8px 0;font-size:11px;color:var(--muted);font-family:var(--font-brand)">
+          NutriTrack v1.0 · by Flexeno Fitness
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══ LEGENDA PAGE (accessible from settings) ═══ -->
     <div class="page" id="page-legenda">
       <div class="page-header">
         <div>
           <div class="page-title-tag">// riferimento rapido</div>
           <h1>Legenda & Conversioni</h1>
         </div>
+        <button class="btn btn-ghost btn-sm" onclick="goPage('settings')">← Impostazioni</button>
       </div>
 
       <div class="grid-2" style="gap:20px">
@@ -2183,7 +2415,7 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       </div>
     </div>
 
-    <!-- ═══ REWARDS HUB PAGE ═══ -->
+        <!-- ═══ REWARDS HUB PAGE ═══ -->
     <div class="page" id="page-rewards">
       <div class="page-header">
         <div>
@@ -2611,7 +2843,13 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       </div>
 
       <!-- Bottone salva -->
-      <button onclick="adminSavePlan()" style="width:100%;margin-top:16px;background:var(--green);color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer">💾 Salva Piano</button>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:14px;padding:12px;background:var(--cream);border-radius:10px">
+        <input type="checkbox" id="admin-plan-global" style="width:18px;height:18px;accent-color:var(--green);cursor:pointer">
+        <label for="admin-plan-global" style="font-size:13px;font-weight:600;cursor:pointer;color:var(--text)">
+          🌐 Condividi con tutti gli utenti (piano globale)
+        </label>
+      </div>
+      <button onclick="adminSavePlan()" style="width:100%;margin-top:12px;background:var(--green);color:#fff;border:none;border-radius:12px;padding:13px;font-size:15px;font-weight:700;cursor:pointer">💾 Salva Piano</button>
     </div>
   </div>
 </div>
@@ -2966,6 +3204,12 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
        // League groups — tutti gli autenticati possono leggere e scrivere
        match /leagueGroups/{groupId} {
          allow read, write: if request.auth != null;
+       }
+
+       // Piani pasto globali (admin → utenti)
+       match /globalPlans/{planId} {
+         allow read: if request.auth != null;
+         allow write: if isAdmin();
        }
      }
    }
@@ -3468,9 +3712,10 @@ function goPage(id) {
   if (nb) nb.classList.add('active');
   if (id === 'admin') loadAdminUsers();
   if (id === 'goals') loadGoal();
-  if (id === 'diary') { setDiaryToday(); }
+  if (id === 'diary') { setDiaryToday(); switchDiaryTab('diary'); }
   if (id === 'home') { loadMacroWeekChart(); updateHomeDiarySummary(); }
   if (id === 'rewards') { renderPointsUI(); loadReferralData(); refreshLeagueGroup().then(()=>renderLeagueUI()).catch(()=>{}); }
+  if (id === 'settings') { loadSettingsPage(); }
 }
 
 // ══════════════════════════════════
@@ -3712,6 +3957,8 @@ function showApp() {
   if (fabBtn) fabBtn.style.display = 'flex';
   // Onboarding (skip for admin)
   checkOnboarding();
+  renderWater();
+  initFasting();
 }
 
 // ══════════════════════════════════
@@ -4310,6 +4557,14 @@ function renderDiary() {
   setBar('mpr-carb','mpr-carb-val', totals.carbs,   t.carbs, '#3b82f6');
   setBar('mpr-fat', 'mpr-fat-val',  totals.fat,     t.fat,   '#ca8a04');
 
+  // +5 NutriPoints per ogni barra macro completata (solo diary di oggi)
+  if (currentDiaryDate === todayStr() && t.kcal > 0) {
+    checkMacroBarCompletion(
+      { kcal: t.kcal, protein: t.prot, carbs: t.carbs, fat: t.fat },
+      totals
+    );
+  }
+
   // Entries list
   const el = document.getElementById('diary-entries');
   if (!diaryEntries.length) {
@@ -4393,9 +4648,21 @@ async function updateHomeDiarySummary() {
 // ══════════════════════════════════
 async function loadPlans() {
   const {db, collection, getDocs, query, orderBy} = window._fb;
+  // Piani personali
   const snap = await getDocs(query(collection(db,'users',uid(),'plans'), orderBy('createdAt','desc')));
-  const plans = snap.docs.map(d=>({id:d.id,...d.data()}));
-  renderPlans(plans);
+  const myPlans = snap.docs.map(d=>({id:d.id,...d.data(), source:'personal'}));
+
+  // Piani globali dell'admin (visibili a tutti)
+  let globalPlans = [];
+  try {
+    const gSnap = await getDocs(query(collection(db,'globalPlans'), orderBy('createdAt','desc')));
+    globalPlans = gSnap.docs.map(d=>({id:d.id,...d.data(), source:'global'}));
+  } catch(e) {}
+
+  // Mostra prima i personali poi i globali (evita duplicati per ID)
+  const myIds = new Set(myPlans.map(p=>p.id));
+  const combined = [...myPlans, ...globalPlans.filter(p=>!myIds.has(p.id))];
+  renderPlans(combined);
 }
 
 function renderPlans(plans) {
@@ -4413,7 +4680,9 @@ function renderPlans(plans) {
     return `
       <div class="food-card" style="margin-bottom:10px">
         <div style="flex:1">
-          <div style="font-weight:700;font-size:15px;margin-bottom:4px">📋 ${plan.name}</div>
+          <div style="font-weight:700;font-size:15px;margin-bottom:4px">
+            ${plan.source==='global' ? '<span style="font-size:10px;font-weight:700;background:#dcfce7;color:#15803d;padding:2px 7px;border-radius:10px;margin-right:6px">🌐 ADMIN</span>' : ''}📋 ${plan.name}
+          </div>
           <div style="display:flex;gap:6px;flex-wrap:wrap">
             <span class="macro-pill mp-kcal">${totKcal} kcal</span>
             <span class="macro-pill mp-prot">P ${totP}g</span>
@@ -4478,11 +4747,50 @@ async function deletePlan(planId) {
 // Ora mostra in cima i tuoi alimenti personali con badge
 // ══════════════════════════════════
 // (Already handled in searchDiaryFood — enhanced below)
+let _activeDiaryCat = null; // null = tutti
+
+function setDiaryCat(cat, btn) {
+  _activeDiaryCat = cat;
+  // Update active pill styling
+  document.querySelectorAll('.cat-pill').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  // Clear search and trigger new search
+  const input = document.getElementById('diary-food-search');
+  if (input) {
+    input.value = '';
+    input.focus();
+  }
+  searchDiaryFoodEnhanced();
+}
+
 function searchDiaryFoodEnhanced() {
   const q = document.getElementById('diary-food-search').value.toLowerCase().trim();
   const ac = document.getElementById('diary-ac');
   if (!q) {
-    // When empty, show personal foods as suggestions
+    // Se c'è una categoria attiva, mostra gli alimenti di quella categoria
+    if (_activeDiaryCat) {
+      const catFoods = INRAN.filter(f => f.cat === _activeDiaryCat)
+        .map(f=>({name:f.n,kcal:f.kcal,protein:f.p,carbs:f.c,fat:f.f,cat:f.cat}));
+      if (catFoods.length) {
+        ac.innerHTML = `<div style="padding:6px 16px;font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px">📂 ${_activeDiaryCat.toUpperCase()} (${catFoods.length} alimenti)</div>`
+          + catFoods.slice(0,12).map((f,i)=>`
+            <div class="ac-item" onclick="selectDiaryFoodObj(${i},'inran_cat')">
+              <div class="ac-item-name">${f.name}</div>
+              <div class="ac-item-meta">
+                <span style="color:var(--green);font-weight:700">${f.kcal} kcal</span>
+                <span>· P ${f.protein}g · C ${f.carbs}g · G ${f.fat}g</span>
+                <span style="opacity:0.5">per 100g</span>
+              </div>
+            </div>`).join('');
+        ac._personal = [];
+        ac._inran = catFoods.slice(0,12);
+        ac._inran_cat = catFoods.slice(0,12);
+        ac.classList.add('open');
+      }
+      selectedDiaryFood = null;
+      return;
+    }
+    // Nessuna categoria: mostra alimenti personali recenti
     if (userFoods.length) {
       const recent = userFoods.slice(0,6);
       ac.innerHTML = '<div style="padding:8px 16px;font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px">I TUOI ALIMENTI</div>'
@@ -4504,7 +4812,13 @@ function searchDiaryFoodEnhanced() {
   }
   // Search with personal foods first
   const personalHits = userFoods.filter(f=>f.name.toLowerCase().includes(q));
-  const inranHits = INRAN.filter(f=>f.n.toLowerCase().includes(q)&&!personalHits.find(p=>p.name===f.n))
+  const inranHits = INRAN
+    .filter(f => {
+      const matchQ   = !q || f.n.toLowerCase().includes(q);
+      const matchCat = !_activeDiaryCat || f.cat === _activeDiaryCat;
+      const notDup   = !personalHits.find(p => p.name === f.n);
+      return matchQ && matchCat && notDup;
+    })
     .map(f=>({name:f.n,kcal:f.kcal,protein:f.p,carbs:f.c,fat:f.f,cat:f.cat}));
   
   let html = '';
@@ -4543,6 +4857,8 @@ function selectDiaryFoodObj(idx, source) {
   const ac = document.getElementById('diary-ac');
   if (source === 'personal') {
     selectedDiaryFood = ac._personal[idx];
+  } else if (source === 'inran_cat') {
+    selectedDiaryFood = (ac._inran_cat || ac._inran)[idx];
   } else {
     selectedDiaryFood = ac._inran[idx];
   }
@@ -5210,16 +5526,38 @@ async function adminSavePlan() {
   if (!name) { alert('Inserisci il nome del piano'); return; }
   if (!adminPlanEntries.length) { alert('Aggiungi almeno un alimento'); return; }
   const {db, doc, addDoc, setDoc, collection, getDocs, orderBy, query} = window._fb;
-  const planData = { name, entries: adminPlanEntries, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+
+  // Controlla se il piano è "globale" (condivisibile con tutti gli utenti)
+  const globalCheckbox = document.getElementById('admin-plan-global');
+  const isGlobal = globalCheckbox ? globalCheckbox.checked : false;
+
+  const totKcal = adminPlanEntries.reduce((a,e)=>a+(e.kcal||0),0);
+  const planData = {
+    name,
+    entries: adminPlanEntries,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    totalKcal: totKcal,
+    isGlobal: isGlobal
+  };
   try {
     if (adminPlanEditId) {
       await setDoc(doc(db,'users',adminCurrentUid,'plans',adminPlanEditId), planData);
+      // Se globale, aggiorna anche in /globalPlans
+      if (isGlobal) {
+        await setDoc(doc(db,'globalPlans',adminPlanEditId), {...planData, createdByAdmin: true});
+      }
     } else {
-      await addDoc(collection(db,'users',adminCurrentUid,'plans'), planData);
+      const newRef = await addDoc(collection(db,'users',adminCurrentUid,'plans'), planData);
+      // Se globale, salva anche in /globalPlans con lo stesso ID
+      if (isGlobal) {
+        await setDoc(doc(db,'globalPlans',newRef.id), {...planData, createdByAdmin: true});
+      }
     }
     document.getElementById('admin-plan-modal').style.display = 'none';
     const snap = await getDocs(query(collection(db,'users',adminCurrentUid,'plans'), orderBy('createdAt','desc')));
     renderAdminPlans(snap.docs.map(d=>({id:d.id,...d.data()})));
+    toast(isGlobal ? '✅ Piano salvato e condiviso con tutti gli utenti!' : '✅ Piano salvato');
   } catch(e){ console.error(e); alert('Errore salvataggio: '+e.message); }
 }
 
@@ -5751,7 +6089,12 @@ async function processLeagueWeekEnd(prevWeek) {
 }
 
 async function joinOrLoadLeagueGroup(week) {
-  const {db, doc, getDoc, setDoc, updateDoc, arrayUnion} = window._fb;
+  // ─── setDoc con merge:true + arrayUnion è l'unica soluzione race-condition safe ───
+  // Se due utenti aprono l'app nello stesso momento:
+  // - setDoc(merge:true) NON sovrascrive i dati degli altri membri già presenti
+  // - arrayUnion aggiunge atomicamente il proprio UID all'array
+  // Funziona sia per "creare il documento" (primo utente) che per "unirsi" (altri)
+  const {db, doc, getDoc, setDoc, arrayUnion} = window._fb;
   const myUid   = uid();
   const tier    = leagueData.tier;
   const myName  = leagueData.username || window._currentUser?.name || window._currentUser?.email?.split('@')[0] || 'Utente';
@@ -5759,48 +6102,22 @@ async function joinOrLoadLeagueGroup(week) {
   const docId   = leagueDocId(week, tier);
   const docRef  = doc(db, 'leagueGroups', docId);
 
-  console.log(`[League] joinOrLoad → ${docId}`);
+  console.log('[League] joining →', docId);
 
   try {
-    const snap = await getDoc(docRef);
-
-    if (!snap.exists()) {
-      // Primo utente della settimana per questo tier — crea il documento
-      const groupData = {
-        week, tier,
-        memberData: { [myUid]: { name: myName, weekPts } },
-        memberUids: [myUid],
-        createdAt: Date.now()
-      };
-      await setDoc(docRef, groupData);
-      leagueData.currentGroup = { id: docId, ...groupData };
-      console.log(`[League] creato documento ${docId}`);
-      return;
-    }
-
-    const dd      = snap.data();
-    const members = dd.memberUids || [];
-
-    // Già membro?
-    if (members.includes(myUid)) {
-      leagueData.currentGroup = { id: docId, ...normalizeGroupDoc(dd) };
-      await updateMyWeeklyPts();
-      console.log(`[League] già membro in ${docId} — ${members.length} utenti totali`);
-      return;
-    }
-
-    // Nuovo membro — update atomico (arrayUnion non ha race condition)
-    await updateDoc(docRef, {
+    // Unica operazione atomica — crea o mergia senza mai sovrascrivere altri
+    await setDoc(docRef, {
+      week,
+      tier,
       [`memberData.${myUid}`]: { name: myName, weekPts },
       memberUids: arrayUnion(myUid)
-    });
+    }, { merge: true });
 
-    // Rileggi il documento fresco con tutti i membri
+    // Rileggi per avere lo stato completo del gruppo
     const fresh = await getDoc(docRef);
-    const freshData = normalizeGroupDoc(fresh.exists() ? fresh.data() : dd);
-    freshData.memberData[myUid] = { name: myName, weekPts };
-    leagueData.currentGroup = { id: docId, week, tier, ...freshData };
-    console.log(`[League] entrato in ${docId} — ora ${freshData.memberUids?.length ?? '?'} utenti`);
+    leagueData.currentGroup = { id: docId, ...normalizeGroupDoc(fresh.data()) };
+    const memberCount = leagueData.currentGroup.memberUids?.length ?? 1;
+    console.log('[League] ok —', memberCount, 'utenti in', docId);
 
   } catch(e) {
     console.error('[League] joinOrLoad err:', e);
@@ -5875,7 +6192,7 @@ function renderLeagueUI() {
 
   // Home username
   const homeUsername = document.getElementById('home-league-username');
-  if (homeUsername) homeUsername.textContent = leagueData.username || '—';
+  if (homeUsername) homeUsername.innerHTML = `👤 ${leagueData.username || '—'} <span style="opacity:.5">✏️</span>`;
 
   const homeRank = document.getElementById('home-league-rank');
   if (homeRank) homeRank.textContent = myRank > 0 ? `#${myRank}` : '—';
@@ -7218,7 +7535,7 @@ function fabQuickWeight() {
 function fabQuickFood(type) {
   closeFab();
   if (type === 'alimento') {
-    goPage('foods');
+    goPage('diary');switchDiaryTab('foods');
     setTimeout(() => openFoodModal(), 200);
   } else {
     goPage('diary');
@@ -7423,6 +7740,533 @@ function initPWA() {
 initPWA();
 
 
+// ═══════════════════════════════════════════════════════════
+// SETTINGS PAGE
+// ═══════════════════════════════════════════════════════════
+
+function loadSettingsPage() {
+  const user = window._currentUser;
+  if (!user) return;
+
+  // Avatar & name
+  const name  = user.name  || user.displayName || user.email?.split('@')[0] || '?';
+  const email = user.email || '';
+  const letter = name.charAt(0).toUpperCase();
+
+  const av = document.getElementById('settings-avatar');
+  if (av) av.textContent = letter;
+  const nm = document.getElementById('settings-name');
+  if (nm) nm.textContent = name;
+  const em = document.getElementById('settings-email');
+  if (em) em.textContent = email;
+  const ni = document.getElementById('settings-name-input');
+  if (ni) ni.value = name;
+
+  // Plan badge
+  const pb = document.getElementById('settings-plan-badge');
+  if (pb) pb.textContent = isPremium ? '⭐ Piano Premium' : '🆓 Piano Free';
+  if (pb) pb.style.color = isPremium ? '#ca8a04' : 'var(--green)';
+
+  // Premium card
+  const ps = document.getElementById('settings-premium-status');
+  const pbtn = document.getElementById('settings-premium-btn');
+  if (ps) ps.textContent = isPremium
+    ? '✅ Abbonamento Premium attivo. Grazie per il tuo supporto!'
+    : 'Con Premium sblocchi: AI foto, storico illimitato, export dati e molto altro.';
+  if (pbtn) {
+    pbtn.style.display = isPremium ? 'none' : 'block';
+  }
+
+  // Dark mode button
+  updateSettingsDarkBtn();
+
+  // Notification button
+  const nb = document.getElementById('settings-notif-btn');
+  if (nb) {
+    const perm = Notification?.permission;
+    nb.textContent = perm === 'granted' ? '✅ Attive' : perm === 'denied' ? '🚫 Bloccate' : 'Attiva';
+    nb.disabled = perm === 'denied' || perm === 'granted';
+  }
+}
+
+function updateSettingsDarkBtn() {
+  const btn = document.getElementById('settings-dark-toggle');
+  if (!btn) return;
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+  btn.textContent = dark ? '☀️ Chiaro' : '🌙 Scuro';
+}
+
+async function saveDisplayName() {
+  const input = document.getElementById('settings-name-input');
+  const newName = input?.value?.trim();
+  if (!newName) return;
+  const {db, doc, updateDoc} = window._fb;
+  try {
+    await updateDoc(doc(db, 'users', uid()), { name: newName });
+    if (window._currentUser) window._currentUser.name = newName;
+    // update avatar
+    const av = document.getElementById('user-avatar');
+    if (av) av.textContent = newName.charAt(0).toUpperCase();
+    const sav = document.getElementById('settings-avatar');
+    if (sav) sav.textContent = newName.charAt(0).toUpperCase();
+    const nm = document.getElementById('settings-name');
+    if (nm) nm.textContent = newName;
+    showSettingsMsg('✅ Nome aggiornato!', 'green');
+  } catch(e) {
+    showSettingsMsg('❌ Errore nel salvataggio', 'red');
+  }
+}
+
+async function saveNewPassword() {
+  const input = document.getElementById('settings-new-pass');
+  const newPass = input?.value?.trim();
+  if (!newPass || newPass.length < 6) {
+    showSettingsMsg('⚠️ Password minimo 6 caratteri', 'orange');
+    return;
+  }
+  try {
+    const { updatePassword } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
+    await updatePassword(window._auth || window._fb.auth, newPass);
+    input.value = '';
+    showSettingsMsg('✅ Password aggiornata!', 'green');
+  } catch(e) {
+    if (e.code === 'auth/requires-recent-login') {
+      showSettingsMsg('⚠️ Fai logout e login di nuovo prima di cambiare la password', 'orange');
+    } else {
+      showSettingsMsg('❌ Errore: ' + e.message, 'red');
+    }
+  }
+}
+
+async function sendPasswordReset() {
+  const user = window._currentUser;
+  if (!user?.email) return;
+  try {
+    const { sendPasswordResetEmail } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
+    await sendPasswordResetEmail(window._auth || window._fb.auth, user.email);
+    showSettingsMsg('📧 Email inviata a ' + user.email, 'green');
+  } catch(e) {
+    showSettingsMsg('❌ Errore invio email', 'red');
+  }
+}
+
+function showSettingsMsg(msg, color) {
+  const el = document.getElementById('settings-pass-msg');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = color === 'green' ? 'var(--green)' : color === 'orange' ? 'var(--orange)' : 'var(--danger)';
+  setTimeout(() => { if (el) el.textContent = ''; }, 4000);
+}
+
+async function confirmDeleteAccount() {
+  const confirmed = confirm('⚠️ ATTENZIONE\n\nEliminare l\'account è definitivo e irreversibile.\nTutti i tuoi dati (diario, pesi, obiettivi, NutriPoints) saranno cancellati per sempre.\n\nSei sicuro di voler continuare?');
+  if (!confirmed) return;
+
+  const confirmed2 = confirm("Ultima conferma: eliminare davvero l\'account?");
+  if (!confirmed2) return;
+
+  try {
+    const myUid = uid();
+    const {db, doc, deleteDoc, collection, getDocs} = window._fb;
+
+    // Delete Firestore user data
+    const subcols = ['weights','diary','foods','plans','mealPresets','league'];
+    for (const sc of subcols) {
+      try {
+        const snap = await getDocs(collection(db, 'users', myUid, sc));
+        for (const d of snap.docs) await deleteDoc(d.ref);
+      } catch(e) {}
+    }
+    try { await deleteDoc(doc(db, 'users', myUid)); } catch(e) {}
+
+    // Delete Firebase Auth user
+    const { deleteUser } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js');
+    await deleteUser((window._auth || window._fb.auth).currentUser);
+
+    localStorage.removeItem('nt_logged_in');
+    alert('Account eliminato. Arrivederci!');
+    window.location.reload();
+  } catch(e) {
+    if (e.code === 'auth/requires-recent-login') {
+      alert("Per eliminare l\'account devi aver fatto login di recente. Fai logout e login di nuovo, poi riprova.");
+    } else {
+      alert('Errore: ' + e.message);
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════
+// WATER TRACKER
+// ═══════════════════════════════════════════════════════════
+const WATER_KEY = 'nt_water_';
+const WATER_GOAL = 8;
+
+function waterKey() { return WATER_KEY + todayStr(); }
+
+function getWaterCount() {
+  return parseInt(localStorage.getItem(waterKey()) || '0');
+}
+
+function setWaterCount(n) {
+  localStorage.setItem(waterKey(), String(Math.max(0, Math.min(WATER_GOAL, n))));
+  renderWater();
+}
+
+function addWater() {
+  const cur = getWaterCount();
+  if (cur < WATER_GOAL) {
+    setWaterCount(cur + 1);
+    if (cur + 1 === WATER_GOAL) {
+      showPtsToast('💧 Obiettivo acqua raggiunto! +5 pts');
+      awardPoints(5, 'Obiettivo acqua raggiunto 💧', '💧');
+    }
+  }
+}
+
+function resetWater() { setWaterCount(0); }
+
+function renderWater() {
+  const container = document.getElementById('water-glasses');
+  const label     = document.getElementById('water-label');
+  if (!container) return;
+  const count = getWaterCount();
+  if (label) label.textContent = `${count} / ${WATER_GOAL} bicchieri`;
+  container.innerHTML = '';
+  for (let i = 0; i < WATER_GOAL; i++) {
+    const filled = i < count;
+    const btn = document.createElement('button');
+    btn.style.cssText = `width:32px;height:40px;border-radius:6px;border:2px solid ${filled ? '#3b82f6' : 'var(--border)'};background:${filled ? '#eff6ff' : 'transparent'};cursor:pointer;font-size:18px;transition:all .15s;display:flex;align-items:center;justify-content:center;padding:0`;
+    btn.textContent = filled ? '💧' : '○';
+    btn.title = filled ? `Rimuovi bicchiere ${i+1}` : `Aggiungi bicchiere ${i+1}`;
+    btn.onclick = () => {
+      if (!filled) { addWater(); }
+      else { setWaterCount(i); } // click su filled → rimuovi fino a quel punto
+    };
+    container.appendChild(btn);
+  }
+}
+
+// Init water on app load
+
+
+// ═══════════════════════════════════════════════════════════
+// EXPORT DATI CSV
+// ═══════════════════════════════════════════════════════════
+
+function downloadCSV(filename, rows, headers) {
+  const esc = v => {
+    const s = String(v ?? '');
+    return s.includes(',') || s.includes('"') || s.includes('\n')
+      ? '"' + s.replace(/"/g, '""') + '"' : s;
+  };
+  const csv = [headers.join(','), ...rows.map(r => r.map(esc).join(','))].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+async function exportWeightsCSV() {
+  const {db, collection, getDocs, query, orderBy} = window._fb;
+  try {
+    const snap = await getDocs(query(collection(db,'users',uid(),'weights'), orderBy('date','asc')));
+    if (snap.empty) { alert('Nessun dato peso trovato.'); return; }
+    const rows = snap.docs.map(d => {
+      const dd = d.data();
+      return [dd.date || d.id, dd.weight ?? ''];
+    });
+    downloadCSV('nutritrack_pesi.csv', rows, ['Data', 'Peso (kg)']);
+    toast('✅ Storico pesi esportato!');
+  } catch(e) { alert('Errore export: ' + e.message); }
+}
+
+async function exportDiaryCSV() {
+  const {db, collection, getDocs, query, where, orderBy} = window._fb;
+  try {
+    // Ultimi 90 giorni
+    const from = new Date();
+    from.setDate(from.getDate() - 90);
+    const fromStr = from.toISOString().split('T')[0];
+    const snap = await getDocs(collection(db,'users',uid(),'diary'));
+    const rows = [];
+    snap.docs
+      .filter(d => d.id >= fromStr)
+      .sort((a,b) => a.id.localeCompare(b.id))
+      .forEach(d => {
+        const dd = d.data();
+        const entries = dd.entries || [];
+        entries.forEach(e => {
+          rows.push([
+            d.id,
+            e.name || '',
+            e.grams ?? '',
+            e.kcal ?? '',
+            e.protein ?? '',
+            e.carbs ?? '',
+            e.fat ?? ''
+          ]);
+        });
+        if (!entries.length) {
+          rows.push([d.id,'—','','','','','']);
+        }
+      });
+    if (!rows.length) { alert('Nessun dato diario trovato.'); return; }
+    downloadCSV('nutritrack_diario.csv', rows,
+      ['Data','Alimento','Grammi','Kcal','Proteine (g)','Carb (g)','Grassi (g)']);
+    toast('✅ Diario esportato (' + rows.length + ' righe)!');
+  } catch(e) { alert('Errore export: ' + e.message); }
+}
+
+function exportNutriPointsCSV() {
+  const hist = nutriPoints.history || [];
+  if (!hist.length) { alert('Nessuno storico NutriPoints trovato.'); return; }
+  const rows = hist.map(h => [h.date||'', h.icon||'', h.reason||'', h.pts||0]);
+  downloadCSV('nutritrack_nutripoints.csv', rows,
+    ['Data','Icona','Motivo','Punti']);
+  toast('✅ NutriPoints esportati!');
+}
+
+
+// ═══════════════════════════════════════════════════════════
+// TIMER DIGIUNO INTERMITTENTE
+// ═══════════════════════════════════════════════════════════
+
+const FASTING_KEY   = 'nt_fasting';
+const FASTING_GOALS = [12, 14, 16, 18, 20, 24]; // ore
+let fastingTimer    = null;
+
+function getFastingState() {
+  try { return JSON.parse(localStorage.getItem(FASTING_KEY) || 'null'); } catch(e) { return null; }
+}
+
+function setFastingState(state) {
+  if (state) localStorage.setItem(FASTING_KEY, JSON.stringify(state));
+  else localStorage.removeItem(FASTING_KEY);
+}
+
+function toggleFasting() {
+  const state = getFastingState();
+  if (state && state.active) {
+    // Ferma il digiuno — chiedi conferma con mini-modal
+    const elapsed = Date.now() - state.startTime;
+    const hours   = elapsed / 3600000;
+    const hh = Math.floor(hours);
+    const mm = Math.floor((hours % 1) * 60);
+    const ss = Math.floor((elapsed/1000) % 60);
+    // Usa confirm nativo con messaggio chiaro
+    const ok = confirm(`Vuoi interrompere il digiuno dopo ${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}?`);
+    if (!ok) return;
+    setFastingState(null);
+    clearInterval(fastingTimer);
+    fastingTimer = null;
+    toast(`⏱️ Digiuno terminato: ${hh}h ${mm}m ${ss}s`);
+    if (hours >= state.goalHours) {
+      awardPoints(5, `Digiuno ${state.goalHours}h completato`, '⏱️');
+    }
+    renderFastingWidget();
+  } else {
+    // Avvia il digiuno — chiedi obiettivo
+    openFastingModal();
+  }
+}
+
+function openFastingModal() {
+  const existing = document.getElementById('fasting-modal');
+  if (existing) { existing.remove(); }
+  const modal = document.createElement('div');
+  modal.id = 'fasting-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9000;display:flex;align-items:flex-end;justify-content:center;padding:0';
+  modal.innerHTML = `
+    <div style="background:var(--bg-card);border-radius:24px 24px 0 0;padding:28px 24px 36px;width:100%;max-width:480px;box-shadow:0 -20px 60px rgba(0,0,0,0.2)">
+      <div style="width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 24px"></div>
+      <h3 style="font-family:var(--font-brand);font-size:22px;margin-bottom:4px;text-align:center">Inizia il Digiuno</h3>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:24px;text-align:center">Scegli la durata del tuo obiettivo</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">
+        ${FASTING_GOALS.map(h => {
+          const desc = h<=12?'Facile':h<=16?'Classico':h<=18?'Avanzato':'Elite';
+          return `<button onclick="startFasting(${h})"
+            style="padding:16px 8px;border-radius:14px;border:2px solid var(--border);background:var(--bg-card);cursor:pointer;transition:all .15s;text-align:center"
+            onmouseover="this.style.borderColor='#7c3aed';this.style.background='#7c3aed0f'"
+            onmouseout="this.style.borderColor='var(--border)';this.style.background='var(--bg-card)'">
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:20px;color:var(--text)">${h}h</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:2px;font-family:var(--font-mono)">${desc}</div>
+          </button>`;
+        }).join('')}
+      </div>
+      <button onclick="document.getElementById('fasting-modal').remove()"
+        style="width:100%;padding:13px;border-radius:14px;border:1.5px solid var(--border);background:transparent;cursor:pointer;font-size:14px;color:var(--muted);font-family:var(--font-brand);font-weight:600">
+        Annulla
+      </button>
+    </div>`;
+  document.body.appendChild(modal);
+  // Click outside to close
+  modal.addEventListener('click', e => { if(e.target === modal) modal.remove(); });
+}
+
+function startFasting(goalHours) {
+  const modal = document.getElementById('fasting-modal');
+  if (modal) modal.remove();
+  const state = { active: true, startTime: Date.now(), goalHours };
+  setFastingState(state);
+  toast(`⏱️ Digiuno ${goalHours}h iniziato! Buona fortuna 💪`);
+  renderFastingWidget();
+  startFastingTick();
+}
+
+function startFastingTick() {
+  if (fastingTimer) clearInterval(fastingTimer);
+  fastingTimer = setInterval(renderFastingWidget, 1000); // ogni secondo per il timer live
+}
+
+// Calcola i parametri dell'arco SVG
+// L'arco di riferimento M10,64 A54,54 0 0,1 110,64 ha lunghezza ~170px
+const FASTING_ARC_LEN = 170;
+
+function renderFastingWidget() {
+  const state   = getFastingState();
+  const btn     = document.getElementById('fasting-home-btn');
+  const label   = document.getElementById('fasting-home-label');
+  const elapsed = document.getElementById('fasting-home-elapsed');
+  const goalLbl = document.getElementById('fasting-home-goal-label');
+  const arcFill = document.getElementById('fasting-arc-fill');
+
+  const card = document.getElementById('home-fasting-card');
+  if (!state || !state.active) {
+    if (card) card.classList.remove('fasting-active');
+    // Stato inattivo
+    if (btn) {
+      btn.textContent = '▶ Inizia Digiuno';
+      btn.style.background = '#7c3aed12';
+      btn.style.color = '#7c3aed';
+      btn.style.borderColor = '#7c3aed30';
+    }
+    if (label)   label.textContent = 'Non attivo';
+    if (elapsed) elapsed.textContent = '00:00:00';
+    if (goalLbl) goalLbl.textContent = 'TOCCA PER INIZIARE';
+    if (arcFill) { arcFill.style.strokeDashoffset = FASTING_ARC_LEN; arcFill.style.stroke = '#7c3aed'; }
+    if (fastingTimer) { clearInterval(fastingTimer); fastingTimer = null; }
+    return;
+  }
+
+  if (card) card.classList.add('fasting-active');
+  const elapsedMs = Date.now() - state.startTime;
+  const elapsedH  = elapsedMs / 3600000;
+  const pct       = Math.min(1, elapsedH / state.goalHours);
+  const done      = elapsedH >= state.goalHours;
+
+  // Formattazione HH:MM:SS
+  const totalSec = Math.floor(elapsedMs / 1000);
+  const hh = Math.floor(totalSec / 3600);
+  const mm = Math.floor((totalSec % 3600) / 60);
+  const ss = totalSec % 60;
+  const timeStr = `${String(hh).padStart(2,'0')}:${String(mm).padStart(2,'0')}:${String(ss).padStart(2,'0')}`;
+
+  // Arco SVG: stroke-dashoffset 170 = 0%, 0 = 100%
+  const offset = FASTING_ARC_LEN * (1 - pct);
+  const arcColor = done ? '#16a34a' : '#7c3aed';
+
+  if (elapsed) elapsed.textContent = timeStr;
+  if (goalLbl) goalLbl.textContent = done ? 'OBIETTIVO RAGGIUNTO! 🎉' : `OBIETTIVO: ${state.goalHours}H`;
+  if (arcFill) { arcFill.style.strokeDashoffset = offset; arcFill.style.stroke = arcColor; }
+
+  if (btn) {
+    if (done) {
+      btn.textContent = '✅ Completa & Termina';
+      btn.style.background = '#16a34a20';
+      btn.style.color = '#16a34a';
+      btn.style.borderColor = '#16a34a40';
+    } else {
+      btn.textContent = '⏹ Interrompi digiuno';
+      btn.style.background = '#dc262612';
+      btn.style.color = '#dc2626';
+      btn.style.borderColor = '#dc262630';
+    }
+  }
+  if (label) label.textContent = done
+    ? `${state.goalHours}h raggiunte!`
+    : `Obiettivo: ${state.goalHours}h`;
+}
+
+// Auto-start tick if active on app load
+function initFasting() {
+  const state = getFastingState();
+  if (state && state.active) startFastingTick();
+  renderFastingWidget();
+}
+
+
+
+// ═══════════════════════════════════════════════════════════
+// FOODS PAGE — CATEGORY FILTER
+// ═══════════════════════════════════════════════════════════
+let _activeFoodsCat = '';
+
+function setFoodsCat(cat) {
+  _activeFoodsCat = cat;
+  document.querySelectorAll('.cat-chip').forEach(b => b.classList.remove('active'));
+  // Find the clicked button by matching text
+  document.querySelectorAll('.cat-chip').forEach(b => {
+    const matches = cat === '' ? b.textContent.trim() === 'Tutti' : b.getAttribute('onclick')?.includes(`'${cat}'`);
+    if (matches) b.classList.add('active');
+  });
+  renderFoodsList(document.getElementById('foods-search')?.value || '');
+}
+
+// ═══════════════════════════════════════════════════════════
+// +5 NUTRIPOINTS PER OGNI BARRA MACRO COMPLETATA
+// ═══════════════════════════════════════════════════════════
+const _macroBarsAwardedToday = { kcal: false, prot: false, carb: false, fat: false };
+let   _macroBarsAwardedDate  = '';
+
+function checkMacroBarCompletion(targets, totals) {
+  const today = todayStr();
+  // Reset se nuovo giorno
+  if (_macroBarsAwardedDate !== today) {
+    _macroBarsAwardedDate = today;
+    Object.keys(_macroBarsAwardedToday).forEach(k => _macroBarsAwardedToday[k] = false);
+  }
+
+  const macros = [
+    { key: 'kcal', val: totals.kcal,   target: targets.kcal,   label: 'Kcal target raggiunto',       icon: '🔥' },
+    { key: 'prot', val: totals.protein, target: targets.protein, label: 'Target proteine raggiunto',   icon: '💪' },
+    { key: 'carb', val: totals.carbs,   target: targets.carbs,   label: 'Target carboidrati raggiunto', icon: '⚡' },
+    { key: 'fat',  val: totals.fat,     target: targets.fat,     label: 'Target grassi raggiunto',     icon: '🥑' },
+  ];
+
+  for (const m of macros) {
+    if (!m.target || m.target <= 0 || _macroBarsAwardedToday[m.key]) continue;
+    const pct = m.val / m.target;
+    if (pct >= 0.95 && pct <= 1.15) {   // tra 95% e 115% del target
+      _macroBarsAwardedToday[m.key] = true;
+      awardPoints(5, m.label, m.icon);
+    }
+  }
+}
+
+
+
+// ══════════════════════════════════
+// DIARY INTERNAL TABS (Diario / Alimenti)
+// ══════════════════════════════════
+function switchDiaryTab(tab) {
+  const tabs    = ['diary', 'foods'];
+  const colors  = { diary: 'var(--green)', foods: 'var(--orange)' };
+  tabs.forEach(t => {
+    const btn     = document.getElementById('dtab-' + t);
+    const content = document.getElementById('dtab-content-' + t);
+    const active  = t === tab;
+    if (btn) {
+      btn.style.borderBottomColor = active ? colors[tab] : 'transparent';
+      btn.style.color             = active ? colors[tab] : 'var(--muted)';
+    }
+    if (content) content.style.display = active ? 'block' : 'none';
+  });
+  // When switching to foods tab, refresh list
+  if (tab === 'foods') renderFoodsList();
+}
+
 </script>
+
 </body>
 </html>
