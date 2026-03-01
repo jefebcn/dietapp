@@ -6,14 +6,14 @@
 <title>NutriTrack — Mangia bene. Muoviti. Trasformati.</title>
 <meta name="description" content="L'app italiana gratuita per tracciare macro, calorie e progressi. Barcode scanner, AI foto e NutriPoints per chi vuole davvero cambiare.">
 <meta name="theme-color" content="#3a6b27">
-<link rel="canonical" href="https://jefebcn.github.io/dietapp">
+<link rel="canonical" href="https://nutritrack.it">
 
 <!-- ═══ OPEN GRAPH — anteprima social/WhatsApp/Telegram ═══ -->
 <meta property="og:type"        content="website">
-<meta property="og:url"         content="https://jefebcn.github.io/dietapp">
+<meta property="og:url"         content="https://nutritrack.it">
 <meta property="og:title"       content="NutriTrack — Mangia bene. Trasformati. Vinci ogni giorno.">
 <meta property="og:description" content="L'app italiana gratuita per tracciare macro, calorie e progressi. Barcode scanner, AI foto e NutriPoints. Inizia gratis.">
-<meta property="og:image"       content="https://jefebcn.github.io/dietapp/og-image.png">
+<meta property="og:image"       content="https://nutritrack.it/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height"content="630">
 <meta property="og:locale"      content="it_IT">
@@ -21,7 +21,7 @@
 <meta name="twitter:card"       content="summary_large_image">
 <meta name="twitter:title"      content="NutriTrack — Mangia bene. Trasformati. Vinci ogni giorno.">
 <meta name="twitter:description"content="App italiana gratuita per macro, calorie e NutriPoints. Barcode scanner e AI foto inclusi.">
-<meta name="twitter:image"      content="https://jefebcn.github.io/dietapp/og-image.png">
+<meta name="twitter:image"      content="https://nutritrack.it/og-image.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -1033,6 +1033,66 @@ footer {
   .pscreen-ring-wrap svg { width: 62px; height: 62px; }
 }
 
+/* ── STATS BAR ── */
+.stats-bar {
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 36px 24px;
+}
+.stats-bar-inner {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+}
+.stat-item {
+  text-align: center;
+  padding: 0 24px;
+  position: relative;
+}
+.stat-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0; top: 10%; bottom: 10%;
+  width: 1px;
+  background: var(--border);
+}
+.stat-num {
+  font-family: var(--font-serif);
+  font-weight: 900;
+  font-size: clamp(32px, 4vw, 48px);
+  color: var(--bark);
+  line-height: 1;
+  display: block;
+}
+.stat-num .stat-unit {
+  font-size: 0.55em;
+  color: var(--muted);
+  font-weight: 700;
+}
+.stat-label {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 6px;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+.stat-icon {
+  font-size: 22px;
+  display: block;
+  margin-bottom: 8px;
+}
+@media (max-width: 540px) {
+  .stats-bar { padding: 24px 16px; }
+  .stats-bar-inner { gap: 0; }
+  .stat-item { padding: 0 10px; }
+  .stat-num { font-size: 28px; }
+  .stat-label { font-size: 11px; }
+  .stat-icon { font-size: 18px; }
+}
+
 /* Landing: nessun loader, pagina sempre visibile */
 #page-loader { display:none !important; }
 #page-content { opacity:1 !important; }
@@ -1255,6 +1315,28 @@ footer {
   </div>
 </section>
 
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-bar-inner">
+    <div class="stat-item reveal">
+      <span class="stat-icon">👥</span>
+      <span class="stat-num" data-count="2400" data-suffix="">0</span>
+      <div class="stat-label">utenti attivi</div>
+    </div>
+    <div class="stat-item reveal reveal-delay-1">
+      <span class="stat-icon">⚖️</span>
+      <span class="stat-num" data-count="18000" data-suffix="kg" data-format="it">0</span>
+      <div class="stat-label">kg persi totali</div>
+    </div>
+    <div class="stat-item reveal reveal-delay-2">
+      <span class="stat-icon">⭐</span>
+      <span class="stat-num" data-count="4.9" data-suffix="" data-decimal="true">0</span>
+      <div class="stat-label">rating medio</div>
+    </div>
+  </div>
+</div>
+
+
 <!-- FEATURES -->
 <section id="features">
   <div class="container">
@@ -1359,7 +1441,7 @@ footer {
               stroke-dasharray="282.7" stroke-dashoffset="70.7"
               stroke-linecap="round" transform="rotate(-90 80 80)"/>
             <!-- PROT arc -->
-            <circle cx="80" cy="80" r="46" fill="none" stroke="#2563eb" stroke-width="10"
+            <circle cx="80" cy="80" r="46" fill="none" stroke="#d4622a" stroke-width="10"
               stroke-dasharray="289" stroke-dashoffset="46.2"
               stroke-linecap="round" transform="rotate(-90 80 80)"/>
           </svg>
@@ -1531,7 +1613,7 @@ footer {
     </svg>
     <span style="font-family:var(--font-serif);font-size:18px;color:#fff;font-weight:700">NutriTrack</span>
   </div>
-  <div class="footer-copy">© 2025 Flexeno Fitness</div>
+  <div class="footer-copy">© 2026 Flexeno Fitness</div>
   <div class="footer-links">
     <a href="#">Privacy</a>
     <a href="#">Termini</a>
@@ -1542,13 +1624,50 @@ footer {
 </div><!-- end page-content -->
 
 <script>
-// Scroll reveal
+// Scroll reveal + counter animation
+function animateCounter(el) {
+  const target  = parseFloat(el.dataset.count);
+  const suffix  = el.dataset.suffix || '';
+  const decimal = el.dataset.decimal === 'true';
+  const format  = el.dataset.format === 'it';
+  const duration = 1800;
+  const start = performance.now();
+
+  function step(now) {
+    const progress = Math.min((now - start) / duration, 1);
+    // ease out cubic
+    const ease = 1 - Math.pow(1 - progress, 3);
+    const current = target * ease;
+
+    let display;
+    if (decimal) {
+      display = current.toFixed(1);
+    } else if (format) {
+      display = Math.round(current).toLocaleString('it-IT');
+    } else {
+      display = Math.round(current).toLocaleString('it-IT');
+    }
+
+    el.innerHTML = display + (suffix ? `<span class="stat-unit"> ${suffix}</span>` : '');
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
 const obs = new IntersectionObserver(entries => {
   entries.forEach(e => {
-    if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      // Avvia counter se l'elemento è un stat-num
+      if (e.target.dataset.count) animateCounter(e.target);
+      obs.unobserve(e.target);
+    }
   });
 }, { threshold: 0.08 });
+
 document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+// Osserva anche i stat-num direttamente (non hanno classe reveal)
+document.querySelectorAll('[data-count]').forEach(el => obs.observe(el));
 </script>
 
 <!-- ═══════════════════════════════════════════════════════════
