@@ -24,6 +24,7 @@
 <meta name="twitter:image"      content="https://nutritrack.it/og-image.png">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 
 <!-- Redirect istantaneo se l'utente era già loggato nella sessione precedente -->
@@ -305,46 +306,6 @@ nav {
   align-items: center;
 }
 
-/* Big food illustration using CSS + emoji */
-.food-orbit {
-  position: relative;
-  width: 440px; height: 440px;
-  margin: 0 auto;
-}
-.orbit-center {
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 200px; height: 200px;
-  background: #fff;
-  border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  box-shadow: 0 20px 60px rgba(58,107,39,0.3), 0 0 0 20px rgba(58,107,39,0.08), 0 0 0 40px rgba(58,107,39,0.04);
-}
-/* orbit logo styles removed - using image */
-.food-item {
-  position: absolute;
-  width: 72px; height: 72px;
-  background: var(--white);
-  border-radius: 20px;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 32px;
-  box-shadow: 0 8px 24px rgba(44,31,14,0.12);
-  transition: transform 0.3s;
-  animation: float 4s ease-in-out infinite;
-}
-.food-item:hover { transform: scale(1.1) !important; }
-.food-item:nth-child(1) { top: 0; left: 50%; transform: translateX(-50%); animation-delay: 0s; }
-.food-item:nth-child(2) { top: 15%; right: 5%; animation-delay: 0.5s; }
-.food-item:nth-child(3) { top: 50%; right: 0; transform: translateY(-50%); animation-delay: 1s; }
-.food-item:nth-child(4) { bottom: 10%; right: 10%; animation-delay: 1.5s; }
-.food-item:nth-child(5) { bottom: 0; left: 50%; transform: translateX(-50%); animation-delay: 2s; }
-.food-item:nth-child(6) { bottom: 10%; left: 10%; animation-delay: 2.5s; }
-.food-item:nth-child(7) { top: 50%; left: 0; transform: translateY(-50%); animation-delay: 3s; }
-.food-item:nth-child(8) { top: 15%; left: 5%; animation-delay: 3.5s; }
-
-@keyframes float {
-  0%, 100% { margin-top: 0; }
   50% { margin-top: -10px; }
 }
 
@@ -710,8 +671,6 @@ footer {
   }
   .hero-btns { justify-content: center; }
   .hero-trust { justify-content: center; }
-  .food-orbit { width: 300px; height: 300px; }
-  .orbit-center { width: 140px; height: 140px; }
   .features-grid { grid-template-columns: 1fr 1fr; }
   .how-grid { grid-template-columns: 1fr; }
   .pricing-grid { grid-template-columns: 1fr; max-width: 420px; }
@@ -769,9 +728,6 @@ footer {
 
   /* ── ORBIT: più piccola, centrata, no overflow ── */
   .hero-right { overflow: visible; }
-  .food-orbit { width: 240px; height: 240px; margin: 0 auto; }
-  .orbit-center { width: 108px; height: 108px; }
-  .food-item { width: 52px; height: 52px; font-size: 24px; border-radius: 14px; }
 
   /* ── STAT FLOATS: nascoste su schermi piccoli per non tagliare ── */
   .stat-float { display: none; }
@@ -800,8 +756,6 @@ footer {
 
 @media (max-width: 380px) {
   .hero-title { font-size: 30px !important; }
-  .food-orbit { width: 210px; height: 210px; }
-  .orbit-center { width: 96px; height: 96px; }
 }
 
 /* ══════════════════════════════════════
@@ -1515,7 +1469,7 @@ footer {
           <li class="on">🚀 Accesso anticipato</li>
           <li class="on">💬 Supporto prioritario</li>
         </ul>
-        <a href="https://buy.stripe.com/9B64gy8eo3O4bID0xB6Na01" target="_blank" class="plan-btn featured-btn">🚀 Diventa Premium — 2,99€/mese</a>
+        <a href="https://buy.stripe.com/9B64gy8eo3O4bID0xB6Na01" target="_blank" rel="noopener noreferrer" class="plan-btn featured-btn">🚀 Diventa Premium — 2,99€/mese</a>
         <p style="font-size:11px;color:rgba(255,255,255,0.3);text-align:center;margin-top:12px;font-family:var(--font-mono)">
           💳 Pagamento sicuro con Stripe · Attivazione immediata
         </p>
@@ -1617,7 +1571,7 @@ footer {
   <div class="footer-links">
     <a href="#">Privacy</a>
     <a href="#">Termini</a>
-    <a href="https://flexenofitness.com" target="_blank">Flexeno.com</a>
+    <a href="https://flexenofitness.com" target="_blank" rel="noopener noreferrer">Flexeno.com</a>
   </div>
 </footer>
 
