@@ -4760,7 +4760,11 @@ async function updateHomeDiarySummary() {
     <div class="macro-box"><div class="mval" style="color:#3b82f6">${t.carbs.toFixed(1)}g</div><div class="mlbl">CARBOIDRATI</div></div>
     <div class="macro-box"><div class="mval" style="color:#ca8a04">${t.fat.toFixed(1)}g</div><div class="mlbl">GRASSI</div></div>`;
   const te = document.getElementById('home-today-entries');
-  if (te) te.textContent = entries.length ? entries.slice(0,3).map(e=>e.name).join(', ') + (entries.length>3?` +${entries.length-3} altri`:'') : '<a href="#" onclick="goPage(\'diary\');return false;" style="color:var(--green);text-decoration:none;font-weight:600">+ Aggiungi il primo alimento →</a>';
+  if (te) if (entries.length) {
+      te.textContent = entries.slice(0,3).map(e=>e.name).join(', ') + (entries.length>3?` +${entries.length-3} altri`:'');
+    } else {
+      te.innerHTML = '+ <a href="#" onclick="goPage(\'diary\');return false;" style="color:var(--green);text-decoration:none;font-weight:600">Aggiungi il primo alimento →</a>';
+    }
 
   // Barre progresso obiettivi macro
   const targetsSection = document.getElementById('home-macro-targets');
