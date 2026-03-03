@@ -1573,6 +1573,471 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 }
 .wizard-dot.active { background: var(--green); transform: scale(1.3); }
 .wizard-dot.done { background: var(--green-bg); border: 2px solid var(--green); }
+/* ══════════════════════════════════════
+   HOME REDESIGN — Yazio-inspired
+══════════════════════════════════════ */
+
+/* Header hero */
+.home-hero-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 0 18px;
+}
+.home-hero-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.home-avatar {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  background: var(--green);
+  color: #fff;
+  font-family: var(--font-brand);
+  font-weight: 900;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(58,107,39,0.3);
+}
+.home-hero-greeting {
+  font-family: var(--font-brand);
+  font-weight: 900;
+  font-size: 20px;
+  color: var(--text);
+  line-height: 1.1;
+}
+.home-hero-date {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+  letter-spacing: 0.3px;
+}
+.home-streak-chip {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(234,88,12,0.12);
+  color: #ea580c;
+  font-family: var(--font-brand);
+  font-weight: 800;
+  font-size: 14px;
+  padding: 5px 12px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(234,88,12,0.25);
+}
+
+/* Quick actions */
+.home-quick-actions {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.home-qa-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 12px 6px;
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+  font-family: var(--font-brand);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text);
+  transition: all .15s;
+  box-shadow: var(--shadow);
+}
+.home-qa-btn:active { transform: scale(0.95); }
+.home-qa-primary {
+  background: var(--green) !important;
+  border-color: var(--green) !important;
+  color: #fff !important;
+  font-size: 13px !important;
+  flex-direction: row !important;
+  gap: 8px !important;
+  padding: 14px 12px !important;
+}
+
+/* Ring macro card */
+.home-macro-ring-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.home-ring-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+.home-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.home-ring-kcal {
+  font-family: var(--font-brand);
+  font-weight: 900;
+  font-size: 22px;
+  color: var(--text);
+  line-height: 1;
+}
+.home-ring-lbl {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+.home-macro-pills {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.home-macro-pill {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+}
+.hmp-bar-bg {
+  height: 6px;
+  border-radius: 4px;
+  background: var(--border);
+  overflow: hidden;
+}
+.hmp-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 1s ease;
+}
+.hmp-val {
+  font-family: var(--font-brand);
+  font-weight: 800;
+  font-size: 14px;
+  white-space: nowrap;
+  min-width: 36px;
+  text-align: right;
+}
+.hmp-lbl {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: .5px;
+  min-width: 34px;
+  text-align: right;
+}
+
+/* Accordion grafici */
+.home-accordion {
+  margin-bottom: 16px;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1.5px solid var(--border);
+  box-shadow: var(--shadow);
+}
+.home-accordion-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  background: var(--card);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-brand);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--text);
+  transition: background .15s;
+}
+.home-accordion-btn:hover { background: var(--bg); }
+.home-accordion-arrow {
+  font-size: 12px;
+  color: var(--muted);
+  transition: transform .2s;
+}
+.home-accordion-body {
+  padding: 16px;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+}
+
+/* Mobile tweaks */
+@media (max-width: 380px) {
+  .home-quick-actions { grid-template-columns: 1fr 1fr 1fr 1fr; }
+  .home-qa-primary { flex-direction: column !important; font-size: 11px !important; padding: 12px 6px !important; }
+  .home-ring-kcal { font-size: 18px; }
+}
+
+/* ══════════════════════════════════════
+   RICETTE — Card con foto thumbnail
+══════════════════════════════════════ */
+#ricette-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+.rc-card {
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform .15s, box-shadow .15s;
+}
+.rc-card:hover { transform: translateY(-3px); box-shadow: 0 10px 32px rgba(0,0,0,.13); }
+.rc-card:active { transform: scale(.98); }
+.rc-thumb {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+}
+.rc-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  transition: transform .3s;
+}
+.rc-card:hover .rc-img { transform: scale(1.04); }
+.rc-thumb-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,.75) 0%, rgba(0,0,0,.2) 50%, transparent 100%);
+}
+.rc-cat-badge {
+  position: absolute;
+  top: 10px; left: 10px;
+  background: var(--orange);
+  color: #fff;
+  font-family: var(--font-brand);
+  font-weight: 700;
+  font-size: 10px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: .3px;
+}
+.rc-thumb-bottom {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+}
+.rc-stat {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: rgba(255,255,255,.92);
+  font-weight: 600;
+  background: rgba(0,0,0,.3);
+  padding: 2px 7px;
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
+}
+.rc-body { padding: 12px 14px 14px; }
+.rc-nome {
+  font-family: var(--font-brand);
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 1.25;
+  margin-bottom: 4px;
+  color: var(--text);
+}
+.rc-desc {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.4;
+  margin-bottom: 10px;
+  min-height: 30px;
+}
+.rc-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.rc-tag {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  white-space: nowrap;
+}
+.rc-add-btn {
+  font-family: var(--font-brand);
+  font-weight: 700;
+  font-size: 11px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  border: 1.5px solid var(--green);
+  background: transparent;
+  color: var(--green);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all .15s;
+}
+.rc-add-btn:hover { background: var(--green); color: #fff; }
+.rc-arrow {
+  color: var(--muted);
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* ══════════════════════════════════════
+   DIARIO — Sezioni per pasto
+══════════════════════════════════════ */
+.diary-meal-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+.dmt-btn {
+  padding: 8px 4px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  background: transparent;
+  font-family: var(--font-brand);
+  font-weight: 700;
+  font-size: 11px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .15s;
+  white-space: nowrap;
+  text-align: center;
+}
+.dmt-btn.active {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+.dmt-btn:hover:not(.active) {
+  border-color: var(--green);
+  color: var(--green);
+}
+.dm-section {
+  margin-bottom: 16px;
+}
+.dm-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px 8px 12px;
+  background: var(--bg);
+  border-radius: 10px;
+  margin-bottom: 6px;
+}
+@media (max-width: 380px) {
+  .diary-meal-tabs { grid-template-columns: repeat(2,1fr); }
+  .dmt-btn { font-size: 10px; }
+}
+
+/* ══════════════════════════════════════
+   GOAL PAGE — Visual progress
+══════════════════════════════════════ */
+.goal-empty-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 20px;
+  text-align: center;
+}
+.goal-empty-visual {
+  margin-bottom: 16px;
+  opacity: .35;
+}
+.goal-progress-card-inner { padding: 20px; }
+.goal-stat-chip {
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 10px;
+  text-align: center;
+  background: var(--card);
+}
+.gsc-val {
+  font-family: var(--font-brand);
+  font-weight: 900;
+  font-size: 17px;
+  line-height: 1.1;
+  margin-bottom: 2px;
+}
+.gsc-lbl {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1px;
+}
+.goal-progress-track {
+  height: 10px;
+  border-radius: 6px;
+  background: var(--border);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.goal-progress-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 1.2s cubic-bezier(.34,1.2,.64,1);
+}
+.goal-milestones {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  padding: 0 2px;
+}
+.goal-milestone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+.gm-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+  border: 2px solid var(--card);
+  transition: background .4s;
+}
+.goal-milestone.reached .gm-dot { background: var(--green); box-shadow: 0 0 0 2px rgba(74,122,53,.25); }
+.gm-label {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--muted);
+}
+.goal-eta-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 14px;
+  padding: 14px;
+  background: linear-gradient(135deg, rgba(74,122,53,.07), rgba(74,122,53,.03));
+  border: 1.5px solid rgba(74,122,53,.2);
+  border-radius: 12px;
+}
+.goal-eta-icon { font-size: 24px; flex-shrink: 0; }
+.goal-eta-warn {
+  margin-top: 12px;
+  padding: 10px 14px;
+  background: rgba(220,38,38,.05);
+  border: 1.5px solid rgba(220,38,38,.2);
+  border-radius: 10px;
+  font-size: 12px;
+  color: var(--danger);
+}
+
 /* ── EMPTY STATE DIARIO ── */
 .diary-empty-state {
   display: flex;
@@ -1816,14 +2281,19 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 
     <!-- ═══ HOME PAGE ═══ -->
     <div class="page active" id="page-home" style="isolation:isolate">
-      <div class="page-header" style="padding-bottom:12px">
-        <div>
-          <div class="page-title-tag">// dashboard</div>
-          <h1 id="home-greeting">Ciao!</h1>
+
+      <!-- ── HEADER HERO ── -->
+      <div class="home-hero-header">
+        <div class="home-hero-left">
+          <div id="home-avatar" class="home-avatar">NT</div>
+          <div>
+            <div class="home-hero-greeting" id="home-greeting">Ciao!</div>
+            <div class="home-hero-date" id="home-date"></div>
+          </div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px">
-          <button class="btn btn-ghost btn-sm" onclick="checkPremium('openShareCard','📤 Progress Card','Genera e condividi una card con i tuoi progressi.')" title="Condividi progressi" style="font-size:18px;padding:6px 10px">📤</button>
-          <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted)" id="home-date"></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div id="home-streak-chip" class="home-streak-chip" style="display:none">🔥 <span id="home-streak-num">0</span></div>
+          <button class="btn btn-ghost btn-sm" onclick="checkPremium('openShareCard','📤 Progress Card','Genera e condividi una card con i tuoi progressi.')" style="font-size:18px;padding:6px 10px" title="Progress Card">📤</button>
         </div>
       </div>
 
@@ -1836,28 +2306,85 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       </div>
       <div id="weight-banner" style="display:none"></div>
 
-      <!-- ① RIEPILOGO OGGI (dieta + barre) -->
-      <div class="card" style="margin-bottom:16px;border-top:3px solid var(--orange)">
-        <div class="sec-header" style="margin-bottom:12px">
+      <!-- ── QUICK ACTIONS ── -->
+      <div class="home-quick-actions">
+        <button class="home-qa-btn home-qa-primary" onclick="goPage('diary')">
+          <span style="font-size:20px">✏️</span>
+          <span>Log pasto</span>
+        </button>
+        <button class="home-qa-btn" onclick="goPage('diary');setTimeout(()=>document.getElementById('barcode-tab-btn')?.click(),300)">
+          <span style="font-size:20px">📷</span>
+          <span>Scanner</span>
+        </button>
+        <button class="home-qa-btn" onclick="copyYesterdayDiary()">
+          <span style="font-size:20px">📅</span>
+          <span>Da ieri</span>
+        </button>
+        <button class="home-qa-btn" onclick="toggleFasting()">
+          <span style="font-size:20px">⏱️</span>
+          <span id="qa-fasting-lbl">Digiuno</span>
+        </button>
+      </div>
+
+      <!-- ① RING MACRO + OGGI ── -->
+      <div class="card home-macro-card" style="margin-bottom:16px">
+        <div class="sec-header" style="margin-bottom:14px">
           <h3>🍽️ Oggi</h3>
-          <button class="btn btn-ghost btn-sm" onclick="goPage('diary')">Apri Diario →</button>
+          <button class="btn btn-ghost btn-sm" onclick="goPage('diary')">Diario →</button>
         </div>
-        <div class="macro-summary" id="home-macro-summary">
-          <div class="macro-box"><div class="mval" style="color:var(--green)">0</div><div class="mlbl">KCAL</div></div>
-          <div class="macro-box"><div class="mval" style="color:var(--orange)">0g</div><div class="mlbl">PROT</div></div>
-          <div class="macro-box"><div class="mval" style="color:#3b82f6">0g</div><div class="mlbl">CARB</div></div>
-          <div class="macro-box"><div class="mval" style="color:#ca8a04">0g</div><div class="mlbl">GRASSI</div></div>
+
+        <!-- Ring + 3 macro laterali -->
+        <div class="home-macro-ring-row" id="home-macro-summary">
+          <!-- SVG ring kcal -->
+          <div class="home-ring-wrap" id="home-ring-wrap">
+            <svg viewBox="0 0 100 100" width="110" height="110" id="home-macro-svg">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="var(--border)" stroke-width="10"/>
+              <circle cx="50" cy="50" r="40" fill="none" stroke="var(--green)" stroke-width="10"
+                stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round"
+                transform="rotate(-90 50 50)" id="home-ring-kcal" style="transition:stroke-dashoffset 1s ease"/>
+            </svg>
+            <div class="home-ring-center">
+              <div class="home-ring-kcal" id="home-ring-kcal-val">0</div>
+              <div class="home-ring-lbl">kcal</div>
+            </div>
+          </div>
+          <!-- 3 macro pill -->
+          <div class="home-macro-pills">
+            <div class="home-macro-pill">
+              <div class="hmp-bar-bg"><div class="hmp-bar-fill" id="hmp-prot-bar" style="background:var(--orange);width:0%"></div></div>
+              <div class="hmp-val" id="hmp-prot-val" style="color:var(--orange)">0g</div>
+              <div class="hmp-lbl">Prot</div>
+            </div>
+            <div class="home-macro-pill">
+              <div class="hmp-bar-bg"><div class="hmp-bar-fill" id="hmp-carb-bar" style="background:#3b82f6;width:0%"></div></div>
+              <div class="hmp-val" id="hmp-carb-val" style="color:#3b82f6">0g</div>
+              <div class="hmp-lbl">Carb</div>
+            </div>
+            <div class="home-macro-pill">
+              <div class="hmp-bar-bg"><div class="hmp-bar-fill" id="hmp-fat-bar" style="background:#ca8a04;width:0%"></div></div>
+              <div class="hmp-val" id="hmp-fat-val" style="color:#ca8a04">0g</div>
+              <div class="hmp-lbl">Grassi</div>
+            </div>
+          </div>
         </div>
-        <div id="home-macro-targets" style="display:none;margin-top:12px">
-          <div style="display:flex;flex-direction:column;gap:6px" id="home-macro-bars"></div>
+
+        <!-- Obiettivo kcal sotto ring -->
+        <div id="home-kcal-goal-row" style="display:none;margin-top:10px">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px">
+            <span>Obiettivo kcal</span><span id="home-kcal-goal-pct">0%</span>
+          </div>
+          <div style="height:5px;border-radius:4px;background:var(--border);overflow:hidden">
+            <div id="home-kcal-goal-bar" style="height:100%;border-radius:4px;background:var(--green);width:0%;transition:width 1s ease"></div>
+          </div>
         </div>
-        <div id="home-today-entries" style="font-size:13px;margin-top:8px;text-align:center;padding:4px 0">
+
+        <div id="home-today-entries" style="font-size:13px;margin-top:12px;text-align:center;padding:4px 0">
           <a href="#" onclick="goPage('diary');return false;" style="color:var(--green);text-decoration:none;font-weight:600">+ Aggiungi il primo alimento →</a>
         </div>
       </div>
 
-      <!-- ② PESO + STATS -->
-      <div class="card" style="margin-bottom:16px;border-top:3px solid var(--green)">
+      <!-- ② PESO compact ── -->
+      <div class="card" style="margin-bottom:16px">
         <div class="sec-header" style="margin-bottom:10px">
           <h3>⚖️ Peso</h3>
           <div id="weight-streak" style="font-family:var(--font-mono);font-size:12px;color:var(--muted)"></div>
@@ -1879,9 +2406,8 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         </div>
       </div>
 
-      <!-- ③ DIGIUNO -->
+      <!-- ③ DIGIUNO ── -->
       <div style="margin-bottom:16px">
-        <!-- Digiuno — arco SVG, full width -->
         <div class="card" style="margin-bottom:0;padding:16px 14px" id="home-fasting-card">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
             <div style="font-weight:700;font-size:13px">⏱️ Digiuno</div>
@@ -1902,10 +2428,10 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
             style="width:100%;margin-top:6px;padding:8px;border-radius:12px;border:1.5px solid #7c3aed30;background:#7c3aed12;color:#7c3aed;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--font-brand);transition:all .2s">
             ▶ Inizia Digiuno
           </button>
-        </div><!-- /home-fasting-card -->
-      </div><!-- /③ digiuno wrapper -->
+        </div>
+      </div>
 
-      <!-- ④ NUTRIPOINTS -->
+      <!-- ④ NUTRIPOINTS ── -->
       <div class="card" style="margin-bottom:16px;border-top:3px solid #ca8a04" id="home-points-card">
         <div class="sec-header" style="margin-bottom:10px">
           <div style="display:flex;align-items:center;gap:10px">
@@ -1930,7 +2456,7 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         <div id="home-pts-today" style="font-size:12px;color:var(--muted)">Nessun punto oggi.</div>
       </div>
 
-      <!-- ⑤ LEGA -->
+      <!-- ⑤ LEGA ── -->
       <div class="card" style="margin-bottom:16px;border-top:3px solid #7c3aed" id="home-league-card">
         <div class="sec-header" style="margin-bottom:10px">
           <div style="display:flex;align-items:center;gap:10px">
@@ -1961,37 +2487,43 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         <div class="league-countdown" id="home-league-countdown">—</div>
       </div>
 
-      <!-- ⑥ GRAFICI -->
-      <div class="card" style="margin-bottom:16px">
-        <div class="sec-header">
-          <h3>📈 Peso</h3>
-          <div style="display:flex;gap:6px">
-            <button class="btn btn-ghost btn-xs" onclick="setChartRange(30)" id="cr-30">30gg</button>
-            <button class="btn btn-ghost btn-xs" onclick="setChartRange(90)" id="cr-90">3m</button>
-            <button class="btn btn-ghost btn-xs" onclick="setChartRange(99999)" id="cr-all">Tutto</button>
+      <!-- ⑥ GRAFICI + STORICO — accordion collassabile ── -->
+      <div class="home-accordion" id="home-accordion-charts">
+        <button class="home-accordion-btn" onclick="toggleHomeAccordion('charts')">
+          <span>📈 Grafici & Storico</span>
+          <span class="home-accordion-arrow" id="home-accordion-arrow-charts">▼</span>
+        </button>
+        <div class="home-accordion-body" id="home-accordion-body-charts" style="display:none">
+          <div class="card" style="margin-bottom:16px;border:none;padding:0">
+            <div class="sec-header" style="padding:0 0 10px">
+              <h3>📈 Peso</h3>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-ghost btn-xs" onclick="setChartRange(30)" id="cr-30">30gg</button>
+                <button class="btn btn-ghost btn-xs" onclick="setChartRange(90)" id="cr-90">3m</button>
+                <button class="btn btn-ghost btn-xs" onclick="setChartRange(99999)" id="cr-all">Tutto</button>
+              </div>
+            </div>
+            <div class="chart-wrap"><canvas id="weight-chart"></canvas></div>
+          </div>
+          <div class="card" style="margin-bottom:16px;border:none;padding:0">
+            <div class="sec-header" style="padding:0 0 10px">
+              <h3>🍽️ Kcal settimana</h3>
+              <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">ultimi 7 giorni</span>
+            </div>
+            <div style="height:160px"><canvas id="macro-week-chart"></canvas></div>
+          </div>
+          <div style="padding:0">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+              <h3>📋 Storico pesi</h3>
+              <span id="hist-count" style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">0 misurazioni</span>
+            </div>
+            <div id="weight-history" style="max-height:300px;overflow-y:auto">
+              <div class="empty"><div class="empty-icon">⚖️</div><p>Nessuna misurazione ancora.</p></div>
+            </div>
           </div>
         </div>
-        <div class="chart-wrap"><canvas id="weight-chart"></canvas></div>
       </div>
 
-      <div class="card" style="margin-bottom:16px">
-        <div class="sec-header">
-          <h3>🍽️ Kcal settimana</h3>
-          <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">ultimi 7 giorni</span>
-        </div>
-        <div style="height:160px"><canvas id="macro-week-chart"></canvas></div>
-      </div>
-
-      <!-- ⑦ STORICO PESI -->
-      <div class="card" style="padding:0;overflow:hidden">
-        <div style="padding:14px 22px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between">
-          <h3>📋 Storico pesi</h3>
-          <span id="hist-count" style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">0 misurazioni</span>
-        </div>
-        <div id="weight-history" style="max-height:340px;overflow-y:auto">
-          <div class="empty"><div class="empty-icon">⚖️</div><p>Nessuna misurazione ancora.</p></div>
-        </div>
-      </div>
     </div>
 
         <!-- ═══ DIARY + FOODS PAGE (unified) ═══ -->
@@ -2164,6 +2696,14 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
           <button class="cat-pill" onclick="setDiaryCat('Integratori',this)">💊 Integrat.</button>
         </div>
 
+        <!-- Meal selector -->
+        <div class="diary-meal-tabs" style="margin-bottom:12px">
+          <button class="dmt-btn active" data-meal="colazione" onclick="setDiaryMeal('colazione',this)">🌅 Colazione</button>
+          <button class="dmt-btn" data-meal="pranzo"    onclick="setDiaryMeal('pranzo',this)">☀️ Pranzo</button>
+          <button class="dmt-btn" data-meal="cena"      onclick="setDiaryMeal('cena',this)">🌙 Cena</button>
+          <button class="dmt-btn" data-meal="spuntini"  onclick="setDiaryMeal('spuntini',this)">🍎 Spuntini</button>
+        </div>
+        <input type="hidden" id="diary-meal-selector" value="colazione">
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
           <div style="flex:2;min-width:0">
             <div class="ac-wrap">
@@ -2323,7 +2863,7 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
           <button class="cat-pill" onclick="filterRicette('snack',this)">🍎 Snack</button>
         </div>
         <!-- Grid ricette -->
-        <div id="ricette-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px"></div>
+        <div id="ricette-grid"></div>
       </div>
 
     </div>
@@ -4069,6 +4609,8 @@ function showApp() {
   const initials = (u.name||u.email).slice(0,2).toUpperCase();
   document.getElementById('user-avatar').textContent = initials;
   document.getElementById('home-greeting').textContent = 'Ciao, ' + (u.name||u.email.split('@')[0]) + '!';
+  const homeAv = document.getElementById('home-avatar');
+  if (homeAv) homeAv.textContent = (u.name||u.email||'NT').slice(0,2).toUpperCase();
   document.getElementById('home-date').textContent = new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'});
   // Admin nav — doppio controllo: ruolo Firestore E email corrispondente
   const isAdmin = u.role === 'admin' || (u.email && u.email.toLowerCase() === ADMIN_EMAIL.toLowerCase());
@@ -4237,6 +4779,13 @@ function updateWeightUI() {
   // Streak
   const streak = computeStreak(weightData);
   document.getElementById('weight-streak').textContent = streak>1?'🔥 '+streak+' giorni consecutivi':streak===1?'✅ Streak iniziata!':'';
+  // Streak chip header
+  const sc = document.getElementById('home-streak-chip');
+  const sn = document.getElementById('home-streak-num');
+  if (sc && sn) {
+    if (streak > 1) { sn.textContent = streak; sc.style.display = 'flex'; }
+    else { sc.style.display = 'none'; }
+  }
 
   // Chart
   updateChart();
@@ -4547,10 +5096,12 @@ async function addToDiary() {
   if (!selectedDiaryFood) { toast('Seleziona un alimento!','var(--danger)'); return; }
   const grams = parseFloat(document.getElementById('diary-grams').value)||100;
   const f = grams/100;
+  const activeMeal = document.getElementById('diary-meal-selector')?.value || 'colazione';
   diaryEntries.push({
     id: Date.now(),
     name: selectedDiaryFood.name,
     grams,
+    meal: activeMeal,
     kcal:  Math.round(selectedDiaryFood.kcal  * f),
     protein: parseFloat((selectedDiaryFood.protein * f).toFixed(1)),
     carbs: parseFloat((selectedDiaryFood.carbs   * f).toFixed(1)),
@@ -4711,7 +5262,7 @@ function renderDiary() {
     );
   }
 
-  // Entries list
+  // Entries list — raggruppate per pasto
   const el = document.getElementById('diary-entries');
   if (!diaryEntries.length) {
     el.innerHTML=`<div class="diary-empty-state">
@@ -4734,36 +5285,116 @@ function renderDiary() {
         </div>`;
     return;
   }
-  el.innerHTML = diaryEntries.map(e=>`
-    <div class="diary-entry">
-      <div style="flex:1">
-        <div class="food-name">${e.name}</div>
-        <div style="font-size:12px;color:var(--muted);margin-top:2px">${e.grams}g</div>
+
+  const MEALS = [
+    { key:'colazione', label:'🌅 Colazione', color:'#f97316' },
+    { key:'pranzo',    label:'☀️ Pranzo',    color:'#22c55e' },
+    { key:'cena',      label:'🌙 Cena',      color:'#3b82f6' },
+    { key:'spuntini',  label:'🍎 Spuntini',  color:'#a855f7' }
+  ];
+
+  // Entries senza meal → "colazione" default (retrocompat)
+  const grouped = {};
+  MEALS.forEach(m => grouped[m.key] = []);
+  diaryEntries.forEach(e => {
+    const k = e.meal || 'colazione';
+    if (!grouped[k]) grouped[k] = [];
+    grouped[k].push(e);
+  });
+
+  let html = '';
+  MEALS.forEach(m => {
+    const entries = grouped[m.key] || [];
+    if (!entries.length) return;
+    const mTot = entries.reduce((a,e) => ({
+      kcal: a.kcal+e.kcal, protein: a.protein+e.protein,
+      carbs: a.carbs+e.carbs, fat: a.fat+e.fat
+    }), {kcal:0, protein:0, carbs:0, fat:0});
+
+    html += `
+    <div class="dm-section">
+      <div class="dm-section-header" style="border-left:3px solid ${m.color}">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-family:var(--font-brand);font-weight:800;font-size:14px;color:var(--text)">${m.label}</span>
+          <span style="font-family:var(--font-mono);font-size:11px;color:${m.color};font-weight:700">${mTot.kcal} kcal</span>
+        </div>
+        <div style="display:flex;gap:8px;font-family:var(--font-mono);font-size:10px;color:var(--muted)">
+          <span>P ${mTot.protein.toFixed(0)}g</span>
+          <span>C ${mTot.carbs.toFixed(0)}g</span>
+          <span>G ${mTot.fat.toFixed(0)}g</span>
+        </div>
       </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap">
-        <span class="macro-pill mp-kcal">${e.kcal} kcal</span>
-        <span class="macro-pill mp-prot">P ${e.protein}g</span>
-        <span class="macro-pill mp-carb">C ${e.carbs}g</span>
-        <span class="macro-pill mp-fat">G ${e.fat}g</span>
-      </div>
-      <button class="btn btn-danger btn-icon btn-sm" onclick="removeDiaryEntry(${e.id})">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
-      </button>
-    </div>`).join('');
+      ${entries.map(e => `
+      <div class="diary-entry" style="padding-left:12px">
+        <div style="flex:1;min-width:0">
+          <div class="food-name" style="font-size:13px">${e.name}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:1px">${e.grams > 1 ? e.grams+'g' : '1 porzione'}</div>
+        </div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;align-items:center">
+          <span class="macro-pill mp-kcal" style="font-size:10px">${e.kcal}</span>
+          <span class="macro-pill mp-prot" style="font-size:10px">P ${e.protein}g</span>
+          <span class="macro-pill mp-carb" style="font-size:10px">C ${e.carbs}g</span>
+          <span class="macro-pill mp-fat"  style="font-size:10px">G ${e.fat}g</span>
+        </div>
+        <button class="btn btn-danger btn-icon btn-sm" onclick="removeDiaryEntry(${e.id})" style="flex-shrink:0">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div>`).join('')}
+    </div>`;
+  });
+
+  el.innerHTML = html;
+}
+
+function setDiaryMeal(meal, btn) {
+  document.getElementById('diary-meal-selector').value = meal;
+  document.querySelectorAll('.dmt-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  // Aggiorna placeholder ricerca
+  const labels = {colazione:'Colazione',pranzo:'Pranzo',cena:'Cena',spuntini:'Spuntini'};
+  const inp = document.getElementById('diary-food-search');
+  if (inp) inp.placeholder = 'Cerca per ' + (labels[meal]||meal) + '...';
 }
 
 async function updateHomeDiarySummary() {
-  // Load today's diary for home summary
   const {db, doc, getDoc} = window._fb;
   const snap = await getDoc(doc(db,'users',uid(),'diary',todayStr()));
   const entries = snap.exists() ? (snap.data().entries||[]) : [];
   const t = entries.reduce((a,e)=>({kcal:a.kcal+e.kcal,protein:a.protein+e.protein,carbs:a.carbs+e.carbs,fat:a.fat+e.fat}),{kcal:0,protein:0,carbs:0,fat:0});
-  const el = document.getElementById('home-macro-summary');
-  if (el) el.innerHTML = `
-    <div class="macro-box"><div class="mval" style="color:var(--green)">${t.kcal}</div><div class="mlbl">KCAL</div></div>
-    <div class="macro-box"><div class="mval" style="color:var(--orange)">${t.protein.toFixed(1)}g</div><div class="mlbl">PROTEINE</div></div>
-    <div class="macro-box"><div class="mval" style="color:#3b82f6">${t.carbs.toFixed(1)}g</div><div class="mlbl">CARBOIDRATI</div></div>
-    <div class="macro-box"><div class="mval" style="color:#ca8a04">${t.fat.toFixed(1)}g</div><div class="mlbl">GRASSI</div></div>`;
+
+  // Aggiorna ring SVG kcal
+  if (!userTargets) try { await loadUserTargets(); } catch(e) {}
+  const tKcal = userTargets?.tdee || 2000;
+  const tProt = userTargets?.protein || 150;
+  const tCarbs = userTargets?.carbs || 200;
+  const tFat   = userTargets?.fat || 60;
+
+  const kcalPct = Math.min(t.kcal / tKcal, 1);
+  const circ = 251.2;
+  const ringEl = document.getElementById('home-ring-kcal');
+  if (ringEl) ringEl.style.strokeDashoffset = circ - (circ * kcalPct);
+  const kcalValEl = document.getElementById('home-ring-kcal-val');
+  if (kcalValEl) kcalValEl.textContent = t.kcal;
+
+  // Macro pills + barre
+  const protEl = document.getElementById('hmp-prot-val'); if (protEl) protEl.textContent = t.protein.toFixed(0)+'g';
+  const carbEl = document.getElementById('hmp-carb-val'); if (carbEl) carbEl.textContent = t.carbs.toFixed(0)+'g';
+  const fatEl  = document.getElementById('hmp-fat-val');  if (fatEl)  fatEl.textContent  = t.fat.toFixed(0)+'g';
+  const protBar = document.getElementById('hmp-prot-bar'); if (protBar) protBar.style.width = Math.min(t.protein/tProt*100,100)+'%';
+  const carbBar = document.getElementById('hmp-carb-bar'); if (carbBar) carbBar.style.width = Math.min(t.carbs/tCarbs*100,100)+'%';
+  const fatBar  = document.getElementById('hmp-fat-bar');  if (fatBar)  fatBar.style.width  = Math.min(t.fat/tFat*100,100)+'%';
+
+  // Barra obiettivo kcal sotto ring
+  const goalRow = document.getElementById('home-kcal-goal-row');
+  const goalBar = document.getElementById('home-kcal-goal-bar');
+  const goalPct = document.getElementById('home-kcal-goal-pct');
+  if (goalRow && tKcal > 0) {
+    goalRow.style.display = 'block';
+    const pct = Math.round(kcalPct * 100);
+    if (goalBar) goalBar.style.width = pct + '%';
+    if (goalPct) goalPct.textContent = pct + '%';
+    if (goalBar) goalBar.style.background = pct >= 100 ? 'var(--orange)' : 'var(--green)';
+  }
   const te = document.getElementById('home-today-entries');
   if (te) if (entries.length) {
       te.textContent = entries.slice(0,3).map(e=>e.name).join(', ') + (entries.length>3?` +${entries.length-3} altri`:'');
@@ -5227,80 +5858,160 @@ async function saveGoal() {
 function renderGoalProgress() {
   const el = document.getElementById('goal-progress-card');
   if (!el) return;
-  if (!goalData) { el.innerHTML='<div class="card"><div class="empty"><div class="empty-icon">🎯</div><p>Imposta il tuo obiettivo per vedere i progressi.</p></div></div>'; return; }
+  if (!goalData) {
+    el.innerHTML = `
+    <div class="card goal-empty-card">
+      <div class="goal-empty-visual">
+        <svg viewBox="0 0 120 120" width="110" height="110">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" stroke-width="8" stroke-dasharray="6 4"/>
+          <circle cx="60" cy="60" r="34" fill="none" stroke="var(--border)" stroke-width="6" stroke-dasharray="4 3"/>
+          <circle cx="60" cy="60" r="18" fill="none" stroke="var(--border)" stroke-width="5"/>
+          <circle cx="60" cy="60" r="5" fill="var(--border)"/>
+        </svg>
+      </div>
+      <div style="font-family:var(--font-brand);font-weight:800;font-size:16px;margin-bottom:6px">Imposta il tuo obiettivo</div>
+      <p style="font-size:13px;color:var(--muted);text-align:center;line-height:1.5">Inserisci peso di partenza e obiettivo per vedere il tuo percorso visuale e la data stimata di raggiungimento.</p>
+    </div>`;
+    return;
+  }
+
   const current = weightData.length ? [...weightData].sort((a,b)=>b.date.localeCompare(a.date))[0].weight : null;
   const {startWeight:start, targetWeight:target, note} = goalData;
-  let pct=0,statusText='',statusColor='var(--green)';
-  if (current&&start!==target) {
-    const totalChange = target-start;
-    const currChange  = current-start;
-    pct = Math.min(100,Math.max(0,(currChange/totalChange)*100));
-    const diff = (current-target).toFixed(1);
-    const dv = parseFloat(diff);
-    if (Math.abs(dv)<0.3) { statusText='🎯 Obiettivo raggiunto!'; statusColor='var(--green)'; }
-    else if (dv<0) { statusText=`Ancora ${Math.abs(dv)} kg da perdere`; statusColor='var(--orange)'; }
-    else { statusText=`+${dv} kg sopra l'obiettivo`; statusColor='var(--danger)'; }
-  }
-  // Stima data raggiungimento obiettivo basata sul trend degli ultimi 14 giorni
-  let estimatedDateHtml = '';
-  if (current && start !== target && weightData.length >= 2) {
-    const sorted = [...weightData].sort((a,b) => a.date.localeCompare(b.date));
-    // Usa gli ultimi 14 giorni per il trend
-    const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-14);
-    const cutoffStr = cutoff.toISOString().slice(0,10);
-    const recent = sorted.filter(w => w.date >= cutoffStr);
-    const trendData = recent.length >= 2 ? recent : sorted.slice(-2);
-    const firstW = trendData[0];
-    const lastW = trendData[trendData.length-1];
-    const daysDiff = Math.max(1, (new Date(lastW.date) - new Date(firstW.date)) / 86400000);
-    const kgPerDay = (lastW.weight - firstW.weight) / daysDiff; // negativo = perdita peso
-    const kgToGoal = target - current;
-    const isGoingRight = (kgToGoal < 0 && kgPerDay < 0) || (kgToGoal > 0 && kgPerDay > 0);
-    const rateLabel = Math.abs(kgPerDay * 7).toFixed(2);
+  const losing = target < start;
+  let pct = 0, statusText = '', statusColor = 'var(--green)', statusIcon = '🎯';
 
-    if (Math.abs(kgPerDay) > 0.001 && isGoingRight) {
-      const daysToGoal = Math.abs(kgToGoal / kgPerDay);
-      const estDate = new Date();
-      estDate.setDate(estDate.getDate() + Math.round(daysToGoal));
-      const dateStr = estDate.toLocaleDateString('it-IT', { day:'numeric', month:'long', year:'numeric' });
-      const weeks = Math.round(daysToGoal / 7);
-      estimatedDateHtml = `
-        <div style="margin-top:16px;padding:14px 16px;background:linear-gradient(135deg,rgba(74,122,53,0.07),rgba(74,122,53,0.03));border:1.5px solid rgba(74,122,53,0.2);border-radius:12px">
-          <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;margin-bottom:6px">📅 DATA STIMATA OBIETTIVO</div>
-          <div style="font-family:var(--font-brand);font-weight:900;font-size:20px;color:var(--green)">${dateStr}</div>
-          <div style="font-size:12px;color:var(--muted);margin-top:4px">al ritmo attuale di <strong style="color:var(--text-primary)">${rateLabel} kg/settimana</strong> — ancora <strong style="color:var(--text-primary)">${weeks > 0 ? weeks + ' settimane' : 'pochi giorni'}</strong></div>
-        </div>`;
-    } else if (!isGoingRight && Math.abs(kgPerDay) > 0.001) {
-      estimatedDateHtml = `
-        <div style="margin-top:16px;padding:12px 16px;background:rgba(220,80,60,0.05);border:1.5px solid rgba(220,80,60,0.2);border-radius:12px">
-          <div style="font-size:12px;color:var(--danger)">⚠️ Il trend attuale (${kgPerDay>0?'+':''}${(kgPerDay*7).toFixed(2)} kg/sett.) si allontana dall'obiettivo. Rivedi la strategia!</div>
-        </div>`;
+  if (current && start !== target) {
+    const totalChange = target - start;
+    const currChange  = current - start;
+    pct = Math.min(100, Math.max(0, (currChange / totalChange) * 100));
+    const diff = parseFloat((current - target).toFixed(1));
+    if (Math.abs(diff) < 0.3) { statusText = 'Obiettivo raggiunto!'; statusColor = 'var(--green)'; statusIcon = '🏆'; }
+    else if ((losing && diff < 0) || (!losing && diff > 0)) { statusText = `Ancora ${Math.abs(diff)} kg`; statusColor = 'var(--orange)'; statusIcon = losing ? '⬇️' : '⬆️'; }
+    else { statusText = `${Math.abs(diff)} kg oltre`; statusColor = 'var(--danger)'; statusIcon = '⚠️'; }
+  }
+
+  // Trend e stima
+  let kgPerDay = 0, estimatedHtml = '', rateLabel = '';
+  if (current && weightData.length >= 2) {
+    const sorted = [...weightData].sort((a,b) => a.date.localeCompare(b.date));
+    const cutoff = new Date(); cutoff.setDate(cutoff.getDate()-14);
+    const recent = sorted.filter(w => w.date >= cutoff.toISOString().slice(0,10));
+    const td = recent.length >= 2 ? recent : sorted.slice(-2);
+    const days = Math.max(1, (new Date(td[td.length-1].date) - new Date(td[0].date)) / 86400000);
+    kgPerDay = (td[td.length-1].weight - td[0].weight) / days;
+    rateLabel = (kgPerDay * 7).toFixed(2);
+    const kgToGoal = target - current;
+    const onTrack = (kgToGoal < 0 && kgPerDay < 0) || (kgToGoal > 0 && kgPerDay > 0);
+    if (Math.abs(kgPerDay) > 0.001 && onTrack) {
+      const daysLeft = Math.abs(kgToGoal / kgPerDay);
+      const est = new Date(); est.setDate(est.getDate() + Math.round(daysLeft));
+      const dateStr = est.toLocaleDateString('it-IT', {day:'numeric',month:'long',year:'numeric'});
+      const weeks = Math.round(daysLeft / 7);
+      estimatedHtml = `
+      <div class="goal-eta-card">
+        <div class="goal-eta-icon">📅</div>
+        <div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.2px;margin-bottom:3px">DATA STIMATA</div>
+          <div style="font-family:var(--font-brand);font-weight:900;font-size:18px;color:var(--green)">${dateStr}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px">Ritmo: <b>${Math.abs(rateLabel)} kg/settimana</b> · ${weeks > 0 ? weeks+' settimane' : 'pochi giorni'}</div>
+        </div>
+      </div>`;
+    } else if (!onTrack && Math.abs(kgPerDay) > 0.001) {
+      estimatedHtml = `<div class="goal-eta-warn">⚠️ Trend attuale (${kgPerDay>0?'+':''}${rateLabel} kg/sett.) si allontana dall'obiettivo</div>`;
     }
   }
 
-  el.innerHTML = `
-    <div class="card">
-      <h3 style="margin-bottom:16px">📊 I tuoi progressi</h3>
-      <div class="grid-3" style="margin-bottom:18px">
-        <div class="stat-chip"><div class="val" style="color:var(--muted)">${start} kg</div><div class="lbl">PARTENZA</div></div>
-        <div class="stat-chip"><div class="val" style="color:var(--green)">${current?current.toFixed(1)+' kg':'—'}</div><div class="lbl">ATTUALE</div></div>
-        <div class="stat-chip"><div class="val" style="color:var(--orange)">${target} kg</div><div class="lbl">OBIETTIVO</div></div>
-      </div>
-      ${current?`
-        <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px">
-          <span style="color:${statusColor};font-weight:700">${statusText}</span>
-          <span style="font-family:var(--font-mono);font-size:13px;color:var(--green);font-weight:600">${pct.toFixed(0)}%</span>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill" style="width:${pct}%;background:var(--green)"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;margin-top:6px;font-family:var(--font-mono);font-size:10px;color:var(--muted)">
-          <span>${start} kg</span><span>${target} kg</span>
-        </div>
-        ${estimatedDateHtml}
-      `:'<p style="color:var(--muted);font-size:13px">Inserisci il peso per vedere i progressi.</p>'}
-      ${note?`<div style="margin-top:16px;padding:12px;background:var(--cream);border-radius:10px;font-size:13px;color:var(--text2)">${note}</div>`:''}
+  // Sparkle milestones
+  const milestones = [25, 50, 75, 100];
+  const milestonesHtml = milestones.map(m => {
+    const reached = pct >= m;
+    return `<div class="goal-milestone ${reached?'reached':''}">
+      <div class="gm-dot" style="${reached?'background:var(--green)':''}"></div>
+      <div class="gm-label">${m}%</div>
     </div>`;
+  }).join('');
+
+  // Grafico linea peso ultimi 14gg
+  const recentWeights = [...weightData].sort((a,b)=>a.date.localeCompare(b.date)).slice(-10);
+  let sparklineHtml = '';
+  if (recentWeights.length >= 2) {
+    const vals = recentWeights.map(w => w.weight);
+    const minV = Math.min(...vals, target) - 0.5;
+    const maxV = Math.max(...vals, start) + 0.5;
+    const range = maxV - minV || 1;
+    const W = 240, H = 60, pad = 8;
+    const pts = vals.map((v, i) => {
+      const x = pad + (i / (vals.length-1)) * (W - pad*2);
+      const y = H - pad - ((v - minV) / range) * (H - pad*2);
+      return `${x},${y}`;
+    }).join(' ');
+    // Linea obiettivo
+    const ty = H - pad - ((target - minV) / range) * (H - pad*2);
+    const sy = H - pad - ((start - minV) / range) * (H - pad*2);
+    sparklineHtml = `
+    <div style="margin-top:14px">
+      <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.2px;margin-bottom:6px">TREND PESO (ultimi ${vals.length} rilevamenti)</div>
+      <svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block;overflow:visible">
+        <!-- Target line -->
+        <line x1="${pad}" y1="${ty}" x2="${W-pad}" y2="${ty}" stroke="var(--orange)" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.6"/>
+        <text x="${W-pad+2}" y="${ty+4}" font-size="8" fill="var(--orange)" opacity="0.8">Target</text>
+        <!-- Start line -->
+        <line x1="${pad}" y1="${sy}" x2="${W-pad}" y2="${sy}" stroke="var(--muted)" stroke-width="1" stroke-dasharray="3 3" opacity="0.4"/>
+        <!-- Area fill -->
+        <polyline points="${pts}" fill="none" stroke="var(--green)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Last point dot -->
+        ${(() => { const last = pts.split(' ').pop(); const [lx,ly] = last.split(','); return `<circle cx="${lx}" cy="${ly}" r="4" fill="var(--green)" stroke="#fff" stroke-width="2"/>`; })()}
+      </svg>
+    </div>`;
+  }
+
+  el.innerHTML = `
+  <div class="card goal-progress-card-inner">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <h3>📊 Il tuo percorso</h3>
+      ${pct >= 100 ? '<span style="font-size:24px">🏆</span>' : ''}
+    </div>
+
+    <!-- 3 stat chips -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px">
+      <div class="goal-stat-chip">
+        <div style="font-size:18px;margin-bottom:2px">🚀</div>
+        <div class="gsc-val">${start} kg</div>
+        <div class="gsc-lbl">Partenza</div>
+      </div>
+      <div class="goal-stat-chip" style="border-color:var(--green);background:rgba(74,122,53,0.06)">
+        <div style="font-size:18px;margin-bottom:2px">${statusIcon}</div>
+        <div class="gsc-val" style="color:${statusColor}">${current ? current.toFixed(1)+' kg' : '—'}</div>
+        <div class="gsc-lbl">Attuale</div>
+      </div>
+      <div class="goal-stat-chip" style="border-color:var(--orange);background:rgba(234,88,12,0.05)">
+        <div style="font-size:18px;margin-bottom:2px">🎯</div>
+        <div class="gsc-val" style="color:var(--orange)">${target} kg</div>
+        <div class="gsc-lbl">Obiettivo</div>
+      </div>
+    </div>
+
+    ${current ? `
+    <!-- Progress bar con milestones -->
+    <div style="margin-bottom:6px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:13px;font-weight:700;color:${statusColor}">${statusText}</span>
+      <span style="font-family:var(--font-brand);font-weight:900;font-size:18px;color:${statusColor}">${pct.toFixed(0)}%</span>
+    </div>
+    <div class="goal-progress-track">
+      <div class="goal-progress-fill" style="width:${pct}%;background:${pct>=100?'var(--green)':statusColor}"></div>
+    </div>
+    <!-- Milestone dots -->
+    <div class="goal-milestones">${milestonesHtml}</div>
+
+    <!-- Sparkline -->
+    ${sparklineHtml}
+
+    <!-- ETA card -->
+    ${estimatedHtml}
+    ` : '<p style="color:var(--muted);font-size:13px;margin-top:4px">Pesati per iniziare a vedere i progressi.</p>'}
+
+    ${note ? `<div style="margin-top:14px;padding:11px 14px;background:var(--cream);border-radius:10px;font-size:13px;color:var(--text2);border-left:3px solid var(--orange)">📝 ${note}</div>` : ''}
+  </div>`;
 }
 
 // ══════════════════════════════════
@@ -8254,6 +8965,8 @@ function renderFastingWidget() {
       btn.style.color = '#7c3aed';
       btn.style.borderColor = '#7c3aed30';
     }
+    const qaLbl = document.getElementById('qa-fasting-lbl');
+    if (qaLbl) qaLbl.textContent = 'Digiuno';
     if (label)   label.textContent = 'Non attivo';
     if (elapsed) elapsed.textContent = '00:00:00';
     if (goalLbl) goalLbl.textContent = 'TOCCA PER INIZIARE';
@@ -8394,6 +9107,17 @@ function switchDiaryTab(tab) {
 }
 
 // ══════════════════════════════════════════════════════════════
+function toggleHomeAccordion(id) {
+  const body  = document.getElementById('home-accordion-body-'  + id);
+  const arrow = document.getElementById('home-accordion-arrow-' + id);
+  if (!body) return;
+  const open = body.style.display !== 'none';
+  body.style.display  = open ? 'none' : 'block';
+  if (arrow) arrow.textContent = open ? '▼' : '▲';
+  // Forza ridisegno grafici Chart.js quando si apre
+  if (!open) { try { weightChart?.resize(); macroWeekChart?.resize(); } catch(e){} }
+}
+
 // RICETTE FIT
 // ══════════════════════════════════════════════════════════════
 const RICETTE_FIT = [
@@ -8402,73 +9126,85 @@ const RICETTE_FIT = [
     desc:"Pancake soffici e proteici, perfetti per iniziare la giornata con energia e gusto.",
     ing:["80g fiocchi d'avena","2 uova intere","1 banana matura","1 cucchiaino lievito"],
     prep:"Frulla avena, uova e banana fino a ottenere un composto liscio. Scalda una padella antiaderente a fuoco medio e cuoci le frittelle 2 minuti per lato. Servi con frutti di bosco freschi.",
-    tag:['alto-proteico','senza-glutine'] },
+    tag:['alto-proteico','senza-glutine'],
+    foto:'https://images.unsplash.com/photo-1528207776546-365bb710ee93?w=600&q=80' },
   { id:'rf02', cat:'colazione', nome:'Greek Yogurt Bowl', emoji:'🫙',
     tempo:'5 min', diff:'Facilissimo', kcal:280, prot:20, porz:1,
     desc:"Bowl fresca e cremosa con yogurt greco, granola croccante e frutti di bosco antiossidanti.",
     ing:['200g yogurt greco 0%','30g granola integrale','80g frutti di bosco','1 cucchiaio miele'],
     prep:'Versa lo yogurt in una ciotola. Aggiungi granola e frutti di bosco. Finisci con un filo di miele. Consuma subito per mantenere la croccantezza.',
-    tag:['veloce','ricco-calcio'] },
+    tag:['veloce','ricco-calcio'],
+    foto:'https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?w=600&q=80' },
   { id:'rf03', cat:'colazione', nome:'Overnight Oats Proteici', emoji:'🌙',
     tempo:'5 min + notte', diff:'Facilissimo', kcal:360, prot:22, porz:1,
     desc:"Prepara la sera, gusta la mattina. Colazione completa pronta in zero secondi.",
     ing:["70g fiocchi d'avena","200ml latte scremato","100g yogurt greco","1 misurino proteine vaniglia","frutti di bosco","semi di chia"],
     prep:"Mescola avena, latte, yogurt e proteine in un barattolo. Aggiungi un cucchiaio di chia, chiudi e riponi in frigo per tutta la notte. Al mattino guarnisci con i frutti di bosco.",
-    tag:['meal-prep','alto-proteico'] },
+    tag:['meal-prep','alto-proteico'],
+    foto:'https://images.unsplash.com/photo-1579722821273-0f6c7d44362f?w=600&q=80' },
   { id:'rf04', cat:'pranzo', nome:'Bowl Quinoa e Pollo', emoji:'🍲',
     tempo:'20 min', diff:'Facile', kcal:480, prot:42, porz:1,
     desc:"Bowl bilanciata e saziante con proteine nobili, carboidrati complessi e grassi buoni.",
     ing:['150g petto di pollo','80g quinoa','spinacini freschi q.b.','½ avocado','limone, olio evo'],
     prep:"Cuoci la quinoa in brodo vegetale 15 min. Griglia il pollo a cubetti con spezie a piacere. Componi la bowl: spinacini, quinoa, pollo e avocado a fette. Condisci con limone e olio.",
-    tag:['alto-proteico','meal-prep'] },
+    tag:['alto-proteico','meal-prep'],
+    foto:'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=600&q=80' },
   { id:'rf05', cat:'pranzo', nome:'Insalata Tonno e Ceci', emoji:'🥗',
     tempo:'5 min', diff:'Facilissimo', kcal:380, prot:35, porz:1,
     desc:"Pranzo velocissimo senza cottura, ricco di proteine e fibre. Ideale in ufficio.",
     ing:['160g tonno al naturale','200g ceci in lattina','pomodorini','½ cipolla rossa','prezzemolo','olio evo, limone'],
     prep:'Scola e risciacqua i ceci. Unisci tonno, ceci, pomodorini tagliati, cipolla e prezzemolo. Condisci con olio e succo di limone. Nessuna cottura richiesta.',
-    tag:['veloce','senza-cottura'] },
+    tag:['veloce','senza-cottura'],
+    foto:'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&q=80' },
   { id:'rf06', cat:'pranzo', nome:'Wrap Integrale al Pollo', emoji:'🌯',
     tempo:'15 min', diff:'Facile', kcal:420, prot:38, porz:1,
     desc:"Wrap croccante e saporito, perfetto da portare ovunque. Proteico e soddisfacente.",
     ing:['1 piadina integrale','120g pollo grigliato','lattuga','pomodoro','yogurt greco + erbe aromatiche'],
     prep:"Griglia il pollo con paprika e aglio. Prepara la salsa mescolando yogurt greco con erbe fresche. Stendi la salsa sulla piadina, aggiungi verdure e pollo, avvolgi stretto.",
-    tag:['meal-prep','alto-proteico'] },
+    tag:['meal-prep','alto-proteico'],
+    foto:'https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=600&q=80' },
   { id:'rf07', cat:'cena', nome:'Salmone al Forno con Verdure', emoji:'🐟',
     tempo:'25 min', diff:'Facile', kcal:390, prot:36, porz:1,
     desc:"Cena leggera e nutriente, ricca di omega-3 e antiossidanti dalle verdure di stagione.",
     ing:['180g filetto di salmone','zucchine','peperoni','aglio','olio evo','limone','rosmarino'],
     prep:'Preriscalda il forno a 200°C. Disponi salmone e verdure su teglia, condisci con olio, aglio, limone e rosmarino. Cuoci 18-20 minuti.',
-    tag:['omega-3','anti-infiammatorio'] },
+    tag:['omega-3','anti-infiammatorio'],
+    foto:'https://images.unsplash.com/photo-1467003909585-2f8a72700288?w=600&q=80' },
   { id:'rf08', cat:'cena', nome:'Frittata di Albumi e Verdure', emoji:'🍳',
     tempo:'15 min', diff:'Facile', kcal:230, prot:28, porz:1,
     desc:"Leggerissima ma saziante. Alta in proteine, bassissima in calorie. Perfetta post-allenamento.",
     ing:['6 albumi','1 uovo intero','spinaci','pomodorini','30g feta light','olio evo'],
     prep:"Sbatti albumi e uovo. Aggiungi spinaci e pomodorini. Cuoci in padella antiaderente coperta 8 min, poi spolvera con feta.",
-    tag:['basso-calorie','alto-proteico'] },
+    tag:['basso-calorie','alto-proteico'],
+    foto:'https://images.unsplash.com/photo-1510693206972-df098062cb71?w=600&q=80' },
   { id:'rf09', cat:'cena', nome:'Pollo al Curry Leggero', emoji:'🍛',
     tempo:'25 min', diff:'Facile', kcal:460, prot:40, porz:2,
     desc:"Cena esotica e aromatica, con il curry che accelera il metabolismo e il cocco che arrotonda i sapori.",
     ing:['150g petto di pollo','80g riso basmati','100ml latte di cocco light','curry','cipolla','aglio','zenzero'],
     prep:'Soffriggi cipolla, aglio e zenzero. Aggiungi pollo a cubetti e curry, poi il latte di cocco. Cuoci 12 min. Servi sul riso basmati cotto al vapore.',
-    tag:['esotico','meal-prep'] },
+    tag:['esotico','meal-prep'],
+    foto:'https://images.unsplash.com/photo-1455619452474-d2be8b1e70cd?w=600&q=80' },
   { id:'rf10', cat:'snack', nome:'Hummus Fatto in Casa', emoji:'🫘',
     tempo:'10 min', diff:'Facilissimo', kcal:180, prot:8, porz:4,
     desc:"Crema di ceci vellutata e aromatica. Si conserva 5 giorni, ideale come base per spuntini.",
     ing:['200g ceci cotti','2 cucchiai tahini','succo di 1 limone','1 spicchio aglio','cumino','olio evo'],
     prep:'Frulla ceci, tahini, limone e aglio fino a ottenere una crema liscia. Regola con acqua se troppo denso. Condisci con olio e cumino. Conserva in frigo fino a 5 giorni.',
-    tag:['vegan','plant-based'] },
+    tag:['vegan','plant-based'],
+    foto:'https://images.unsplash.com/photo-1541014741259-de529411b96a?w=600&q=80' },
   { id:'rf11', cat:'snack', nome:'Energy Balls al Cacao', emoji:'🍫',
     tempo:'15 min', diff:'Facilissimo', kcal:140, prot:6, porz:8,
     desc:"Snack energetico pre-workout senza cottura. Dolci al punto giusto, ricchi di energia naturale.",
     ing:['100g datteri Medjool','60g fiocchi avena','2 cucchiai cacao amaro','30g mandorle','1 cucchiaio burro arachidi'],
     prep:"Trita i datteri nel mixer. Aggiungi avena, cacao, mandorle tritate e burro d'arachidi. Impasta, forma palline da 20g. Riponi in frigo 30 min.",
-    tag:['pre-workout','senza-cottura'] },
+    tag:['pre-workout','senza-cottura'],
+    foto:'https://images.unsplash.com/photo-1604482430049-28ec5d3b8c1f?w=600&q=80' },
   { id:'rf12', cat:'snack', nome:'Smoothie Verde Proteico', emoji:'🥤',
     tempo:'5 min', diff:'Facilissimo', kcal:220, prot:18, porz:1,
     desc:"Smoothie verde energizzante con spinaci, banana e proteine. Perfetto post-allenamento.",
     ing:['200ml latte di mandorla','1 misurino proteine vaniglia','2 manciate spinaci freschi','½ banana','1 cucchiaio semi di chia'],
     prep:'Inserisci tutti gli ingredienti nel mixer partendo dai liquidi. Frulla 45 secondi. Consuma subito o conserva max 1 ora in frigo.',
-    tag:['post-workout','veloce'] }
+    tag:['post-workout','veloce'],
+    foto:'https://images.unsplash.com/photo-1610970881699-44a5587cabec?w=600&q=80' }
 ];
 
 let _ricetteCat = 'all';
@@ -8480,34 +9216,71 @@ function renderRicette() {
     ? RICETTE_FIT
     : RICETTE_FIT.filter(r => r.cat === _ricetteCat);
 
+  const _grad = {
+    colazione:'linear-gradient(145deg,#f97316,#fbbf24)',
+    pranzo:   'linear-gradient(145deg,#166534,#4ade80)',
+    cena:     'linear-gradient(145deg,#0c4a6e,#22d3ee)',
+    snack:    'linear-gradient(145deg,#581c87,#c084fc)'
+  };
+  const _catLabel = {colazione:'☀️ Colazione',pranzo:'🍽️ Pranzo',cena:'🌙 Cena',snack:'🍎 Snack'};
+
   grid.innerHTML = list.map(r => `
-    <div class="card" onclick="apriRicetta('${r.id}')"
-      style="padding:0;overflow:hidden;cursor:pointer;transition:box-shadow .2s"
-      onmouseover="this.style.boxShadow='0 6px 20px rgba(0,0,0,.12)'"
-      onmouseout="this.style.boxShadow=''">
-      <div style="padding:16px 16px 14px">
-        <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px">
-          <span style="font-size:32px;line-height:1;flex-shrink:0">${r.emoji}</span>
-          <div style="min-width:0;flex:1">
-            <div style="font-family:var(--font-brand);font-weight:700;font-size:13px;line-height:1.3;color:var(--text)">${r.nome}</div>
-            <div style="font-size:11px;color:var(--muted);margin-top:3px">⏱ ${r.tempo} &nbsp;·&nbsp; ${r.diff}</div>
-          </div>
+    <div class="rc-card" onclick="apriRicetta('${r.id}')">
+      <div class="rc-thumb" style="background:${_grad[r.cat]||_grad.pranzo}">
+        ${r.foto ? `<img src="${r.foto}" alt="${r.nome}" loading="lazy" class="rc-img" onerror="this.style.display='none'">` : ''}
+        <div class="rc-thumb-overlay"></div>
+        <span class="rc-cat-badge">${_catLabel[r.cat]||r.cat}</span>
+        <div class="rc-thumb-bottom">
+          <div class="rc-stat">🔥 ${r.kcal}</div>
+          <div class="rc-stat">💪 ${r.prot}g</div>
+          <div class="rc-stat">⏱ ${r.tempo}</div>
         </div>
-        <div style="display:flex;gap:8px;margin-bottom:10px">
-          <div style="flex:1;text-align:center;padding:8px 4px;border-radius:10px;background:var(--green-bg,#f0fdf4)">
-            <div style="font-family:var(--font-brand);font-weight:900;font-size:18px;color:var(--green)">${r.kcal}</div>
-            <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1px;color:var(--muted)">KCAL</div>
+      </div>
+      <div class="rc-body">
+        <div class="rc-nome">${r.nome}</div>
+        <div class="rc-desc">${(r.desc||'').slice(0,72)}${(r.desc||'').length>72?'…':''}</div>
+        <div class="rc-footer">
+          <div style="display:flex;gap:4px;flex-wrap:wrap;flex:1;min-width:0">
+            ${r.tag.slice(0,2).map(t=>`<span class="rc-tag">#${t}</span>`).join('')}
           </div>
-          <div style="flex:1;text-align:center;padding:8px 4px;border-radius:10px;background:#fff7ed">
-            <div style="font-family:var(--font-brand);font-weight:900;font-size:18px;color:var(--orange)">${r.prot}g</div>
-            <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1px;color:var(--muted)">PROT</div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button class="rc-add-btn" onclick="event.stopPropagation();addRicettaToDiary('${r.id}')" title="Aggiungi al diario">
+              + Diario
+            </button>
+            <span class="rc-arrow">→</span>
           </div>
-        </div>
-        <div style="display:flex;gap:4px;flex-wrap:wrap">
-          ${r.tag.map(t=>`<span style="font-size:9px;padding:2px 8px;border-radius:10px;border:1px solid var(--border);color:var(--muted);font-family:var(--font-mono)">#${t}</span>`).join('')}
         </div>
       </div>
     </div>`).join('');
+}
+
+// Aggiungi ingredienti ricetta al diario con un tap
+async function addRicettaToDiary(id) {
+  const r = RICETTE_FIT.find(x => x.id === id);
+  if (!r) return;
+  // Mappa ingredienti → entry diario (per porzione)
+  const portions = r.porz || 1;
+  const entryKcal   = Math.round(r.kcal / portions);
+  const entryProt   = parseFloat((r.prot / portions).toFixed(1));
+  const entryCarbs  = parseFloat(((r.carbs || Math.round(r.kcal*0.4/4)) / portions).toFixed(1));
+  const entryFat    = parseFloat(((r.fat   || Math.round(r.kcal*0.25/9)) / portions).toFixed(1));
+  const activeMealR = document.getElementById('diary-meal-selector')?.value || 'pranzo';
+  diaryEntries.push({
+    id: Date.now(),
+    name: r.nome + (portions > 1 ? ' (1 porzione)' : ''),
+    grams: 1,
+    meal: activeMealR,
+    kcal:    entryKcal,
+    protein: entryProt,
+    carbs:   entryCarbs,
+    fat:     entryFat
+  });
+  await saveDiary();
+  renderDiary();
+  if (currentDiaryDate === todayStr()) { updateHomeDiarySummary(); checkRingClosure(); }
+  // Switcha automaticamente al diario per mostrare l'aggiunta
+  if (typeof goPage === 'function') goPage('diary');
+  toast('🥗 ' + r.nome + ' aggiunto al diario!');
 }
 
 function filterRicette(cat, btn) {
@@ -8556,20 +9329,22 @@ function _buildRicettaModal(idx) {
   <div id="ricetta-sheet" style="width:100%;max-width:540px;height:92vh;display:flex;flex-direction:column;border-radius:24px 24px 0 0;overflow:hidden;background:var(--bg-card);box-shadow:0 -20px 60px rgba(0,0,0,0.35);">
 
     <!-- ══ HERO IMAGE ══ -->
-    <div style="position:relative;width:100%;height:52%;flex-shrink:0;background:${grad};overflow:hidden">
+    <div style="position:relative;width:100%;height:52%;flex-shrink:0;overflow:hidden;background:${grad}">
 
-      <!-- Decorazione emoji sfondo -->
+      <!-- Foto reale se disponibile, altrimenti gradiente + emoji -->
+      ${r.foto ? `<img src="${r.foto}" alt="${r.nome}"
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center"
+        onerror="this.style.display='none'">` : ''}
+
+      <!-- Decorazione emoji sfondo (visibile solo se no foto) -->
+      ${!r.foto ? `
       <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:120px;opacity:0.18;user-select:none;pointer-events:none;filter:blur(1px)">${r.emoji}</div>
-      <div style="position:absolute;top:15%;left:8%;font-size:36px;opacity:0.12;transform:rotate(-15deg)">${r.emoji}</div>
-      <div style="position:absolute;bottom:20%;right:10%;font-size:28px;opacity:0.12;transform:rotate(20deg)">${r.emoji}</div>
-
-      <!-- Emoji centrale grande -->
       <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
         <div style="font-size:88px;line-height:1;filter:drop-shadow(0 8px 24px rgba(0,0,0,0.25));animation:ricettaEmojiIn .4s cubic-bezier(.34,1.56,.64,1) both">${r.emoji}</div>
-      </div>
+      </div>` : ''}
 
-      <!-- Overlay gradiente in basso -->
-      <div style="position:absolute;bottom:0;left:0;right:0;height:60%;background:linear-gradient(to top,rgba(0,0,0,0.82) 0%,rgba(0,0,0,0.4) 50%,transparent 100%)"></div>
+      <!-- Overlay gradiente in basso (sempre) -->
+      <div style="position:absolute;bottom:0;left:0;right:0;height:70%;background:linear-gradient(to top,rgba(0,0,0,0.88) 0%,rgba(0,0,0,0.5) 50%,transparent 100%)"></div>
 
       <!-- Pulsante chiudi in alto a sinistra -->
       <button onclick="document.getElementById('ricetta-modal').remove()"
