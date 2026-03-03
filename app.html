@@ -95,28 +95,17 @@ onAuthStateChanged(auth, async user => {
         window._currentUser = { uid: user.uid, email: user.email, ...snap.data() };
       } else {
         window._currentUser = { uid: user.uid, email: user.email, name: (user.displayName || (user.email||'').split('@')[0] || 'Utente'), role: 'user' };
-        // Tenta di creare il documento utente se non esiste
-        try {
-          await setDoc(doc(db, 'users', user.uid), window._currentUser);
-        } catch(writeErr) { /* ignora errori di scrittura */ }
+        try { await setDoc(doc(db,'users',user.uid), window._currentUser); } catch(we){}
       }
     } catch(firestoreErr) {
-      // Firestore non raggiungibile: usa dati minimi dall'Auth e mostra comunque l'app
-      console.warn('Firestore getDoc fallito:', firestoreErr.code || firestoreErr.message);
-      window._currentUser = {
-        uid: user.uid,
-        email: user.email || '',
-        name: user.displayName || (user.email||'').split('@')[0] || 'Utente',
-        role: 'user'
-      };
+      console.warn('Firestore error, using auth data:', firestoreErr.code || firestoreErr.message);
+      window._currentUser = { uid: user.uid, email: user.email || '', name: user.displayName || (user.email||'').split('@')[0] || 'Utente', role: 'user' };
     }
-    if (typeof showApp === 'function') showApp();
-    else window.addEventListener('DOMContentLoaded', showApp);
+    window.showApp ? window.showApp() : window.addEventListener('DOMContentLoaded', () => window.showApp && window.showApp());
   } else {
     localStorage.removeItem('nt_logged_in');
     window._currentUser = null;
-    if (typeof showAuth === 'function') showAuth();
-    else window.addEventListener('DOMContentLoaded', showAuth);
+    window.showAuth ? window.showAuth() : window.addEventListener('DOMContentLoaded', () => window.showAuth && window.showAuth());
   }
 });
 </script>
@@ -4494,7 +4483,6 @@ async function doRegister() {
   const isAdmin = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
   const btn = document.getElementById('reg-btn');
   btn.disabled = true; btn.textContent = 'Registrazione...';
-  // Guard: Firebase non ancora pronto
   if (!window._fb || !window._fb.createUserWithEmailAndPassword) {
     await new Promise(r => setTimeout(r, 2500));
     if (!window._fb || !window._fb.createUserWithEmailAndPassword) {
@@ -4654,12 +4642,12 @@ function showAuth() {
 function showApp() {
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app-screen').style.display = 'block';
-  const u = window._currentUser || { uid: '', email: '', name: 'Utente', role: 'user' };
+  const u = window._currentUser || { uid:'', email:'', name:'Utente', role:'user' };
   if (!window._currentUser) window._currentUser = u;
   // Avatar & greeting
   const initials = ((u.name||u.email||'NT')).slice(0,2).toUpperCase();
   document.getElementById('user-avatar').textContent = initials;
-  document.getElementById('home-greeting').textContent = 'Ciao, ' + (u.name || (u.email ? u.email.split('@')[0] : 'Utente')) + '!';
+  document.getElementById('home-greeting').textContent = 'Ciao, ' + (u.name||(u.email?u.email.split('@')[0]:'Utente')) + '!';
   const homeAv = document.getElementById('home-avatar');
   if (homeAv) homeAv.textContent = (u.name||u.email||'NT').slice(0,2).toUpperCase();
   document.getElementById('home-date').textContent = new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'});
@@ -5456,24 +5444,23 @@ async function updateHomeDiarySummary() {
   // Barre progresso obiettivi macro
   const targetsSection = document.getElementById('home-macro-targets');
   const barsEl = document.getElementById('home-macro-bars');
-  if (!userTargets) try { await loadUserTargets(); } catch(e) {}
-  const tKcal = (userTargets?.tdee) || 0;
-  const tProt = (userTargets?.protein) || 0;
-  const tCarbs = (userTargets?.carbs) || 0;
-  const tFat = (userTargets?.fat) || 0;
+  const tKcalTarget = (userTargets?.tdee) || 0;
+  const tProtTarget = (userTargets?.protein) || 0;
+  const tCarbsTarget = (userTargets?.carbs) || 0;
+  const tFatTarget  = (userTargets?.fat) || 0;
 
-  if (targetsSection && barsEl && tKcal > 0) {
+  if (targetsSection && barsEl && tKcalTarget > 0) {
     targetsSection.style.display = 'block';
     const bars = [
-      { label:'Kcal', val:Math.round(t.kcal), target:tKcal, color:'var(--green)', unit:'' },
-      { label:'Proteine', val:Math.round(t.protein), target:tProt, color:'var(--orange)', unit:'g' },
-      { label:'Carboidrati', val:Math.round(t.carbs), target:tCarbs, color:'#3b82f6', unit:'g' },
-      { label:'Grassi', val:Math.round(t.fat), target:tFat, color:'#ca8a04', unit:'g' },
+      { label:'Kcal', val:Math.round(t.kcal), target:tKcalTarget, color:'var(--green)', unit:'' },
+      { label:'Proteine', val:Math.round(t.protein), target:tProtTarget, color:'var(--orange)', unit:'g' },
+      { label:'Carboidrati', val:Math.round(t.carbs), target:tCarbsTarget, color:'#3b82f6', unit:'g' },
+      { label:'Grassi', val:Math.round(t.fat), target:tFatTarget, color:'#ca8a04', unit:'g' },
     ];
     barsEl.innerHTML = bars.map(b => {
-      const pct = Math.min(100, tgt > 0 ? Math.round((b.val/b.target)*100) : 0);
       const tgt = b.target;
       const pctCalc = tgt > 0 ? Math.min(100, Math.round((b.val/tgt)*100)) : 0;
+      const pct = pctCalc;
       const over = tgt > 0 && b.val > tgt;
       const barColor = over ? '#ef4444' : b.color;
       return `<div>
