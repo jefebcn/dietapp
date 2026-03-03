@@ -89,17 +89,34 @@ window._fb = { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassw
 onAuthStateChanged(auth, async user => {
   if (user) {
     localStorage.setItem('nt_logged_in', '1');
-    const snap = await getDoc(doc(db, 'users', user.uid));
-    if (snap.exists()) {
-      window._currentUser = { uid: user.uid, email: user.email, ...snap.data() };
-    } else {
-      window._currentUser = { uid: user.uid, email: user.email, name: (user.email||'').split('@')[0] || 'Utente', role: 'user' };
+    try {
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (snap.exists()) {
+        window._currentUser = { uid: user.uid, email: user.email, ...snap.data() };
+      } else {
+        window._currentUser = { uid: user.uid, email: user.email, name: (user.displayName || (user.email||'').split('@')[0] || 'Utente'), role: 'user' };
+        // Tenta di creare il documento utente se non esiste
+        try {
+          await setDoc(doc(db, 'users', user.uid), window._currentUser);
+        } catch(writeErr) { /* ignora errori di scrittura */ }
+      }
+    } catch(firestoreErr) {
+      // Firestore non raggiungibile: usa dati minimi dall'Auth e mostra comunque l'app
+      console.warn('Firestore getDoc fallito:', firestoreErr.code || firestoreErr.message);
+      window._currentUser = {
+        uid: user.uid,
+        email: user.email || '',
+        name: user.displayName || (user.email||'').split('@')[0] || 'Utente',
+        role: 'user'
+      };
     }
-    showApp();
+    if (typeof showApp === 'function') showApp();
+    else window.addEventListener('DOMContentLoaded', showApp);
   } else {
     localStorage.removeItem('nt_logged_in');
     window._currentUser = null;
-    showAuth();
+    if (typeof showAuth === 'function') showAuth();
+    else window.addEventListener('DOMContentLoaded', showAuth);
   }
 });
 </script>
@@ -203,6 +220,8 @@ body {
   background: var(--cream);
   background-image: radial-gradient(ellipse at 20% 80%, rgba(74,122,53,0.08) 0%, transparent 50%),
                     radial-gradient(ellipse at 80% 20%, rgba(224,112,32,0.08) 0%, transparent 50%);
+  position: relative;
+  z-index: 10000;
 }
 
 .auth-box {
@@ -4475,6 +4494,15 @@ async function doRegister() {
   const isAdmin = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
   const btn = document.getElementById('reg-btn');
   btn.disabled = true; btn.textContent = 'Registrazione...';
+  // Guard: Firebase non ancora pronto
+  if (!window._fb || !window._fb.createUserWithEmailAndPassword) {
+    await new Promise(r => setTimeout(r, 2500));
+    if (!window._fb || !window._fb.createUserWithEmailAndPassword) {
+      showAuthError('Connessione al server non riuscita. Controlla la rete e ricarica la pagina.');
+      btn.disabled = false; btn.textContent = 'Crea account →';
+      return;
+    }
+  }
   try {
     const {auth, db, createUserWithEmailAndPassword, doc, setDoc} = window._fb;
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
@@ -4626,11 +4654,12 @@ function showAuth() {
 function showApp() {
   document.getElementById('auth-screen').style.display = 'none';
   document.getElementById('app-screen').style.display = 'block';
-  const u = window._currentUser;
+  const u = window._currentUser || { uid: '', email: '', name: 'Utente', role: 'user' };
+  if (!window._currentUser) window._currentUser = u;
   // Avatar & greeting
-  const initials = (u.name||u.email).slice(0,2).toUpperCase();
+  const initials = ((u.name||u.email||'NT')).slice(0,2).toUpperCase();
   document.getElementById('user-avatar').textContent = initials;
-  document.getElementById('home-greeting').textContent = 'Ciao, ' + (u.name||u.email.split('@')[0]) + '!';
+  document.getElementById('home-greeting').textContent = 'Ciao, ' + (u.name || (u.email ? u.email.split('@')[0] : 'Utente')) + '!';
   const homeAv = document.getElementById('home-avatar');
   if (homeAv) homeAv.textContent = (u.name||u.email||'NT').slice(0,2).toUpperCase();
   document.getElementById('home-date').textContent = new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long'});
