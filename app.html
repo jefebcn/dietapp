@@ -1909,12 +1909,27 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
    DIARIO — Sezioni per pasto
 ══════════════════════════════════════ */
 .diary-meal-tabs {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
+  flex-direction: column;
   gap: 6px;
 }
+.dmt-row {
+  display: grid;
+  gap: 6px;
+}
+.dmt-row-main  { grid-template-columns: repeat(3, 1fr); }
+.dmt-row-snack { grid-template-columns: repeat(3, 1fr); }
+.dmt-snack-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0 2px 2px;
+}
 .dmt-btn {
-  padding: 8px 4px;
+  padding: 9px 4px;
   border-radius: 10px;
   border: 1.5px solid var(--border);
   background: transparent;
@@ -1926,13 +1941,18 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   transition: all .15s;
   white-space: nowrap;
   text-align: center;
+  line-height: 1.3;
 }
+.dmt-btn .dmt-icon { display: block; font-size: 15px; margin-bottom: 2px; }
 .dmt-btn.active {
   background: var(--green);
   border-color: var(--green);
   color: #fff;
 }
-.dmt-btn:hover:not(.active) {
+.dmt-btn.active-snack-mat  { background: #f97316; border-color: #f97316; color: #fff; }
+.dmt-btn.active-snack-pom  { background: #a855f7; border-color: #a855f7; color: #fff; }
+.dmt-btn.active-snack-ser  { background: #6366f1; border-color: #6366f1; color: #fff; }
+.dmt-btn:hover:not(.active):not(.active-snack-mat):not(.active-snack-pom):not(.active-snack-ser) {
   border-color: var(--green);
   color: var(--green);
 }
@@ -1944,13 +1964,13 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   align-items: center;
   justify-content: space-between;
   padding: 8px 10px 8px 12px;
-  background: var(--bg);
+  background: var(--cream);
   border-radius: 10px;
   margin-bottom: 6px;
 }
-@media (max-width: 380px) {
-  .diary-meal-tabs { grid-template-columns: repeat(2,1fr); }
-  .dmt-btn { font-size: 10px; }
+@media (max-width: 360px) {
+  .dmt-btn { font-size: 10px; padding: 7px 2px; }
+  .dmt-btn .dmt-icon { font-size: 13px; }
 }
 
 /* ══════════════════════════════════════
@@ -2705,11 +2725,32 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         </div>
 
         <!-- Meal selector -->
-        <div class="diary-meal-tabs" style="margin-bottom:12px">
-          <button class="dmt-btn active" data-meal="colazione" onclick="setDiaryMeal('colazione',this)">🌅 Colazione</button>
-          <button class="dmt-btn" data-meal="pranzo"    onclick="setDiaryMeal('pranzo',this)">☀️ Pranzo</button>
-          <button class="dmt-btn" data-meal="cena"      onclick="setDiaryMeal('cena',this)">🌙 Cena</button>
-          <button class="dmt-btn" data-meal="spuntini"  onclick="setDiaryMeal('spuntini',this)">🍎 Spuntini</button>
+        <div class="diary-meal-tabs" style="margin-bottom:14px">
+          <!-- Row 1: pasti principali -->
+          <div class="dmt-row dmt-row-main">
+            <button class="dmt-btn active" data-meal="colazione" onclick="setDiaryMeal('colazione',this)">
+              <span class="dmt-icon">🌅</span>Colazione
+            </button>
+            <button class="dmt-btn" data-meal="pranzo" onclick="setDiaryMeal('pranzo',this)">
+              <span class="dmt-icon">☀️</span>Pranzo
+            </button>
+            <button class="dmt-btn" data-meal="cena" onclick="setDiaryMeal('cena',this)">
+              <span class="dmt-icon">🌙</span>Cena
+            </button>
+          </div>
+          <!-- Row 2: spuntini suddivisi -->
+          <div class="dmt-snack-label">🍎 Spuntini</div>
+          <div class="dmt-row dmt-row-snack">
+            <button class="dmt-btn" data-meal="spuntino_mat" onclick="setDiaryMeal('spuntino_mat',this)">
+              <span class="dmt-icon">🌤️</span>Mattutino
+            </button>
+            <button class="dmt-btn" data-meal="spuntino_pom" onclick="setDiaryMeal('spuntino_pom',this)">
+              <span class="dmt-icon">🌇</span>Pomeridiano
+            </button>
+            <button class="dmt-btn" data-meal="spuntino_ser" onclick="setDiaryMeal('spuntino_ser',this)">
+              <span class="dmt-icon">🌃</span>Serale
+            </button>
+          </div>
         </div>
         <input type="hidden" id="diary-meal-selector" value="colazione">
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end">
@@ -5073,6 +5114,17 @@ async function deleteFood(foodId) {
 // DIARY
 // ══════════════════════════════════
 function setDiaryToday() {
+  // Auto-select pasto in base all'ora corrente
+  const h = new Date().getHours();
+  let autoMeal = 'colazione';
+  if (h >= 6  && h < 9)  autoMeal = 'colazione';
+  else if (h >= 9  && h < 12) autoMeal = 'spuntino_mat';
+  else if (h >= 12 && h < 15) autoMeal = 'pranzo';
+  else if (h >= 15 && h < 19) autoMeal = 'spuntino_pom';
+  else if (h >= 19 && h < 22) autoMeal = 'cena';
+  else                         autoMeal = 'spuntino_ser';
+  const mealBtn = document.querySelector('.dmt-btn[data-meal="' + autoMeal + '"]');
+  setDiaryMeal(autoMeal, mealBtn);
   currentDiaryDate = todayStr();
   document.getElementById('diary-date').value = currentDiaryDate;
   setTimeout(updateDiaryDateLabel, 0);
@@ -5325,13 +5377,18 @@ function renderDiary() {
   }
 
   const MEALS = [
-    { key:'colazione', label:'🌅 Colazione', color:'#f97316' },
-    { key:'pranzo',    label:'☀️ Pranzo',    color:'#22c55e' },
-    { key:'cena',      label:'🌙 Cena',      color:'#3b82f6' },
-    { key:'spuntini',  label:'🍎 Spuntini',  color:'#a855f7' }
+    { key:'colazione',   label:'🌅 Colazione',           color:'#f97316' },
+    { key:'spuntino_mat',label:'🌤️ Spuntino Mattutino',  color:'#fb923c' },
+    { key:'pranzo',      label:'☀️ Pranzo',               color:'#22c55e' },
+    { key:'spuntino_pom',label:'🌇 Spuntino Pomeridiano', color:'#a855f7' },
+    { key:'cena',        label:'🌙 Cena',                 color:'#3b82f6' },
+    { key:'spuntino_ser',label:'🌃 Spuntino Serale',      color:'#6366f1' },
+    // retrocompatibilità con vecchie voci "spuntini"
+    { key:'spuntini',    label:'🍎 Spuntini',             color:'#a855f7' }
   ];
 
   // Entries senza meal → "colazione" default (retrocompat)
+  // "spuntini" legacy → rimane nel bucket spuntini per retrocompat
   const grouped = {};
   MEALS.forEach(m => grouped[m.key] = []);
   diaryEntries.forEach(e => {
@@ -5386,10 +5443,26 @@ function renderDiary() {
 
 function setDiaryMeal(meal, btn) {
   document.getElementById('diary-meal-selector').value = meal;
-  document.querySelectorAll('.dmt-btn').forEach(b => b.classList.remove('active'));
-  if (btn) btn.classList.add('active');
+  // Rimuovi tutte le classi active dai bottoni
+  document.querySelectorAll('.dmt-btn').forEach(b => {
+    b.classList.remove('active','active-snack-mat','active-snack-pom','active-snack-ser');
+  });
+  if (btn) {
+    const snackClass = {
+      spuntino_mat: 'active-snack-mat',
+      spuntino_pom: 'active-snack-pom',
+      spuntino_ser: 'active-snack-ser'
+    }[meal];
+    btn.classList.add(snackClass || 'active');
+  }
   // Aggiorna placeholder ricerca
-  const labels = {colazione:'Colazione',pranzo:'Pranzo',cena:'Cena',spuntini:'Spuntini'};
+  const labels = {
+    colazione:'Colazione', pranzo:'Pranzo', cena:'Cena',
+    spuntino_mat:'Spuntino Mattutino',
+    spuntino_pom:'Spuntino Pomeridiano',
+    spuntino_ser:'Spuntino Serale',
+    spuntini:'Spuntini'
+  };
   const inp = document.getElementById('diary-food-search');
   if (inp) inp.placeholder = 'Cerca per ' + (labels[meal]||meal) + '...';
 }
