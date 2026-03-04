@@ -782,41 +782,123 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   .target-edit-grid { grid-template-columns: 1fr 1fr; }
 }
 
-/* ── MOBILE: sidebar diventa bottom nav ── */
+/* ══════════════════════════════════
+   MOBILE BOTTOM NAV — nuova versione
+══════════════════════════════════ */
+/* La bottom-nav mobile è un elemento separato, nascosto su desktop */
+#mobile-bottom-nav {
+  display: none;
+}
+
 @media (max-width: 520px) {
-  .sidebar {
-    width: 100% !important;
-    height: 64px;
-    flex-direction: row;
+  /* Nascondi la sidebar desktop */
+  .sidebar { display: none !important; }
+
+  /* Mostra la bottom nav mobile */
+  #mobile-bottom-nav {
+    display: flex;
     position: fixed;
-    bottom: 0; left: 0; top: auto;
-    border-right: none;
-    border-top: 1.5px solid var(--border);
-    z-index: 200;
-    padding: 0;
-    overflow-x: auto;
-    overflow-y: hidden;
-    justify-content: space-around;
-    align-items: center;
-    gap: 0;
+    bottom: 0; left: 0; right: 0;
+    height: 70px;
+    background: var(--white);
+    border-top: 1px solid var(--border);
+    z-index: 500;
+    align-items: stretch;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.06);
   }
-  .sidebar .logo-wrap { display: none; }
-  .sidebar .sidebar-bottom {
+
+  /* I 5 bottoni: 2 + centro + 2 */
+  .mbn-btn {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 6px 4px 4px;
+    transition: all .15s;
+    position: relative;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mbn-btn svg {
+    width: 22px; height: 22px;
+    stroke: var(--muted);
+    fill: none;
+    stroke-width: 1.8;
+    transition: stroke .15s;
+    flex-shrink: 0;
+  }
+  .mbn-label {
+    font-family: var(--font-brand);
+    font-weight: 700;
+    font-size: 9px;
+    letter-spacing: 0.3px;
+    color: var(--muted);
+    transition: color .15s;
+    line-height: 1;
+  }
+  .mbn-btn.active svg    { stroke: var(--green); }
+  .mbn-btn.active .mbn-label { color: var(--green); }
+  .mbn-btn.active::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 50%;
+    transform: translateX(-50%);
+    width: 28px; height: 2.5px;
+    background: var(--green);
+    border-radius: 0 0 3px 3px;
+  }
+
+  /* Bottone centrale — il più importante */
+  .mbn-center-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+  }
+  .mbn-center-btn {
+    width: 58px; height: 58px;
+    border-radius: 18px;
+    background: var(--green);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 18px rgba(74,122,53,0.45);
+    transition: all .18s cubic-bezier(.34,1.56,.64,1);
+    position: absolute;
+    bottom: 8px;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .mbn-center-btn:active { transform: scale(0.92); }
+  .mbn-center-btn svg {
+    width: 26px; height: 26px;
+    stroke: #fff;
+    fill: none;
+    stroke-width: 2.2;
+  }
+
+  /* Badge notifica su rewards */
+  .mbn-badge {
+    position: absolute;
+    top: 6px; right: calc(50% - 18px);
+    width: 8px; height: 8px;
+    background: var(--orange);
+    border-radius: 50%;
+    border: 2px solid var(--white);
     display: none;
   }
-  .nav-btn {
-    flex-direction: column;
-    padding: 6px 10px;
-    gap: 2px;
-    min-width: 52px;
-    border-radius: 10px;
-    font-size: 9px;
-  }
-  .nav-btn svg { width: 20px; height: 20px; }
-  .nav-btn span { font-size: 8px; }
+  .mbn-badge.show { display: block; }
+
   .main {
     margin-left: 0 !important;
-    padding: 14px 12px 80px 12px;
+    padding: 14px 12px 90px 12px;
   }
   .page-header { flex-wrap: wrap; gap: 8px; }
   .macro-summary { grid-template-columns: 1fr 1fr; gap: 8px; }
@@ -825,7 +907,7 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   .target-edit-grid { grid-template-columns: 1fr 1fr; }
   .fab { display: none !important; }
   .fab-menu { display: none !important; }
-  .pts-toast { bottom: 78px; }
+  .pts-toast { bottom: 82px; }
   .card { padding: 16px; }
   h1 { font-size: 24px; }
   .modal-box { margin: 12px; padding: 20px; max-height: 85vh; overflow-y: auto; }
@@ -2305,6 +2387,45 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
     </div>
   </nav>
 
+  <!-- ══════════════════════════════════
+       MOBILE BOTTOM NAV (solo mobile)
+  ══════════════════════════════════ -->
+  <nav id="mobile-bottom-nav" role="navigation" aria-label="Navigazione principale">
+
+    <!-- 1. HOME -->
+    <button class="mbn-btn active" id="mbn-home" onclick="mbnGoPage('home')" aria-label="Home">
+      <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="mbn-label">Home</span>
+    </button>
+
+    <!-- 2. ALIMENTI + OBIETTIVI -->
+    <button class="mbn-btn" id="mbn-food" onclick="mbnGoPage('food')" aria-label="Alimenti e Obiettivi">
+      <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+      <span class="mbn-label">Alimenti</span>
+    </button>
+
+    <!-- 3. BOTTONE CENTRALE — Aggiungi alimento -->
+    <div class="mbn-center-wrap">
+      <button class="mbn-center-btn" id="mbn-add" onclick="mbnAddFood()" aria-label="Aggiungi alimento">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+
+    <!-- 4. REWARDS -->
+    <button class="mbn-btn" id="mbn-rewards" onclick="mbnGoPage('rewards')" aria-label="Rewards">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
+      <span class="mbn-badge" id="mbn-rewards-badge"></span>
+      <span class="mbn-label">Rewards</span>
+    </button>
+
+    <!-- 5. IMPOSTAZIONI -->
+    <button class="mbn-btn" id="mbn-settings" onclick="mbnGoPage('settings')" aria-label="Impostazioni">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span class="mbn-label">Impostaz.</span>
+    </button>
+
+  </nav>
+
   <main class="main" style="isolation:isolate">
 
     <!-- ═══ HOME PAGE ═══ -->
@@ -2555,6 +2676,21 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
     </div>
 
         <!-- ═══ DIARY + FOODS PAGE (unified) ═══ -->
+    <!-- ══ PAGINA ALIMENTI + OBIETTIVI (mobile tab 2) ══ -->
+    <div class="page" id="page-food-goals" style="display:none">
+      <!-- Sub-nav: Alimenti | Obiettivi -->
+      <div style="display:flex;background:var(--cream);border-radius:14px;padding:4px;gap:4px;margin-bottom:18px">
+        <button id="fg-tab-food" onclick="switchFoodGoalsTab('food')"
+          style="flex:1;padding:10px;border-radius:10px;border:none;font-family:var(--font-brand);font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;background:var(--white);color:var(--green);box-shadow:var(--shadow)">
+          🍽️ Alimenti
+        </button>
+        <button id="fg-tab-goals" onclick="switchFoodGoalsTab('goals')"
+          style="flex:1;padding:10px;border-radius:10px;border:none;font-family:var(--font-brand);font-weight:700;font-size:13px;cursor:pointer;transition:all .2s;background:transparent;color:var(--muted)">
+          🎯 Obiettivi
+        </button>
+      </div>
+    </div>
+
     <div class="page" id="page-diary">
 
       <!-- Internal tab bar — gerarchia Diario > Alimenti -->
@@ -4443,7 +4579,8 @@ let editingFoodId = null;
 function goPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('page-'+id).classList.add('active');
+  const pageEl = document.getElementById('page-'+id);
+  if (pageEl) pageEl.classList.add('active');
   const nb = document.getElementById('nav-'+id);
   if (nb) nb.classList.add('active');
   if (id === 'admin') loadAdminUsers();
@@ -4452,6 +4589,97 @@ function goPage(id) {
   if (id === 'home') { loadMacroWeekChart(); updateHomeDiarySummary(); }
   if (id === 'rewards') { renderPointsUI(); loadReferralData(); refreshLeagueGroup().then(()=>renderLeagueUI()).catch(()=>{}); }
   if (id === 'settings') { loadSettingsPage(); }
+  // Sync mobile bottom nav
+  _syncMobileNav(id);
+}
+
+// ──────────────────────────────────────────
+// MOBILE BOTTOM NAV
+// ──────────────────────────────────────────
+let _currentFoodGoalsTab = 'food';
+
+function _syncMobileNav(pageId) {
+  const map = { home:'home', diary:'food', 'food-goals':'food', goals:'food', rewards:'rewards', settings:'settings' };
+  const activeKey = map[pageId] || pageId;
+  document.querySelectorAll('.mbn-btn').forEach(b => b.classList.remove('active'));
+  const btn = document.getElementById('mbn-' + activeKey);
+  if (btn) btn.classList.add('active');
+}
+
+function mbnGoPage(key) {
+  if (key === 'home') {
+    goPage('home');
+  } else if (key === 'food') {
+    // Su mobile apriamo la pagina combinata Alimenti+Obiettivi
+    if (window.innerWidth <= 520) {
+      _openFoodGoalsPage();
+    } else {
+      goPage('diary');
+    }
+  } else if (key === 'rewards') {
+    goPage('rewards');
+  } else if (key === 'settings') {
+    goPage('settings');
+  }
+  _syncMobileNav(key === 'food' ? 'food-goals' : key);
+}
+
+function mbnAddFood() {
+  // Vai al diario e apri direttamente la tab ricerca alimento
+  if (window.innerWidth <= 520) {
+    _openFoodGoalsPage('food');
+    setTimeout(() => {
+      switchDiaryTab('foods');
+      const inp = document.getElementById('diary-food-search');
+      if (inp) { inp.focus(); inp.scrollIntoView({behavior:'smooth', block:'center'}); }
+    }, 120);
+  } else {
+    goPage('diary');
+    setTimeout(() => switchDiaryTab('foods'), 120);
+  }
+  // Animazione pulse sul bottone centrale
+  const btn = document.getElementById('mbn-add');
+  if (btn) {
+    btn.style.transform = 'scale(1.15)';
+    setTimeout(() => btn.style.transform = '', 200);
+  }
+}
+
+function _openFoodGoalsPage(tab) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  switchFoodGoalsTab(tab || _currentFoodGoalsTab);
+}
+
+function switchFoodGoalsTab(tab) {
+  _currentFoodGoalsTab = tab;
+  const tabFood  = document.getElementById('fg-tab-food');
+  const tabGoals = document.getElementById('fg-tab-goals');
+
+  // Stile tab attivo/inattivo
+  const activeStyle  = { bg:'var(--white)', color:'var(--green)', shadow:'var(--shadow)' };
+  const inactiveStyle= { bg:'transparent',  color:'var(--muted)', shadow:'none' };
+  const applyStyle = (el, s) => { if (!el) return; el.style.background = s.bg; el.style.color = s.color; el.style.boxShadow = s.shadow; };
+
+  if (tab === 'food') {
+    applyStyle(tabFood, activeStyle); applyStyle(tabGoals, inactiveStyle);
+    // Naviga al vero page-diary ma tieniti nella food-goals page come wrapper visivo
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const fgPage = document.getElementById('page-food-goals');
+    const diaryPage = document.getElementById('page-diary');
+    if (fgPage)   fgPage.classList.add('active');
+    if (diaryPage){ diaryPage.classList.add('active'); diaryPage.style.display = 'block'; }
+    setDiaryToday(); switchDiaryTab('diary');
+  } else {
+    applyStyle(tabGoals, activeStyle); applyStyle(tabFood, inactiveStyle);
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const fgPage = document.getElementById('page-food-goals');
+    const goalsPage = document.getElementById('page-goals');
+    if (fgPage)    fgPage.classList.add('active');
+    if (goalsPage){ goalsPage.classList.add('active'); goalsPage.style.display = 'block'; }
+    loadGoal(); renderRicette();
+  }
+  _syncMobileNav('food');
 }
 
 // ══════════════════════════════════
