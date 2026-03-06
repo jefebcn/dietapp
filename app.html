@@ -4577,7 +4577,9 @@ let editingFoodId = null;
 // NAVIGATION
 // ══════════════════════════════════
 function goPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  // Rimuove active E resetta inline style.display (impostato da switchFoodGoalsTab)
+  // altrimenti le pagine rimangono visibili nella home causando uno scroll infinito
+  document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = ''; });
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   const pageEl = document.getElementById('page-'+id);
   if (pageEl) pageEl.classList.add('active');
@@ -4625,7 +4627,50 @@ function mbnGoPage(key) {
 }
 
 function mbnAddFood() {
-  // Vai al diario e apri direttamente la tab ricerca alimento
+  // Mostra un action sheet con le opzioni: Diario, Ricette, Peso
+  const existing = document.getElementById('mbn-quick-sheet');
+  if (existing) { existing.remove(); return; }
+
+  const sheet = document.createElement('div');
+  sheet.id = 'mbn-quick-sheet';
+  sheet.style.cssText = `
+    position:fixed; bottom:72px; left:50%; transform:translateX(-50%);
+    background:var(--card); border-radius:20px; padding:12px 8px;
+    box-shadow:0 8px 32px rgba(0,0,0,0.18); z-index:9000;
+    display:flex; flex-direction:column; gap:6px; min-width:220px;
+    animation: fadeUp .2s ease;
+  `;
+  sheet.innerHTML = `
+    <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:2px;color:var(--muted);padding:4px 10px 2px;text-transform:uppercase">Aggiungi veloce</div>
+    <button onclick="mbnSheetDiary()" style="display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:14px;border:none;background:var(--green-bg);color:var(--green);font-family:var(--font-brand);font-weight:700;font-size:14px;cursor:pointer;text-align:left">
+      <span style="font-size:22px">🍽️</span> Aggiungi al diario
+    </button>
+    <button onclick="mbnSheetRicette()" style="display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:14px;border:none;background:var(--orange-bg);color:var(--orange);font-family:var(--font-brand);font-weight:700;font-size:14px;cursor:pointer;text-align:left">
+      <span style="font-size:22px">🥗</span> Ricette Fit
+    </button>
+    <button onclick="mbnSheetWeight()" style="display:flex;align-items:center;gap:12px;padding:13px 14px;border-radius:14px;border:none;background:var(--cream);color:var(--text);font-family:var(--font-brand);font-weight:700;font-size:14px;cursor:pointer;text-align:left">
+      <span style="font-size:22px">⚖️</span> Inserisci peso
+    </button>
+  `;
+  document.body.appendChild(sheet);
+
+  // Chiudi toccando fuori
+  setTimeout(() => {
+    const close = (e) => {
+      if (!sheet.contains(e.target) && e.target.id !== 'mbn-add') {
+        sheet.remove(); document.removeEventListener('click', close);
+      }
+    };
+    document.addEventListener('click', close);
+  }, 50);
+
+  // Animazione pulse sul bottone centrale
+  const btn = document.getElementById('mbn-add');
+  if (btn) { btn.style.transform = 'scale(1.15)'; setTimeout(() => btn.style.transform = '', 200); }
+}
+
+function mbnSheetDiary() {
+  const s = document.getElementById('mbn-quick-sheet'); if (s) s.remove();
   if (window.innerWidth <= 520) {
     _openFoodGoalsPage('food');
     setTimeout(() => {
@@ -4634,19 +4679,38 @@ function mbnAddFood() {
       if (inp) { inp.focus(); inp.scrollIntoView({behavior:'smooth', block:'center'}); }
     }, 120);
   } else {
-    goPage('diary');
-    setTimeout(() => switchDiaryTab('foods'), 120);
-  }
-  // Animazione pulse sul bottone centrale
-  const btn = document.getElementById('mbn-add');
-  if (btn) {
-    btn.style.transform = 'scale(1.15)';
-    setTimeout(() => btn.style.transform = '', 200);
+    goPage('diary'); setTimeout(() => switchDiaryTab('foods'), 120);
   }
 }
 
+function mbnSheetRicette() {
+  const s = document.getElementById('mbn-quick-sheet'); if (s) s.remove();
+  if (window.innerWidth <= 520) {
+    _openFoodGoalsPage('goals');
+    setTimeout(() => {
+      const grid = document.getElementById('ricette-grid');
+      if (grid) grid.scrollIntoView({behavior:'smooth', block:'start'});
+    }, 200);
+  } else {
+    goPage('goals');
+    setTimeout(() => {
+      const grid = document.getElementById('ricette-grid');
+      if (grid) grid.scrollIntoView({behavior:'smooth', block:'start'});
+    }, 200);
+  }
+}
+
+function mbnSheetWeight() {
+  const s = document.getElementById('mbn-quick-sheet'); if (s) s.remove();
+  goPage('home');
+  setTimeout(() => {
+    const inp = document.getElementById('weight-today');
+    if (inp) { inp.focus(); inp.scrollIntoView({behavior:'smooth', block:'center'}); }
+  }, 150);
+}
+
 function _openFoodGoalsPage(tab) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p => { p.classList.remove('active'); p.style.display = ''; });
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
   switchFoodGoalsTab(tab || _currentFoodGoalsTab);
 }
