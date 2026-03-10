@@ -1873,6 +1873,342 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 }
 
 /* ══════════════════════════════════════
+   HOME REDESIGN — Hero ring + widget row
+══════════════════════════════════════ */
+
+/* ── Hero Ring ── */
+.home-hero-ring-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 0 4px;
+  margin-bottom: 4px;
+}
+.home-hero-ring-svg-wrap {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  flex-shrink: 0;
+}
+.home-hero-ring-svg-wrap svg {
+  width: 100%;
+  height: 100%;
+}
+.home-hero-ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.home-hero-ring-icon {
+  font-size: 36px;
+  line-height: 1;
+  margin-bottom: 4px;
+  filter: drop-shadow(0 0 8px rgba(74,122,53,0.4));
+}
+.home-hero-ring-kcal {
+  font-family: var(--font-brand);
+  font-weight: 900;
+  font-size: 30px;
+  line-height: 1;
+  color: var(--text);
+  letter-spacing: -1px;
+}
+.home-hero-ring-sub {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: 1.5px;
+  margin-top: 2px;
+}
+.home-hero-ring-goal {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.home-hero-ring-goal b {
+  color: var(--green);
+  font-weight: 700;
+}
+
+/* ── Macro mini-pills row ── */
+.home-macro-mini-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.home-macro-mini-card {
+  background: var(--cream);
+  border-radius: 14px;
+  padding: 10px 8px;
+  text-align: center;
+  border: 1px solid var(--border);
+  transition: transform .12s;
+}
+.home-macro-mini-card:active { transform: scale(0.97); }
+.home-macro-mini-val {
+  font-family: var(--font-brand);
+  font-weight: 900;
+  font-size: 17px;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+.home-macro-mini-bar-wrap {
+  height: 4px;
+  border-radius: 3px;
+  background: var(--border);
+  overflow: hidden;
+  margin: 4px 0 3px;
+}
+.home-macro-mini-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.8s ease;
+}
+.home-macro-mini-lbl {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: .5px;
+}
+
+/* ── 3 widget row (Peso · Digiuno · Lega) ── */
+.home-widget-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.home-widget-card {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 12px 8px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 2px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform .12s, box-shadow .12s;
+  min-height: 82px;
+  justify-content: center;
+}
+.home-widget-card:active { transform: scale(0.97); }
+.home-widget-icon {
+  font-size: 20px;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+.home-widget-val {
+  font-family: var(--font-brand);
+  font-weight: 900;
+  font-size: 16px;
+  line-height: 1;
+  color: var(--text);
+}
+.home-widget-lbl {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--muted);
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+.home-widget-sub {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+}
+
+/* ── Quick actions strip (mobile: 4 in row) ── */
+.home-quick-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.home-qs-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 10px 4px;
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  cursor: pointer;
+  font-family: var(--font-brand);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text);
+  transition: all .15s;
+  box-shadow: var(--shadow);
+}
+.home-qs-btn .qs-icon { font-size: 18px; line-height: 1; }
+.home-qs-btn.qs-primary {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+/* ══════════════════════════════════════
+   PESO — storico per settimana (stile Garmin/Samsung)
+══════════════════════════════════════ */
+.wh-week-block {
+  margin-bottom: 20px;
+}
+.wh-week-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 6px;
+}
+.wh-week-label {
+  font-family: var(--font-brand);
+  font-weight: 800;
+  font-size: 12px;
+  color: var(--text);
+}
+.wh-week-avg {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--green);
+  font-weight: 700;
+}
+.wh-row {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 8px;
+}
+.wh-row:last-child { border-bottom: none; }
+.wh-row-date {
+  flex: 0 0 50px;
+}
+.wh-row-day {
+  font-family: var(--font-brand);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text);
+  line-height: 1;
+}
+.wh-row-date-sub {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  margin-top: 1px;
+}
+.wh-row-weight {
+  flex: 1;
+  font-family: var(--font-brand);
+  font-weight: 900;
+  font-size: 20px;
+  color: var(--text);
+}
+.wh-row-weight span {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--muted);
+}
+.wh-row-delta {
+  flex: 0 0 52px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+.wh-row-fat {
+  flex: 0 0 52px;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+}
+.wh-row-actions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 4px;
+}
+.wh-badge-today {
+  background: var(--green);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 6px;
+  letter-spacing: .5px;
+}
+
+/* Weight progress goal bar */
+.wh-goal-block {
+  background: var(--cream);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border);
+}
+.wh-goal-title {
+  font-family: var(--font-brand);
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: .5px;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.wh-goal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.wh-goal-stat {
+  text-align: center;
+}
+.wh-goal-stat-val {
+  font-family: var(--font-brand);
+  font-weight: 900;
+  font-size: 20px;
+  color: var(--text);
+}
+.wh-goal-stat-lbl {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--muted);
+  letter-spacing: .5px;
+  margin-top: 1px;
+}
+.wh-goal-bar-wrap {
+  height: 8px;
+  background: var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+.wh-goal-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), #86efac);
+  border-radius: 6px;
+  transition: width 1s ease;
+}
+
+/* ══════════════════════════════════════
    RICETTE — Card con foto thumbnail
 ══════════════════════════════════════ */
 #ricette-grid {
@@ -2431,7 +2767,7 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
     <!-- ═══ HOME PAGE ═══ -->
     <div class="page active" id="page-home" style="isolation:isolate">
 
-      <!-- ── HEADER HERO ── -->
+      <!-- ── HEADER ── -->
       <div class="home-hero-header">
         <div class="home-hero-left">
           <div id="home-avatar" class="home-avatar">NT</div>
@@ -2455,84 +2791,119 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       </div>
       <div id="weight-banner" style="display:none"></div>
 
-      <!-- ── QUICK ACTIONS ── -->
-      <div class="home-quick-actions">
-        <button class="home-qa-btn home-qa-primary" onclick="goPage('diary')">
-          <span style="font-size:20px">✏️</span>
+      <!-- ══════════════════════════════
+           HERO RING CENTRALE (kcal)
+      ══════════════════════════════ -->
+      <div class="card" style="margin-bottom:16px;text-align:center;padding:20px 16px 16px">
+        <!-- Ring grande -->
+        <div class="home-hero-ring-wrap">
+          <div class="home-hero-ring-svg-wrap">
+            <svg viewBox="0 0 120 120" id="home-macro-svg">
+              <!-- Traccia sfondo -->
+              <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" stroke-width="10"/>
+              <!-- Anello kcal principale -->
+              <circle cx="60" cy="60" r="50" fill="none" stroke="var(--green)" stroke-width="10"
+                stroke-dasharray="314.2" stroke-dashoffset="314.2" stroke-linecap="round"
+                transform="rotate(-90 60 60)" id="home-ring-kcal" style="transition:stroke-dashoffset 1.2s ease;filter:drop-shadow(0 0 6px rgba(74,122,53,.35))"/>
+            </svg>
+            <div class="home-hero-ring-center">
+              <div class="home-hero-ring-icon">🔥</div>
+              <div class="home-hero-ring-kcal" id="home-ring-kcal-val">0</div>
+              <div class="home-hero-ring-sub">KCAL</div>
+            </div>
+          </div>
+          <!-- Obiettivo + % sotto ring -->
+          <div class="home-hero-ring-goal" id="home-kcal-goal-row" style="display:none">
+            <span id="home-kcal-goal-pct" style="font-weight:700;color:var(--green)">0%</span>
+            <span>del tuo obiettivo —</span>
+            <b id="home-kcal-goal-target">—</b>
+          </div>
+          <!-- Link quick diary -->
+          <div id="home-today-entries" style="font-size:12px;color:var(--muted);margin-top:8px">
+            <a href="#" onclick="goPage('diary');return false;" style="color:var(--green);text-decoration:none;font-weight:600">+ Aggiungi alimento →</a>
+          </div>
+        </div>
+
+        <!-- Macro mini-cards row (Proteine · Carboidrati · Grassi) -->
+        <div class="home-macro-mini-row" id="home-macro-summary">
+          <div class="home-macro-mini-card">
+            <div class="home-macro-mini-val" id="hmp-prot-val" style="color:var(--orange)">0g</div>
+            <div class="home-macro-mini-bar-wrap">
+              <div class="home-macro-mini-bar-fill" id="hmp-prot-bar" style="background:var(--orange);width:0%"></div>
+            </div>
+            <div class="home-macro-mini-lbl">Proteine</div>
+          </div>
+          <div class="home-macro-mini-card">
+            <div class="home-macro-mini-val" id="hmp-carb-val" style="color:#3b82f6">0g</div>
+            <div class="home-macro-mini-bar-wrap">
+              <div class="home-macro-mini-bar-fill" id="hmp-carb-bar" style="background:#3b82f6;width:0%"></div>
+            </div>
+            <div class="home-macro-mini-lbl">Carboidrati</div>
+          </div>
+          <div class="home-macro-mini-card">
+            <div class="home-macro-mini-val" id="hmp-fat-val" style="color:#ca8a04">0g</div>
+            <div class="home-macro-mini-bar-wrap">
+              <div class="home-macro-mini-bar-fill" id="hmp-fat-bar" style="background:#ca8a04;width:0%"></div>
+            </div>
+            <div class="home-macro-mini-lbl">Grassi</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════
+           QUICK ACTIONS strip
+      ══════════════════════════════ -->
+      <div class="home-quick-strip">
+        <button class="home-qs-btn qs-primary" onclick="goPage('diary')">
+          <span class="qs-icon">✏️</span>
           <span>Log pasto</span>
         </button>
-        <button class="home-qa-btn" onclick="goPage('diary');setTimeout(()=>document.getElementById('barcode-tab-btn')?.click(),300)">
-          <span style="font-size:20px">📷</span>
+        <button class="home-qs-btn" onclick="goPage('diary');setTimeout(()=>document.getElementById('barcode-tab-btn')?.click(),300)">
+          <span class="qs-icon">📷</span>
           <span>Scanner</span>
         </button>
-        <button class="home-qa-btn" onclick="copyYesterdayDiary()">
-          <span style="font-size:20px">📅</span>
+        <button class="home-qs-btn" onclick="copyYesterdayDiary()">
+          <span class="qs-icon">📅</span>
           <span>Da ieri</span>
         </button>
-        <button class="home-qa-btn" onclick="toggleFasting()">
-          <span style="font-size:20px">⏱️</span>
+        <button class="home-qs-btn" onclick="toggleFasting()">
+          <span class="qs-icon">⏱️</span>
           <span id="qa-fasting-lbl">Digiuno</span>
         </button>
       </div>
 
-      <!-- ① RING MACRO + OGGI ── -->
-      <div class="card home-macro-card" style="margin-bottom:16px">
-        <div class="sec-header" style="margin-bottom:14px">
-          <h3>🍽️ Oggi</h3>
-          <button class="btn btn-ghost btn-sm" onclick="goPage('diary')">Diario →</button>
+      <!-- ══════════════════════════════
+           3 WIDGET ROW — Peso · Digiuno · NutriPoints
+      ══════════════════════════════ -->
+      <div class="home-widget-row">
+
+        <!-- Widget PESO -->
+        <div class="home-widget-card" onclick="document.querySelector('.home-accordion-btn')?.click();setTimeout(()=>document.getElementById('weight-today')?.focus(),200)">
+          <div class="home-widget-icon">⚖️</div>
+          <div class="home-widget-val" id="hw-weight-val">—</div>
+          <div class="home-widget-lbl">Peso kg</div>
+          <div class="home-widget-sub" id="hw-weight-delta" style="margin-top:2px"></div>
         </div>
 
-        <!-- Ring + 3 macro laterali -->
-        <div class="home-macro-ring-row" id="home-macro-summary">
-          <!-- SVG ring kcal -->
-          <div class="home-ring-wrap" id="home-ring-wrap">
-            <svg viewBox="0 0 100 100" width="110" height="110" id="home-macro-svg">
-              <circle cx="50" cy="50" r="40" fill="none" stroke="var(--border)" stroke-width="10"/>
-              <circle cx="50" cy="50" r="40" fill="none" stroke="var(--green)" stroke-width="10"
-                stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round"
-                transform="rotate(-90 50 50)" id="home-ring-kcal" style="transition:stroke-dashoffset 1s ease"/>
-            </svg>
-            <div class="home-ring-center">
-              <div class="home-ring-kcal" id="home-ring-kcal-val">0</div>
-              <div class="home-ring-lbl">kcal</div>
-            </div>
-          </div>
-          <!-- 3 macro pill -->
-          <div class="home-macro-pills">
-            <div class="home-macro-pill">
-              <div class="hmp-bar-bg"><div class="hmp-bar-fill" id="hmp-prot-bar" style="background:var(--orange);width:0%"></div></div>
-              <div class="hmp-val" id="hmp-prot-val" style="color:var(--orange)">0g</div>
-              <div class="hmp-lbl">Prot</div>
-            </div>
-            <div class="home-macro-pill">
-              <div class="hmp-bar-bg"><div class="hmp-bar-fill" id="hmp-carb-bar" style="background:#3b82f6;width:0%"></div></div>
-              <div class="hmp-val" id="hmp-carb-val" style="color:#3b82f6">0g</div>
-              <div class="hmp-lbl">Carb</div>
-            </div>
-            <div class="home-macro-pill">
-              <div class="hmp-bar-bg"><div class="hmp-bar-fill" id="hmp-fat-bar" style="background:#ca8a04;width:0%"></div></div>
-              <div class="hmp-val" id="hmp-fat-val" style="color:#ca8a04">0g</div>
-              <div class="hmp-lbl">Grassi</div>
-            </div>
-          </div>
+        <!-- Widget DIGIUNO -->
+        <div class="home-widget-card" onclick="toggleFasting()" id="home-fasting-widget">
+          <div class="home-widget-icon">⏱️</div>
+          <div class="home-widget-val" id="fasting-home-elapsed" style="font-size:13px;letter-spacing:.5px">00:00</div>
+          <div class="home-widget-lbl" id="fasting-home-goal-label">Digiuno</div>
+          <div class="home-widget-sub" id="fasting-home-label" style="color:#7c3aed;font-size:9px">Non attivo</div>
         </div>
 
-        <!-- Obiettivo kcal sotto ring -->
-        <div id="home-kcal-goal-row" style="display:none;margin-top:10px">
-          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px">
-            <span>Obiettivo kcal</span><span id="home-kcal-goal-pct">0%</span>
-          </div>
-          <div style="height:5px;border-radius:4px;background:var(--border);overflow:hidden">
-            <div id="home-kcal-goal-bar" style="height:100%;border-radius:4px;background:var(--green);width:0%;transition:width 1s ease"></div>
-          </div>
+        <!-- Widget NUTRIPOINTS -->
+        <div class="home-widget-card" onclick="goPage('rewards')" style="border-top:2px solid #ca8a04">
+          <div class="home-widget-icon">🪙</div>
+          <div class="home-widget-val" id="home-pts-total" style="color:#ca8a04">0</div>
+          <div class="home-widget-lbl">NutriPts</div>
+          <div class="home-widget-sub" id="home-points-badge">—</div>
         </div>
 
-        <div id="home-today-entries" style="font-size:13px;margin-top:12px;text-align:center;padding:4px 0">
-          <a href="#" onclick="goPage('diary');return false;" style="color:var(--green);text-decoration:none;font-weight:600">+ Aggiungi il primo alimento →</a>
-        </div>
       </div>
 
-      <!-- ② PESO compact ── -->
+      <!-- ② PESO input + stats ── -->
       <div class="card" style="margin-bottom:16px">
         <div class="sec-header" style="margin-bottom:10px">
           <h3>⚖️ Peso</h3>
@@ -2543,55 +2914,35 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
           <span style="color:var(--muted);font-family:var(--font-mono);font-size:16px">kg</span>
           <button class="btn btn-green" onclick="saveWeight()">Salva</button>
         </div>
-        <div style="margin-top:12px;display:flex;gap:12px;flex-wrap:wrap">
-          <div><div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;margin-bottom:2px">ULTIMO</div>
-            <div style="font-family:var(--font-brand);font-weight:900;font-size:22px;color:var(--green)" id="stat-last">—</div></div>
-          <div><div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;margin-bottom:2px">VARIAZIONE</div>
-            <div style="font-family:var(--font-brand);font-weight:800;font-size:20px" id="stat-delta">—</div></div>
-          <div><div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;margin-bottom:2px">MEDIA 7gg</div>
-            <div style="font-family:var(--font-brand);font-weight:900;font-size:22px" id="stat-weekly">—</div></div>
-          <div><div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.5px;margin-bottom:2px">MEDIA 30gg</div>
-            <div style="font-family:var(--font-brand);font-weight:900;font-size:22px" id="stat-monthly">—</div></div>
+        <div style="margin-top:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+          <div style="text-align:center;background:var(--cream);border-radius:10px;padding:8px 4px">
+            <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:1px;margin-bottom:3px">ULTIMO</div>
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:18px;color:var(--green)" id="stat-last">—</div>
+          </div>
+          <div style="text-align:center;background:var(--cream);border-radius:10px;padding:8px 4px">
+            <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:1px;margin-bottom:3px">VAR.</div>
+            <div style="font-family:var(--font-brand);font-weight:800;font-size:18px" id="stat-delta">—</div>
+          </div>
+          <div style="text-align:center;background:var(--cream);border-radius:10px;padding:8px 4px">
+            <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:1px;margin-bottom:3px">7gg</div>
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:18px" id="stat-weekly">—</div>
+          </div>
+          <div style="text-align:center;background:var(--cream);border-radius:10px;padding:8px 4px">
+            <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:1px;margin-bottom:3px">30gg</div>
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:18px" id="stat-monthly">—</div>
+          </div>
         </div>
       </div>
 
-      <!-- ③ DIGIUNO ── -->
-      <div style="margin-bottom:16px">
-        <div class="card" style="margin-bottom:0;padding:16px 14px" id="home-fasting-card">
-          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
-            <div style="font-weight:700;font-size:13px">⏱️ Digiuno</div>
-            <span id="fasting-home-label" style="font-size:10px;color:var(--muted);font-family:var(--font-mono)">Non attivo</span>
-          </div>
-          <div style="position:relative;display:flex;align-items:center;justify-content:center;height:104px">
-            <svg id="fasting-arc-svg" viewBox="0 0 120 68" width="144" height="82" style="position:absolute;top:0;left:50%;transform:translateX(-50%)">
-              <path d="M10,64 A54,54 0 0,1 110,64" fill="none" stroke="var(--border)" stroke-width="9" stroke-linecap="round"/>
-              <path id="fasting-arc-fill" d="M10,64 A54,54 0 0,1 110,64" fill="none" stroke="#7c3aed" stroke-width="9" stroke-linecap="round"
-                stroke-dasharray="170" stroke-dashoffset="170" style="transition:stroke-dashoffset 1s linear"/>
-            </svg>
-            <div style="position:relative;text-align:center;padding-top:30px">
-              <div id="fasting-home-elapsed" style="font-family:var(--font-brand);font-weight:900;font-size:17px;color:var(--text);letter-spacing:0.5px;line-height:1">00:00:00</div>
-              <div id="fasting-home-goal-label" style="font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:1.5px;margin-top:3px">TOCCA PER INIZIARE</div>
-            </div>
-          </div>
-          <button id="fasting-home-btn" onclick="toggleFasting()"
-            style="width:100%;margin-top:6px;padding:8px;border-radius:12px;border:1.5px solid #7c3aed30;background:#7c3aed12;color:#7c3aed;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--font-brand);transition:all .2s">
-            ▶ Inizia Digiuno
-          </button>
-        </div>
-      </div>
-
-      <!-- ④ NUTRIPOINTS ── -->
+      <!-- ④ NUTRIPOINTS full card ── -->
       <div class="card" style="margin-bottom:16px;border-top:3px solid #ca8a04" id="home-points-card">
         <div class="sec-header" style="margin-bottom:10px">
-          <div style="display:flex;align-items:center;gap:10px">
-            <h3>🪙 NutriPoints</h3>
-            <span id="home-points-badge" class="badge-chip bronze">🥉 Sprinter</span>
-          </div>
+          <h3>🪙 NutriPoints</h3>
           <button class="btn btn-ghost btn-sm" onclick="goPage('rewards')">Rewards →</button>
         </div>
         <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:8px">
           <div style="text-align:center">
-            <div style="font-family:var(--font-brand);font-weight:900;font-size:32px;color:#ca8a04" id="home-pts-total">0</div>
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:32px;color:#ca8a04" id="home-pts-total-full">0</div>
             <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">PUNTI TOTALI</div>
           </div>
           <div style="flex:1;min-width:0">
@@ -2609,27 +2960,28 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       <div class="card" style="margin-bottom:16px;border-top:3px solid #7c3aed" id="home-league-card">
         <div class="sec-header" style="margin-bottom:10px">
           <div style="display:flex;align-items:center;gap:10px">
-            <h3>🏆 Lega</h3>
+            <h3>🏆 Classifica</h3>
             <span id="home-league-tier-chip" class="badge-chip bronze" style="font-size:11px;padding:3px 10px">🌱 Rookie</span>
           </div>
-          <button class="btn btn-ghost btn-sm" onclick="goPage('rewards');setTimeout(()=>document.getElementById('league-full-section')?.scrollIntoView({behavior:'smooth'}),200)">Classifica →</button>
+          <button class="btn btn-ghost btn-sm" onclick="goPage('rewards');setTimeout(()=>document.getElementById('league-full-section')?.scrollIntoView({behavior:'smooth'}),200)">Vedi →</button>
         </div>
         <div id="home-league-username-bar" style="display:flex;align-items:center;gap:6px;margin-bottom:10px;padding:6px 10px;background:rgba(124,58,237,0.05);border-radius:8px;cursor:pointer" onclick="openLeagueUsernameModal(true)">
           <span style="font-size:12px">👤</span>
           <span id="home-league-username" style="font-family:var(--font-brand);font-weight:700;font-size:13px;color:#7c3aed">—</span>
           <span style="font-size:10px;color:var(--muted);margin-left:auto">✏️</span>
         </div>
-        <div style="display:flex;align-items:center;gap:16px;margin-bottom:10px">
-          <div style="text-align:center">
-            <div style="font-family:var(--font-brand);font-weight:900;font-size:32px;color:#7c3aed" id="home-league-rank">—</div>
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">POSIZIONE</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+          <div style="text-align:center;background:rgba(124,58,237,0.06);border-radius:12px;padding:10px 4px">
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:26px;color:#7c3aed" id="home-league-rank">—</div>
+            <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted)">POSIZIONE</div>
           </div>
-          <div style="text-align:center">
-            <div style="font-family:var(--font-brand);font-weight:900;font-size:24px;color:var(--green)" id="home-league-week-pts">0</div>
-            <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">PTS SETTIMANA</div>
+          <div style="text-align:center;background:rgba(74,122,53,0.06);border-radius:12px;padding:10px 4px">
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:26px;color:var(--green)" id="home-league-week-pts">0</div>
+            <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted)">PTS SETT.</div>
           </div>
-          <div style="flex:1;text-align:right">
-            <div id="home-league-status-tag" style="font-family:var(--font-mono);font-size:10px;color:var(--muted)"></div>
+          <div style="text-align:center;background:var(--cream);border-radius:12px;padding:10px 4px">
+            <div id="home-league-status-tag" style="font-family:var(--font-brand);font-weight:900;font-size:14px;color:var(--text)">—</div>
+            <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted)">STATUS</div>
           </div>
         </div>
         <div id="home-league-mini-board" style="font-size:13px;color:var(--muted);text-align:center">Caricamento classifica...</div>
@@ -5236,7 +5588,22 @@ function updateChart() {
 // ══════════════════════════════════
 // WEIGHT HISTORY RENDER
 // ══════════════════════════════════
+
+function _syncWeightWidget() {
+  if (!weightData || !weightData.length) return;
+  const sorted = [...weightData].sort((a,b)=>b.date.localeCompare(a.date));
+  const hw = document.getElementById('hw-weight-val');
+  const hd = document.getElementById('hw-weight-delta');
+  if (hw) hw.textContent = sorted[0].weight;
+  if (hd && sorted.length >= 2) {
+    const d = (sorted[0].weight - sorted[1].weight).toFixed(1);
+    const v = parseFloat(d);
+    hd.textContent = (v > 0 ? '+' : '') + d + ' kg';
+    hd.style.color = v > 0 ? 'var(--danger)' : v < 0 ? 'var(--green)' : 'var(--muted)';
+  } else if (hd) { hd.textContent = ''; }
+}
 function renderWeightHistory() {
+  _syncWeightWidget();
   const el = document.getElementById('weight-history');
   const cnt = document.getElementById('hist-count');
   if (!el) return;
@@ -5245,47 +5612,132 @@ function renderWeightHistory() {
     el.innerHTML = '<div class="empty"><div class="empty-icon">⚖️</div><p>Nessuna misurazione ancora.</p></div>';
     return;
   }
+
+  // Ordina per data decrescente
   const sorted = [...weightData].sort((a,b)=>b.date.localeCompare(a.date));
-  el.innerHTML = sorted.map((w,i)=>{
-    const isToday = w.date===todayStr();
-    const prev = sorted[i+1];
-    let deltaHtml='';
-    if(prev){
-      const d=(w.weight-prev.weight).toFixed(1);
-      const v=parseFloat(d);
-      const col=v>0?'var(--danger)':v<0?'var(--green)':'var(--muted)';
-      const arrow=v>0?'↑':v<0?'↓':'→';
-      deltaHtml=`<span style="font-family:var(--font-mono);font-size:11px;color:${col}">${v>0?'+':''}${d} kg ${arrow}</span>`;
-    }
-    return `
-    <div class="hist-row">
-      <div style="flex:1">
-        <div style="display:flex;align-items:center;gap:7px">
-          <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">${formatDate(w.date)}</span>
-          ${isToday?'<span class="badge badge-green" style="font-size:9px;padding:2px 7px">OGGI</span>':''}
+
+  // Raggruppa per settimana (lun–dom)
+  function getWeekKey(dateStr) {
+    const d = new Date(dateStr + 'T00:00:00');
+    const day = d.getDay(); // 0=dom,1=lun,...
+    const diff = (day === 0) ? -6 : 1 - day; // offset verso il lunedì
+    const mon = new Date(d); mon.setDate(d.getDate() + diff);
+    return mon.toISOString().slice(0,10);
+  }
+  function weekLabel(monStr) {
+    const mon = new Date(monStr + 'T00:00:00');
+    const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+    const today = new Date(); today.setHours(0,0,0,0);
+    const thisMonStr = getWeekKey(todayStr());
+    if (monStr === thisMonStr) return 'Questa settimana';
+    const lastMon = new Date(today); lastMon.setDate(today.getDate() - 7);
+    const lastMonStr = getWeekKey(lastMon.toISOString().slice(0,10));
+    if (monStr === lastMonStr) return 'Settimana scorsa';
+    const opts = {day:'numeric', month:'short'};
+    return mon.toLocaleDateString('it-IT',opts)+' – '+sun.toLocaleDateString('it-IT',opts);
+  }
+  const DAY_NAMES = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+
+  const weeks = {};
+  sorted.forEach(w => {
+    const wk = getWeekKey(w.date);
+    if (!weeks[wk]) weeks[wk] = [];
+    weeks[wk].push(w);
+  });
+
+  // Goal progress block (se presente)
+  let goalHtml = '';
+  const goalWeight = userTargets?.goal_weight;
+  if (goalWeight && sorted.length) {
+    const current = sorted[0].weight;
+    const start   = sorted[sorted.length-1].weight;
+    const total   = Math.abs(start - goalWeight);
+    const done    = Math.abs(start - current);
+    const pct     = total > 0 ? Math.min(100, Math.round(done/total*100)) : 0;
+    const diff    = (current - goalWeight).toFixed(1);
+    const col     = parseFloat(diff) <= 0 ? 'var(--green)' : 'var(--danger)';
+    goalHtml = `<div class="wh-goal-block">
+      <div class="wh-goal-title">📍 Progressi verso l'obiettivo</div>
+      <div class="wh-goal-row">
+        <div class="wh-goal-stat">
+          <div class="wh-goal-stat-val">${sorted[0].weight}</div>
+          <div class="wh-goal-stat-lbl">ATTUALE kg</div>
         </div>
-        <div id="wd-${w.date}" style="display:flex;align-items:center;gap:10px;margin-top:2px">
-          <span style="font-family:var(--font-brand);font-weight:900;font-size:20px;color:var(--green)">${w.weight} kg</span>
-          ${deltaHtml}
+        <div style="flex:1;padding:0 12px">
+          <div class="wh-goal-bar-wrap">
+            <div class="wh-goal-bar-fill" style="width:${pct}%"></div>
+          </div>
+          <div style="text-align:center;font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:4px">${pct}%</div>
         </div>
-        <div id="we-row-${w.date}" style="display:none;align-items:center;gap:8px;margin-top:4px">
-          <input type="number" id="we-${w.date}" value="${w.weight}" step="0.1" style="width:100px;font-family:var(--font-brand);font-weight:700;font-size:16px;text-align:center"
+        <div class="wh-goal-stat">
+          <div class="wh-goal-stat-val" style="color:var(--green)">${goalWeight}</div>
+          <div class="wh-goal-stat-lbl">OBIETTIVO kg</div>
+        </div>
+      </div>
+      <div style="text-align:center;font-family:var(--font-mono);font-size:11px;color:${col}">
+        ${parseFloat(diff) > 0 ? 'Ancora ' + diff + ' kg da perdere' : parseFloat(diff) < 0 ? 'Obiettivo superato di ' + Math.abs(diff) + ' kg 🎉' : '🎯 Obiettivo raggiunto!'}
+      </div>
+    </div>`;
+  }
+
+  // Build weeks HTML
+  const weeksHtml = Object.keys(weeks).sort((a,b)=>b.localeCompare(a)).map(wk => {
+    const rows = weeks[wk];
+    const avg  = (rows.reduce((s,r)=>s+r.weight,0)/rows.length).toFixed(1);
+    const rowsHtml = rows.map((w, i) => {
+      const isToday = w.date === todayStr();
+      const allSorted = sorted;
+      const allIdx = allSorted.findIndex(x=>x.date===w.date);
+      const prev = allSorted[allIdx+1];
+      let deltaHtml='', deltaColor='var(--muted)';
+      if (prev) {
+        const d = (w.weight - prev.weight).toFixed(1);
+        const v = parseFloat(d);
+        deltaColor = v > 0 ? 'var(--danger)' : v < 0 ? 'var(--green)' : 'var(--muted)';
+        const arrow = v > 0 ? '↑' : v < 0 ? '↓' : '→';
+        deltaHtml = `${v>0?'+':''}${d}`;
+      }
+      const dateObj = new Date(w.date+'T00:00:00');
+      const dayName = DAY_NAMES[dateObj.getDay()];
+      const dateLabel = dateObj.toLocaleDateString('it-IT',{day:'numeric',month:'short'});
+      const fatHtml = w.fat_pct ? `${w.fat_pct}% gr.` : '--';
+      return `
+      <div class="wh-row" id="wd-wrap-${w.date}">
+        <div class="wh-row-date">
+          <div class="wh-row-day">${isToday ? '<span class="wh-badge-today">OGGI</span>' : dayName}</div>
+          <div class="wh-row-date-sub">${dateLabel}</div>
+        </div>
+        <div class="wh-row-weight" id="wd-${w.date}">${w.weight}<span> kg</span></div>
+        <div class="wh-row-delta" style="color:${deltaColor}">${deltaHtml||'—'}</div>
+        <div class="wh-row-fat">${fatHtml}</div>
+        <div class="wh-row-actions">
+          <button class="btn btn-ghost btn-icon btn-sm" title="Modifica" onclick="startWeightEdit('${w.date}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn btn-danger btn-icon btn-sm" title="Elimina" onclick="deleteWeight('${w.date}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+        <!-- inline edit row -->
+        <div id="we-row-${w.date}" style="display:none;align-items:center;gap:6px;position:absolute;left:0;right:0;padding:4px 16px;background:var(--card)">
+          <input type="number" id="we-${w.date}" value="${w.weight}" step="0.1" style="width:90px;font-family:var(--font-brand);font-weight:700;font-size:16px;text-align:center"
             onkeydown="if(event.key==='Enter')confirmWeightEdit('${w.date}');if(event.key==='Escape')cancelWeightEdit('${w.date}')">
           <span style="color:var(--muted);font-size:13px">kg</span>
           <button class="btn btn-green btn-sm" onclick="confirmWeightEdit('${w.date}')">✓</button>
           <button class="btn btn-ghost btn-sm" onclick="cancelWeightEdit('${w.date}')">✕</button>
         </div>
+      </div>`;
+    }).join('');
+    return `<div class="wh-week-block">
+      <div class="wh-week-header">
+        <div class="wh-week-label">${weekLabel(wk)}</div>
+        <div class="wh-week-avg">${avg} kg in media</div>
       </div>
-      <div style="display:flex;gap:6px">
-        <button class="btn btn-ghost btn-icon btn-sm" title="Modifica" onclick="startWeightEdit('${w.date}')">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        </button>
-        <button class="btn btn-danger btn-icon btn-sm" title="Elimina" onclick="deleteWeight('${w.date}')">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-        </button>
-      </div>
+      ${rowsHtml}
     </div>`;
   }).join('');
+
+  el.innerHTML = goalHtml + weeksHtml;
 }
 
 // ══════════════════════════════════
@@ -5773,7 +6225,7 @@ async function updateHomeDiarySummary() {
   const tFat   = userTargets?.fat || 60;
 
   const kcalPct = Math.min(t.kcal / tKcal, 1);
-  const circ = 251.2;
+  const circ = 314.2; // r=50 => 2*PI*50
   const ringEl = document.getElementById('home-ring-kcal');
   if (ringEl) ringEl.style.strokeDashoffset = circ - (circ * kcalPct);
   const kcalValEl = document.getElementById('home-ring-kcal-val');
@@ -5787,16 +6239,16 @@ async function updateHomeDiarySummary() {
   const carbBar = document.getElementById('hmp-carb-bar'); if (carbBar) carbBar.style.width = Math.min(t.carbs/tCarbs*100,100)+'%';
   const fatBar  = document.getElementById('hmp-fat-bar');  if (fatBar)  fatBar.style.width  = Math.min(t.fat/tFat*100,100)+'%';
 
-  // Barra obiettivo kcal sotto ring
+  // Goal row sotto ring
   const goalRow = document.getElementById('home-kcal-goal-row');
-  const goalBar = document.getElementById('home-kcal-goal-bar');
   const goalPct = document.getElementById('home-kcal-goal-pct');
+  const goalTarget = document.getElementById('home-kcal-goal-target');
   if (goalRow && tKcal > 0) {
-    goalRow.style.display = 'block';
+    goalRow.style.display = 'flex';
     const pct = Math.round(kcalPct * 100);
-    if (goalBar) goalBar.style.width = pct + '%';
     if (goalPct) goalPct.textContent = pct + '%';
-    if (goalBar) goalBar.style.background = pct >= 100 ? 'var(--orange)' : 'var(--green)';
+    if (goalTarget) goalTarget.textContent = tKcal + ' kcal';
+    if (goalPct) goalPct.style.color = pct >= 100 ? 'var(--orange)' : 'var(--green)';
   }
   const te = document.getElementById('home-today-entries');
   if (te) if (entries.length) {
@@ -7006,6 +7458,7 @@ function renderPointsUI() {
 
   // Home widget
   const homeTotal = document.getElementById('home-pts-total');
+  { const f=document.getElementById('home-pts-total-full'); if(f) f.textContent = document.getElementById('home-pts-total')?.textContent||'0'; }
   if (homeTotal) homeTotal.textContent = pts;
   const homeBadge = document.getElementById('home-points-badge');
   if (homeBadge) { homeBadge.textContent = badge.icon + ' ' + badge.name; homeBadge.className = 'badge-chip ' + badge.cls; }
