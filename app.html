@@ -1873,339 +1873,358 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 }
 
 /* ══════════════════════════════════════
-   HOME REDESIGN — Hero ring + widget row
+   PAGINA PESO DEDICATA
 ══════════════════════════════════════ */
 
-/* ── Hero Ring ── */
-.home-hero-ring-wrap {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 8px 0 4px;
-  margin-bottom: 4px;
-}
-.home-hero-ring-svg-wrap {
+/* Grafico hero */
+.wp-chart-hero {
+  background: #0d0d0d;
+  border-radius: 20px;
+  padding: 16px 14px 12px;
+  margin-bottom: 14px;
   position: relative;
-  width: 180px;
-  height: 180px;
-  flex-shrink: 0;
+  overflow: hidden;
 }
-.home-hero-ring-svg-wrap svg {
-  width: 100%;
-  height: 100%;
-}
-.home-hero-ring-center {
+.wp-chart-hero::before {
+  content: '';
   position: absolute;
   inset: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  background: radial-gradient(ellipse at 50% 0%, rgba(74,122,53,.18) 0%, transparent 70%);
   pointer-events: none;
 }
-.home-hero-ring-icon {
-  font-size: 36px;
-  line-height: 1;
-  margin-bottom: 4px;
-  filter: drop-shadow(0 0 8px rgba(74,122,53,0.4));
-}
-.home-hero-ring-kcal {
-  font-family: var(--font-brand);
-  font-weight: 900;
-  font-size: 30px;
-  line-height: 1;
-  color: var(--text);
-  letter-spacing: -1px;
-}
-.home-hero-ring-sub {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--muted);
-  letter-spacing: 1.5px;
-  margin-top: 2px;
-}
-.home-hero-ring-goal {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--muted);
-  margin-top: 10px;
+.wp-chart-header {
   display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
-.home-hero-ring-goal b {
-  color: var(--green);
-  font-weight: 700;
-}
-
-/* ── Macro mini-pills row ── */
-.home-macro-mini-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 16px;
-}
-.home-macro-mini-card {
-  background: var(--cream);
-  border-radius: 14px;
-  padding: 10px 8px;
-  text-align: center;
-  border: 1px solid var(--border);
-  transition: transform .12s;
-}
-.home-macro-mini-card:active { transform: scale(0.97); }
-.home-macro-mini-val {
+.wp-chart-title {
   font-family: var(--font-brand);
   font-weight: 900;
-  font-size: 17px;
-  line-height: 1;
-  margin-bottom: 3px;
+  font-size: 14px;
+  color: #fff;
+  letter-spacing: .3px;
 }
-.home-macro-mini-bar-wrap {
-  height: 4px;
-  border-radius: 3px;
-  background: var(--border);
-  overflow: hidden;
-  margin: 4px 0 3px;
-}
-.home-macro-mini-bar-fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 0.8s ease;
-}
-.home-macro-mini-lbl {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--muted);
-  letter-spacing: .5px;
-}
-
-/* ── 3 widget row (Peso · Digiuno · Lega) ── */
-.home-widget-row {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
-  margin-bottom: 16px;
-}
-.home-widget-card {
-  background: var(--card);
-  border: 1.5px solid var(--border);
-  border-radius: 16px;
-  padding: 12px 8px 10px;
+.wp-range-pills {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  gap: 2px;
-  box-shadow: var(--shadow);
-  cursor: pointer;
-  transition: transform .12s, box-shadow .12s;
-  min-height: 82px;
-  justify-content: center;
-}
-.home-widget-card:active { transform: scale(0.97); }
-.home-widget-icon {
-  font-size: 20px;
-  line-height: 1;
-  margin-bottom: 3px;
-}
-.home-widget-val {
-  font-family: var(--font-brand);
-  font-weight: 900;
-  font-size: 16px;
-  line-height: 1;
-  color: var(--text);
-}
-.home-widget-lbl {
-  font-family: var(--font-mono);
-  font-size: 8px;
-  color: var(--muted);
-  letter-spacing: .8px;
-  text-transform: uppercase;
-  margin-top: 1px;
-}
-.home-widget-sub {
-  font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--muted);
-}
-
-/* ── Quick actions strip (mobile: 4 in row) ── */
-.home-quick-strip {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-  margin-bottom: 16px;
-}
-.home-qs-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
   gap: 4px;
-  padding: 10px 4px;
-  border-radius: 14px;
-  border: 1.5px solid var(--border);
-  background: var(--card);
-  cursor: pointer;
-  font-family: var(--font-brand);
-  font-size: 10px;
-  font-weight: 700;
-  color: var(--text);
-  transition: all .15s;
-  box-shadow: var(--shadow);
 }
-.home-qs-btn .qs-icon { font-size: 18px; line-height: 1; }
-.home-qs-btn.qs-primary {
+.wp-range-pill {
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(255,255,255,.15);
+  background: transparent;
+  color: rgba(255,255,255,.5);
+  font-family: var(--font-mono);
+  font-size: 10px;
+  cursor: pointer;
+  transition: all .15s;
+}
+.wp-range-pill.active {
   background: var(--green);
   border-color: var(--green);
   color: #fff;
 }
-
-/* ══════════════════════════════════════
-   PESO — storico per settimana (stile Garmin/Samsung)
-══════════════════════════════════════ */
-.wh-week-block {
-  margin-bottom: 20px;
+.wp-chart-canvas-wrap {
+  height: 180px;
+  position: relative;
 }
-.wh-week-header {
+
+/* Stat row sotto grafico */
+.wp-stat-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+.wp-stat {
+  text-align: center;
+}
+.wp-stat-val {
+  font-family: var(--font-brand);
+  font-weight: 900;
+  font-size: 18px;
+  line-height: 1;
+  color: #fff;
+}
+.wp-stat-lbl {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: rgba(255,255,255,.4);
+  letter-spacing: 1px;
+  margin-top: 3px;
+  text-transform: uppercase;
+}
+
+/* STATUS NEON CARD */
+.wp-status-card {
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 14px;
+  position: relative;
+  overflow: hidden;
+  transition: all .3s;
+}
+.wp-status-card.green  { background:#001a06; border:1.5px solid #00ff5533; }
+.wp-status-card.yellow { background:#1a1200; border:1.5px solid #ffee0033; }
+.wp-status-card.red    { background:#1a0003; border:1.5px solid #ff003333; }
+.wp-status-card.neutral{ background:var(--cream); border:1.5px solid var(--border); }
+
+.wp-status-glow {
+  position: absolute;
+  top: -30px; left: 50%;
+  transform: translateX(-50%);
+  width: 200px; height: 80px;
+  border-radius: 50%;
+  filter: blur(30px);
+  opacity: .4;
+  pointer-events: none;
+}
+.wp-status-card.green  .wp-status-glow { background: #00ff55; }
+.wp-status-card.yellow .wp-status-glow { background: #ffee00; }
+.wp-status-card.red    .wp-status-glow { background: #ff0033; }
+
+.wp-status-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.wp-status-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  animation: wp-pulse 2s infinite;
+}
+.wp-status-card.green  .wp-status-dot { background:#00ff55; box-shadow:0 0 8px #00ff55; }
+.wp-status-card.yellow .wp-status-dot { background:#ffee00; box-shadow:0 0 8px #ffee00; }
+.wp-status-card.red    .wp-status-dot { background:#ff3355; box-shadow:0 0 8px #ff3355; }
+.wp-status-card.neutral .wp-status-dot { background:var(--muted); }
+
+@keyframes wp-pulse {
+  0%,100% { opacity:1; transform:scale(1); }
+  50%      { opacity:.5; transform:scale(1.3); }
+}
+.wp-status-label {
+  font-family: var(--font-brand);
+  font-weight: 900;
+  font-size: 15px;
+}
+.wp-status-card.green  .wp-status-label { color:#00ff55; }
+.wp-status-card.yellow .wp-status-label { color:#ffee00; }
+.wp-status-card.red    .wp-status-label { color:#ff3355; }
+.wp-status-card.neutral .wp-status-label { color:var(--muted); }
+
+.wp-status-msg {
+  font-size: 13px;
+  line-height: 1.55;
+  margin-bottom: 12px;
+}
+.wp-status-card.green  .wp-status-msg { color:rgba(255,255,255,.75); }
+.wp-status-card.yellow .wp-status-msg { color:rgba(255,255,255,.75); }
+.wp-status-card.red    .wp-status-msg { color:rgba(255,255,255,.75); }
+.wp-status-card.neutral .wp-status-msg { color:var(--muted); }
+
+/* Consigli tag pills */
+.wp-tips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.wp-tip-pill {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-family: var(--font-brand);
+  font-weight: 700;
+  font-size: 11px;
+  cursor: pointer;
+}
+.wp-status-card.green  .wp-tip-pill { background:rgba(0,255,85,.12); color:#00ff55; border:1px solid rgba(0,255,85,.25); }
+.wp-status-card.yellow .wp-tip-pill { background:rgba(255,238,0,.12); color:#ffe500; border:1px solid rgba(255,238,0,.25); }
+.wp-status-card.red    .wp-tip-pill { background:rgba(255,51,85,.12); color:#ff3355; border:1px solid rgba(255,51,85,.25); }
+.wp-status-card.neutral .wp-tip-pill { background:var(--cream); color:var(--muted); border:1px solid var(--border); }
+
+/* Trend barra orizzontale */
+.wp-trend-bar-wrap {
+  height: 8px;
+  background: rgba(255,255,255,.1);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 12px 0 6px;
+}
+.wp-trend-bar {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 1s ease;
+}
+
+/* Obiettivo row */
+.wp-goal-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(255,255,255,.07);
+  margin-top: 8px;
+}
+.wp-goal-val {
+  font-family: var(--font-brand);
+  font-weight: 900;
+  font-size: 26px;
+}
+.wp-goal-sub {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(255,255,255,.4);
+  letter-spacing: .8px;
+}
+.wp-goal-remain {
+  margin-left: auto;
+  text-align: right;
+}
+.wp-goal-remain-val {
+  font-family: var(--font-brand);
+  font-weight: 900;
+  font-size: 18px;
+}
+.wp-goal-remain-lbl {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: rgba(255,255,255,.4);
+  letter-spacing: .5px;
+}
+
+/* Input peso su pagina dedicata */
+.wp-input-card {
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 20px;
+  padding: 14px;
+  margin-bottom: 14px;
+}
+.wp-input-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.wp-input-row input {
+  flex: 1;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1.5px solid var(--border);
+  background: var(--cream);
+  font-family: var(--font-brand);
+  font-weight: 700;
+  font-size: 18px;
+  color: var(--text);
+  text-align: center;
+}
+.wp-input-row .wp-unit {
+  font-family: var(--font-mono);
+  font-size: 15px;
+  color: var(--muted);
+}
+
+/* Storico settimanale */
+.wp-hist-section { margin-bottom: 14px; }
+.wp-hist-title {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 6px 0 8px;
-  border-bottom: 1px solid var(--border);
-  margin-bottom: 6px;
+  margin-bottom: 8px;
 }
-.wh-week-label {
+.wp-hist-title h3 {
   font-family: var(--font-brand);
   font-weight: 800;
-  font-size: 12px;
+  font-size: 14px;
   color: var(--text);
 }
-.wh-week-avg {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--green);
-  font-weight: 700;
-}
-.wh-row {
+.wp-week-block { margin-bottom: 16px; }
+.wp-week-hdr {
   display: flex;
   align-items: center;
-  padding: 8px 0;
+  justify-content: space-between;
+  padding: 6px 0 6px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+.wp-week-lbl {
+  font-family: var(--font-brand);
+  font-weight: 800;
+  font-size: 11px;
+  color: var(--text);
+  letter-spacing: .3px;
+}
+.wp-week-avg {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+.wp-row {
+  display: flex;
+  align-items: center;
+  padding: 9px 0;
   border-bottom: 1px solid var(--border);
   gap: 8px;
 }
-.wh-row:last-child { border-bottom: none; }
-.wh-row-date {
-  flex: 0 0 50px;
+.wp-row:last-child { border-bottom:none; }
+.wp-row-day {
+  flex: 0 0 44px;
 }
-.wh-row-day {
+.wp-row-day-name {
   font-family: var(--font-brand);
   font-weight: 700;
   font-size: 13px;
-  color: var(--text);
   line-height: 1;
 }
-.wh-row-date-sub {
+.wp-row-day-date {
   font-family: var(--font-mono);
   font-size: 9px;
   color: var(--muted);
   margin-top: 1px;
 }
-.wh-row-weight {
+.wp-row-weight {
   flex: 1;
   font-family: var(--font-brand);
   font-weight: 900;
   font-size: 20px;
   color: var(--text);
 }
-.wh-row-weight span {
-  font-size: 13px;
+.wp-row-weight span {
+  font-size: 12px;
   font-weight: 400;
   color: var(--muted);
 }
-.wh-row-delta {
+.wp-row-delta {
   flex: 0 0 52px;
   text-align: right;
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 700;
 }
-.wh-row-fat {
-  flex: 0 0 52px;
+.wp-row-fat {
+  flex: 0 0 48px;
   text-align: right;
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--muted);
 }
-.wh-row-actions {
+.wp-row-acts {
   flex: 0 0 auto;
   display: flex;
   gap: 4px;
 }
-.wh-badge-today {
+.wp-today-badge {
   background: var(--green);
   color: #fff;
-  font-family: var(--font-mono);
   font-size: 8px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 6px;
-  letter-spacing: .5px;
-}
-
-/* Weight progress goal bar */
-.wh-goal-block {
-  background: var(--cream);
-  border-radius: 14px;
-  padding: 14px;
-  margin-bottom: 16px;
-  border: 1px solid var(--border);
-}
-.wh-goal-title {
-  font-family: var(--font-brand);
-  font-weight: 800;
-  font-size: 12px;
-  letter-spacing: .5px;
-  color: var(--muted);
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-.wh-goal-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-.wh-goal-stat {
-  text-align: center;
-}
-.wh-goal-stat-val {
-  font-family: var(--font-brand);
-  font-weight: 900;
-  font-size: 20px;
-  color: var(--text);
-}
-.wh-goal-stat-lbl {
   font-family: var(--font-mono);
-  font-size: 9px;
-  color: var(--muted);
-  letter-spacing: .5px;
-  margin-top: 1px;
-}
-.wh-goal-bar-wrap {
-  height: 8px;
-  background: var(--border);
-  border-radius: 6px;
-  overflow: hidden;
-  margin-top: 4px;
-}
-.wh-goal-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--green), #86efac);
-  border-radius: 6px;
-  transition: width 1s ease;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 5px;
+  letter-spacing: .4px;
 }
 
 /* ══════════════════════════════════════
@@ -2393,7 +2412,62 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 
 /* ══════════════════════════════════════
    GOAL PAGE — Visual progress
+*/
+
+/* ══════════════════════════════════════
+   WEIGHT SECTION — Neon Banner + Ring
 ══════════════════════════════════════ */
+.weight-neon-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  border-radius: 16px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+  transition: all .3s;
+}
+.wnb-green  { background: rgba(34,197,94,0.10);  border: 1.5px solid rgba(34,197,94,0.45); box-shadow: 0 0 20px rgba(34,197,94,0.20), inset 0 0 14px rgba(34,197,94,0.07); }
+.wnb-orange { background: rgba(249,115,22,0.10); border: 1.5px solid rgba(249,115,22,0.45); box-shadow: 0 0 20px rgba(249,115,22,0.20), inset 0 0 14px rgba(249,115,22,0.07); }
+.wnb-red    { background: rgba(239,68,68,0.10);  border: 1.5px solid rgba(239,68,68,0.45);  box-shadow: 0 0 20px rgba(239,68,68,0.20),  inset 0 0 14px rgba(239,68,68,0.07); }
+.wnb-gold   { background: rgba(202,138,4,0.10);  border: 1.5px solid rgba(202,138,4,0.50);  box-shadow: 0 0 24px rgba(202,138,4,0.28),  inset 0 0 14px rgba(202,138,4,0.08); }
+.wnb-neutral{ background: var(--cream);           border: 1.5px solid var(--border); box-shadow:none; }
+.wnb-icon { font-size: 28px; flex-shrink: 0; }
+.wnb-body { flex: 1; min-width: 0; }
+.wnb-title { font-family: var(--font-brand); font-weight: 900; font-size: 14px; line-height: 1.2; letter-spacing: -.2px; }
+.wnb-green  .wnb-title { color: #15803d; }
+.wnb-orange .wnb-title { color: #c2410c; }
+.wnb-red    .wnb-title { color: #b91c1c; }
+.wnb-gold   .wnb-title { color: #92400e; }
+.wnb-neutral .wnb-title { color: var(--text); }
+.wnb-sub { font-family: var(--font-mono); font-size: 10.5px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+.wnb-tip { font-size: 11px; margin-top: 5px; padding: 5px 8px; border-radius: 8px; background: rgba(0,0,0,0.05); color: var(--text); font-family: var(--font-mono); line-height: 1.4; }
+.wgt-ring-row { display:flex; align-items:center; gap:14px; padding:14px 0 10px; border-bottom:1px solid var(--border); margin-bottom:12px; }
+.wgt-ring-svg-wrap { position:relative; width:90px; height:90px; flex-shrink:0; }
+.wgt-ring-center-text { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+.wgt-ring-pct { font-family:var(--font-brand); font-weight:900; font-size:18px; line-height:1; color:var(--text); }
+.wgt-ring-lbl { font-family:var(--font-mono); font-size:8.5px; color:var(--muted); letter-spacing:.8px; margin-top:2px; }
+.wgt-goal-details { flex:1; }
+.wgt-goal-from-to { display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+.wgt-kgval { font-family:var(--font-brand); font-weight:900; font-size:20px; color:var(--text); min-width:50px; }
+.wgt-kglbl { font-family:var(--font-mono); font-size:9px; color:var(--muted); letter-spacing:1px; margin-top:2px; }
+.wgt-arrow { font-size:16px; color:var(--muted); }
+.wgt-progress-track { height:8px; background:var(--cream); border-radius:6px; overflow:hidden; }
+.wgt-progress-fill { height:100%; border-radius:6px; transition:width 1s ease; background:var(--green); }
+.wgt-remaining { font-family:var(--font-mono); font-size:10px; color:var(--muted); margin-top:5px; }
+.wgt-stats-grid { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:8px; margin-bottom:14px; }
+.wgt-stat { background:var(--cream); border-radius:12px; padding:8px 6px; text-align:center; }
+.wgt-stat-val { font-family:var(--font-brand); font-weight:900; font-size:15px; line-height:1.1; color:var(--text); }
+.wgt-stat-lbl { font-family:var(--font-mono); font-size:8px; color:var(--muted); letter-spacing:.8px; margin-top:3px; text-transform:uppercase; }
+.wgt-suggestion { display:none; align-items:flex-start; gap:10px; padding:11px 12px; border-radius:12px; background:rgba(59,130,246,0.07); border:1.5px solid rgba(59,130,246,0.25); margin-top:12px; }
+.wgt-suggestion.show { display:flex; }
+.wgt-sug-icon { font-size:20px; flex-shrink:0; }
+.wgt-sug-text { font-size:12px; color:var(--text); line-height:1.5; font-family:var(--font-mono); }
+.wgt-sug-text strong { color:#2563eb; font-family:var(--font-brand); }
+.ring-emoji-pulse { animation:ringPulse .6s ease; }
+@keyframes ringPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.4)} }
+/*══════════════════════════════════════ */
 .goal-empty-card {
   display: flex;
   flex-direction: column;
@@ -2689,6 +2763,10 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       <span>HOME</span>
     </button>
+    <button class="nav-btn" id="nav-peso" onclick="goPage('peso')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M12 6v6l4 2"/></svg>
+      <span>PESO</span>
+    </button>
     <button class="nav-btn" id="nav-diary" onclick="goPage('diary')">
       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="16" y2="14"/><line x1="8" y1="18" x2="12" y2="18"/></svg>
       <span>DIARIO</span>
@@ -2734,10 +2812,10 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       <span class="mbn-label">Home</span>
     </button>
 
-    <!-- 2. ALIMENTI + OBIETTIVI -->
-    <button class="mbn-btn" id="mbn-food" onclick="mbnGoPage('food')" aria-label="Alimenti e Obiettivi">
-      <svg viewBox="0 0 24 24"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
-      <span class="mbn-label">Alimenti</span>
+    <!-- 2. PESO -->
+    <button class="mbn-btn" id="mbn-peso" onclick="mbnGoPage('peso')" aria-label="Peso">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="14" rx="3"/><path d="M8 7V5a4 4 0 018 0v2"/><line x1="12" y1="12" x2="12" y2="16"/><circle cx="12" cy="11" r="1" fill="currentColor"/></svg>
+      <span class="mbn-label">Peso</span>
     </button>
 
     <!-- 3. BOTTONE CENTRALE — Aggiungi alimento -->
@@ -2767,7 +2845,7 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
     <!-- ═══ HOME PAGE ═══ -->
     <div class="page active" id="page-home" style="isolation:isolate">
 
-      <!-- ── HEADER ── -->
+      <!-- ── HEADER HERO ── -->
       <div class="home-hero-header">
         <div class="home-hero-left">
           <div id="home-avatar" class="home-avatar">NT</div>
@@ -2791,158 +2869,210 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       </div>
       <div id="weight-banner" style="display:none"></div>
 
-      <!-- ══════════════════════════════
-           HERO RING CENTRALE (kcal)
-      ══════════════════════════════ -->
-      <div class="card" style="margin-bottom:16px;text-align:center;padding:20px 16px 16px">
-        <!-- Ring grande -->
-        <div class="home-hero-ring-wrap">
-          <div class="home-hero-ring-svg-wrap">
-            <svg viewBox="0 0 120 120" id="home-macro-svg">
-              <!-- Traccia sfondo -->
-              <circle cx="60" cy="60" r="50" fill="none" stroke="var(--border)" stroke-width="10"/>
-              <!-- Anello kcal principale -->
-              <circle cx="60" cy="60" r="50" fill="none" stroke="var(--green)" stroke-width="10"
-                stroke-dasharray="314.2" stroke-dashoffset="314.2" stroke-linecap="round"
-                transform="rotate(-90 60 60)" id="home-ring-kcal" style="transition:stroke-dashoffset 1.2s ease;filter:drop-shadow(0 0 6px rgba(74,122,53,.35))"/>
-            </svg>
-            <div class="home-hero-ring-center">
-              <div class="home-hero-ring-icon">🔥</div>
-              <div class="home-hero-ring-kcal" id="home-ring-kcal-val">0</div>
-              <div class="home-hero-ring-sub">KCAL</div>
-            </div>
-          </div>
-          <!-- Obiettivo + % sotto ring -->
-          <div class="home-hero-ring-goal" id="home-kcal-goal-row" style="display:none">
-            <span id="home-kcal-goal-pct" style="font-weight:700;color:var(--green)">0%</span>
-            <span>del tuo obiettivo —</span>
-            <b id="home-kcal-goal-target">—</b>
-          </div>
-          <!-- Link quick diary -->
-          <div id="home-today-entries" style="font-size:12px;color:var(--muted);margin-top:8px">
-            <a href="#" onclick="goPage('diary');return false;" style="color:var(--green);text-decoration:none;font-weight:600">+ Aggiungi alimento →</a>
-          </div>
-        </div>
-
-        <!-- Macro mini-cards row (Proteine · Carboidrati · Grassi) -->
-        <div class="home-macro-mini-row" id="home-macro-summary">
-          <div class="home-macro-mini-card">
-            <div class="home-macro-mini-val" id="hmp-prot-val" style="color:var(--orange)">0g</div>
-            <div class="home-macro-mini-bar-wrap">
-              <div class="home-macro-mini-bar-fill" id="hmp-prot-bar" style="background:var(--orange);width:0%"></div>
-            </div>
-            <div class="home-macro-mini-lbl">Proteine</div>
-          </div>
-          <div class="home-macro-mini-card">
-            <div class="home-macro-mini-val" id="hmp-carb-val" style="color:#3b82f6">0g</div>
-            <div class="home-macro-mini-bar-wrap">
-              <div class="home-macro-mini-bar-fill" id="hmp-carb-bar" style="background:#3b82f6;width:0%"></div>
-            </div>
-            <div class="home-macro-mini-lbl">Carboidrati</div>
-          </div>
-          <div class="home-macro-mini-card">
-            <div class="home-macro-mini-val" id="hmp-fat-val" style="color:#ca8a04">0g</div>
-            <div class="home-macro-mini-bar-wrap">
-              <div class="home-macro-mini-bar-fill" id="hmp-fat-bar" style="background:#ca8a04;width:0%"></div>
-            </div>
-            <div class="home-macro-mini-lbl">Grassi</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ══════════════════════════════
-           QUICK ACTIONS strip
-      ══════════════════════════════ -->
-      <div class="home-quick-strip">
-        <button class="home-qs-btn qs-primary" onclick="goPage('diary')">
-          <span class="qs-icon">✏️</span>
+      <!-- ── QUICK ACTIONS ── -->
+      <div class="home-quick-actions">
+        <button class="home-qa-btn home-qa-primary" onclick="goPage('diary')">
+          <span style="font-size:20px">✏️</span>
           <span>Log pasto</span>
         </button>
-        <button class="home-qs-btn" onclick="goPage('diary');setTimeout(()=>document.getElementById('barcode-tab-btn')?.click(),300)">
-          <span class="qs-icon">📷</span>
+        <button class="home-qa-btn" onclick="goPage('diary');setTimeout(()=>document.getElementById('barcode-tab-btn')?.click(),300)">
+          <span style="font-size:20px">📷</span>
           <span>Scanner</span>
         </button>
-        <button class="home-qs-btn" onclick="copyYesterdayDiary()">
-          <span class="qs-icon">📅</span>
+        <button class="home-qa-btn" onclick="copyYesterdayDiary()">
+          <span style="font-size:20px">📅</span>
           <span>Da ieri</span>
         </button>
-        <button class="home-qs-btn" onclick="toggleFasting()">
-          <span class="qs-icon">⏱️</span>
+        <button class="home-qa-btn" onclick="toggleFasting()">
+          <span style="font-size:20px">⏱️</span>
           <span id="qa-fasting-lbl">Digiuno</span>
         </button>
       </div>
 
-      <!-- ══════════════════════════════
-           3 WIDGET ROW — Peso · Digiuno · NutriPoints
-      ══════════════════════════════ -->
-      <div class="home-widget-row">
-
-        <!-- Widget PESO -->
-        <div class="home-widget-card" onclick="document.querySelector('.home-accordion-btn')?.click();setTimeout(()=>document.getElementById('weight-today')?.focus(),200)">
-          <div class="home-widget-icon">⚖️</div>
-          <div class="home-widget-val" id="hw-weight-val">—</div>
-          <div class="home-widget-lbl">Peso kg</div>
-          <div class="home-widget-sub" id="hw-weight-delta" style="margin-top:2px"></div>
+      <!-- ① RING MACRO + OGGI ── -->
+      <div class="card home-macro-card" style="margin-bottom:16px">
+        <div class="sec-header" style="margin-bottom:14px">
+          <h3>🍽️ Oggi</h3>
+          <button class="btn btn-ghost btn-sm" onclick="goPage('diary')">Diario →</button>
         </div>
 
-        <!-- Widget DIGIUNO -->
-        <div class="home-widget-card" onclick="toggleFasting()" id="home-fasting-widget">
-          <div class="home-widget-icon">⏱️</div>
-          <div class="home-widget-val" id="fasting-home-elapsed" style="font-size:13px;letter-spacing:.5px">00:00</div>
-          <div class="home-widget-lbl" id="fasting-home-goal-label">Digiuno</div>
-          <div class="home-widget-sub" id="fasting-home-label" style="color:#7c3aed;font-size:9px">Non attivo</div>
+        <!-- Ring + 3 macro laterali -->
+        <div class="home-macro-ring-row" id="home-macro-summary">
+          <!-- SVG ring kcal -->
+          <div class="home-ring-wrap" id="home-ring-wrap">
+            <svg viewBox="0 0 100 100" width="110" height="110" id="home-macro-svg">
+              <circle cx="50" cy="50" r="40" fill="none" stroke="var(--border)" stroke-width="10"/>
+              <circle cx="50" cy="50" r="40" fill="none" stroke="var(--green)" stroke-width="10"
+                stroke-dasharray="251.2" stroke-dashoffset="251.2" stroke-linecap="round"
+                transform="rotate(-90 50 50)" id="home-ring-kcal" style="transition:stroke-dashoffset 1s ease"/>
+            </svg>
+            <div class="home-ring-center">
+              <div class="home-ring-kcal" id="home-ring-kcal-val">0</div>
+              <div class="home-ring-lbl">kcal</div>
+            </div>
+          </div>
+          <!-- 3 macro pill -->
+          <div class="home-macro-pills">
+            <div class="home-macro-pill">
+              <div class="hmp-bar-bg"><div class="hmp-bar-fill" id="hmp-prot-bar" style="background:var(--orange);width:0%"></div></div>
+              <div class="hmp-val" id="hmp-prot-val" style="color:var(--orange)">0g</div>
+              <div class="hmp-lbl">Prot</div>
+            </div>
+            <div class="home-macro-pill">
+              <div class="hmp-bar-bg"><div class="hmp-bar-fill" id="hmp-carb-bar" style="background:#3b82f6;width:0%"></div></div>
+              <div class="hmp-val" id="hmp-carb-val" style="color:#3b82f6">0g</div>
+              <div class="hmp-lbl">Carb</div>
+            </div>
+            <div class="home-macro-pill">
+              <div class="hmp-bar-bg"><div class="hmp-bar-fill" id="hmp-fat-bar" style="background:#ca8a04;width:0%"></div></div>
+              <div class="hmp-val" id="hmp-fat-val" style="color:#ca8a04">0g</div>
+              <div class="hmp-lbl">Grassi</div>
+            </div>
+          </div>
         </div>
 
-        <!-- Widget NUTRIPOINTS -->
-        <div class="home-widget-card" onclick="goPage('rewards')" style="border-top:2px solid #ca8a04">
-          <div class="home-widget-icon">🪙</div>
-          <div class="home-widget-val" id="home-pts-total" style="color:#ca8a04">0</div>
-          <div class="home-widget-lbl">NutriPts</div>
-          <div class="home-widget-sub" id="home-points-badge">—</div>
+        <!-- Obiettivo kcal sotto ring -->
+        <div id="home-kcal-goal-row" style="display:none;margin-top:10px">
+          <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px">
+            <span>Obiettivo kcal</span><span id="home-kcal-goal-pct">0%</span>
+          </div>
+          <div style="height:5px;border-radius:4px;background:var(--border);overflow:hidden">
+            <div id="home-kcal-goal-bar" style="height:100%;border-radius:4px;background:var(--green);width:0%;transition:width 1s ease"></div>
+          </div>
         </div>
 
+        <div id="home-today-entries" style="font-size:13px;margin-top:12px;text-align:center;padding:4px 0">
+          <a href="#" onclick="goPage('diary');return false;" style="color:var(--green);text-decoration:none;font-weight:600">+ Aggiungi il primo alimento →</a>
+        </div>
       </div>
 
-      <!-- ② PESO input + stats ── -->
-      <div class="card" style="margin-bottom:16px">
-        <div class="sec-header" style="margin-bottom:10px">
-          <h3>⚖️ Peso</h3>
-          <div id="weight-streak" style="font-family:var(--font-mono);font-size:12px;color:var(--muted)"></div>
+      <!-- ② PESO — sezione dedicata con neon banner ── -->
+      <div class="card" style="margin-bottom:16px;padding:16px 14px" id="weight-main-card">
+
+        <!-- Header -->
+        <div class="sec-header" style="margin-bottom:12px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <h3>⚖️ Peso</h3>
+            <span id="weight-streak" style="font-family:var(--font-mono);font-size:11px;color:var(--muted)"></span>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="goPage('goals')" style="font-size:11px">Obiettivo →</button>
         </div>
+
+        <!-- NEON STATUS BANNER -->
+        <div class="weight-neon-banner wnb-neutral" id="weight-neon-banner">
+          <div class="wnb-icon" id="wnb-icon">⚖️</div>
+          <div class="wnb-body">
+            <div class="wnb-title" id="wnb-title">Inizia a tracciare il tuo peso</div>
+            <div class="wnb-sub" id="wnb-sub">Registra il primo peso per vedere i tuoi progressi</div>
+            <div class="wnb-tip" id="wnb-tip" style="display:none"></div>
+          </div>
+        </div>
+
+        <!-- RING PROGRESSO VERSO OBIETTIVO (se impostato) -->
+        <div class="wgt-ring-row" id="wgt-ring-row" style="display:none">
+          <div class="wgt-ring-svg-wrap">
+            <svg viewBox="0 0 90 90" width="90" height="90">
+              <circle cx="45" cy="45" r="36" fill="none" stroke="var(--border)" stroke-width="8"/>
+              <circle cx="45" cy="45" r="36" fill="none" stroke="var(--green)" stroke-width="8"
+                stroke-linecap="round" stroke-dasharray="226.2" stroke-dashoffset="226.2"
+                transform="rotate(-90 45 45)" id="wgt-goal-ring" style="transition:stroke-dashoffset 1s ease"/>
+            </svg>
+            <div class="wgt-ring-center-text">
+              <div class="wgt-ring-pct" id="wgt-ring-pct">0%</div>
+              <div class="wgt-ring-lbl">FATTO</div>
+            </div>
+          </div>
+          <div class="wgt-goal-details">
+            <div class="wgt-goal-from-to">
+              <div>
+                <div class="wgt-kgval" id="wgt-current-kg">—</div>
+                <div class="wgt-kglbl">ATTUALE</div>
+              </div>
+              <div class="wgt-arrow">→</div>
+              <div>
+                <div class="wgt-kgval" style="color:var(--green)" id="wgt-goal-kg">—</div>
+                <div class="wgt-kglbl">OBIETTIVO</div>
+              </div>
+            </div>
+            <div class="wgt-progress-track">
+              <div class="wgt-progress-fill" id="wgt-progress-fill" style="width:0%"></div>
+            </div>
+            <div class="wgt-remaining" id="wgt-remaining"></div>
+          </div>
+        </div>
+
+        <!-- STATS 4-CELLE -->
+        <div class="wgt-stats-grid">
+          <div class="wgt-stat">
+            <div class="wgt-stat-val" id="stat-last">—</div>
+            <div class="wgt-stat-lbl">Ultimo</div>
+          </div>
+          <div class="wgt-stat">
+            <div class="wgt-stat-val" id="stat-delta">—</div>
+            <div class="wgt-stat-lbl">Var.</div>
+          </div>
+          <div class="wgt-stat">
+            <div class="wgt-stat-val" id="stat-weekly">—</div>
+            <div class="wgt-stat-lbl">Med. 7gg</div>
+          </div>
+          <div class="wgt-stat">
+            <div class="wgt-stat-val" id="stat-monthly">—</div>
+            <div class="wgt-stat-lbl">Med. 30gg</div>
+          </div>
+        </div>
+
+        <!-- INPUT PESO -->
         <div class="weight-input-row">
           <input type="number" id="weight-today" placeholder="75.0" step="0.1" min="20" max="300">
           <span style="color:var(--muted);font-family:var(--font-mono);font-size:16px">kg</span>
           <button class="btn btn-green" onclick="saveWeight()">Salva</button>
         </div>
-        <div style="margin-top:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
-          <div style="text-align:center;background:var(--cream);border-radius:10px;padding:8px 4px">
-            <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:1px;margin-bottom:3px">ULTIMO</div>
-            <div style="font-family:var(--font-brand);font-weight:900;font-size:18px;color:var(--green)" id="stat-last">—</div>
+
+        <!-- SUGGERIMENTO PIANO (condizionale) -->
+        <div class="wgt-suggestion" id="wgt-suggestion">
+          <div class="wgt-sug-icon" id="wgt-sug-icon">💡</div>
+          <div class="wgt-sug-text" id="wgt-sug-text"></div>
+        </div>
+
+      </div>
+
+      <!-- ③ DIGIUNO ── -->
+      <div style="margin-bottom:16px">
+        <div class="card" style="margin-bottom:0;padding:16px 14px" id="home-fasting-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+            <div style="font-weight:700;font-size:13px">⏱️ Digiuno</div>
+            <span id="fasting-home-label" style="font-size:10px;color:var(--muted);font-family:var(--font-mono)">Non attivo</span>
           </div>
-          <div style="text-align:center;background:var(--cream);border-radius:10px;padding:8px 4px">
-            <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:1px;margin-bottom:3px">VAR.</div>
-            <div style="font-family:var(--font-brand);font-weight:800;font-size:18px" id="stat-delta">—</div>
+          <div style="position:relative;display:flex;align-items:center;justify-content:center;height:104px">
+            <svg id="fasting-arc-svg" viewBox="0 0 120 68" width="144" height="82" style="position:absolute;top:0;left:50%;transform:translateX(-50%)">
+              <path d="M10,64 A54,54 0 0,1 110,64" fill="none" stroke="var(--border)" stroke-width="9" stroke-linecap="round"/>
+              <path id="fasting-arc-fill" d="M10,64 A54,54 0 0,1 110,64" fill="none" stroke="#7c3aed" stroke-width="9" stroke-linecap="round"
+                stroke-dasharray="170" stroke-dashoffset="170" style="transition:stroke-dashoffset 1s linear"/>
+            </svg>
+            <div style="position:relative;text-align:center;padding-top:30px">
+              <div id="fasting-home-elapsed" style="font-family:var(--font-brand);font-weight:900;font-size:17px;color:var(--text);letter-spacing:0.5px;line-height:1">00:00:00</div>
+              <div id="fasting-home-goal-label" style="font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:1.5px;margin-top:3px">TOCCA PER INIZIARE</div>
+            </div>
           </div>
-          <div style="text-align:center;background:var(--cream);border-radius:10px;padding:8px 4px">
-            <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:1px;margin-bottom:3px">7gg</div>
-            <div style="font-family:var(--font-brand);font-weight:900;font-size:18px" id="stat-weekly">—</div>
-          </div>
-          <div style="text-align:center;background:var(--cream);border-radius:10px;padding:8px 4px">
-            <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);letter-spacing:1px;margin-bottom:3px">30gg</div>
-            <div style="font-family:var(--font-brand);font-weight:900;font-size:18px" id="stat-monthly">—</div>
-          </div>
+          <button id="fasting-home-btn" onclick="toggleFasting()"
+            style="width:100%;margin-top:6px;padding:8px;border-radius:12px;border:1.5px solid #7c3aed30;background:#7c3aed12;color:#7c3aed;font-weight:700;font-size:12px;cursor:pointer;font-family:var(--font-brand);transition:all .2s">
+            ▶ Inizia Digiuno
+          </button>
         </div>
       </div>
 
-      <!-- ④ NUTRIPOINTS full card ── -->
+      <!-- ④ NUTRIPOINTS ── -->
       <div class="card" style="margin-bottom:16px;border-top:3px solid #ca8a04" id="home-points-card">
         <div class="sec-header" style="margin-bottom:10px">
-          <h3>🪙 NutriPoints</h3>
+          <div style="display:flex;align-items:center;gap:10px">
+            <h3>🪙 NutriPoints</h3>
+            <span id="home-points-badge" class="badge-chip bronze">🥉 Sprinter</span>
+          </div>
           <button class="btn btn-ghost btn-sm" onclick="goPage('rewards')">Rewards →</button>
         </div>
         <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:8px">
           <div style="text-align:center">
-            <div style="font-family:var(--font-brand);font-weight:900;font-size:32px;color:#ca8a04" id="home-pts-total-full">0</div>
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:32px;color:#ca8a04" id="home-pts-total">0</div>
             <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">PUNTI TOTALI</div>
           </div>
           <div style="flex:1;min-width:0">
@@ -2960,28 +3090,27 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       <div class="card" style="margin-bottom:16px;border-top:3px solid #7c3aed" id="home-league-card">
         <div class="sec-header" style="margin-bottom:10px">
           <div style="display:flex;align-items:center;gap:10px">
-            <h3>🏆 Classifica</h3>
+            <h3>🏆 Lega</h3>
             <span id="home-league-tier-chip" class="badge-chip bronze" style="font-size:11px;padding:3px 10px">🌱 Rookie</span>
           </div>
-          <button class="btn btn-ghost btn-sm" onclick="goPage('rewards');setTimeout(()=>document.getElementById('league-full-section')?.scrollIntoView({behavior:'smooth'}),200)">Vedi →</button>
+          <button class="btn btn-ghost btn-sm" onclick="goPage('rewards');setTimeout(()=>document.getElementById('league-full-section')?.scrollIntoView({behavior:'smooth'}),200)">Classifica →</button>
         </div>
         <div id="home-league-username-bar" style="display:flex;align-items:center;gap:6px;margin-bottom:10px;padding:6px 10px;background:rgba(124,58,237,0.05);border-radius:8px;cursor:pointer" onclick="openLeagueUsernameModal(true)">
           <span style="font-size:12px">👤</span>
           <span id="home-league-username" style="font-family:var(--font-brand);font-weight:700;font-size:13px;color:#7c3aed">—</span>
           <span style="font-size:10px;color:var(--muted);margin-left:auto">✏️</span>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
-          <div style="text-align:center;background:rgba(124,58,237,0.06);border-radius:12px;padding:10px 4px">
-            <div style="font-family:var(--font-brand);font-weight:900;font-size:26px;color:#7c3aed" id="home-league-rank">—</div>
-            <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted)">POSIZIONE</div>
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:10px">
+          <div style="text-align:center">
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:32px;color:#7c3aed" id="home-league-rank">—</div>
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">POSIZIONE</div>
           </div>
-          <div style="text-align:center;background:rgba(74,122,53,0.06);border-radius:12px;padding:10px 4px">
-            <div style="font-family:var(--font-brand);font-weight:900;font-size:26px;color:var(--green)" id="home-league-week-pts">0</div>
-            <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted)">PTS SETT.</div>
+          <div style="text-align:center">
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:24px;color:var(--green)" id="home-league-week-pts">0</div>
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">PTS SETTIMANA</div>
           </div>
-          <div style="text-align:center;background:var(--cream);border-radius:12px;padding:10px 4px">
-            <div id="home-league-status-tag" style="font-family:var(--font-brand);font-weight:900;font-size:14px;color:var(--text)">—</div>
-            <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted)">STATUS</div>
+          <div style="flex:1;text-align:right">
+            <div id="home-league-status-tag" style="font-family:var(--font-mono);font-size:10px;color:var(--muted)"></div>
           </div>
         </div>
         <div id="home-league-mini-board" style="font-size:13px;color:var(--muted);text-align:center">Caricamento classifica...</div>
@@ -3041,6 +3170,133 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
           🎯 Obiettivi
         </button>
       </div>
+    </div>
+
+    <!-- ═══ PAGINA PESO DEDICATA ═══ -->
+    <div class="page" id="page-peso" style="padding-left:0;padding-right:0">
+
+      <!-- ① GRAFICO HERO teal -->
+      <div class="wp-chart-hero">
+        <div class="wp-chart-header">
+          <div>
+            <div class="wp-chart-title" id="wp-chart-title-lbl">Tendenze peso negli ultimi 30 giorni (kg)</div>
+            <div class="wp-legend-row">
+              <span class="wp-legend-dot peso">Peso (kg)</span>
+              <span class="wp-legend-dot trend">Tendenza peso</span>
+            </div>
+          </div>
+          <div class="wp-range-pills">
+            <button class="wp-range-pill" id="wpr-7"  onclick="wpSetRange(7)">7g</button>
+            <button class="wp-range-pill active" id="wpr-30" onclick="wpSetRange(30)">30g</button>
+            <button class="wp-range-pill" id="wpr-90" onclick="wpSetRange(90)">3m</button>
+            <button class="wp-range-pill" id="wpr-0"  onclick="wpSetRange(0)">Tutto</button>
+          </div>
+        </div>
+        <div class="wp-chart-canvas-wrap">
+          <canvas id="wp-chart"></canvas>
+        </div>
+        <div class="wp-chart-date-row" id="wp-chart-date-row">
+          <span class="wp-chart-date-lbl" id="wp-date-start">—</span>
+          <span class="wp-chart-date-lbl">Oggi</span>
+        </div>
+      </div>
+
+      <!-- Stats row (dark band) -->
+      <div class="wp-stat-row" id="wp-stat-row">
+        <div class="wp-stat">
+          <div class="wp-stat-val" id="wp-s-current">—</div>
+          <div class="wp-stat-lbl">Attuale</div>
+        </div>
+        <div class="wp-stat">
+          <div class="wp-stat-val" id="wp-s-delta7">—</div>
+          <div class="wp-stat-lbl">Δ 7 giorni</div>
+        </div>
+        <div class="wp-stat">
+          <div class="wp-stat-val" id="wp-s-avg30">—</div>
+          <div class="wp-stat-lbl">Media 30g</div>
+        </div>
+      </div>
+
+      <!-- Spacer and padding back -->
+      <div style="padding: 0 16px">
+
+        <!-- ② STATUS NEON (hidden, kept for JS) -->
+        <div class="wp-status-card neutral" id="wp-status-card" style="display:none">
+          <div class="wp-status-glow" id="wp-status-glow"></div>
+          <div class="wp-status-top">
+            <div class="wp-status-dot" id="wp-status-dot"></div>
+            <div class="wp-status-label" id="wp-status-label">Analisi in corso…</div>
+          </div>
+          <div class="wp-status-msg" id="wp-status-msg"></div>
+          <div class="wp-trend-bar-wrap"><div class="wp-trend-bar" id="wp-trend-bar" style="width:0%"></div></div>
+          <div style="display:none">
+            <span id="wp-trend-start-lbl"></span><span id="wp-trend-end-lbl"></span>
+          </div>
+          <div id="wp-goal-row" style="display:none">
+            <div id="wp-goal-current"></div><div id="wp-goal-target"></div><div id="wp-goal-remain"></div>
+          </div>
+          <div id="wp-tips"></div>
+        </div>
+
+        <!-- ② PROGRESSI verso obiettivo (nuovo) -->
+        <div class="wp-progress-card" id="wp-progress-card">
+          <div class="wp-progress-header">
+            <div class="wp-progress-title">🎯 Progressi rispetto all'obiettivo</div>
+            <button class="wp-progress-edit" onclick="goPage('impostazioni')">Modifica obiettivo</button>
+          </div>
+          <div class="wp-progress-goal-row">
+            <div class="wp-progress-start">
+              <div class="wp-progress-kg" id="wpp-start">—</div>
+              <div class="wp-progress-kg-lbl">Inizio</div>
+            </div>
+            <div class="wp-progress-bar-wrap">
+              <div class="wp-progress-bar-fill" id="wpp-bar" style="width:0%"></div>
+            </div>
+            <div class="wp-progress-target">
+              <div class="wp-progress-kg" id="wpp-target">—</div>
+              <div class="wp-progress-kg-lbl">Obiettivo</div>
+            </div>
+          </div>
+          <div class="wp-progress-info" id="wpp-info">
+            Imposta un peso obiettivo nelle impostazioni per vedere i progressi.
+          </div>
+        </div>
+
+        <!-- ③ REGISTRA PESO — big CTA -->
+        <button class="wp-register-cta" onclick="wpToggleInput()">
+          ⚖️ Registra peso
+        </button>
+
+        <!-- Input inline (toggle) -->
+        <div class="wp-input-card" id="wp-input-panel" style="display:none">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <div style="font-family:var(--font-brand);font-weight:800;font-size:13px;color:var(--text)">Inserisci il peso di oggi</div>
+            <div id="wp-streak-chip2" style="font-family:var(--font-mono);font-size:11px;color:var(--muted)"></div>
+          </div>
+          <div class="wp-input-row">
+            <input type="number" id="wp-weight-input" placeholder="75.0" step="0.1" min="20" max="300"
+              onkeydown="if(event.key==='Enter') wpSaveWeight()">
+            <span class="wp-unit">kg</span>
+            <button class="btn btn-green" onclick="wpSaveWeightCta()">Salva</button>
+          </div>
+        </div>
+
+        <!-- ④ STORICO SETTIMANALE -->
+        <div class="wp-hist-section" style="margin-top:4px">
+          <div class="wp-hist-title">
+            <h3>📋 Storico</h3>
+            <span id="wp-hist-count" style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">0 misurazioni</span>
+          </div>
+          <div id="wp-history"></div>
+        </div>
+
+      </div><!-- /padding wrapper -->
+
+      <!-- hidden chips for JS compatibility -->
+      <div style="display:none">
+        <div id="wp-streak-chip"></div>
+      </div>
+
     </div>
 
     <div class="page" id="page-diary">
@@ -4942,6 +5198,7 @@ function goPage(id) {
   if (id === 'diary') { setDiaryToday(); switchDiaryTab('diary'); }
   if (id === 'home') { loadMacroWeekChart(); updateHomeDiarySummary(); }
   if (id === 'rewards') { renderPointsUI(); loadReferralData(); refreshLeagueGroup().then(()=>renderLeagueUI()).catch(()=>{}); }
+  if (id === 'peso') { wpInitPage(); }
   if (id === 'settings') { loadSettingsPage(); }
   // Sync mobile bottom nav
   _syncMobileNav(id);
@@ -4953,7 +5210,7 @@ function goPage(id) {
 let _currentFoodGoalsTab = 'food';
 
 function _syncMobileNav(pageId) {
-  const map = { home:'home', diary:'food', 'food-goals':'food', goals:'food', rewards:'rewards', settings:'settings' };
+  const map = { home:'home', peso:'peso', diary:'food', 'food-goals':'food', goals:'food', rewards:'rewards', settings:'settings' };
   const activeKey = map[pageId] || pageId;
   document.querySelectorAll('.mbn-btn').forEach(b => b.classList.remove('active'));
   const btn = document.getElementById('mbn-' + activeKey);
@@ -4970,6 +5227,8 @@ function mbnGoPage(key) {
     } else {
       goPage('diary');
     }
+  } else if (key === 'peso') {
+    goPage('peso');
   } else if (key === 'rewards') {
     goPage('rewards');
   } else if (key === 'settings') {
@@ -5392,6 +5651,535 @@ function formatDate(str) {
 }
 function uid() { return window._currentUser?.uid; }
 
+// ══════════════════════════════════════════════════════
+// PAGINA PESO DEDICATA — wpInitPage / wpRenderAll
+// ══════════════════════════════════════════════════════
+let wpChart = null;
+let wpChartRange = 30; // default 30g
+
+function wpInitPage() {
+  if (!userTargets) loadUserTargets().then(() => _wpRender()).catch(() => _wpRender());
+  else _wpRender();
+}
+
+function _wpRender() {
+  if (!weightData) return;
+  wpRenderChart();
+  wpRenderStatus();
+  wpRenderHistory();
+  wpRenderProgressCard();
+  wpSyncStreakChips();
+
+  // Pre-fill weight input with last value
+  if (weightData.length) {
+    const sorted = [...weightData].sort((a,b)=>b.date.localeCompare(a.date));
+    const inp = document.getElementById('wp-weight-input');
+    if (inp && !inp.value) inp.placeholder = sorted[0].weight + ' kg';
+  }
+}
+
+// ── Toggle input panel visibility ──
+function wpToggleInput() {
+  const panel = document.getElementById('wp-input-panel');
+  if (!panel) return;
+  const shown = panel.style.display !== 'none';
+  panel.style.display = shown ? 'none' : 'block';
+  if (!shown) {
+    const inp = document.getElementById('wp-weight-input');
+    if (inp) setTimeout(() => inp.focus(), 100);
+  }
+}
+
+// ── Salva + chiudi panel ──
+async function wpSaveWeightCta() {
+  await wpSaveWeight();
+  const panel = document.getElementById('wp-input-panel');
+  if (panel) panel.style.display = 'none';
+}
+
+// ── Progressi card ──
+function wpRenderProgressCard() {
+  const card = document.getElementById('wp-progress-card');
+  if (!card) return;
+
+  const sorted = weightData ? [...weightData].sort((a,b)=>a.date.localeCompare(b.date)) : [];
+  const goalW  = userTargets?.goal_weight ? parseFloat(userTargets.goal_weight) : null;
+  const info   = document.getElementById('wpp-info');
+  const bar    = document.getElementById('wpp-bar');
+  const startEl= document.getElementById('wpp-start');
+  const targEl = document.getElementById('wpp-target');
+
+  if (!goalW || sorted.length === 0) {
+    if (info) info.innerHTML = 'Imposta un peso obiettivo nelle impostazioni per vedere i progressi.';
+    if (startEl) startEl.textContent = '—';
+    if (targEl)  targEl.textContent  = '—';
+    if (bar)     bar.style.width     = '0%';
+    return;
+  }
+
+  const startW   = sorted[0].weight;
+  const currentW = sorted[sorted.length-1].weight;
+  const totalNeeded = Math.abs(startW - goalW);
+  const totalDone   = Math.abs(startW - currentW);
+  const pct = totalNeeded > 0 ? Math.min(100, Math.round(totalDone / totalNeeded * 100)) : 0;
+  const remaining = Math.abs(currentW - goalW).toFixed(1);
+  const achieved  = Math.abs(currentW - goalW) < 0.3;
+
+  if (startEl) startEl.textContent = startW + ' kg';
+  if (targEl)  targEl.textContent  = goalW  + ' kg';
+  if (bar)     bar.style.width     = pct + '%';
+
+  const lostGained = (startW - currentW).toFixed(1);
+  const direction = currentW < goalW ? 'perdere' : 'aumentare';
+  const d0 = new Date(sorted[0].date + 'T00:00:00');
+  const dateStr = d0.toLocaleDateString('it-IT', {day:'numeric', month:'short'});
+
+  if (achieved) {
+    if (info) info.innerHTML = '🎉 <b>Obiettivo raggiunto!</b> Complimenti!';
+  } else {
+    const lostGainedAbs = Math.abs(parseFloat(lostGained));
+    if (info) info.innerHTML =
+      '<b>' + (parseFloat(lostGained) > 0 ? '-' : '+') + lostGainedAbs.toFixed(1) + ' kg</b>' +
+      ' dal ' + dateStr + ' · Ancora <b>' + remaining + ' kg</b> da ' + direction + ' per raggiungere il tuo obiettivo.';
+  }
+}
+
+// ── Salva peso dalla pagina dedicata ──
+async function wpSaveWeight() {
+  const inp = document.getElementById('wp-weight-input');
+  const val = parseFloat(inp?.value);
+  if (!val || val < 20 || val > 300) { toast('Peso non valido!', 'var(--danger)'); return; }
+  const {db, doc, setDoc} = window._fb;
+  const today = todayStr();
+  await setDoc(doc(db,'users',uid(),'weights',today), { weight: val, date: today, ts: Date.now() });
+  if (inp) inp.value = '';
+  toast('✅ Peso salvato: ' + val + ' kg');
+  // Also sync home saveWeight side effects via awardPoints
+  if (typeof awardPoints === 'function' && typeof nutriPoints !== 'undefined') {
+    if ((nutriPoints.lastWeighDate||'') !== today) {
+      nutriPoints.lastWeighDate = today;
+      await awardPoints('weigh', 10, '⚖️ Pesata giornaliera', today);
+    }
+  }
+}
+
+// ── Chart (dark, linea + trend) ──
+function wpRenderChart() {
+  if (!weightData.length) return;
+
+  const canvas = document.getElementById('wp-chart');
+  if (!canvas) return;
+
+  const cutoff = new Date();
+  if (wpChartRange > 0) cutoff.setDate(cutoff.getDate() - wpChartRange);
+  else cutoff.setFullYear(2000);
+
+  const sorted = [...weightData].sort((a,b)=>a.date.localeCompare(b.date));
+  const filtered = sorted.filter(w => new Date(w.date+'T00:00:00') >= cutoff);
+  if (!filtered.length) return;
+
+  const labels = filtered.map(w => {
+    const d = new Date(w.date+'T00:00:00');
+    return d.toLocaleDateString('it-IT',{day:'2-digit',month:'short'});
+  });
+  const vals   = filtered.map(w => w.weight);
+
+  // Linea tendenza lineare (regressione)
+  const n = vals.length;
+  const xArr = vals.map((_,i)=>i);
+  const sumX = xArr.reduce((a,b)=>a+b,0);
+  const sumY = vals.reduce((a,b)=>a+b,0);
+  const sumXY = xArr.reduce((a,x,i)=>a+x*vals[i],0);
+  const sumX2 = xArr.reduce((a,x)=>a+x*x,0);
+  const slope = n > 1 ? (n*sumXY - sumX*sumY) / (n*sumX2 - sumX*sumX) : 0;
+  const intercept = (sumY - slope*sumX) / n;
+  const trendVals = xArr.map(x => parseFloat((intercept + slope*x).toFixed(2)));
+
+  // Colore linea tendenza
+  const trendColor = '#1e40af'; // dark navy, visible on teal
+
+  const goalW = userTargets?.goal_weight;
+
+  // Destroy if exists
+  if (wpChart) { wpChart.destroy(); wpChart = null; }
+
+  const ctx = canvas.getContext('2d');
+  const datasets = [
+    {
+      label: 'Peso',
+      data: vals,
+      borderColor: 'rgba(255,255,255,0.75)',
+      backgroundColor: 'rgba(255,255,255,0.06)',
+      borderWidth: 2,
+      pointRadius: vals.map((_,i) => i === vals.length-1 ? 5 : 3),
+      pointBackgroundColor: vals.map((_,i) => i === vals.length-1 ? '#fff' : 'rgba(255,255,255,0.5)'),
+      pointBorderColor: 'transparent',
+      fill: true,
+      tension: 0.35,
+    },
+    {
+      label: 'Tendenza',
+      data: trendVals,
+      borderColor: trendColor,
+      borderWidth: 2,
+      borderDash: [5,4],
+      pointRadius: 0,
+      fill: false,
+      tension: 0,
+    }
+  ];
+
+  // Linea obiettivo orizzontale
+  if (goalW) {
+    datasets.push({
+      label: 'Obiettivo',
+      data: new Array(vals.length).fill(goalW),
+      borderColor: 'rgba(74,122,53,0.55)',
+      borderWidth: 1.5,
+      borderDash: [3,3],
+      pointRadius: 0,
+      fill: false,
+    });
+  }
+
+  wpChart = new Chart(ctx, {
+    type: 'line',
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#1a1a1a',
+          borderColor: 'rgba(255,255,255,.1)',
+          borderWidth: 1,
+          titleColor: 'rgba(255,255,255,.5)',
+          bodyColor: '#fff',
+          callbacks: {
+            label: ctx => {
+              if (ctx.dataset.label === 'Tendenza') return null;
+              if (ctx.dataset.label === 'Obiettivo') return ' 🎯 Obiettivo: ' + ctx.raw + ' kg';
+              return ' ' + ctx.raw + ' kg';
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          grid: { color: 'rgba(255,255,255,.05)' },
+          ticks: { color: 'rgba(255,255,255,.35)', font: { family: 'DM Mono', size: 9 }, maxTicksLimit: 6 }
+        },
+        y: {
+          grid: { color: 'rgba(255,255,255,.05)' },
+          ticks: {
+            color: 'rgba(255,255,255,.35)', font: { family: 'DM Mono', size: 9 },
+            callback: v => v + ' kg'
+          }
+        }
+      }
+    }
+  });
+
+  // Update stat row
+  const current = filtered[filtered.length-1].weight;
+  const el7start = filtered.length >= 7 ? filtered[filtered.length-7].weight : filtered[0].weight;
+  const delta7 = (current - el7start).toFixed(1);
+  const avg30arr = sorted.filter(w => {
+    const d = new Date(w.date+'T00:00:00');
+    const c30 = new Date(); c30.setDate(c30.getDate()-30);
+    return d >= c30;
+  });
+  const avg30 = avg30arr.length ? (avg30arr.reduce((s,w)=>s+w.weight,0)/avg30arr.length).toFixed(1) : '—';
+
+  const sc = document.getElementById('wp-s-current');
+  const s7 = document.getElementById('wp-s-delta7');
+  const s30 = document.getElementById('wp-s-avg30');
+  if (sc) sc.textContent = current + ' kg';
+  if (s7) {
+    s7.textContent = (parseFloat(delta7)>0?'+':'')+delta7+' kg';
+    s7.style.color = parseFloat(delta7) < 0 ? '#00ff55' : parseFloat(delta7) > 0 ? '#ff3355' : '#ffee00';
+  }
+  if (s30) s30.textContent = avg30 !== '—' ? avg30+' kg' : '—';
+
+  // Update start date label
+  const dateStartEl = document.getElementById('wp-date-start');
+  if (dateStartEl && filtered.length) {
+    const d0 = new Date(filtered[0].date+'T00:00:00');
+    dateStartEl.textContent = d0.toLocaleDateString('it-IT',{day:'2-digit',month:'short'});
+  }
+}
+
+// ── Status neon analysis ──
+function wpRenderStatus() {
+  const card   = document.getElementById('wp-status-card');
+  const dot    = document.getElementById('wp-status-dot');
+  const label  = document.getElementById('wp-status-label');
+  const msg    = document.getElementById('wp-status-msg');
+  const tips   = document.getElementById('wp-tips');
+  const tbar   = document.getElementById('wp-trend-bar');
+  const tstart = document.getElementById('wp-trend-start-lbl');
+  const tend   = document.getElementById('wp-trend-end-lbl');
+  const grow   = document.getElementById('wp-goal-row');
+  const gcur   = document.getElementById('wp-goal-current');
+  const gtar   = document.getElementById('wp-goal-target');
+  const grem   = document.getElementById('wp-goal-remain');
+  if (!card) return;
+
+  if (!weightData || weightData.length < 2) {
+    // No data
+    card.className = 'wp-status-card neutral';
+    if (label) { label.textContent = 'Nessun dato'; label.style.color = 'var(--muted)'; }
+    if (msg)   msg.textContent = "Aggiungi almeno 2 misurazioni di peso per vedere l'analisi dell'andamento.";
+    if (tips)  tips.innerHTML = '';
+    return;
+  }
+
+  const sorted = [...weightData].sort((a,b)=>a.date.localeCompare(b.date));
+  const current = sorted[sorted.length-1].weight;
+
+  // Tendenza 7gg o tutto
+  const lookback = Math.min(sorted.length, 7);
+  const recent = sorted.slice(-lookback);
+  const oldest = recent[0].weight;
+  const newest = recent[recent.length-1].weight;
+  const weekDelta = newest - oldest;          // kg in N giorni
+  const weekDeltaPerDay = weekDelta / Math.max(lookback-1, 1);
+
+  // Goal
+  const goalW = userTargets?.goal_weight ? parseFloat(userTargets.goal_weight) : null;
+  const wantLose = goalW ? current > goalW : true; // default assume dimagrire
+
+  // Start peso storico
+  const startWeight = sorted[0].weight;
+  const totalNeeded = goalW ? Math.abs(startWeight - goalW) : null;
+  const totalDone   = goalW ? Math.abs(startWeight - current) : null;
+  const pct = (totalNeeded && totalNeeded > 0) ? Math.min(100, Math.round(totalDone/totalNeeded*100)) : 0;
+  const remaining = goalW ? Math.abs(current - goalW).toFixed(1) : null;
+
+  // Classify status
+  let status = 'neutral'; // green / yellow / red
+  let statusLabel = '';
+  let statusMsg = '';
+  let tipsList = [];
+
+  if (goalW) {
+    // Con obiettivo: valutiamo progresso
+    const onTrack = wantLose ? weekDelta < 0 : weekDelta > 0;
+    const stuck   = Math.abs(weekDelta) < 0.15 && lookback >= 5;
+    const tooFast = Math.abs(weekDeltaPerDay) > 0.3; // >2.1kg/settimana
+    const reached = Math.abs(current - goalW) < 0.3;
+
+    if (reached) {
+      status = 'green';
+      statusLabel = '🎯 OBIETTIVO RAGGIUNTO!';
+      statusMsg = `Hai raggiunto il tuo peso obiettivo di ${goalW} kg. Ottimo lavoro! Concentrati sul mantenimento con un piano alimentare equilibrato.`;
+      tipsList = ['🎉 Mantieni obiettivo', '🥗 Piano mantenimento', '💪 Allenamento regolare'];
+    } else if (onTrack && !tooFast) {
+      status = 'green';
+      const kgPerWeek = Math.abs(weekDelta / (lookback/7)).toFixed(2);
+      const weeksLeft = remaining ? Math.ceil(parseFloat(remaining) / parseFloat(kgPerWeek)) : '?';
+      statusLabel = '✅ SEI SULLA STRADA GIUSTA';
+      statusMsg = `Stai progredendo a un ritmo sano di ~${kgPerWeek} kg/settimana. Mancano ancora ${remaining} kg all'obiettivo. Continua così! Stimato: ~${weeksLeft} settimane.`;
+      tipsList = ['🥦 Mantieni il deficit', '💧 Idratazione costante', '😴 Dormi 7-8 ore'];
+    } else if (tooFast) {
+      status = 'yellow';
+      statusLabel = '⚡ ATTENZIONE: RITMO TROPPO VELOCE';
+      statusMsg = `Stai perdendo peso troppo rapidamente (${Math.abs(weekDelta).toFixed(1)} kg in ${lookback} giorni). Un calo superiore a 0.5-1 kg/settimana può causare perdita muscolare e rallentare il metabolismo.`;
+      tipsList = ['🍽️ Aumenta le kcal leggermente', '💪 Più proteine per preservare muscoli', '🏋️ Riduci il cardio'];
+    } else if (stuck) {
+      status = 'yellow';
+      statusLabel = '⚠️ STALLO — PLATEAU RILEVATO';
+      statusMsg = `Il peso è rimasto quasi invariato negli ultimi ${lookback} giorni (Δ ${weekDelta.toFixed(1)} kg). È normale durante un plateau. Potrebbe essere necessario cambiare stimolo.`;
+      tipsList = ['🔄 Varia gli allenamenti', '📊 Ricontrolla le kcal', '⏱️ Prova il digiuno intermittente', '💤 Controlla il sonno'];
+    } else {
+      // Wrong direction
+      status = 'red';
+      const wrongDelta = Math.abs(weekDelta).toFixed(1);
+      statusLabel = '🚨 ATTENZIONE: DIREZIONE OPPOSTA';
+      statusMsg = wantLose
+        ? `Il peso è aumentato di ${wrongDelta} kg negli ultimi ${lookback} giorni. Controlla il piano alimentare: potrebbe esserci un surplus calorico nascosto.`
+        : `Il peso è diminuito di ${wrongDelta} kg negli ultimi ${lookback} giorni. Se vuoi aumentare massa, aumenta le calorie e le proteine.`;
+      tipsList = wantLose
+        ? ['🔍 Rivedi il piano alimentare', '📉 Riduci carboidrati serali', '🏃 Aggiungi cardio LISS', '🧮 Ricalcola il TDEE']
+        : ['🍗 Aumenta le proteine', '🍚 Più carboidrati complessi', '🏋️ Allenamento con pesi', '📈 Surplus 200-300 kcal'];
+    }
+  } else {
+    // Senza obiettivo impostato: mostra solo trend
+    if (Math.abs(weekDeltaPerDay) < 0.05) {
+      status = 'yellow';
+      statusLabel = '➡️ PESO STABILE';
+      statusMsg = `Il tuo peso è stabile (Δ ${weekDelta.toFixed(1)} kg in ${lookback} giorni). Imposta un obiettivo nelle impostazioni per vedere un'analisi più precisa.`;
+      tipsList = ['🎯 Imposta un obiettivo peso', '📊 Traccia i macro'];
+    } else if (weekDelta < 0) {
+      status = 'green';
+      statusLabel = '📉 IN CALO';
+      statusMsg = `Il tuo peso sta diminuendo (${weekDelta.toFixed(1)} kg in ${lookback} giorni). Imposta un obiettivo per monitorare meglio il progresso verso il tuo traguardo.`;
+      tipsList = ['🎯 Imposta obiettivo peso', '🥗 Monitora i macro', '💧 Idratazione'];
+    } else {
+      status = 'yellow';
+      statusLabel = '📈 IN AUMENTO';
+      statusMsg = `Il peso è in aumento (+${weekDelta.toFixed(1)} kg in ${lookback} giorni). Se è intenzionale, ottimo! Altrimenti valuta di impostare un obiettivo e rivedere il piano.`;
+      tipsList = ['🎯 Imposta obiettivo peso', '📊 Revisiona il piano', '🏋️ Allenamento'];
+    }
+  }
+
+  // Apply status
+  card.className = 'wp-status-card ' + status;
+  if (label) label.textContent = statusLabel;
+  if (msg)   msg.textContent   = statusMsg;
+
+  // Trend bar
+  if (tbar) {
+    const barPct = goalW ? pct : (Math.min(100, Math.abs(weekDelta)*50));
+    const barCol = status==='green'?'#00ff55': status==='yellow'?'#ffee00':'#ff3355';
+    tbar.style.width = barPct + '%';
+    tbar.style.background = `linear-gradient(90deg, ${barCol}aa, ${barCol})`;
+  }
+  if (tstart) tstart.textContent = goalW ? (startWeight+' kg') : 'Inizio';
+  if (tend)   tend.textContent   = goalW ? (goalW+' kg') : 'Oggi';
+
+  // Goal row
+  if (grow) {
+    if (goalW) {
+      grow.style.display = 'flex';
+      if (gcur) { gcur.textContent = current+' kg'; }
+      if (gtar) gtar.textContent = goalW+' kg';
+      if (grem) {
+        grem.textContent = remaining+' kg';
+        grem.style.color = status==='green'?'#00ff55': status==='yellow'?'#ffee00':'#ff3355';
+      }
+    } else {
+      grow.style.display = 'none';
+    }
+  }
+
+  // Tips
+  if (tips) {
+    tips.innerHTML = tipsList.map(t =>
+      `<span class="wp-tip-pill">${t}</span>`
+    ).join('');
+  }
+}
+
+// ── History (settimanale) ──
+function wpRenderHistory() {
+  const el  = document.getElementById('wp-history');
+  const cnt = document.getElementById('wp-hist-count');
+  if (!el) return;
+  cnt.textContent = weightData.length+' misurazion'+(weightData.length===1?'e':'i');
+
+  if (!weightData.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">⚖️</div><p>Nessuna misurazione ancora.</p></div>';
+    return;
+  }
+
+  const sorted = [...weightData].sort((a,b)=>b.date.localeCompare(a.date));
+
+  function getMonKey(dateStr) {
+    const d = new Date(dateStr+'T00:00:00');
+    const day = d.getDay();
+    const diff = day===0 ? -6 : 1-day;
+    const mon = new Date(d); mon.setDate(d.getDate()+diff);
+    return mon.toISOString().slice(0,10);
+  }
+  function weekLabel(mk) {
+    const mon = new Date(mk+'T00:00:00');
+    const sun = new Date(mon); sun.setDate(mon.getDate()+6);
+    const today = new Date(); today.setHours(0,0,0,0);
+    const thisMk = getMonKey(todayStr());
+    if (mk===thisMk) return 'Questa settimana';
+    const lm = new Date(today); lm.setDate(today.getDate()-7);
+    if (mk===getMonKey(lm.toISOString().slice(0,10))) return 'Settimana scorsa';
+    return mon.toLocaleDateString('it-IT',{day:'numeric',month:'short'})+' – '+sun.toLocaleDateString('it-IT',{day:'numeric',month:'short'});
+  }
+  const DAY = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
+
+  const weeks = {};
+  sorted.forEach(w => { const k=getMonKey(w.date); if(!weeks[k]) weeks[k]=[]; weeks[k].push(w); });
+
+  el.innerHTML = Object.keys(weeks).sort((a,b)=>b.localeCompare(a)).map(wk => {
+    const rows = weeks[wk];
+    const avg  = (rows.reduce((s,r)=>s+r.weight,0)/rows.length).toFixed(1);
+    const avgColor = (() => {
+      // Compare with prev week avg
+      const allWks = Object.keys(weeks).sort((a,b)=>b.localeCompare(a));
+      const idx = allWks.indexOf(wk);
+      const prevWk = allWks[idx+1];
+      if (!prevWk) return 'var(--green)';
+      const prevAvg = weeks[prevWk].reduce((s,r)=>s+r.weight,0)/weeks[prevWk].length;
+      return parseFloat(avg) < prevAvg ? 'var(--green)' : parseFloat(avg) > prevAvg ? 'var(--danger)' : 'var(--muted)';
+    })();
+
+    const rowsHtml = rows.map(w => {
+      const isToday = w.date===todayStr();
+      const allIdx  = sorted.findIndex(x=>x.date===w.date);
+      const prev    = sorted[allIdx+1];
+      let dHtml='', dColor='var(--muted)';
+      if(prev){ const d=(w.weight-prev.weight).toFixed(1); const v=parseFloat(d); dColor=v>0?'var(--danger)':v<0?'var(--green)':'var(--muted)'; dHtml=(v>0?'+':'')+d; }
+      const dateObj = new Date(w.date+'T00:00:00');
+      const dayName = DAY[dateObj.getDay()];
+      const dateLbl = dateObj.toLocaleDateString('it-IT',{day:'numeric',month:'short'});
+      const fatStr  = w.fat_pct ? w.fat_pct+'% gr.' : '—';
+      return `<div class="wp-row">
+        <div class="wp-row-day">
+          <div class="wp-row-day-name">${isToday?'<span class="wp-today-badge">OGGI</span>':dayName}</div>
+          <div class="wp-row-day-date">${dateLbl}</div>
+        </div>
+        <div class="wp-row-weight">${w.weight}<span> kg</span></div>
+        <div class="wp-row-delta" style="color:${dColor}">${dHtml||'—'}</div>
+        <div class="wp-row-fat">${fatStr}</div>
+        <div class="wp-row-acts">
+          <button class="btn btn-ghost btn-icon btn-sm" onclick="startWeightEdit('${w.date}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="btn btn-danger btn-icon btn-sm" onclick="deleteWeight('${w.date}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+          </button>
+        </div>
+      </div>`;
+    }).join('');
+
+    return `<div class="wp-week-block">
+      <div class="wp-week-hdr">
+        <div class="wp-week-lbl">${weekLabel(wk)}</div>
+        <div class="wp-week-avg" style="color:${avgColor}">${avg} kg in media</div>
+      </div>
+      ${rowsHtml}
+    </div>`;
+  }).join('');
+}
+
+// ── Range selector ──
+function wpSetRange(days) {
+  wpChartRange = days;
+  // Update title
+  const titleEl = document.getElementById('wp-chart-title-lbl');
+  if (titleEl) {
+    const labels = {7:'7 giorni', 30:'30 giorni', 90:'3 mesi', 0:'tutto il periodo'};
+    titleEl.textContent = 'Tendenze peso – ultimi ' + (labels[days]||days+'g') + ' (kg)';
+  }
+  ['7','30','90','0'].forEach(r => {
+    const b = document.getElementById('wpr-'+r);
+    if (b) b.className = 'wp-range-pill' + (parseInt(r)===days ? ' active' : '');
+  });
+  wpRenderChart();
+}
+
+// ── Streak chips ──
+function wpSyncStreakChips() {
+  const streak = computeStreak ? computeStreak(weightData) : 0;
+  const txt = streak > 0 ? '🔥 ' + streak + ' giorni' : '';
+  ['wp-streak-chip','wp-streak-chip2'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.textContent = txt;
+  });
+}
+
+// Hook: wpInitPage viene chiamata anche ogni volta che weightData si aggiorna
+// (già gestito da updateWeightUI, ci aggiungiamo la pagina peso)
+const _origUpdateWeightUI = typeof updateWeightUI === 'function' ? updateWeightUI : null;
+
 // ══════════════════════════════════
 // WEIGHT — SUBSCRIBE (realtime)
 // ══════════════════════════════════
@@ -5402,6 +6190,9 @@ function subscribeWeights() {
     snap => {
       weightData = snap.docs.map(d => ({id:d.id,...d.data()}));
       updateWeightUI();
+      // Sync dedicated peso page if visible
+      const pesoPage = document.getElementById('page-peso');
+      if (pesoPage && pesoPage.classList.contains('active')) { wpRenderChart(); wpRenderStatus(); wpRenderHistory(); wpSyncStreakChips(); }
     }
   );
 }
@@ -5501,7 +6292,10 @@ function updateWeightUI() {
 
   // Streak
   const streak = computeStreak(weightData);
-  document.getElementById('weight-streak').textContent = streak>1?'🔥 '+streak+' giorni consecutivi':streak===1?'✅ Streak iniziata!':'';
+  document.getElementById('weight-streak').textContent = streak>1?'🔥 '+streak+'gg':streak===1?'✅ inizio':'';
+
+  // Neon banner dinamico
+  updateWeightNeonBanner();
   // Streak chip header
   const sc = document.getElementById('home-streak-chip');
   const sn = document.getElementById('home-streak-num');
@@ -5519,6 +6313,226 @@ function updateWeightUI() {
   // Aggiorna progressi obiettivo se la pagina è aperta
   if (document.getElementById('page-goals') && document.getElementById('page-goals').classList.contains('active')) {
     renderGoalProgress();
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// WEIGHT NEON BANNER + RING LOGIC
+// ══════════════════════════════════════════════════════
+function updateWeightNeonBanner() {
+  const banner = document.getElementById('weight-neon-banner');
+  const icon   = document.getElementById('wnb-icon');
+  const title  = document.getElementById('wnb-title');
+  const sub    = document.getElementById('wnb-sub');
+  const tip    = document.getElementById('wnb-tip');
+  const ringRow      = document.getElementById('wgt-ring-row');
+  const ringEl       = document.getElementById('wgt-goal-ring');
+  const ringPct      = document.getElementById('wgt-ring-pct');
+  const currentKgEl  = document.getElementById('wgt-current-kg');
+  const goalKgEl     = document.getElementById('wgt-goal-kg');
+  const progressFill = document.getElementById('wgt-progress-fill');
+  const remaining    = document.getElementById('wgt-remaining');
+  const sugBox       = document.getElementById('wgt-suggestion');
+  const sugIcon      = document.getElementById('wgt-sug-icon');
+  const sugText      = document.getElementById('wgt-sug-text');
+  if (!banner) return;
+
+  const sorted = weightData.length
+    ? [...weightData].sort((a,b)=>b.date.localeCompare(a.date))
+    : [];
+
+  // ── No data ──────────────────────────────────────────────
+  if (!sorted.length) {
+    _setNeonBanner('neutral','⚖️','Inizia a tracciare il tuo peso',
+      'Registra il tuo peso giornaliero per vedere i progressi',null);
+    if (ringRow) ringRow.style.display = 'none';
+    if (sugBox)  sugBox.classList.remove('show');
+    return;
+  }
+
+  const current = sorted[0].weight;
+  const goal    = userTargets?.goal_weight || 0;
+  const start   = userTargets?.start_weight || 0;
+  const hasGoal = goal > 0;
+
+  // ── Ring progress ─────────────────────────────────────────
+  if (ringRow) {
+    if (hasGoal && start > 0) {
+      ringRow.style.display = 'flex';
+      if (currentKgEl) currentKgEl.textContent = current.toFixed(1)+' kg';
+      if (goalKgEl)    goalKgEl.textContent    = goal.toFixed(1)+' kg';
+      const totalDiff = Math.abs(start - goal);
+      const doneDiff  = Math.abs(start - current);
+      const pct = totalDiff > 0 ? Math.min(100, Math.round((doneDiff / totalDiff) * 100)) : 100;
+      const circ = 226.2;
+      if (ringEl)       ringEl.style.strokeDashoffset = circ - (circ * pct / 100);
+      if (ringEl)       ringEl.style.stroke = pct >= 100 ? '#ca8a04' : pct >= 70 ? 'var(--green)' : pct >= 40 ? '#f97316' : '#ef4444';
+      if (ringPct)      ringPct.textContent = pct + '%';
+      if (progressFill) progressFill.style.width = pct + '%';
+      if (progressFill) progressFill.style.background = pct >= 100 ? '#ca8a04' : pct >= 70 ? 'var(--green)' : pct >= 40 ? '#f97316' : '#ef4444';
+      const diff = Math.abs(current - goal);
+      if (remaining) {
+        if (pct >= 100) remaining.textContent = '🎉 Obiettivo raggiunto!';
+        else {
+          const dir = goal < start ? 'perdere' : 'guadagnare';
+          remaining.textContent = `Ancora ${diff.toFixed(1)} kg da ${dir}`;
+        }
+      }
+    } else {
+      ringRow.style.display = 'none';
+    }
+  }
+
+  // ── Delta calcoli per valutazione ────────────────────────
+  const weekAgo   = new Date(); weekAgo.setDate(weekAgo.getDate()-7);
+  const wkData    = weightData.filter(w=>new Date(w.date+'T00:00:00')>=weekAgo);
+  const wkFirst   = wkData.length ? [...wkData].sort((a,b)=>a.date.localeCompare(b.date))[0].weight : null;
+  const wkDelta   = wkFirst != null ? (current - wkFirst) : null;
+
+  const monthAgo  = new Date(); monthAgo.setDate(monthAgo.getDate()-30);
+  const moData    = weightData.filter(w=>new Date(w.date+'T00:00:00')>=monthAgo);
+  const moFirst   = moData.length ? [...moData].sort((a,b)=>a.date.localeCompare(b.date))[0].weight : null;
+  const moDelta   = moFirst != null ? (current - moFirst) : null;
+
+  const isLosingGoal = hasGoal && goal < current;
+  const isGainingGoal= hasGoal && goal > current;
+  const goalPct  = (()=>{
+    if (!hasGoal || !start) return null;
+    const tot = Math.abs(start - goal);
+    const done= Math.abs(start - current);
+    return tot > 0 ? Math.min(100, Math.round((done/tot)*100)) : 100;
+  })();
+
+  // ── Valuta status ─────────────────────────────────────────
+  let state, emojiIcon, bannerTitle, bannerSub, bannerTip=null, sugShown=false, sugEmoji='💡', sugMsg='';
+
+  if (hasGoal && goalPct >= 100) {
+    // 🎉 OBIETTIVO RAGGIUNTO
+    state = 'gold';
+    emojiIcon = '🏆';
+    bannerTitle = 'Obiettivo raggiunto! Fantastico!';
+    bannerSub = `Sei passato da ${start.toFixed(1)} a ${current.toFixed(1)} kg — ce l'hai fatta!`;
+    bannerTip = '✨ Considera di impostare un nuovo obiettivo per continuare.';
+  } else if (!hasGoal) {
+    // Nessun obiettivo — mostra solo trend
+    if (wkDelta != null) {
+      if (Math.abs(wkDelta) < 0.2) {
+        state='neutral'; emojiIcon='📊';
+        bannerTitle='Peso stabile questa settimana';
+        bannerSub=`${current.toFixed(1)} kg — variazione minima negli ultimi 7 giorni`;
+      } else if (wkDelta < 0) {
+        state='green'; emojiIcon='📉';
+        bannerTitle=`-${Math.abs(wkDelta).toFixed(1)} kg questa settimana`;
+        bannerSub='Ottima tendenza! Continua a monitorare i progressi.';
+      } else {
+        state='orange'; emojiIcon='📈';
+        bannerTitle=`+${wkDelta.toFixed(1)} kg questa settimana`;
+        bannerSub='Imposta un obiettivo peso per avere una guida personalizzata.';
+        bannerTip='💡 Vai su Obiettivo Peso per impostare il tuo target.';
+      }
+    } else {
+      state='neutral'; emojiIcon='⚖️';
+      bannerTitle='Buona abitudine!';
+      bannerSub=`Ultimo peso: ${current.toFixed(1)} kg — continua a registrare ogni giorno`;
+    }
+  } else if (isLosingGoal) {
+    // OBIETTIVO DIMAGRIMENTO
+    const idealWkLoss = -0.3; // -0.3 to -0.8 kg/week is healthy
+    if (wkDelta != null) {
+      if (wkDelta < -1.2) {
+        // Troppo veloce
+        state='orange'; emojiIcon='⚠️';
+        bannerTitle='Stai calando troppo rapidamente';
+        bannerSub=`${wkDelta.toFixed(1)} kg questa settimana — potrebbe essere eccessivo`;
+        bannerTip='⚠️ Considera un piano più graduale per preservare la massa muscolare.';
+        sugShown=true; sugEmoji='🥗'; sugMsg='<strong>Piano alimentare:</strong> Aumenta leggermente le calorie (+100–200 kcal/giorno) per un calo più sano e sostenibile.';
+      } else if (wkDelta <= -0.3) {
+        // OTTIMO
+        state='green'; emojiIcon='🔥';
+        bannerTitle='Stai andando alla grande!';
+        bannerSub=`${wkDelta.toFixed(1)} kg questa settimana · ${goalPct}% del traguardo completato`;
+        if (moDelta && moDelta < -1) bannerTip='🎯 Ritmo ottimo! Stima: ' + Math.ceil(Math.abs(current-goal)/Math.abs(moDelta/4.3)) + ' settimane al traguardo.';
+      } else if (wkDelta < 0) {
+        // Lento ma positivo
+        state='green'; emojiIcon='📉';
+        bannerTitle='Progressi lenti ma costanti';
+        bannerSub=`${wkDelta.toFixed(1)} kg questa settimana — continua così`;
+        bannerTip='💪 Aumenta il deficit calorico di 100–200 kcal per accelerare.';
+      } else if (Math.abs(wkDelta) < 0.2) {
+        // Stasi
+        state='orange'; emojiIcon='⏸️';
+        bannerTitle='Peso in stallo questa settimana';
+        bannerSub=`Nessuna variazione significativa — obiettivo: ${goal.toFixed(1)} kg`;
+        bannerTip='📊 Lo stallo è normale ogni 3–4 settimane. Persisti!';
+        sugShown=true; sugEmoji='💡'; sugMsg='<strong>Stallo?</strong> Prova HIIT o a cambiare la distribuzione dei macro per ripartire.';
+      } else {
+        // Sta aumentando — lontano da goal
+        state='red'; emojiIcon='🚨';
+        bannerTitle='Attenzione: ti stai allontanando dal traguardo';
+        bannerSub=`+${wkDelta.toFixed(1)} kg questa settimana · target: ${goal.toFixed(1)} kg`;
+        sugShown=true; sugEmoji='🏋️'; sugMsg='<strong>Rivedi il piano:</strong> Ricalcola il TDEE, riduci le calorie e aggiungi 2-3 sessioni cardio settimanali.';
+      }
+    } else {
+      state='neutral'; emojiIcon='🎯';
+      bannerTitle=`Obiettivo: ${goal.toFixed(1)} kg`;
+      bannerSub=`Hai ancora ${Math.abs(current-goal).toFixed(1)} kg da perdere — stai monitorando`;
+    }
+  } else if (isGainingGoal) {
+    // OBIETTIVO AUMENTO MASSA
+    if (wkDelta != null) {
+      if (wkDelta >= 0.2 && wkDelta <= 0.6) {
+        state='green'; emojiIcon='💪';
+        bannerTitle='Guadagno di massa ottimale!';
+        bannerSub=`+${wkDelta.toFixed(1)} kg questa settimana — ritmo perfetto`;
+      } else if (wkDelta > 0.6) {
+        state='orange'; emojiIcon='⚠️';
+        bannerTitle='Stai guadagnando troppo in fretta';
+        bannerSub=`+${wkDelta.toFixed(1)} kg questa settimana — rischio di massa grassa`;
+        sugShown=true; sugEmoji='🥗'; sugMsg='<strong>Piano alimentare:</strong> Riduci leggermente il surplus calorico (+200–300 kcal è ideale per il lean bulk).';
+      } else if (wkDelta < 0) {
+        state='red'; emojiIcon='🚨';
+        bannerTitle='Peso in calo — opposto al tuo obiettivo';
+        bannerSub=`${wkDelta.toFixed(1)} kg questa settimana — aumenta le calorie`;
+        sugShown=true; sugEmoji='🍽️'; sugMsg='<strong>Aumenta il surplus:</strong> Aggiungi 200–400 kcal/giorno, privilegiando carboidrati complessi e proteine.';
+      } else {
+        state='orange'; emojiIcon='📊';
+        bannerTitle='Progressi lenti verso il traguardo';
+        bannerSub=`+${(wkDelta||0).toFixed(1)} kg · obiettivo: ${goal.toFixed(1)} kg`;
+        bannerTip='💡 Assicurati di essere in surplus calorico di almeno 200–300 kcal.';
+      }
+    } else {
+      state='neutral'; emojiIcon='💪';
+      bannerTitle=`Obiettivo: ${goal.toFixed(1)} kg`;
+      bannerSub=`Hai ancora ${Math.abs(current-goal).toFixed(1)} kg da guadagnare`;
+    }
+  }
+
+  _setNeonBanner(state, emojiIcon, bannerTitle, bannerSub, bannerTip);
+  if (sugBox) {
+    if (sugShown) {
+      sugBox.classList.add('show');
+      if (sugIcon) sugIcon.textContent = sugEmoji;
+      if (sugText) sugText.innerHTML = sugMsg;
+    } else {
+      sugBox.classList.remove('show');
+    }
+  }
+}
+
+function _setNeonBanner(state, emoji, title, sub, tip) {
+  const banner = document.getElementById('weight-neon-banner');
+  const icon   = document.getElementById('wnb-icon');
+  const titleEl= document.getElementById('wnb-title');
+  const subEl  = document.getElementById('wnb-sub');
+  const tipEl  = document.getElementById('wnb-tip');
+  if (!banner) return;
+  banner.className = 'weight-neon-banner wnb-' + state;
+  if (icon)    icon.textContent    = emoji;
+  if (titleEl) titleEl.textContent = title;
+  if (subEl)   subEl.textContent   = sub;
+  if (tipEl) {
+    if (tip) { tipEl.style.display='block'; tipEl.textContent=tip; }
+    else     { tipEl.style.display='none'; }
   }
 }
 
@@ -5588,22 +6602,7 @@ function updateChart() {
 // ══════════════════════════════════
 // WEIGHT HISTORY RENDER
 // ══════════════════════════════════
-
-function _syncWeightWidget() {
-  if (!weightData || !weightData.length) return;
-  const sorted = [...weightData].sort((a,b)=>b.date.localeCompare(a.date));
-  const hw = document.getElementById('hw-weight-val');
-  const hd = document.getElementById('hw-weight-delta');
-  if (hw) hw.textContent = sorted[0].weight;
-  if (hd && sorted.length >= 2) {
-    const d = (sorted[0].weight - sorted[1].weight).toFixed(1);
-    const v = parseFloat(d);
-    hd.textContent = (v > 0 ? '+' : '') + d + ' kg';
-    hd.style.color = v > 0 ? 'var(--danger)' : v < 0 ? 'var(--green)' : 'var(--muted)';
-  } else if (hd) { hd.textContent = ''; }
-}
 function renderWeightHistory() {
-  _syncWeightWidget();
   const el = document.getElementById('weight-history');
   const cnt = document.getElementById('hist-count');
   if (!el) return;
@@ -5612,132 +6611,47 @@ function renderWeightHistory() {
     el.innerHTML = '<div class="empty"><div class="empty-icon">⚖️</div><p>Nessuna misurazione ancora.</p></div>';
     return;
   }
-
-  // Ordina per data decrescente
   const sorted = [...weightData].sort((a,b)=>b.date.localeCompare(a.date));
-
-  // Raggruppa per settimana (lun–dom)
-  function getWeekKey(dateStr) {
-    const d = new Date(dateStr + 'T00:00:00');
-    const day = d.getDay(); // 0=dom,1=lun,...
-    const diff = (day === 0) ? -6 : 1 - day; // offset verso il lunedì
-    const mon = new Date(d); mon.setDate(d.getDate() + diff);
-    return mon.toISOString().slice(0,10);
-  }
-  function weekLabel(monStr) {
-    const mon = new Date(monStr + 'T00:00:00');
-    const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
-    const today = new Date(); today.setHours(0,0,0,0);
-    const thisMonStr = getWeekKey(todayStr());
-    if (monStr === thisMonStr) return 'Questa settimana';
-    const lastMon = new Date(today); lastMon.setDate(today.getDate() - 7);
-    const lastMonStr = getWeekKey(lastMon.toISOString().slice(0,10));
-    if (monStr === lastMonStr) return 'Settimana scorsa';
-    const opts = {day:'numeric', month:'short'};
-    return mon.toLocaleDateString('it-IT',opts)+' – '+sun.toLocaleDateString('it-IT',opts);
-  }
-  const DAY_NAMES = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
-
-  const weeks = {};
-  sorted.forEach(w => {
-    const wk = getWeekKey(w.date);
-    if (!weeks[wk]) weeks[wk] = [];
-    weeks[wk].push(w);
-  });
-
-  // Goal progress block (se presente)
-  let goalHtml = '';
-  const goalWeight = userTargets?.goal_weight;
-  if (goalWeight && sorted.length) {
-    const current = sorted[0].weight;
-    const start   = sorted[sorted.length-1].weight;
-    const total   = Math.abs(start - goalWeight);
-    const done    = Math.abs(start - current);
-    const pct     = total > 0 ? Math.min(100, Math.round(done/total*100)) : 0;
-    const diff    = (current - goalWeight).toFixed(1);
-    const col     = parseFloat(diff) <= 0 ? 'var(--green)' : 'var(--danger)';
-    goalHtml = `<div class="wh-goal-block">
-      <div class="wh-goal-title">📍 Progressi verso l'obiettivo</div>
-      <div class="wh-goal-row">
-        <div class="wh-goal-stat">
-          <div class="wh-goal-stat-val">${sorted[0].weight}</div>
-          <div class="wh-goal-stat-lbl">ATTUALE kg</div>
+  el.innerHTML = sorted.map((w,i)=>{
+    const isToday = w.date===todayStr();
+    const prev = sorted[i+1];
+    let deltaHtml='';
+    if(prev){
+      const d=(w.weight-prev.weight).toFixed(1);
+      const v=parseFloat(d);
+      const col=v>0?'var(--danger)':v<0?'var(--green)':'var(--muted)';
+      const arrow=v>0?'↑':v<0?'↓':'→';
+      deltaHtml=`<span style="font-family:var(--font-mono);font-size:11px;color:${col}">${v>0?'+':''}${d} kg ${arrow}</span>`;
+    }
+    return `
+    <div class="hist-row">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:7px">
+          <span style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">${formatDate(w.date)}</span>
+          ${isToday?'<span class="badge badge-green" style="font-size:9px;padding:2px 7px">OGGI</span>':''}
         </div>
-        <div style="flex:1;padding:0 12px">
-          <div class="wh-goal-bar-wrap">
-            <div class="wh-goal-bar-fill" style="width:${pct}%"></div>
-          </div>
-          <div style="text-align:center;font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:4px">${pct}%</div>
+        <div id="wd-${w.date}" style="display:flex;align-items:center;gap:10px;margin-top:2px">
+          <span style="font-family:var(--font-brand);font-weight:900;font-size:20px;color:var(--green)">${w.weight} kg</span>
+          ${deltaHtml}
         </div>
-        <div class="wh-goal-stat">
-          <div class="wh-goal-stat-val" style="color:var(--green)">${goalWeight}</div>
-          <div class="wh-goal-stat-lbl">OBIETTIVO kg</div>
-        </div>
-      </div>
-      <div style="text-align:center;font-family:var(--font-mono);font-size:11px;color:${col}">
-        ${parseFloat(diff) > 0 ? 'Ancora ' + diff + ' kg da perdere' : parseFloat(diff) < 0 ? 'Obiettivo superato di ' + Math.abs(diff) + ' kg 🎉' : '🎯 Obiettivo raggiunto!'}
-      </div>
-    </div>`;
-  }
-
-  // Build weeks HTML
-  const weeksHtml = Object.keys(weeks).sort((a,b)=>b.localeCompare(a)).map(wk => {
-    const rows = weeks[wk];
-    const avg  = (rows.reduce((s,r)=>s+r.weight,0)/rows.length).toFixed(1);
-    const rowsHtml = rows.map((w, i) => {
-      const isToday = w.date === todayStr();
-      const allSorted = sorted;
-      const allIdx = allSorted.findIndex(x=>x.date===w.date);
-      const prev = allSorted[allIdx+1];
-      let deltaHtml='', deltaColor='var(--muted)';
-      if (prev) {
-        const d = (w.weight - prev.weight).toFixed(1);
-        const v = parseFloat(d);
-        deltaColor = v > 0 ? 'var(--danger)' : v < 0 ? 'var(--green)' : 'var(--muted)';
-        const arrow = v > 0 ? '↑' : v < 0 ? '↓' : '→';
-        deltaHtml = `${v>0?'+':''}${d}`;
-      }
-      const dateObj = new Date(w.date+'T00:00:00');
-      const dayName = DAY_NAMES[dateObj.getDay()];
-      const dateLabel = dateObj.toLocaleDateString('it-IT',{day:'numeric',month:'short'});
-      const fatHtml = w.fat_pct ? `${w.fat_pct}% gr.` : '--';
-      return `
-      <div class="wh-row" id="wd-wrap-${w.date}">
-        <div class="wh-row-date">
-          <div class="wh-row-day">${isToday ? '<span class="wh-badge-today">OGGI</span>' : dayName}</div>
-          <div class="wh-row-date-sub">${dateLabel}</div>
-        </div>
-        <div class="wh-row-weight" id="wd-${w.date}">${w.weight}<span> kg</span></div>
-        <div class="wh-row-delta" style="color:${deltaColor}">${deltaHtml||'—'}</div>
-        <div class="wh-row-fat">${fatHtml}</div>
-        <div class="wh-row-actions">
-          <button class="btn btn-ghost btn-icon btn-sm" title="Modifica" onclick="startWeightEdit('${w.date}')">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-          <button class="btn btn-danger btn-icon btn-sm" title="Elimina" onclick="deleteWeight('${w.date}')">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-          </button>
-        </div>
-        <!-- inline edit row -->
-        <div id="we-row-${w.date}" style="display:none;align-items:center;gap:6px;position:absolute;left:0;right:0;padding:4px 16px;background:var(--card)">
-          <input type="number" id="we-${w.date}" value="${w.weight}" step="0.1" style="width:90px;font-family:var(--font-brand);font-weight:700;font-size:16px;text-align:center"
+        <div id="we-row-${w.date}" style="display:none;align-items:center;gap:8px;margin-top:4px">
+          <input type="number" id="we-${w.date}" value="${w.weight}" step="0.1" style="width:100px;font-family:var(--font-brand);font-weight:700;font-size:16px;text-align:center"
             onkeydown="if(event.key==='Enter')confirmWeightEdit('${w.date}');if(event.key==='Escape')cancelWeightEdit('${w.date}')">
           <span style="color:var(--muted);font-size:13px">kg</span>
           <button class="btn btn-green btn-sm" onclick="confirmWeightEdit('${w.date}')">✓</button>
           <button class="btn btn-ghost btn-sm" onclick="cancelWeightEdit('${w.date}')">✕</button>
         </div>
-      </div>`;
-    }).join('');
-    return `<div class="wh-week-block">
-      <div class="wh-week-header">
-        <div class="wh-week-label">${weekLabel(wk)}</div>
-        <div class="wh-week-avg">${avg} kg in media</div>
       </div>
-      ${rowsHtml}
+      <div style="display:flex;gap:6px">
+        <button class="btn btn-ghost btn-icon btn-sm" title="Modifica" onclick="startWeightEdit('${w.date}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        </button>
+        <button class="btn btn-danger btn-icon btn-sm" title="Elimina" onclick="deleteWeight('${w.date}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        </button>
+      </div>
     </div>`;
   }).join('');
-
-  el.innerHTML = goalHtml + weeksHtml;
 }
 
 // ══════════════════════════════════
@@ -6225,11 +7139,43 @@ async function updateHomeDiarySummary() {
   const tFat   = userTargets?.fat || 60;
 
   const kcalPct = Math.min(t.kcal / tKcal, 1);
-  const circ = 314.2; // r=50 => 2*PI*50
+  const circ = 251.2;
   const ringEl = document.getElementById('home-ring-kcal');
   if (ringEl) ringEl.style.strokeDashoffset = circ - (circ * kcalPct);
+  // Dynamic ring stroke color based on progress
+  if (ringEl) {
+    if (kcalPct >= 1.05) ringEl.style.stroke = '#ef4444'; // over target
+    else if (kcalPct >= 0.9) ringEl.style.stroke = '#ca8a04'; // almost done
+    else if (kcalPct >= 0.5) ringEl.style.stroke = 'var(--green)'; // good
+    else ringEl.style.stroke = '#3b82f6'; // early in day
+  }
   const kcalValEl = document.getElementById('home-ring-kcal-val');
-  if (kcalValEl) kcalValEl.textContent = t.kcal;
+  if (kcalValEl) {
+    // Dynamic emoji based on kcal progress
+    const pctNow = Math.round(kcalPct * 100);
+    let ringEmoji;
+    if (pctNow === 0) ringEmoji = '💤';
+    else if (pctNow < 25) ringEmoji = '🌱';
+    else if (pctNow < 50) ringEmoji = '⚡';
+    else if (pctNow < 80) ringEmoji = '🔥';
+    else if (pctNow < 100) ringEmoji = '🎯';
+    else if (pctNow < 115) ringEmoji = '✅';
+    else ringEmoji = '⚠️';
+    const oldEmoji = kcalValEl.textContent;
+    kcalValEl.textContent = t.kcal;
+    // Update emoji above kcal number in ring center
+    const ringLbl = document.querySelector('.home-ring-lbl');
+    if (ringLbl && ringLbl.dataset.emoji !== ringEmoji) {
+      ringLbl.dataset.emoji = ringEmoji;
+      ringLbl.textContent = ringEmoji;
+      // Add a tiny "kcal" below
+      ringLbl.title = pctNow + '% obiettivo';
+      // Pulse the value
+      kcalValEl.classList.remove('ring-emoji-pulse');
+      void kcalValEl.offsetWidth;
+      kcalValEl.classList.add('ring-emoji-pulse');
+    }
+  }
 
   // Macro pills + barre
   const protEl = document.getElementById('hmp-prot-val'); if (protEl) protEl.textContent = t.protein.toFixed(0)+'g';
@@ -6239,16 +7185,16 @@ async function updateHomeDiarySummary() {
   const carbBar = document.getElementById('hmp-carb-bar'); if (carbBar) carbBar.style.width = Math.min(t.carbs/tCarbs*100,100)+'%';
   const fatBar  = document.getElementById('hmp-fat-bar');  if (fatBar)  fatBar.style.width  = Math.min(t.fat/tFat*100,100)+'%';
 
-  // Goal row sotto ring
+  // Barra obiettivo kcal sotto ring
   const goalRow = document.getElementById('home-kcal-goal-row');
+  const goalBar = document.getElementById('home-kcal-goal-bar');
   const goalPct = document.getElementById('home-kcal-goal-pct');
-  const goalTarget = document.getElementById('home-kcal-goal-target');
   if (goalRow && tKcal > 0) {
-    goalRow.style.display = 'flex';
+    goalRow.style.display = 'block';
     const pct = Math.round(kcalPct * 100);
+    if (goalBar) goalBar.style.width = pct + '%';
     if (goalPct) goalPct.textContent = pct + '%';
-    if (goalTarget) goalTarget.textContent = tKcal + ' kcal';
-    if (goalPct) goalPct.style.color = pct >= 100 ? 'var(--orange)' : 'var(--green)';
+    if (goalBar) goalBar.style.background = pct >= 100 ? 'var(--orange)' : 'var(--green)';
   }
   const te = document.getElementById('home-today-entries');
   if (te) if (entries.length) {
@@ -7458,7 +8404,6 @@ function renderPointsUI() {
 
   // Home widget
   const homeTotal = document.getElementById('home-pts-total');
-  { const f=document.getElementById('home-pts-total-full'); if(f) f.textContent = document.getElementById('home-pts-total')?.textContent||'0'; }
   if (homeTotal) homeTotal.textContent = pts;
   const homeBadge = document.getElementById('home-points-badge');
   if (homeBadge) { homeBadge.textContent = badge.icon + ' ' + badge.name; homeBadge.className = 'badge-chip ' + badge.cls; }
