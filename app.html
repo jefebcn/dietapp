@@ -2415,6 +2415,63 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 */
 
 /* ══════════════════════════════════════
+   PERFORMANCE PAGE
+══════════════════════════════════════ */
+.perf-tab-bar { display:flex; background:var(--cream); border-radius:14px; padding:4px; gap:4px; margin-bottom:18px; }
+.perf-tab-btn { flex:1; padding:9px; border-radius:10px; border:none; font-family:var(--font-brand); font-weight:700; font-size:12px; cursor:pointer; transition:all .2s; background:transparent; color:var(--muted); }
+.perf-tab-btn.active { background:var(--white); color:var(--green); box-shadow:var(--shadow); }
+/* Metric card */
+.perf-metric-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:16px; }
+.perf-metric-card { background:var(--cream); border-radius:14px; padding:12px 14px; cursor:pointer; transition:all .15s; border:1.5px solid transparent; }
+.perf-metric-card:hover,.perf-metric-card.active { border-color:var(--green); background:var(--green-bg); }
+.perf-metric-icon { font-size:22px; margin-bottom:4px; }
+.perf-metric-name { font-family:var(--font-brand); font-weight:800; font-size:13px; color:var(--text); }
+.perf-metric-best { font-family:var(--font-mono); font-size:10px; color:var(--green); margin-top:2px; }
+.perf-metric-unit { font-family:var(--font-mono); font-size:9px; color:var(--muted); letter-spacing:.8px; }
+/* Log entry */
+.perf-log-row { display:flex; align-items:center; gap:10px; padding:10px 0; border-bottom:1px solid var(--border); }
+.perf-log-row:last-child { border-bottom:none; }
+.perf-log-date { font-family:var(--font-mono); font-size:10px; color:var(--muted); min-width:60px; }
+.perf-log-val { font-family:var(--font-brand); font-weight:900; font-size:18px; color:var(--text); flex:1; }
+.perf-log-delta { font-family:var(--font-mono); font-size:10px; }
+.perf-log-badge { font-size:14px; }
+.perf-log-nutrition { font-size:10px; font-family:var(--font-mono); color:var(--muted); }
+/* Correlation panel */
+.corr-insight { padding:12px 14px; border-radius:14px; background:rgba(59,130,246,0.07); border:1.5px solid rgba(59,130,246,0.2); margin-bottom:10px; }
+.corr-insight-title { font-family:var(--font-brand); font-weight:800; font-size:13px; color:#1d4ed8; margin-bottom:4px; }
+.corr-insight-text { font-size:12px; color:var(--text); font-family:var(--font-mono); line-height:1.5; }
+.corr-chart-bar { height:6px; border-radius:3px; background:var(--green); transition:width .6s ease; margin-top:3px; }
+/* Performance input */
+.perf-input-row { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+.perf-input-row input { flex:1; }
+/* ══════════════════════════════════════
+   PERIODIZATION PAGE
+══════════════════════════════════════ */
+.period-week-header { display:flex; align-items:center; justify-content:space-between; padding:10px 12px; background:var(--cream); border-radius:12px; margin-bottom:6px; cursor:pointer; transition:background .15s; }
+.period-week-header:hover { background:var(--green-bg); }
+.period-week-title { font-family:var(--font-brand); font-weight:800; font-size:13px; color:var(--text); }
+.period-week-sub { font-family:var(--font-mono); font-size:10px; color:var(--muted); }
+.period-day-row { display:flex; align-items:center; gap:10px; padding:8px 10px; border-radius:10px; margin-bottom:4px; transition:background .15s; border:1.5px solid var(--border); }
+.period-day-row:hover { background:var(--cream); }
+.period-day-num { font-family:var(--font-brand); font-weight:900; font-size:13px; color:var(--muted); min-width:22px; }
+.period-day-type { flex:1; }
+.period-day-name { font-family:var(--font-brand); font-weight:700; font-size:12px; }
+.period-day-macro { font-family:var(--font-mono); font-size:10px; color:var(--muted); margin-top:1px; }
+.period-day-badge { font-size:12px; padding:3px 8px; border-radius:20px; font-family:var(--font-brand); font-weight:700; font-size:11px; white-space:nowrap; }
+.pdb-heavy  { background:rgba(239,68,68,0.1);   color:#b91c1c; }
+.pdb-medium { background:rgba(249,115,22,0.1);  color:#c2410c; }
+.pdb-light  { background:rgba(34,197,94,0.1);   color:#15803d; }
+.pdb-rest   { background:rgba(148,163,184,0.1); color:#64748b; }
+.pdb-deload { background:rgba(168,85,247,0.1);  color:#7c3aed; }
+.pdb-gara   { background:rgba(202,138,4,0.1);   color:#92400e; }
+/* Active program banner */
+.active-program-bar { padding:10px 14px; border-radius:14px; background:rgba(34,197,94,0.08); border:1.5px solid rgba(34,197,94,0.35); display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+.apb-name { font-family:var(--font-brand); font-weight:900; font-size:13px; color:var(--green); }
+.apb-day  { font-family:var(--font-mono); font-size:10px; color:var(--muted); }
+.apb-macro-chips { display:flex; gap:5px; flex-wrap:wrap; margin-top:3px; }
+.apb-chip { font-family:var(--font-mono); font-size:9px; padding:2px 6px; border-radius:8px; background:var(--cream); color:var(--muted); }
+
+/* ══════════════════════════════════════
    WEIGHT SECTION — Neon Banner + Ring
 ══════════════════════════════════════ */
 .weight-neon-banner {
@@ -2780,6 +2837,14 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       <span>SETTINGS</span>
     </button>
+    <button class="nav-btn" id="nav-performance" onclick="goPage('performance')">
+      <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      <span>Perf</span>
+    </button>
+    <button class="nav-btn" id="nav-periodization" onclick="goPage('periodization')">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span>Piano</span>
+    </button>
     <button class="nav-btn" id="nav-rewards" onclick="goPage('rewards')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg>
       <span>REWARDS</span>
@@ -3115,6 +3180,19 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         </div>
         <div id="home-league-mini-board" style="font-size:13px;color:var(--muted);text-align:center">Caricamento classifica...</div>
         <div class="league-countdown" id="home-league-countdown">—</div>
+      </div>
+
+      <!-- ⑤b PROGRAMMA ATTIVO — home reminder -->
+      <div id="home-program-bar" style="display:none;margin-bottom:16px">
+        <div class="active-program-bar">
+          <div style="flex:1">
+            <div style="font-family:var(--font-mono);font-size:8px;letter-spacing:1.5px;color:var(--muted);margin-bottom:2px">PROGRAMMA ATTIVO</div>
+            <div class="apb-name" id="home-prog-name">—</div>
+            <div class="apb-day" id="home-prog-day">—</div>
+            <div class="apb-macro-chips" id="home-prog-chips"></div>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="goPage('periodization')" style="margin-left:auto;font-size:11px">Piano →</button>
+        </div>
       </div>
 
       <!-- ⑥ GRAFICI + STORICO — accordion collassabile ── -->
@@ -4135,6 +4213,217 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
         <div style="margin-top:16px;padding:12px 16px;background:var(--cream);border-radius:10px;font-size:12px;color:var(--muted);text-align:center;line-height:1.6">
           🛒 I premi aprono direttamente il sito <strong><a href="https://flexenofitness.com" target="_blank" style="color:var(--green)">flexenofitness.com</a></strong><br>
           Per coupon e premi digitali contatta il team Flexeno via WhatsApp o email.
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PERFORMANCE PAGE ═══ -->
+    <div class="page" id="page-performance">
+      <div class="page-header">
+        <div>
+          <div class="page-title-tag">// correlazione nutrizione</div>
+          <h1>⚡ Performance</h1>
+        </div>
+      </div>
+
+      <!-- Tab bar: Registra | Correlazione | Storico -->
+      <div class="perf-tab-bar">
+        <button class="perf-tab-btn active" id="ptab-log"    onclick="perfSwitchTab('log')">📥 Registra</button>
+        <button class="perf-tab-btn"        id="ptab-corr"   onclick="perfSwitchTab('corr')">🔗 Correlazione</button>
+        <button class="perf-tab-btn"        id="ptab-hist"   onclick="perfSwitchTab('hist')">📋 Storico</button>
+      </div>
+
+      <!-- ① TAB: REGISTRA ─────────────────────── -->
+      <div id="perf-panel-log">
+        <!-- Metriche disponibili -->
+        <div style="font-family:var(--font-mono);font-size:9px;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px">SELEZIONA METRICA</div>
+        <div class="perf-metric-grid" id="perf-metric-grid">
+          <!-- populated by JS -->
+        </div>
+
+        <!-- Form inserimento -->
+        <div class="card" style="margin-bottom:16px" id="perf-log-form">
+          <h3 style="margin-bottom:14px" id="perf-form-title">⚡ Registra prestazione</h3>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <div class="form-label" style="margin-bottom:5px">DATA</div>
+              <input type="date" id="perf-date" style="width:100%">
+            </div>
+            <div>
+              <div class="form-label" style="margin-bottom:5px" id="perf-val-label">VALORE</div>
+              <div class="perf-input-row">
+                <input type="number" id="perf-value" placeholder="0.00" step="0.01" min="0">
+                <span id="perf-unit-label" style="font-family:var(--font-mono);font-size:14px;color:var(--muted);min-width:30px">sec</span>
+              </div>
+            </div>
+            <div>
+              <div class="form-label" style="margin-bottom:5px">NOTE (opzionale)</div>
+              <input type="text" id="perf-note" placeholder="es: pista sintetica, vento +1.2 m/s…">
+            </div>
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-green" style="flex:1" onclick="savePerfEntry()">💾 Salva prestazione</button>
+              <button class="btn btn-ghost btn-sm" onclick="openPerfMetricModal()">+ Metrica</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Active program day reminder -->
+        <div id="perf-program-reminder" style="display:none">
+          <div class="active-program-bar">
+            <div>
+              <div class="apb-name" id="perf-prog-name">—</div>
+              <div class="apb-day" id="perf-prog-day">Oggi: —</div>
+              <div class="apb-macro-chips" id="perf-prog-chips"></div>
+            </div>
+            <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="goPage('periodization')">Piano →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ② TAB: CORRELAZIONE ──────────────────── -->
+      <div id="perf-panel-corr" style="display:none">
+        <div id="perf-corr-empty" style="display:none">
+          <div class="empty"><div class="empty-icon">🔗</div><p>Registra almeno 3 misurazioni di performance e 3 giorni di diario alimentare per vedere le correlazioni.</p></div>
+        </div>
+        <div id="perf-corr-content">
+          <!-- Insight cards populated by JS -->
+          <div id="perf-corr-insights"></div>
+
+          <!-- Scatter: kcal vs performance -->
+          <div class="card" style="margin-bottom:16px">
+            <h3 style="margin-bottom:10px;font-size:14px">📊 Kcal giorno prima vs Performance</h3>
+            <div id="perf-scatter" style="overflow-y:auto;max-height:260px"></div>
+          </div>
+
+          <!-- Best days nutrition profile -->
+          <div class="card" style="margin-bottom:16px" id="perf-best-days-card">
+            <h3 style="margin-bottom:10px;font-size:14px">🏆 Profilo nutrizionale dei tuoi top 3 giorni</h3>
+            <div id="perf-best-nutrition"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ③ TAB: STORICO ───────────────────────── -->
+      <div id="perf-panel-hist" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+          <div id="perf-hist-metric-label" style="font-family:var(--font-brand);font-weight:800;font-size:15px;color:var(--text)">Tutte le metriche</div>
+          <select id="perf-hist-filter" onchange="renderPerfHistory()" style="font-family:var(--font-mono);font-size:11px;padding:4px 8px;border-radius:8px;border:1.5px solid var(--border);background:var(--white)">
+            <option value="all">Tutte</option>
+          </select>
+        </div>
+        <div id="perf-history-list">
+          <div class="empty"><div class="empty-icon">⚡</div><p>Nessuna prestazione registrata.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ PERIODIZATION PAGE ═══ -->
+    <div class="page" id="page-periodization">
+      <div class="page-header">
+        <div>
+          <div class="page-title-tag">// macro automatici</div>
+          <h1>🗓 Periodizzazione</h1>
+        </div>
+        <button class="btn btn-green btn-sm" onclick="openNewProgramModal()">+ Nuovo</button>
+      </div>
+
+      <!-- Active program banner -->
+      <div id="period-active-banner" style="display:none">
+        <div class="active-program-bar">
+          <div style="flex:1">
+            <div class="apb-name" id="period-active-name">—</div>
+            <div class="apb-day" id="period-active-status">—</div>
+            <div class="apb-macro-chips" id="period-active-chips"></div>
+          </div>
+          <div style="text-align:right">
+            <button class="btn btn-ghost btn-xs" onclick="stopActiveProgram()" style="font-size:10px;color:var(--danger)">■ Stop</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Program list -->
+      <div id="period-program-list">
+        <div class="empty"><div class="empty-icon">🗓</div><p>Nessun programma ancora. Crea il primo piano strutturato!</p></div>
+      </div>
+    </div>
+
+    <!-- Modal: new metric -->
+    <div id="perf-metric-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closePerfMetricModal()">
+      <div class="modal-card" style="max-width:340px">
+        <div class="modal-header"><h3>➕ Nuova Metrica</h3><button class="modal-close" onclick="closePerfMetricModal()">✕</button></div>
+        <div style="display:flex;flex-direction:column;gap:12px;padding:16px">
+          <div>
+            <div class="form-label" style="margin-bottom:5px">NOME</div>
+            <input type="text" id="pm-name" placeholder="es: 100m piani, Squat 1RM…">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div>
+              <div class="form-label" style="margin-bottom:5px">EMOJI</div>
+              <input type="text" id="pm-emoji" placeholder="⚡" maxlength="2" style="text-align:center;font-size:20px">
+            </div>
+            <div>
+              <div class="form-label" style="margin-bottom:5px">UNITÀ</div>
+              <input type="text" id="pm-unit" placeholder="sec / kg / rep">
+            </div>
+          </div>
+          <div>
+            <div class="form-label" style="margin-bottom:5px">TIPO</div>
+            <select id="pm-dir" style="width:100%;padding:8px;border-radius:8px;border:1.5px solid var(--border)">
+              <option value="lower">↓ Più basso = meglio (tempi, distanze)</option>
+              <option value="higher">↑ Più alto = meglio (kg, reps, distanza)</option>
+            </select>
+          </div>
+          <button class="btn btn-green" onclick="saveCustomMetric()">Salva metrica</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: new program -->
+    <div id="period-new-modal" class="modal-overlay" style="display:none" onclick="if(event.target===this)closeProgramModal()">
+      <div class="modal-card" style="max-width:420px;max-height:90vh;overflow-y:auto">
+        <div class="modal-header"><h3 id="prog-modal-title">🗓 Nuovo Programma</h3><button class="modal-close" onclick="closeProgramModal()">✕</button></div>
+        <div style="padding:16px;display:flex;flex-direction:column;gap:14px">
+          <div>
+            <div class="form-label" style="margin-bottom:5px">NOME PROGRAMMA</div>
+            <input type="text" id="prog-name" placeholder="es: Prep Gara Maggio, Bulk Invernale…">
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div>
+              <div class="form-label" style="margin-bottom:5px">DURATA (settimane)</div>
+              <input type="number" id="prog-weeks" min="1" max="24" value="4" oninput="renderProgramBuilder()">
+            </div>
+            <div>
+              <div class="form-label" style="margin-bottom:5px">DATA INIZIO</div>
+              <input type="date" id="prog-start">
+            </div>
+          </div>
+          <!-- Template quick-select -->
+          <div>
+            <div class="form-label" style="margin-bottom:6px">TEMPLATE</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap">
+              <button class="cat-chip" onclick="applyProgramTemplate('sprint')">🏃 Velocità</button>
+              <button class="cat-chip" onclick="applyProgramTemplate('hypertrophy')">💪 Ipertrofia</button>
+              <button class="cat-chip" onclick="applyProgramTemplate('cut')">📉 Definizione</button>
+              <button class="cat-chip" onclick="applyProgramTemplate('strength')">🏋️ Forza</button>
+              <button class="cat-chip" onclick="applyProgramTemplate('maintenance')">⚖️ Mantenimento</button>
+            </div>
+          </div>
+          <!-- Week pattern builder -->
+          <div>
+            <div class="form-label" style="margin-bottom:6px">SCHEMA SETTIMANALE</div>
+            <div id="prog-week-pattern" style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:8px">
+              <!-- 7 day selectors filled by JS -->
+            </div>
+            <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">Il pattern si ripete ogni settimana. Puoi modificare settimane singole sotto.</div>
+          </div>
+          <!-- Per-week override -->
+          <div id="prog-builder-weeks" style="max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:6px">
+            <!-- weeks populated by renderProgramBuilder() -->
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-green" style="flex:1" onclick="saveNewProgram()">💾 Salva programma</button>
+            <button class="btn btn-ghost btn-sm" onclick="closeProgramModal()">Annulla</button>
+          </div>
         </div>
       </div>
     </div>
@@ -5196,10 +5485,12 @@ function goPage(id) {
   if (id === 'admin') loadAdminUsers();
   if (id === 'goals') { loadGoal(); renderRicette(); }
   if (id === 'diary') { setDiaryToday(); switchDiaryTab('diary'); }
-  if (id === 'home') { loadMacroWeekChart(); updateHomeDiarySummary(); }
+  if (id === 'home') { loadMacroWeekChart(); updateHomeDiarySummary(); injectActiveProgramTargets?.(); }
   if (id === 'rewards') { renderPointsUI(); loadReferralData(); refreshLeagueGroup().then(()=>renderLeagueUI()).catch(()=>{}); }
   if (id === 'peso') { wpInitPage(); }
   if (id === 'settings') { loadSettingsPage(); }
+  if (id === 'performance') { initPerfPage(); }
+  if (id === 'periodization') { initPeriodizationPage(); }
   // Sync mobile bottom nav
   _syncMobileNav(id);
 }
@@ -6316,6 +6607,806 @@ function updateWeightUI() {
   }
 }
 
+// ══════════════════════════════════════════════════════════════
+// PERFORMANCE MODULE
+// ══════════════════════════════════════════════════════════════
+const DEFAULT_METRICS = [
+  { id:'m60',   name:'60m piani',      emoji:'🏃', unit:'sec', dir:'lower' },
+  { id:'m100',  name:'100m piani',     emoji:'⚡', unit:'sec', dir:'lower' },
+  { id:'msquat',name:'Squat 1RM',      emoji:'🏋️', unit:'kg',  dir:'higher' },
+  { id:'mbench',name:'Panca 1RM',      emoji:'💪', unit:'kg',  dir:'higher' },
+  { id:'mdead', name:'Deadlift 1RM',   emoji:'🔱', unit:'kg',  dir:'higher' },
+  { id:'mvert', name:'Salto verticale',emoji:'🦘', unit:'cm',  dir:'higher' },
+];
+
+let perfMetrics     = [];   // DEFAULT_METRICS + custom
+let perfEntries     = [];   // [{id, metricId, date, value, note}]
+let perfSelectedMet = 'm60';
+let perfTabActive   = 'log';
+
+// ─── Init ──────────────────────────────────────────────────
+async function initPerfPage() {
+  await loadPerfData();
+  renderPerfMetricGrid();
+  renderPerfHistory();
+  renderPerfCorrelation();
+  updatePerfProgramReminder();
+  // Set today as default date
+  const di = document.getElementById('perf-date');
+  if (di && !di.value) di.value = todayStr();
+  // Populate history filter
+  const sel = document.getElementById('perf-hist-filter');
+  if (sel) {
+    sel.innerHTML = '<option value="all">Tutte</option>' +
+      perfMetrics.map(m => `<option value="${m.id}">${m.emoji} ${m.name}</option>`).join('');
+  }
+}
+
+async function loadPerfData() {
+  const {db, collection, getDocs, doc, getDoc} = window._fb;
+  try {
+    const metSnap  = await getDoc(doc(db,'users',uid(),'perf','metrics'));
+    const custom   = metSnap.exists() ? (metSnap.data().list || []) : [];
+    perfMetrics    = [...DEFAULT_METRICS, ...custom];
+    const entSnap  = await getDocs(collection(db,'users',uid(),'perf_entries'));
+    perfEntries    = entSnap.docs.map(d => ({id:d.id, ...d.data()}));
+    perfEntries.sort((a,b) => b.date.localeCompare(a.date));
+  } catch(e) {
+    perfMetrics  = [...DEFAULT_METRICS];
+    perfEntries  = [];
+  }
+}
+
+// ─── Tab switching ──────────────────────────────────────────
+function perfSwitchTab(tab) {
+  perfTabActive = tab;
+  ['log','corr','hist'].forEach(t => {
+    const btn   = document.getElementById('ptab-'+t);
+    const panel = document.getElementById('perf-panel-'+t);
+    if (btn)   btn.classList.toggle('active', t===tab);
+    if (panel) panel.style.display = t===tab ? '' : 'none';
+  });
+  if (tab === 'corr') renderPerfCorrelation();
+  if (tab === 'hist') renderPerfHistory();
+}
+
+// ─── Metric grid ───────────────────────────────────────────
+function renderPerfMetricGrid() {
+  const el = document.getElementById('perf-metric-grid');
+  if (!el) return;
+  el.innerHTML = perfMetrics.map(m => {
+    const best = getBestEntry(m);
+    const bestStr = best ? `PB: ${best.value} ${m.unit}` : 'Nessun dato';
+    return `<div class="perf-metric-card ${m.id===perfSelectedMet?'active':''}"
+              onclick="selectPerfMetric('${m.id}')">
+      <div class="perf-metric-icon">${m.emoji}</div>
+      <div class="perf-metric-name">${m.name}</div>
+      <div class="perf-metric-best">${bestStr}</div>
+      <div class="perf-metric-unit">${m.unit}</div>
+    </div>`;
+  }).join('');
+}
+
+function getBestEntry(m) {
+  const entries = perfEntries.filter(e => e.metricId === m.id);
+  if (!entries.length) return null;
+  return entries.reduce((best, e) => {
+    if (!best) return e;
+    return m.dir === 'lower' ? (e.value < best.value ? e : best) : (e.value > best.value ? e : best);
+  }, null);
+}
+
+function selectPerfMetric(id) {
+  perfSelectedMet = id;
+  const m = perfMetrics.find(x => x.id === id);
+  if (!m) return;
+  renderPerfMetricGrid();
+  // Update form labels
+  const title = document.getElementById('perf-form-title');
+  const valLbl= document.getElementById('perf-val-label');
+  const unitLbl= document.getElementById('perf-unit-label');
+  if (title)  title.textContent  = `${m.emoji} ${m.name}`;
+  if (valLbl) valLbl.textContent = `VALORE (${m.unit.toUpperCase()})`;
+  if (unitLbl)unitLbl.textContent= m.unit;
+}
+
+// ─── Save entry ────────────────────────────────────────────
+async function savePerfEntry() {
+  const date  = document.getElementById('perf-date')?.value || todayStr();
+  const value = parseFloat(document.getElementById('perf-value')?.value);
+  const note  = document.getElementById('perf-note')?.value?.trim() || '';
+  if (isNaN(value) || value <= 0) { toast('⚠️ Inserisci un valore valido'); return; }
+  const {db, collection, addDoc} = window._fb;
+  try {
+    await addDoc(collection(db,'users',uid(),'perf_entries'), {
+      metricId: perfSelectedMet, date, value, note,
+      createdAt: new Date().toISOString()
+    });
+    toast('✅ Prestazione salvata!');
+    document.getElementById('perf-value').value = '';
+    document.getElementById('perf-note').value  = '';
+    await loadPerfData();
+    renderPerfMetricGrid();
+    renderPerfHistory();
+    awardPoints(10, '⚡ Prestazione registrata', '⚡').catch(()=>{});
+  } catch(e) { toast('❌ Errore salvataggio: '+e.message); }
+}
+
+// ─── History ───────────────────────────────────────────────
+function renderPerfHistory() {
+  const el  = document.getElementById('perf-history-list');
+  const sel = document.getElementById('perf-hist-filter');
+  if (!el) return;
+  const filterMet = sel ? sel.value : 'all';
+  const entries = filterMet === 'all'
+    ? perfEntries
+    : perfEntries.filter(e => e.metricId === filterMet);
+  if (!entries.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">⚡</div><p>Nessuna prestazione per questa metrica.</p></div>';
+    return;
+  }
+  el.innerHTML = entries.slice(0, 50).map((e, i) => {
+    const m    = perfMetrics.find(x => x.id === e.metricId) || {emoji:'⚡',name:e.metricId,unit:'',dir:'higher'};
+    const prev = entries.slice(i+1).find(x => x.metricId === e.metricId);
+    let deltaHtml = '';
+    if (prev) {
+      const d = e.value - prev.value;
+      const better = m.dir === 'lower' ? d < 0 : d > 0;
+      const col = better ? 'var(--green)' : d !== 0 ? 'var(--danger)' : 'var(--muted)';
+      const arrow = better ? '↑' : d < 0 ? '↓' : '→';
+      deltaHtml = `<span class="perf-log-delta" style="color:${col}">${d>0?'+':''}${d.toFixed(2)} ${arrow}</span>`;
+    }
+    const best = getBestEntry(m);
+    const isPB = best && best.id === e.id;
+    return `<div class="perf-log-row">
+      <span class="perf-log-date">${formatDate(e.date)}</span>
+      <span style="font-size:16px">${m.emoji}</span>
+      <span class="perf-log-val">${e.value} <span style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">${m.unit}</span></span>
+      ${deltaHtml}
+      ${isPB ? '<span class="perf-log-badge" title="Record personale">🏅</span>' : ''}
+      ${e.note ? `<span style="font-size:10px;color:var(--muted);font-family:var(--font-mono)">${e.note}</span>` : ''}
+      <button class="btn btn-danger btn-icon btn-sm" onclick="deletePerfEntry('${e.id}')" title="Elimina">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
+      </button>
+    </div>`;
+  }).join('');
+}
+
+async function deletePerfEntry(id) {
+  if (!confirm('Eliminare questa prestazione?')) return;
+  const {db, doc, deleteDoc} = window._fb;
+  try {
+    await deleteDoc(doc(db,'users',uid(),'perf_entries',id));
+    await loadPerfData();
+    renderPerfMetricGrid();
+    renderPerfHistory();
+    renderPerfCorrelation();
+    toast('🗑 Eliminata');
+  } catch(e) { toast('❌ Errore: '+e.message); }
+}
+
+// ─── Custom metric modal ────────────────────────────────────
+function openPerfMetricModal() {
+  document.getElementById('pm-name').value  = '';
+  document.getElementById('pm-emoji').value = '⚡';
+  document.getElementById('pm-unit').value  = '';
+  document.getElementById('perf-metric-modal').style.display = 'flex';
+}
+function closePerfMetricModal() {
+  document.getElementById('perf-metric-modal').style.display = 'none';
+}
+async function saveCustomMetric() {
+  const name  = document.getElementById('pm-name').value.trim();
+  const emoji = document.getElementById('pm-emoji').value.trim() || '⚡';
+  const unit  = document.getElementById('pm-unit').value.trim() || 'val';
+  const dir   = document.getElementById('pm-dir').value;
+  if (!name) { toast('⚠️ Inserisci un nome'); return; }
+  const id = 'custom_' + Date.now();
+  const {db, doc, setDoc} = window._fb;
+  const existing = perfMetrics.filter(m => m.id.startsWith('custom_'));
+  const newList  = [...existing, {id, name, emoji, unit, dir}];
+  try {
+    await setDoc(doc(db,'users',uid(),'perf','metrics'), { list: newList });
+    closePerfMetricModal();
+    await loadPerfData();
+    renderPerfMetricGrid();
+    const sel = document.getElementById('perf-hist-filter');
+    if (sel) sel.innerHTML = '<option value="all">Tutte</option>' +
+      perfMetrics.map(m => `<option value="${m.id}">${m.emoji} ${m.name}</option>`).join('');
+    toast('✅ Metrica aggiunta!');
+  } catch(e) { toast('❌ Errore: '+e.message); }
+}
+
+// ─── Correlation engine ────────────────────────────────────
+async function renderPerfCorrelation() {
+  const insightsEl = document.getElementById('perf-corr-insights');
+  const scatterEl  = document.getElementById('perf-scatter');
+  const bestNutEl  = document.getElementById('perf-best-nutrition');
+  const emptyEl    = document.getElementById('perf-corr-empty');
+  const contentEl  = document.getElementById('perf-corr-content');
+  if (!insightsEl) return;
+
+  if (perfEntries.length < 3) {
+    if (emptyEl)   emptyEl.style.display = '';
+    if (contentEl) contentEl.style.display = 'none';
+    return;
+  }
+  if (emptyEl)   emptyEl.style.display = 'none';
+  if (contentEl) contentEl.style.display = '';
+
+  // Load diary data for correlation
+  const {db, collection, getDocs} = window._fb;
+  let diaryMap = {};
+  try {
+    const snap = await getDocs(collection(db,'users',uid(),'diary'));
+    snap.docs.forEach(d => {
+      const entries = d.data().entries || [];
+      const t = entries.reduce((a,e)=>({kcal:a.kcal+e.kcal,prot:a.prot+(e.protein||0),carbs:a.carbs+(e.carbs||0),fat:a.fat+(e.fat||0)}),{kcal:0,prot:0,carbs:0,fat:0});
+      diaryMap[d.id] = t;
+    });
+  } catch(e) {}
+
+  // Build correlation data: for each perf entry, look at nutrition on same day AND day before
+  const corrData = perfEntries.map(e => {
+    const dayBefore = new Date(e.date+'T00:00:00');
+    dayBefore.setDate(dayBefore.getDate()-1);
+    const dayBeforeStr = dayBefore.toISOString().slice(0,10);
+    const nutr = diaryMap[e.date] || diaryMap[dayBeforeStr] || null;
+    return { ...e, nutr };
+  }).filter(e => e.nutr);
+
+  if (!corrData.length) {
+    insightsEl.innerHTML = '<div class="corr-insight"><div class="corr-insight-title">📊 Dati insufficienti</div><div class="corr-insight-text">Non trovati giorni con sia una prestazione che un log alimentare. Assicurati di usare il diario nei giorni di allenamento.</div></div>';
+    if (scatterEl) scatterEl.innerHTML = '';
+    return;
+  }
+
+  // Per-metric analysis
+  const insights = [];
+  for (const m of perfMetrics) {
+    const mData = corrData.filter(e => e.metricId === m.id);
+    if (mData.length < 2) continue;
+    // Sort by performance (best first)
+    const sorted = [...mData].sort((a,b) => m.dir === 'lower' ? a.value - b.value : b.value - a.value);
+    const top    = sorted.slice(0, Math.ceil(sorted.length * 0.33));
+    const avg    = arr => arr.reduce((s,e) => s+e, 0) / arr.length;
+    const topKcal= avg(top.map(e => e.nutr.kcal));
+    const allKcal= avg(mData.map(e => e.nutr.kcal));
+    const topProt= avg(top.map(e => e.nutr.prot));
+    const topCarb= avg(top.map(e => e.nutr.carbs));
+    const diff   = Math.round(topKcal - allKcal);
+    const diffPct= allKcal > 0 ? Math.round((diff/allKcal)*100) : 0;
+    const pb = getBestEntry(m);
+    const pbNutr = pb ? corrData.find(e => e.id === pb.id) : null;
+    insights.push({ m, top, allKcal, topKcal, diff, diffPct, topProt, topCarb, pb, pbNutr, mData });
+  }
+
+  if (!insights.length) {
+    insightsEl.innerHTML = '<div class="corr-insight"><div class="corr-insight-title">🔗 Ancora pochi dati</div><div class="corr-insight-text">Continua a registrare prestazioni e pasti per vedere le correlazioni.</div></div>';
+    return;
+  }
+
+  insightsEl.innerHTML = insights.map(ins => {
+    const { m, diff, diffPct, topKcal, allKcal, topProt, topCarb, pbNutr } = ins;
+    const better = diff > 0 ? `+${diff} kcal (${diffPct}% in più)` : `${diff} kcal (${Math.abs(diffPct)}% in meno)`;
+    const icon   = diff > 0 ? '📈' : '📉';
+    const pbLine = pbNutr ? `<br>🏅 Giorno del PB: ${Math.round(pbNutr.nutr.kcal)} kcal · ${Math.round(pbNutr.nutr.prot)}g prot · ${Math.round(pbNutr.nutr.carbs)}g carb` : '';
+    const barW   = Math.min(100, Math.abs(diffPct) * 3);
+    return `<div class="corr-insight">
+      <div class="corr-insight-title">${m.emoji} ${m.name} — Correlazione kcal</div>
+      <div class="corr-insight-text">
+        Nelle tue <strong>top performance</strong> mangiavi in media <strong>${Math.round(topKcal)} kcal</strong> ${icon} (${better} rispetto alla media di tutti i giorni).
+        Proteine ottimali: ~${Math.round(topProt)}g · Carboidrati: ~${Math.round(topCarb)}g${pbLine}
+      </div>
+      <div style="margin-top:6px">
+        <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">Impatto kcal sulle top performance</div>
+        <div class="corr-chart-bar" style="width:${barW}%;background:${diff>0?'var(--green)':'var(--orange)'}"></div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Scatter: kcal vs value for selected metric
+  const selIns = insights.find(i => i.m.id === perfSelectedMet) || insights[0];
+  if (selIns && scatterEl) {
+    const { m, mData } = selIns;
+    const maxKcal = Math.max(...mData.map(e => e.nutr.kcal));
+    const maxVal  = m.dir === 'lower'
+      ? Math.max(...mData.map(e => e.value))
+      : Math.max(...mData.map(e => e.value));
+    scatterEl.innerHTML = mData.slice(0,20).map(e => {
+      const kPct = maxKcal > 0 ? (e.nutr.kcal / maxKcal * 100) : 50;
+      const best = getBestEntry(m);
+      const isPB = best && best.id === e.id;
+      return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border)">
+        <span style="font-family:var(--font-mono);font-size:9px;color:var(--muted);min-width:52px">${formatDate(e.date)}</span>
+        <div style="flex:1;height:16px;background:var(--cream);border-radius:4px;overflow:hidden;position:relative">
+          <div style="height:100%;width:${kPct.toFixed(0)}%;background:rgba(59,130,246,0.35);border-radius:4px"></div>
+          <span style="position:absolute;left:4px;top:0;font-family:var(--font-mono);font-size:9px;line-height:16px;color:var(--text)">${Math.round(e.nutr.kcal)} kcal</span>
+        </div>
+        <span style="font-family:var(--font-brand);font-weight:900;font-size:14px;min-width:52px;text-align:right;color:${isPB?'#ca8a04':'var(--text)'}">${e.value} ${m.unit} ${isPB?'🏅':''}</span>
+      </div>`;
+    }).join('');
+  }
+
+  // Best days nutrition profile
+  if (bestNutEl && insights.length) {
+    const first = insights[0];
+    const topDays = first.top.filter(e => e.nutr);
+    if (topDays.length) {
+      const avg = arr => Math.round(arr.reduce((s,x)=>s+x,0)/arr.length);
+      bestNutEl.innerHTML = `
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
+          ${[['🔥','Kcal',avg(topDays.map(e=>e.nutr.kcal)),''],
+             ['🥩','Prot',avg(topDays.map(e=>e.nutr.prot)),'g'],
+             ['🍚','Carb',avg(topDays.map(e=>e.nutr.carbs)),'g'],
+             ['🧈','Grassi',avg(topDays.map(e=>e.nutr.fat)),'g']].map(([ico,lbl,val,u])=>
+            `<div style="text-align:center;background:var(--cream);border-radius:12px;padding:10px 6px">
+               <div style="font-size:18px">${ico}</div>
+               <div style="font-family:var(--font-brand);font-weight:900;font-size:16px">${val}${u}</div>
+               <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted)">${lbl}</div>
+             </div>`).join('')}
+        </div>
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:8px;text-align:center">Media dei tuoi top ${topDays.length} giorni di prestazione — ${first.m.emoji} ${first.m.name}</div>`;
+    }
+  }
+}
+
+// Active program reminder on perf page
+function updatePerfProgramReminder() {
+  const rem = document.getElementById('perf-program-reminder');
+  if (!rem) return;
+  const prog = getActiveProgramToday();
+  if (!prog) { rem.style.display = 'none'; return; }
+  rem.style.display = '';
+  const nameEl = document.getElementById('perf-prog-name');
+  const dayEl  = document.getElementById('perf-prog-day');
+  const chips  = document.getElementById('perf-prog-chips');
+  if (nameEl) nameEl.textContent = prog.program.name;
+  if (dayEl)  dayEl.textContent  = 'Oggi: ' + prog.dayLabel;
+  if (chips)  chips.innerHTML    = _macroChipsHtml(prog.targets);
+}
+
+// ══════════════════════════════════════════════════════════════
+// PERIODIZATION MODULE
+// ══════════════════════════════════════════════════════════════
+const DAY_TYPES = {
+  heavy:  { label:'🔴 Pesante',  badge:'pdb-heavy',  kcalMult:1.15, protMult:1.05, carbMult:1.40, fatMult:0.80 },
+  medium: { label:'🟠 Medio',    badge:'pdb-medium', kcalMult:1.05, protMult:1.00, carbMult:1.10, fatMult:0.95 },
+  light:  { label:'🟢 Leggero',  badge:'pdb-light',  kcalMult:0.90, protMult:1.00, carbMult:0.80, fatMult:1.10 },
+  rest:   { label:'⬜ Riposo',   badge:'pdb-rest',   kcalMult:0.80, protMult:0.95, carbMult:0.65, fatMult:1.15 },
+  deload: { label:'🟣 Scarico',  badge:'pdb-deload', kcalMult:0.85, protMult:0.90, carbMult:0.75, fatMult:1.10 },
+  gara:   { label:'🏆 Gara',     badge:'pdb-gara',   kcalMult:1.20, protMult:1.00, carbMult:1.70, fatMult:0.70 },
+};
+const DAY_NAMES_SHORT = ['Lun','Mar','Mer','Gio','Ven','Sab','Dom'];
+
+const PROGRAM_TEMPLATES = {
+  sprint: {
+    name:'Preparazione Velocità',
+    pattern:['heavy','medium','rest','heavy','medium','light','rest'],
+    weekModifier: (weekIdx, totalWeeks, pattern) => {
+      // Last week: deload
+      if (weekIdx === totalWeeks - 1) return pattern.map(d => d==='heavy'?'deload':d==='medium'?'light':d);
+      return pattern;
+    }
+  },
+  hypertrophy: {
+    name:'Ipertrofia',
+    pattern:['heavy','heavy','rest','medium','heavy','medium','rest'],
+    weekModifier: (wi, tot, p) => wi === tot-1 ? p.map(d=>d==='heavy'?'medium':d==='medium'?'light':d) : p
+  },
+  cut: {
+    name:'Definizione',
+    pattern:['medium','light','medium','rest','medium','light','rest'],
+    weekModifier: (wi, tot, p) => p
+  },
+  strength: {
+    name:'Forza Massimale',
+    pattern:['heavy','rest','heavy','rest','medium','rest','rest'],
+    weekModifier: (wi, tot, p) => wi===tot-1?p.map(d=>d==='heavy'?'deload':d):p
+  },
+  maintenance: {
+    name:'Mantenimento',
+    pattern:['medium','light','medium','light','medium','light','rest'],
+    weekModifier:(wi,tot,p)=>p
+  }
+};
+
+let programs       = [];
+let activeProgId   = null;
+let progWeekPattern= ['heavy','medium','rest','heavy','medium','light','rest'];
+let editingProgId  = null;
+
+// ─── Init ──────────────────────────────────────────────────
+async function initPeriodizationPage() {
+  await loadPrograms();
+  renderProgramList();
+  updateActiveProgramBanner();
+  // Inject today macro override if program active
+  injectActiveProgramTargets();
+}
+
+async function loadPrograms() {
+  const {db, doc, getDoc} = window._fb;
+  try {
+    const snap = await getDoc(doc(db,'users',uid(),'periodization','data'));
+    if (snap.exists()) {
+      programs     = snap.data().programs || [];
+      activeProgId = snap.data().activeProgId || null;
+    }
+  } catch(e) { programs = []; activeProgId = null; }
+}
+
+async function savePrograms() {
+  const {db, doc, setDoc} = window._fb;
+  await setDoc(doc(db,'users',uid(),'periodization','data'), { programs, activeProgId });
+}
+
+// ─── Program list ──────────────────────────────────────────
+function renderProgramList() {
+  const el = document.getElementById('period-program-list');
+  if (!el) return;
+  if (!programs.length) {
+    el.innerHTML = '<div class="empty"><div class="empty-icon">🗓</div><p>Nessun programma ancora. Crea il primo piano strutturato!</p></div>';
+    return;
+  }
+  el.innerHTML = programs.map(prog => {
+    const isActive  = prog.id === activeProgId;
+    const startDate = new Date(prog.startDate+'T00:00:00');
+    const endDate   = new Date(startDate); endDate.setDate(endDate.getDate() + prog.weeks*7 - 1);
+    const today     = new Date(); today.setHours(0,0,0,0);
+    const dayNum    = Math.floor((today - startDate) / 86400000) + 1;
+    const weekNum   = Math.ceil(dayNum / 7);
+    const inRange   = today >= startDate && today <= endDate;
+    const todayType = inRange ? _getDayType(prog, dayNum-1) : null;
+    const progressPct = prog.weeks > 0 ? Math.min(100, Math.max(0, Math.round(((dayNum-1)/(prog.weeks*7))*100))) : 0;
+    return `<div class="card" style="margin-bottom:12px;border-top:3px solid ${isActive?'var(--green)':'var(--border)'}">
+      <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:10px">
+        <div style="flex:1">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-family:var(--font-brand);font-weight:900;font-size:16px">${prog.name}</span>
+            ${isActive?'<span class="badge badge-green" style="font-size:9px;padding:2px 8px">ATTIVO</span>':''}
+          </div>
+          <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted);margin-top:2px">
+            ${prog.weeks} settimane · ${formatDate(prog.startDate)} → ${formatDate(endDate.toISOString().slice(0,10))}
+          </div>
+        </div>
+        <div style="display:flex;gap:5px">
+          ${!isActive?`<button class="btn btn-green btn-sm" onclick="activateProgram('${prog.id}')">▶ Avvia</button>`:''}
+          <button class="btn btn-ghost btn-sm" onclick="editProgram('${prog.id}')">✏️</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteProgram('${prog.id}')">🗑</button>
+        </div>
+      </div>
+      ${isActive && inRange ? `
+        <div style="margin-bottom:10px">
+          <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-bottom:3px">
+            <span>Settimana ${weekNum}/${prog.weeks}</span><span>${progressPct}%</span>
+          </div>
+          <div style="height:5px;background:var(--cream);border-radius:4px;overflow:hidden">
+            <div style="height:100%;width:${progressPct}%;background:var(--green);border-radius:4px;transition:width 1s ease"></div>
+          </div>
+        </div>
+        ${todayType ? `<div style="font-family:var(--font-mono);font-size:11px;color:var(--muted)">Oggi (Giorno ${dayNum}): <span class="period-day-badge ${DAY_TYPES[todayType]?.badge}">${DAY_TYPES[todayType]?.label}</span></div>` : ''}
+      ` : ''}
+      <!-- Week overview accordion -->
+      <div style="margin-top:8px">
+        <button class="btn btn-ghost btn-xs" onclick="_toggleProgWeeks('${prog.id}')" style="font-size:10px">📅 Schema settimane</button>
+        <div id="prog-weeks-${prog.id}" style="display:none;margin-top:8px">
+          ${_renderProgWeekSummary(prog)}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function _toggleProgWeeks(id) {
+  const el = document.getElementById('prog-weeks-'+id);
+  if (el) el.style.display = el.style.display === 'none' ? '' : 'none';
+}
+
+function _renderProgWeekSummary(prog) {
+  let html = '';
+  for (let w = 0; w < prog.weeks; w++) {
+    const days = prog.days.slice(w*7, w*7+7);
+    const typeCounts = {};
+    days.forEach(d => { typeCounts[d] = (typeCounts[d]||0)+1; });
+    const summary = Object.entries(typeCounts).map(([t,n]) => `${DAY_TYPES[t]?.label||t} ×${n}`).join(' · ');
+    html += `<div style="font-family:var(--font-mono);font-size:10px;margin-bottom:4px;display:flex;gap:6px;align-items:center">
+      <span style="color:var(--muted);min-width:50px">Sett. ${w+1}</span>
+      <div style="display:flex;gap:2px">${days.map(d=>`<span style="width:12px;height:12px;border-radius:3px;display:inline-block;background:${_dayTypeColor(d)}" title="${DAY_TYPES[d]?.label||d}"></span>`).join('')}</div>
+      <span style="color:var(--muted);font-size:9px">${summary}</span>
+    </div>`;
+  }
+  return html;
+}
+
+function _dayTypeColor(type) {
+  return {heavy:'#ef444440',medium:'#f9731640',light:'#22c55e40',rest:'#94a3b840',deload:'#a855f740',gara:'#ca8a0440'}[type] || '#94a3b840';
+}
+
+function _getDayType(prog, dayIndex) {
+  if (!prog.days || dayIndex < 0 || dayIndex >= prog.days.length) return null;
+  return prog.days[dayIndex] || 'rest';
+}
+
+// ─── Activate / Stop ───────────────────────────────────────
+async function activateProgram(id) {
+  activeProgId = id;
+  await savePrograms();
+  await loadPrograms();
+  renderProgramList();
+  updateActiveProgramBanner();
+  injectActiveProgramTargets();
+  toast('✅ Programma attivato! I macro si aggiornano automaticamente ogni giorno.');
+}
+
+async function stopActiveProgram() {
+  if (!confirm('Interrompere il programma attivo? I macro torneranno al valore standard.')) return;
+  activeProgId = null;
+  await savePrograms();
+  await loadPrograms();
+  renderProgramList();
+  updateActiveProgramBanner();
+  injectActiveProgramTargets();
+  toast('⏹ Programma interrotto');
+}
+
+function updateActiveProgramBanner() {
+  const bannerEl = document.getElementById('period-active-banner');
+  if (!bannerEl) return;
+  const prog = getActiveProgramToday();
+  if (!prog) { bannerEl.style.display = 'none'; return; }
+  bannerEl.style.display = '';
+  const nameEl  = document.getElementById('period-active-name');
+  const statEl  = document.getElementById('period-active-status');
+  const chipsEl = document.getElementById('period-active-chips');
+  if (nameEl) nameEl.textContent = prog.program.name;
+  if (statEl) statEl.textContent = `${prog.weekLabel} · Oggi: ${prog.dayLabel}`;
+  if (chipsEl) chipsEl.innerHTML = _macroChipsHtml(prog.targets);
+}
+
+function getActiveProgramToday() {
+  if (!activeProgId) return null;
+  const prog = programs.find(p => p.id === activeProgId);
+  if (!prog) return null;
+  const today    = new Date(); today.setHours(0,0,0,0);
+  const startDate= new Date(prog.startDate+'T00:00:00');
+  const endDate  = new Date(startDate); endDate.setDate(endDate.getDate() + prog.weeks*7 - 1);
+  if (today < startDate || today > endDate) return null;
+  const dayIndex = Math.floor((today - startDate) / 86400000);
+  const dayType  = _getDayType(prog, dayIndex);
+  if (!dayType) return null;
+  const dt       = DAY_TYPES[dayType];
+  const weekNum  = Math.floor(dayIndex / 7) + 1;
+  const tdee     = (userTargets?.tdee)    || 2000;
+  const prot     = (userTargets?.protein) || Math.round(tdee*0.25/4);
+  const carbs    = (userTargets?.carbs)   || Math.round(tdee*0.50/4);
+  const fat      = (userTargets?.fat)     || Math.round(tdee*0.25/9);
+  const targets  = {
+    kcal:  Math.round(tdee  * dt.kcalMult),
+    prot:  Math.round(prot  * dt.protMult),
+    carbs: Math.round(carbs * dt.carbMult),
+    fat:   Math.round(fat   * dt.fatMult),
+  };
+  return {
+    program: prog, dayType, dayIndex, dayLabel: dt.label,
+    weekLabel: `Settimana ${weekNum}`, targets
+  };
+}
+
+function _macroChipsHtml(t) {
+  if (!t) return '';
+  return `<span class="apb-chip">🔥 ${t.kcal} kcal</span>
+          <span class="apb-chip">🥩 ${t.prot}g P</span>
+          <span class="apb-chip">🍚 ${t.carbs}g C</span>
+          <span class="apb-chip">🧈 ${t.fat}g G</span>`;
+}
+
+// Override getActiveTargets when program is active
+function injectActiveProgramTargets() {
+  const prog = getActiveProgramToday();
+  if (prog) {
+    // Inject into customTargets so getActiveTargets picks it up
+    if (typeof customTargets !== 'undefined') {
+      customTargets['program'] = prog.targets;
+    }
+    carbDayMode = 'program';
+    // Extend CARB_DAY_PRESETS if needed
+    if (!CARB_DAY_PRESETS['program']) {
+      CARB_DAY_PRESETS['program'] = { label: prog.dayLabel };
+    }
+    // Show banner on home
+    const programBarHome = document.getElementById('home-program-bar');
+    if (programBarHome) {
+      programBarHome.style.display = 'flex';
+      const nameEl  = document.getElementById('home-prog-name');
+      const dayEl   = document.getElementById('home-prog-day');
+      const chipsEl = document.getElementById('home-prog-chips');
+      if (nameEl)  nameEl.textContent  = prog.program.name;
+      if (dayEl)   dayEl.textContent   = 'Oggi: ' + prog.dayLabel;
+      if (chipsEl) chipsEl.innerHTML   = _macroChipsHtml(prog.targets);
+    }
+    updateCarbDayUI();
+  } else {
+    if (carbDayMode === 'program') carbDayMode = 'std';
+    const programBarHome = document.getElementById('home-program-bar');
+    if (programBarHome) programBarHome.style.display = 'none';
+  }
+}
+
+// ─── New / Edit program modal ──────────────────────────────
+function openNewProgramModal() {
+  editingProgId = null;
+  document.getElementById('prog-modal-title').textContent = '🗓 Nuovo Programma';
+  document.getElementById('prog-name').value  = '';
+  document.getElementById('prog-weeks').value = '4';
+  document.getElementById('prog-start').value = todayStr();
+  progWeekPattern = ['heavy','medium','rest','heavy','medium','light','rest'];
+  renderProgramWeekPattern();
+  renderProgramBuilder();
+  document.getElementById('period-new-modal').style.display = 'flex';
+}
+
+function editProgram(id) {
+  const prog = programs.find(p => p.id === id);
+  if (!prog) return;
+  editingProgId = id;
+  document.getElementById('prog-modal-title').textContent = '✏️ Modifica Programma';
+  document.getElementById('prog-name').value  = prog.name;
+  document.getElementById('prog-weeks').value = prog.weeks;
+  document.getElementById('prog-start').value = prog.startDate;
+  progWeekPattern = prog.days.slice(0, 7);
+  renderProgramWeekPattern();
+  renderProgramBuilder();
+  document.getElementById('period-new-modal').style.display = 'flex';
+}
+
+function closeProgramModal() {
+  document.getElementById('period-new-modal').style.display = 'none';
+  editingProgId = null;
+}
+
+function applyProgramTemplate(key) {
+  const tpl = PROGRAM_TEMPLATES[key];
+  if (!tpl) return;
+  document.getElementById('prog-name').value = tpl.name;
+  progWeekPattern = [...tpl.pattern];
+  renderProgramWeekPattern();
+  renderProgramBuilder();
+}
+
+function renderProgramWeekPattern() {
+  const el = document.getElementById('prog-week-pattern');
+  if (!el) return;
+  el.innerHTML = DAY_NAMES_SHORT.map((day, i) => {
+    const type = progWeekPattern[i] || 'rest';
+    const dt   = DAY_TYPES[type];
+    return `<div style="text-align:center;cursor:pointer" onclick="cyclePatternDay(${i})">
+      <div style="font-family:var(--font-mono);font-size:8px;color:var(--muted);margin-bottom:2px">${day}</div>
+      <div style="width:100%;height:28px;border-radius:6px;background:${_dayTypeColor(type)};border:1.5px solid ${type==='heavy'?'#ef4444':type==='gara'?'#ca8a04':'var(--border)'};display:flex;align-items:center;justify-content:center;font-size:11px" title="${dt?.label||type}">
+        ${type==='heavy'?'🔴':type==='medium'?'🟠':type==='light'?'🟢':type==='rest'?'⬜':type==='deload'?'🟣':'🏆'}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function cyclePatternDay(index) {
+  const order = ['rest','light','medium','heavy','deload','gara'];
+  const cur   = progWeekPattern[index] || 'rest';
+  progWeekPattern[index] = order[(order.indexOf(cur)+1) % order.length];
+  renderProgramWeekPattern();
+  renderProgramBuilder();
+}
+
+function renderProgramBuilder() {
+  const weeks = parseInt(document.getElementById('prog-weeks')?.value) || 4;
+  const el    = document.getElementById('prog-builder-weeks');
+  if (!el) return;
+  // Build full days array using template week modifier if available
+  const tplKey = Object.keys(PROGRAM_TEMPLATES).find(k =>
+    PROGRAM_TEMPLATES[k].name === document.getElementById('prog-name')?.value
+  );
+  el.innerHTML = '';
+  for (let w = 0; w < weeks; w++) {
+    const tpl = tplKey ? PROGRAM_TEMPLATES[tplKey] : null;
+    const weekDays = tpl
+      ? tpl.weekModifier(w, weeks, [...progWeekPattern])
+      : [...progWeekPattern];
+    const isDeload = w === weeks-1 && weeks > 2;
+    const hdr = document.createElement('div');
+    hdr.className = 'period-week-header';
+    hdr.onclick = () => {
+      const body = document.getElementById(`pb-week-${w}`);
+      if (body) body.style.display = body.style.display === 'none' ? '' : 'none';
+    };
+    hdr.innerHTML = `<div>
+      <div class="period-week-title">Settimana ${w+1} ${isDeload && !tpl?'<span style="color:#7c3aed;font-size:11px">(scarico)</span>':''}</div>
+      <div class="period-week-sub">${weekDays.map(d=>DAY_TYPES[d]?.label||d).join(' · ')}</div>
+    </div><span>▼</span>`;
+    el.appendChild(hdr);
+    const body = document.createElement('div');
+    body.id = `pb-week-${w}`;
+    body.style.display = 'none';
+    body.style.marginBottom = '4px';
+    body.innerHTML = weekDays.map((type, di) => {
+      const dt = DAY_TYPES[type];
+      const tdee = (userTargets?.tdee)||2000;
+      const kTarget = Math.round(tdee*(dt?.kcalMult||1));
+      return `<div class="period-day-row" style="cursor:pointer" onclick="cycleBuilderDay(${w},${di},this,'${tplKey||''}')">
+        <span class="period-day-num">${DAY_NAMES_SHORT[di]}</span>
+        <div class="period-day-type">
+          <div class="period-day-name">${dt?.label||type}</div>
+          <div class="period-day-macro">~${kTarget} kcal · carb ×${dt?.carbMult||1}</div>
+        </div>
+        <span class="period-day-badge ${dt?.badge||'pdb-rest'}" data-week="${w}" data-day="${di}">${type}</span>
+      </div>`;
+    }).join('');
+    el.appendChild(body);
+  }
+}
+
+// Store builder state for saving
+let _builderDays = {};
+
+function cycleBuilderDay(week, day, rowEl, tplKey) {
+  const order  = ['rest','light','medium','heavy','deload','gara'];
+  const badge  = rowEl.querySelector('[data-week]');
+  const curType= badge ? badge.dataset.week == week && badge.dataset.day == day ? badge.textContent.trim() : 'rest' : 'rest';
+  const nextType = order[(order.indexOf(curType)+1) % order.length];
+  const dt = DAY_TYPES[nextType];
+  const tdee = (userTargets?.tdee)||2000;
+  if (!_builderDays[week]) _builderDays[week] = [...progWeekPattern];
+  _builderDays[week][day] = nextType;
+  const nameEl = rowEl.querySelector('.period-day-name');
+  const macroEl= rowEl.querySelector('.period-day-macro');
+  const bdg    = rowEl.querySelector('.period-day-badge');
+  if (nameEl)  nameEl.textContent = dt?.label||nextType;
+  if (macroEl) macroEl.textContent= `~${Math.round(tdee*(dt?.kcalMult||1))} kcal · carb ×${dt?.carbMult||1}`;
+  if (bdg)     { bdg.className='period-day-badge '+(dt?.badge||'pdb-rest'); bdg.textContent=nextType; }
+}
+
+async function saveNewProgram() {
+  const name  = document.getElementById('prog-name').value.trim();
+  const weeks = parseInt(document.getElementById('prog-weeks').value) || 4;
+  const start = document.getElementById('prog-start').value || todayStr();
+  if (!name) { toast('⚠️ Inserisci un nome'); return; }
+
+  // Build complete days array
+  const allDays = [];
+  for (let w = 0; w < weeks; w++) {
+    const weekDays = _builderDays[w] ? [..._builderDays[w]] : [...progWeekPattern];
+    // Fill to 7 days
+    while (weekDays.length < 7) weekDays.push('rest');
+    allDays.push(...weekDays.slice(0,7));
+  }
+
+  if (editingProgId) {
+    const idx = programs.findIndex(p => p.id === editingProgId);
+    if (idx >= 0) programs[idx] = { ...programs[idx], name, weeks, startDate:start, days:allDays };
+  } else {
+    programs.push({ id:'prog_'+Date.now(), name, weeks, startDate:start, days:allDays });
+  }
+
+  _builderDays = {};
+  try {
+    await savePrograms();
+    closeProgramModal();
+    renderProgramList();
+    updateActiveProgramBanner();
+    toast(`✅ Programma "${name}" salvato!`);
+  } catch(e) { toast('❌ Errore: '+e.message); }
+}
+
+async function deleteProgram(id) {
+  if (!confirm('Eliminare questo programma?')) return;
+  programs = programs.filter(p => p.id !== id);
+  if (activeProgId === id) activeProgId = null;
+  await savePrograms();
+  renderProgramList();
+  updateActiveProgramBanner();
+  injectActiveProgramTargets();
+  toast('🗑 Programma eliminato');
+}
+
 // ══════════════════════════════════════════════════════
 // WEIGHT NEON BANNER + RING LOGIC
 // ══════════════════════════════════════════════════════
@@ -6925,6 +8016,7 @@ async function loadUserTargets() {
     if (gSnap.exists()) Object.assign(userTargets, gSnap.data());
   } catch(e) { userTargets = {}; }
   updateCarbDayUI();
+  if (typeof injectActiveProgramTargets !== 'undefined') injectActiveProgramTargets();
 }
 
 function setCarbDay(mode) {
