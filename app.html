@@ -5026,6 +5026,30 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
           </div>
         </div>
 
+          <!-- Orario allenamento -->
+          <div style="font-family:var(--font-brand);font-weight:800;font-size:13px;margin-bottom:10px;margin-top:16px">🏋️ Ti alleni? Quando?</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px" id="mp-training-tags">
+            <div class="mp-food-tag" onclick="mpToggleTraining(this)" data-val="no_training">😴 Non mi alleno</div>
+            <div class="mp-food-tag" onclick="mpToggleTraining(this)" data-val="mattina_presto">🌅 Mattina presto (6-9)</div>
+            <div class="mp-food-tag" onclick="mpToggleTraining(this)" data-val="mattina">☀️ Mattina (9-12)</div>
+            <div class="mp-food-tag" onclick="mpToggleTraining(this)" data-val="pranzo">🌞 Ora di pranzo (12-14)</div>
+            <div class="mp-food-tag" onclick="mpToggleTraining(this)" data-val="pomeriggio">🏃 Pomeriggio (14-18)</div>
+            <div class="mp-food-tag" onclick="mpToggleTraining(this)" data-val="sera">🌙 Sera (18-21)</div>
+            <div class="mp-food-tag" onclick="mpToggleTraining(this)" data-val="notte">🌃 Tarda sera (21+)</div>
+          </div>
+
+          <!-- Tipo lavoro -->
+          <div style="font-family:var(--font-brand);font-weight:800;font-size:13px;margin-bottom:10px;margin-top:16px">💼 Che tipo di lavoro fai?</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px" id="mp-work-tags">
+            <div class="mp-food-tag" onclick="mpToggleWork(this)" data-val="sedentario">🖥️ Sedentario (ufficio)</div>
+            <div class="mp-food-tag" onclick="mpToggleWork(this)" data-val="leggero">🚶 Leggero (in piedi)</div>
+            <div class="mp-food-tag" onclick="mpToggleWork(this)" data-val="moderato">⚙️ Moderato (movimento)</div>
+            <div class="mp-food-tag" onclick="mpToggleWork(this)" data-val="pesante">🏗️ Pesante (fisico)</div>
+            <div class="mp-food-tag" onclick="mpToggleWork(this)" data-val="studente">📚 Studente</div>
+          </div>
+
+        </div>
+
         <div style="display:flex;gap:8px">
           <button class="btn btn-ghost" style="flex:1" onclick="mpPrevStep(2)">← Indietro</button>
           <button class="btn btn-green" style="flex:2" onclick="mpGenerate()">🤖 Genera Piano AI</button>
@@ -13140,10 +13164,12 @@ const MP_FOODS = {
 
 let mpSelectedFoods  = new Set();
 let mpCustomFoods    = [];
-let mpSelectedMeals  = 4;
-let mpSelectedGoal   = '';
-let mpCurrentStep    = 0;
-let mpLastPlan       = null;
+let mpSelectedMeals    = 4;
+let mpSelectedGoal     = '';
+let mpSelectedTraining = '';
+let mpSelectedWork     = '';
+let mpCurrentStep      = 0;
+let mpLastPlan         = null;
 
 function initMealPlanPage() {
   mpRenderFoodTags();
@@ -13239,6 +13265,18 @@ function mpToggleGoal(el) {
   mpSelectedGoal = el.dataset.val;
 }
 
+function mpToggleTraining(el) {
+  document.querySelectorAll('#mp-training-tags .mp-food-tag').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+  mpSelectedTraining = el.dataset.val;
+}
+
+function mpToggleWork(el) {
+  document.querySelectorAll('#mp-work-tags .mp-food-tag').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+  mpSelectedWork = el.dataset.val;
+}
+
 function mpNextStep(current) {
   if (current===0 && mpSelectedFoods.size<3) { toast('Seleziona almeno 3 alimenti!','var(--orange)'); return; }
   mpGoStep(current+1);
@@ -13262,7 +13300,14 @@ async function mpGenerate() {
   document.getElementById('mp-result').style.display='none';
   document.getElementById('mp-error').style.display='none';
 
-  const msgs=['Analizzo i tuoi alimenti preferiti...','Calcolo le grammature ideali...','Distribuisco i macro sui pasti...','Ottimizzazione finale...'];
+  const msgs=[
+    'Analizzo i tuoi alimenti preferiti...',
+    'Valuto indici glicemici e limiti giornalieri...',
+    'Calcolo le grammature ideali per ogni pasto...',
+    'Ottimizzando il timing nutrizionale...',
+    'Distribuzione macro in base al tuo stile di vita...',
+    'Elaborazione finale in corso...'
+  ];
   let mi=0;
   const interval=setInterval(()=>{ mi=(mi+1)%msgs.length; const el=document.getElementById('mp-loading-text'); if(el)el.textContent=msgs[mi]; },2200);
 
@@ -13273,16 +13318,109 @@ async function mpGenerate() {
     const fat  =parseInt(document.getElementById('mp-fat').value);
     const notes=document.getElementById('mp-notes').value.trim();
     const foods=[...mpSelectedFoods].map(f=>f.replace(/^[\S]+ /,''));
-    const mealNames={3:['Colazione','Pranzo','Cena'],4:['Colazione','Pranzo','Spuntino pomeridiano','Cena'],5:['Colazione','Spuntino mattutino','Pranzo','Spuntino pomeridiano','Cena']}[mpSelectedMeals]||['Colazione','Pranzo','Cena'];
 
-    const prompt=`Sei un nutrizionista esperto. Crea un piano alimentare giornaliero REALISTICO rispettando:
-KCAL: ${kcal} | Proteine: ${prot}g | Carboidrati: ${carbs}g | Grassi: ${fat}g
-Obiettivo: ${mpSelectedGoal} | Pasti: ${mpSelectedMeals} (${mealNames.join(', ')})
-Alimenti disponibili: ${foods.join(', ')}${notes?'\nNote: '+notes:''}
+    // Meal names based on training time
+    const mealNamesMap = {
+      3: ['Colazione','Pranzo','Cena'],
+      4: ['Colazione','Pranzo','Spuntino pomeridiano','Cena'],
+      5: ['Colazione','Spuntino mattutino','Pranzo','Spuntino pomeridiano','Cena']
+    };
+    const mealNames = mealNamesMap[mpSelectedMeals] || mealNamesMap[4];
 
-Rispondi SOLO con JSON valido senza markdown:
-{"totale":{"kcal":N,"prot":N,"carbs":N,"fat":N},"nota":"2 righe di consiglio pratico","pasti":[{"nome":"Colazione","emoji":"🌅","kcal":N,"prot":N,"carbs":N,"fat":N,"alimenti":[{"nome":"Avena","grammi":80,"kcal":290,"prot":10,"carbs":50,"fat":5}]}]}
-Rispetta ESATTAMENTE i macro target (±5%). Grammature realistiche. Usa solo gli alimenti forniti.`;
+    // Training context
+    const trainingContext = {
+      no_training:    'L'utente NON si allena. Nessun pasto pre/post workout necessario.',
+      mattina_presto: 'L'utente si allena MATTINA PRESTO (6-9). Pre-workout: carboidrati veloci leggeri (banana, riso soffiato) ~30-45 min prima. Post-workout: proteine + carboidrati ad alto IG entro 30 min (whey + frutta o riso bianco).',
+      mattina:        'L'utente si allena la MATTINA (9-12). Colazione abbondante con carboidrati complessi 2h prima. Post-workout (pranzo): proteine elevate + carboidrati medi-alti.',
+      pranzo:         'L'utente si allena a ORA DI PRANZO (12-14). Spuntino pre-workout leggero (frutta + una fonte proteica). Il pranzo diventa pasto post-workout: ricco di proteine e carboidrati.',
+      pomeriggio:     'L'utente si allena nel POMERIGGIO (14-18). Pranzo equilibrato 2-3h prima (carboidrati complessi + proteine). Spuntino pre-workout (15-30 min prima): carboidrati veloci. Cena post-workout: proteine abbondanti + carboidrati medi.',
+      sera:           'L'utente si allena di SERA (18-21). Pranzo normale. Spuntino pomeridiano abbondante (carboidrati + proteine). Cena post-workout: proteine ELEVATE, carboidrati RIDOTTI (favorire recupero notturno), grassi sani.',
+      notte:          'L'utente si allena TARDA SERA (21+). Cena leggera PRE-workout. Pasto post-workout tardivo: proteine a digestione lenta (ricotta, caseina, uova), carboidrati minimi, NO stimolanti.'
+    }[mpSelectedTraining] || 'Informazioni allenamento non specificate.';
+
+    // Work context
+    const workContext = {
+      sedentario: 'Lavoro sedentario (ufficio): TDEE basso, fabbisogno calorico ridotto durante il giorno. Evitare picchi glicemici a pranzo per prevenire sonnolenza. Privilegiare proteine e fibre a pranzo.',
+      leggero:    'Lavoro leggero (in piedi): Fabbisogno moderato. Distribuzione calorica equilibrata nella giornata.',
+      moderato:   'Lavoro con movimento moderato: Fabbisogno medio-alto. Carboidrati complessi a pranzo per energia sostenuta.',
+      pesante:    'Lavoro fisicamente pesante: Alto fabbisogno calorico durante le ore di lavoro. Carboidrati complessi abbondanti, proteine distribuite uniformemente.',
+      studente:   'Studente: Concentrazione mentale importante. Carboidrati a basso IG per mantenere attenzione, omega-3, no picchi glicemici.'
+    }[mpSelectedWork] || 'Tipo di lavoro non specificato.';
+
+    // Per-food limits and glycemic rules
+    const foodLimits = `
+LIMITI GIORNALIERI TASSATIVI PER ALIMENTO:
+- Proteine Whey / Whey: MAX 25-30g al giorno (1 dose). Usare SOLO post-workout.
+- Yogurt greco 0%: MAX 250g/giorno. Alto contenuto proteico ma limitare per evitare eccesso caseina.
+- Uova intere: MAX 2-3 al giorno (colesterolo). Albumi senza limite.
+- Olio EVO / olio d'oliva: MAX 20-30g/giorno (alta densità calorica).
+- Burro: MAX 10g/giorno.
+- Parmigiano / formaggi stagionati: MAX 30g/giorno (grassi saturi elevati).
+- Mozzarella: MAX 125g/giorno.
+- Avocado: MAX 100g/giorno (grassi elevati).
+- Mandorle / noci / frutta secca: MAX 30g/giorno.
+- Pane bianco: preferire integrali, se usato MAX 60g/giorno.
+- Banana: MAX 1 al giorno (zuccheri elevati), ideale pre-workout.
+- Frutta in generale: MAX 2-3 porzioni/giorno, NON la sera.
+
+RISPOSTA GLICEMICA — REGOLE DI TIMING:
+- Carboidrati ad ALTO indice glicemico (riso bianco, pane bianco, banana, riso soffiato): usare SOLO post-workout o colazione.
+- Carboidrati a MEDIO-BASSO indice glicemico (avena, pasta integrale, patate dolci, legumi, farro, quinoa): ideali a pranzo e come base energetica.
+- Patate bianche: IG alto — usare post-workout o limitare la sera.
+- Mais: IG medio-alto — limitare alla sera.
+- NON combinare fonti di carboidrati ad alto IG + grassi elevati nello stesso pasto (picco insulinico + accumulo).
+- La SERA: privilegiare proteine + verdure + grassi sani. Ridurre carboidrati semplici.
+- COLAZIONE: accettare carboidrati complessi + proteine + piccola quota grassi sani.
+
+COMBINAZIONI OTTIMALI:
+- Post-workout: proteine rapide (whey, albume, pollo magro) + carboidrati veloci (riso bianco, banana, patata).
+- Pre-workout (-1-2h): carboidrati complessi + proteine medie + grassi MINIMI (rallentano digestione).
+- Pre-workout (-30min): solo carboidrati veloci leggeri se necessario.
+- Sera/recupero notturno: proteine a lenta digestione (ricotta, yogurt greco, uova intere) + verdure + grassi sani.
+- NON assumere whey la sera (stimolante, insulinico) — preferire caseina o proteine intere.`;
+
+    const prompt = `Sei un nutrizionista sportivo esperto con conoscenza avanzata di biochimica nutrizionale. Crea un piano alimentare giornaliero SCIENTIFICO e PERSONALIZZATO.
+
+═══════════════════════════════════════
+TARGET NUTRIZIONALI GIORNALIERI
+═══════════════════════════════════════
+Kcal totali: ${kcal} kcal
+Proteine: ${prot}g (${Math.round(prot*4)} kcal)
+Carboidrati: ${carbs}g (${Math.round(carbs*4)} kcal)
+Grassi: ${fat}g (${Math.round(fat*9)} kcal)
+Obiettivo: ${mpSelectedGoal}
+Numero pasti: ${mpSelectedMeals} → ${mealNames.join(' | ')}
+
+═══════════════════════════════════════
+STILE DI VITA UTENTE
+═══════════════════════════════════════
+ALLENAMENTO: ${trainingContext}
+LAVORO: ${workContext}
+
+═══════════════════════════════════════
+ALIMENTI DISPONIBILI
+═══════════════════════════════════════
+Usa PREFERIBILMENTE questi alimenti (puoi combinare più alimenti per pasto):
+${foods.join(', ')}
+${notes ? '\nNOTE UTENTE: ' + notes : ''}
+
+═══════════════════════════════════════
+REGOLE NUTRIZIONALI OBBLIGATORIE
+═══════════════════════════════════════
+${foodLimits}
+
+═══════════════════════════════════════
+ISTRUZIONI PIANO
+═══════════════════════════════════════
+1. Rispetta ESATTAMENTE i macro target (tolleranza ±3%)
+2. Per ogni alimento: grammatura PRECISA in grammi, kcal calcolate correttamente
+3. Ottimizza il TIMING: considera quando l'utente si allena per posizionare i carboidrati/proteine giusti al momento giusto
+4. Rispetta i LIMITI GIORNALIERI tassativi per ogni alimento
+5. Considera la RISPOSTA GLICEMICA: non causare picchi insulinici inutili
+6. La nota finale deve spiegare le scelte di timing principali (2-3 frasi)
+
+Rispondi SOLO con JSON valido senza markdown, senza testo aggiuntivo:
+{"totale":{"kcal":N,"prot":N,"carbs":N,"fat":N},"nota":"spiegazione timing e scelte nutrizionali chiave","pasti":[{"nome":"Colazione","emoji":"🌅","kcal":N,"prot":N,"carbs":N,"fat":N,"alimenti":[{"nome":"Avena","grammi":80,"kcal":290,"prot":10,"carbs":50,"fat":5}]}]}`;
 
     const {httpsCallable}=await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js');
     if (!window._fbFunctions) throw new Error('Firebase Functions non disponibile');
@@ -13347,7 +13485,7 @@ async function mpSavePlan() {
     await setDoc(doc(db,'users',uid(),'mealplans',id),{
       plan:mpLastPlan, kcal:parseInt(document.getElementById('mp-kcal').value),
       createdAt:new Date().toISOString(), foods:[...mpSelectedFoods],
-      meals:mpSelectedMeals, goal:mpSelectedGoal
+      meals:mpSelectedMeals, goal:mpSelectedGoal, training:mpSelectedTraining, work:mpSelectedWork
     });
     toast('✅ Piano salvato!','var(--green)');
     if (typeof awardPoints==='function') awardPoints(20,'Piano alimentare AI generato');
@@ -13442,6 +13580,8 @@ function mpReset() {
   mpSelectedFoods.clear(); mpCustomFoods=[]; mpSelectedGoal='';
   document.getElementById('mp-tags-custom').innerHTML='';
   document.querySelectorAll('#mp-tags-proteine .mp-food-tag, #mp-tags-carbs .mp-food-tag, #mp-tags-verdure .mp-food-tag, #mp-tags-grassi .mp-food-tag').forEach(t=>t.classList.remove('selected'));
+  mpSelectedTraining=''; mpSelectedWork='';
+  document.querySelectorAll('#mp-training-tags .mp-food-tag, #mp-work-tags .mp-food-tag').forEach(t=>t.classList.remove('selected'));
   mpGoStep(0);
 }
 
