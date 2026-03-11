@@ -50,6 +50,33 @@ const firebaseConfig = {
 };
 
 const app   = initializeApp(firebaseConfig);
+
+// ── Firebase Functions + Messaging ────────────────────────────
+import('https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js').then(m => {
+  window._fbFunctions = m.getFunctions(app, 'europe-west1');
+}).catch(() => {});
+
+import('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js').then(async m => {
+  try {
+    const messaging = m.getMessaging(app);
+    window._fbMessaging = messaging;
+    // Richiedi permesso notifiche dopo login (chiamato da onAuthStateChanged)
+    window._initFCM = async () => {
+      try {
+        const permission = await Notification.requestPermission();
+        if (permission !== 'granted') return;
+        const token = await m.getToken(messaging, {
+          vapidKey: 'BAqhG6wMTozr4cvdD-Nlz4RcCNfQuaZquQgxI9Vkr67HdfpR0PjDR8eX1n3L4hrpPuW6O62W4KAc6BZQKeDWFTA'
+        });
+        if (token) {
+          const { httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js');
+          const saveFn = httpsCallable(window._fbFunctions, 'saveFcmToken');
+          await saveFn({ token }).catch(() => {});
+        }
+      } catch(e) { /* notifiche non disponibili o negate */ }
+    };
+  } catch(e) { /* messaging non supportato su questo browser */ }
+}).catch(() => {});
 const auth  = getAuth(app);
 const db    = getFirestore(app);
 
@@ -884,6 +911,91 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
     stroke-width: 2.2;
   }
 
+  /* ── More drawer ── */
+  .mbn-more-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 9998;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+  }
+  .mbn-more-overlay.open { display: block; }
+
+  .mbn-more-drawer {
+    position: fixed;
+    bottom: -100%;
+    left: 0; right: 0;
+    background: var(--white);
+    border-radius: 22px 22px 0 0;
+    padding: 12px 16px 30px;
+    z-index: 9999;
+    transition: bottom .3s cubic-bezier(.4,0,.2,1);
+    box-shadow: 0 -8px 40px rgba(0,0,0,0.15);
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  .mbn-more-drawer.open { bottom: 0; }
+
+  .mbn-drawer-handle {
+    width: 36px; height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+  .mbn-drawer-title {
+    font-family: var(--font-brand);
+    font-weight: 900;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    padding: 0 2px;
+  }
+  .mbn-drawer-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .mbn-drawer-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 8px;
+    border-radius: 14px;
+    border: 1.5px solid var(--border);
+    background: var(--cream);
+    cursor: pointer;
+    transition: all .15s;
+    font-family: var(--font-brand);
+    font-weight: 700;
+    font-size: 11px;
+    color: var(--text);
+    position: relative;
+  }
+  .mbn-drawer-btn:active { transform: scale(0.95); background: var(--green-bg); border-color: var(--green); }
+  .mbn-drawer-btn.active  { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+  .mbn-drawer-btn svg {
+    width: 22px; height: 22px;
+    stroke: currentColor; fill: none; stroke-width: 2;
+  }
+  .mbn-drawer-btn .mbn-dot {
+    position: absolute;
+    top: 8px; right: 8px;
+    width: 7px; height: 7px;
+    background: var(--orange);
+    border-radius: 50%;
+    border: 1.5px solid var(--white);
+    display: none;
+  }
+  .mbn-drawer-btn .mbn-dot.show { display: block; }
+
+  /* Badge notifica su rewards */
   /* Badge notifica su rewards */
   .mbn-badge {
     position: absolute;
@@ -2869,6 +2981,58 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   <!-- ══════════════════════════════════
        MOBILE BOTTOM NAV (solo mobile)
   ══════════════════════════════════ -->
+  <!-- More drawer overlay -->
+  <div class="mbn-more-overlay" id="mbn-more-overlay" onclick="closeMbnDrawer()"></div>
+
+  <!-- More drawer panel -->
+  <div class="mbn-more-drawer" id="mbn-more-drawer">
+    <div class="mbn-drawer-handle"></div>
+
+    <div class="mbn-drawer-title">// navigazione</div>
+
+    <!-- Sezioni principali -->
+    <div class="mbn-drawer-grid">
+
+      <button class="mbn-drawer-btn" id="mbd-diary" onclick="mbnDrawerGo('diary')">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Diario
+      </button>
+
+      <button class="mbn-drawer-btn" id="mbd-goals" onclick="mbnDrawerGo('goals')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+        Obiettivo
+      </button>
+
+      <button class="mbn-drawer-btn" id="mbd-performance" onclick="mbnDrawerGo('performance')">
+        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        Perf.
+      </button>
+
+      <button class="mbn-drawer-btn" id="mbd-periodization" onclick="mbnDrawerGo('periodization')">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Piano
+      </button>
+
+      <button class="mbn-drawer-btn" id="mbd-settings" onclick="mbnDrawerGo('settings')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Impostaz.
+      </button>
+
+      <button class="mbn-drawer-btn" id="mbd-legenda" onclick="mbnDrawerGo('legenda')">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Legenda
+      </button>
+
+    </div>
+
+    <!-- Aggiungi alimento rapido -->
+    <button onclick="closeMbnDrawer();mbnAddFood();"
+      style="width:100%;padding:14px;border-radius:14px;border:none;background:var(--green);color:#fff;font-family:var(--font-brand);font-weight:900;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Aggiungi alimento
+    </button>
+  </div>
+
   <nav id="mobile-bottom-nav" role="navigation" aria-label="Navigazione principale">
 
     <!-- 1. HOME -->
@@ -2897,10 +3061,14 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       <span class="mbn-label">Rewards</span>
     </button>
 
-    <!-- 5. IMPOSTAZIONI -->
-    <button class="mbn-btn" id="mbn-settings" onclick="mbnGoPage('settings')" aria-label="Impostazioni">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-      <span class="mbn-label">Impostaz.</span>
+    <!-- 5. MORE — apre drawer -->
+    <button class="mbn-btn" id="mbn-more" onclick="toggleMbnDrawer()" aria-label="Altro">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="5" cy="12" r="1.5" fill="currentColor"/>
+        <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+        <circle cx="19" cy="12" r="1.5" fill="currentColor"/>
+      </svg>
+      <span class="mbn-label" id="mbn-more-label">Altro</span>
     </button>
 
   </nav>
@@ -5501,11 +5669,78 @@ function goPage(id) {
 let _currentFoodGoalsTab = 'food';
 
 function _syncMobileNav(pageId) {
-  const map = { home:'home', peso:'peso', diary:'food', 'food-goals':'food', goals:'food', rewards:'rewards', settings:'settings' };
-  const activeKey = map[pageId] || pageId;
+  // Pages reachable directly from bottom bar
+  const directMap = { home:'home', peso:'peso', rewards:'rewards' };
+  // Pages reachable via drawer
+  const drawerPages = new Set(['diary','food-goals','goals','settings','performance','periodization','legenda','admin','food']);
+
   document.querySelectorAll('.mbn-btn').forEach(b => b.classList.remove('active'));
-  const btn = document.getElementById('mbn-' + activeKey);
-  if (btn) btn.classList.add('active');
+  document.querySelectorAll('.mbn-drawer-btn').forEach(b => b.classList.remove('active'));
+
+  if (directMap[pageId]) {
+    const btn = document.getElementById('mbn-' + directMap[pageId]);
+    if (btn) btn.classList.add('active');
+  } else if (drawerPages.has(pageId)) {
+    // Highlight "More" button + the specific drawer button
+    const moreBtn = document.getElementById('mbn-more');
+    if (moreBtn) moreBtn.classList.add('active');
+    // Map diary variants
+    const drawerKey = pageId === 'food-goals' ? 'diary' : pageId === 'food' ? 'diary' : pageId === 'goals' ? 'goals' : pageId;
+    const dBtn = document.getElementById('mbd-' + drawerKey);
+    if (dBtn) dBtn.classList.add('active');
+  }
+
+  // Update "Altro" label when a drawer page is active
+  const moreLbl = document.getElementById('mbn-more-label');
+  if (moreLbl) {
+    const pageLabels = { diary:'Diario', 'food-goals':'Diario', goals:'Obiett.', settings:'Impost.', performance:'Perf.', periodization:'Piano', legenda:'Legenda', food:'Diario' };
+    if (drawerPages.has(pageId) && pageLabels[pageId]) moreLbl.textContent = pageLabels[pageId];
+    else moreLbl.textContent = 'Altro';
+  }
+}
+
+function toggleMbnDrawer() {
+  const drawer  = document.getElementById('mbn-more-drawer');
+  const overlay = document.getElementById('mbn-more-overlay');
+  if (!drawer) return;
+  const isOpen = drawer.classList.contains('open');
+  if (isOpen) {
+    closeMbnDrawer();
+  } else {
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+  }
+}
+
+function closeMbnDrawer() {
+  document.getElementById('mbn-more-drawer')?.classList.remove('open');
+  document.getElementById('mbn-more-overlay')?.classList.remove('open');
+}
+
+// Swipe down to close drawer
+(function() {
+  let startY = 0;
+  document.addEventListener('touchstart', e => {
+    const d = document.getElementById('mbn-more-drawer');
+    if (d?.classList.contains('open')) startY = e.touches[0].clientY;
+  }, {passive:true});
+  document.addEventListener('touchend', e => {
+    const d = document.getElementById('mbn-more-drawer');
+    if (d?.classList.contains('open')) {
+      const delta = e.changedTouches[0].clientY - startY;
+      if (delta > 60) closeMbnDrawer();
+    }
+  }, {passive:true});
+})();
+
+function mbnDrawerGo(page) {
+  closeMbnDrawer();
+  if (page === 'diary') {
+    if (window.innerWidth <= 520) _openFoodGoalsPage('food');
+    else goPage('diary');
+  } else {
+    goPage(page);
+  }
 }
 
 function mbnGoPage(key) {
@@ -5949,6 +6184,7 @@ let wpChart = null;
 let wpChartRange = 30; // default 30g
 
 function wpInitPage() {
+  updateWeightNeonBanner?.();
   if (!userTargets) loadUserTargets().then(() => _wpRender()).catch(() => _wpRender());
   else _wpRender();
 }
@@ -8013,7 +8249,13 @@ async function loadUserTargets() {
     const gSnap = await getDoc(doc(db,'users',uid(),'goals','main'));
     userTargets = {};
     if (pSnap.exists()) Object.assign(userTargets, pSnap.data());
-    if (gSnap.exists()) Object.assign(userTargets, gSnap.data());
+    if (gSnap.exists()) {
+      const gData = gSnap.data();
+      Object.assign(userTargets, gData);
+      // Normalizza: se esistono solo le chiavi vecchie, mapple alle nuove
+      if (!userTargets.goal_weight  && gData.targetWeight) userTargets.goal_weight  = gData.targetWeight;
+      if (!userTargets.start_weight && gData.startWeight)  userTargets.start_weight = gData.startWeight;
+    }
   } catch(e) { userTargets = {}; }
   updateCarbDayUI();
   if (typeof injectActiveProgramTargets !== 'undefined') injectActiveProgramTargets();
@@ -8741,10 +8983,24 @@ async function saveGoal() {
   const note   = document.getElementById('goal-note').value;
   if (!start||!target) { toast('Inserisci peso di partenza e obiettivo!','var(--danger)'); return; }
   const {db, doc, setDoc} = window._fb;
-  await setDoc(doc(db,'users',uid(),'goals','main'), {startWeight:start,targetWeight:target,note,updatedAt:Date.now()});
-  goalData = {startWeight:start,targetWeight:target,note};
-  toast('Obiettivo salvato!');
+  // Salva con ENTRAMBI i formati chiave per compatibilità con loadUserTargets + banner
+  const goalPayload = {
+    startWeight: start, targetWeight: target, note, updatedAt: Date.now(),
+    start_weight: start, goal_weight: target  // chiavi lette da updateWeightNeonBanner
+  };
+  await setDoc(doc(db,'users',uid(),'goals','main'), goalPayload);
+  goalData = {startWeight:start, targetWeight:target, note};
+  // Aggiorna userTargets in memoria senza ricaricare da rete
+  if (!userTargets) userTargets = {};
+  userTargets.goal_weight  = target;
+  userTargets.start_weight = start;
+  toast('🎯 Obiettivo salvato!');
   renderGoalProgress();
+  // Aggiorna banner e ring nella pagina Peso se è aperta o in cache
+  updateWeightNeonBanner?.();
+  if (document.getElementById('page-peso')?.classList.contains('active')) {
+    wpInitPage?.();
+  }
 }
 
 function renderGoalProgress() {
@@ -10353,7 +10609,7 @@ function scheduleNotifications() {
 // ══════════════════════════════════════════════════════
 // FEATURE 4: PHOTO → AI FOOD ANALYSIS
 // ══════════════════════════════════════════════════════
-const ANTHROPIC_API_KEY = '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';
+// API key rimossa — ora gestita da Cloud Functions (sicuro) ✅
 let aiAnalyzedFood = null;
 let currentPhotoBase64 = null;
 
@@ -10400,47 +10656,19 @@ async function handlePhotoSelected(event) {
 }
 
 async function analyzePhotoWithAI(base64, mediaType) {
-  const apiKey = ANTHROPIC_API_KEY;
-  if (!apiKey) { toast('API Key mancante', 'var(--danger)'); return; }
   document.getElementById('photo-ai-loading').style.display = 'block';
   document.getElementById('photo-ai-result').style.display = 'none';
   document.getElementById('photo-ai-error').style.display = 'none';
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true',
-      },
-      body: JSON.stringify({
-        model: 'claude-opus-4-5',
-        max_tokens: 400,
-        messages: [{
-          role: 'user',
-          content: [
-            { type: 'image', source: { type: 'base64', media_type: mediaType, data: base64 } },
-            { type: 'text', text: 'Analizza questo pasto e stima i valori nutrizionali. Rispondi SOLO con un JSON valido senza markdown, nel formato: {"name":"nome del pasto","kcal":numero,"protein":numero,"carbs":numero,"fat":numero,"note":"breve nota sulla stima","grams":numero} I valori devono essere per la porzione INTERA visibile nella foto. Stima in modo realistico.' }
-          ]
-        }]
-      })
-    });
+    // Chiama Cloud Function sicura (la API key è sul server, non nel client)
+    const { httpsCallable } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js');
+    const functions = window._fbFunctions;
+    if (!functions) throw new Error('Firebase Functions non inizializzato');
+    const analyzeFn = httpsCallable(functions, 'analyzeFood');
+    const result = await analyzeFn({ base64, mediaType });
     document.getElementById('photo-ai-loading').style.display = 'none';
-    if (!response.ok) {
-      const err = await response.json();
-      throw new Error(err.error?.message || 'Errore API (' + response.status + ')');
-    }
-    const data = await response.json();
-    const text = data.content?.[0]?.text || '';
-    let parsed;
-    try {
-      parsed = JSON.parse(text.replace(/```json|```/g, '').trim());
-    } catch(e) {
-      const match = text.match(/\{[\s\S]*\}/);
-      if (match) parsed = JSON.parse(match[0]);
-      else throw new Error('Risposta AI non valida');
-    }
+    if (!result.data?.success) throw new Error('Errore nella risposta del server');
+    const parsed = result.data.data;
     aiAnalyzedFood = parsed;
     document.getElementById('ai-food-name').textContent = parsed.name || 'Pasto analizzato';
     document.getElementById('ai-kcal').textContent = Math.round(parsed.kcal || 0);
