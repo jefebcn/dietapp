@@ -2527,6 +2527,239 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
 */
 
 /* ══════════════════════════════════════
+   MEAL PLAN WIZARD
+══════════════════════════════════════ */
+/* Step progress bar */
+.mp-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 24px;
+}
+.mp-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  position: relative;
+}
+.mp-step-dot {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 2.5px solid var(--border);
+  background: var(--white);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-brand); font-weight: 900; font-size: 12px;
+  color: var(--muted);
+  z-index: 1;
+  transition: all .3s;
+}
+.mp-step.done  .mp-step-dot { background: var(--green); border-color: var(--green); color: #fff; }
+.mp-step.active .mp-step-dot { border-color: var(--green); color: var(--green); box-shadow: 0 0 0 4px rgba(34,197,94,.15); }
+.mp-step-lbl {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  color: var(--muted);
+  text-align: center;
+  letter-spacing: .5px;
+  white-space: nowrap;
+}
+.mp-step.active .mp-step-lbl { color: var(--green); }
+.mp-step-line {
+  position: absolute;
+  top: 16px; left: 50%; right: -50%;
+  height: 2px;
+  background: var(--border);
+  z-index: 0;
+}
+.mp-step.done .mp-step-line { background: var(--green); }
+.mp-step:last-child .mp-step-line { display: none; }
+
+/* Step panels */
+.mp-panel { display: none; animation: pageIn .2s ease; }
+.mp-panel.active { display: block; }
+
+/* Food tag chips */
+.mp-food-tags {
+  display: flex; flex-wrap: wrap; gap: 7px;
+  margin-bottom: 12px;
+}
+.mp-food-tag {
+  padding: 7px 13px;
+  border-radius: 100px;
+  border: 1.5px solid var(--border);
+  background: var(--cream);
+  font-family: var(--font-brand); font-weight: 700; font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all .15s;
+  user-select: none;
+}
+.mp-food-tag.selected {
+  background: var(--green-bg);
+  border-color: var(--green);
+  color: var(--green);
+}
+.mp-food-tag:active { transform: scale(.95); }
+
+/* Macro sliders */
+.mp-macro-row {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 14px;
+}
+.mp-macro-icon { font-size: 20px; flex-shrink: 0; width: 28px; text-align: center; }
+.mp-macro-body { flex: 1; }
+.mp-macro-label {
+  display: flex; justify-content: space-between;
+  font-family: var(--font-mono); font-size: 10px; color: var(--muted);
+  margin-bottom: 4px;
+}
+.mp-macro-val {
+  font-family: var(--font-brand); font-weight: 900; font-size: 15px;
+  color: var(--text);
+}
+.mp-macro-input {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  background: var(--cream);
+  border-radius: 3px;
+  outline: none;
+  cursor: pointer;
+}
+.mp-macro-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--green);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,.2);
+  cursor: pointer;
+}
+
+/* Meal distribution selector */
+.mp-meal-cards {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px; margin-bottom: 16px;
+}
+.mp-meal-card {
+  padding: 14px 8px;
+  border-radius: 14px;
+  border: 2px solid var(--border);
+  background: var(--cream);
+  text-align: center;
+  cursor: pointer;
+  transition: all .15s;
+}
+.mp-meal-card:active { transform: scale(.96); }
+.mp-meal-card.selected {
+  border-color: var(--green);
+  background: var(--green-bg);
+}
+.mp-meal-card-num {
+  font-family: var(--font-brand); font-weight: 900; font-size: 26px;
+  color: var(--text);
+}
+.mp-meal-card.selected .mp-meal-card-num { color: var(--green); }
+.mp-meal-card-lbl {
+  font-family: var(--font-mono); font-size: 9px;
+  color: var(--muted); margin-top: 3px;
+  letter-spacing: .5px;
+}
+
+/* Generated meal plan */
+.mp-result-meal {
+  border-radius: 16px;
+  border: 1.5px solid var(--border);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.mp-result-meal-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 14px;
+  background: var(--cream);
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+.mp-result-meal-icon { font-size: 22px; }
+.mp-result-meal-name {
+  font-family: var(--font-brand); font-weight: 900; font-size: 14px;
+  color: var(--text); flex: 1;
+}
+.mp-result-meal-kcal {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--green); font-weight: 700;
+}
+.mp-result-meal-body { padding: 10px 14px; }
+.mp-result-food-row {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+}
+.mp-result-food-row:last-child { border-bottom: none; }
+.mp-result-food-name {
+  flex: 1; font-size: 13px; font-weight: 600; color: var(--text);
+}
+.mp-result-food-grams {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--muted); min-width: 44px; text-align: right;
+}
+.mp-result-food-kcal {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--green); min-width: 54px; text-align: right;
+}
+/* Macro summary strip */
+.mp-macro-strip {
+  display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 8px; margin-bottom: 16px;
+}
+.mp-macro-strip-cell {
+  background: var(--cream); border-radius: 12px;
+  padding: 10px 6px; text-align: center;
+}
+.mp-macro-strip-val {
+  font-family: var(--font-brand); font-weight: 900; font-size: 16px;
+}
+.mp-macro-strip-lbl {
+  font-family: var(--font-mono); font-size: 8px;
+  color: var(--muted); letter-spacing: .8px; margin-top: 2px;
+}
+/* AI streaming dots */
+.mp-loading {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 48px 20px; gap: 16px;
+}
+.mp-loading-dots {
+  display: flex; gap: 8px;
+}
+.mp-loading-dots span {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--green);
+  animation: mpDot 1.2s infinite ease-in-out;
+}
+.mp-loading-dots span:nth-child(2) { animation-delay: .2s; }
+.mp-loading-dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes mpDot {
+  0%,80%,100% { transform: scale(0.6); opacity:.4; }
+  40%          { transform: scale(1.1); opacity:1;  }
+}
+.mp-loading-text {
+  font-family: var(--font-brand); font-weight: 700; font-size: 15px;
+  color: var(--text); text-align: center;
+}
+.mp-loading-sub {
+  font-family: var(--font-mono); font-size: 11px;
+  color: var(--muted); text-align: center;
+}
+/* Nav dot for meal plan */
+.nav-btn.mealplan-active { background: rgba(168,85,247,.12); }
+.nav-btn.mealplan-active svg { stroke: #a855f7; }
+.nav-btn.mealplan-active span { color: #a855f7; }
+
+/* ══════════════════════════════════════
    PERFORMANCE PAGE
 ══════════════════════════════════════ */
 .perf-tab-bar { display:flex; background:var(--cream); border-radius:14px; padding:4px; gap:4px; margin-bottom:18px; }
@@ -2949,6 +3182,11 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
       <span>SETTINGS</span>
     </button>
+    <button class="nav-btn" id="nav-mealplan" onclick="goPage('mealplan')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+      <span>Meal Plan</span>
+    </button>
+
     <button class="nav-btn" id="nav-performance" onclick="goPage('performance')">
       <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
       <span>Perf</span>
@@ -3001,6 +3239,11 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       <button class="mbn-drawer-btn" id="mbd-goals" onclick="mbnDrawerGo('goals')">
         <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
         Obiettivo
+      </button>
+
+      <button class="mbn-drawer-btn" id="mbd-mealplan" onclick="mbnDrawerGo('mealplan')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><path d="M9 12h6M9 16h4"/></svg>
+        Meal Plan
       </button>
 
       <button class="mbn-drawer-btn" id="mbd-performance" onclick="mbnDrawerGo('performance')">
@@ -4596,6 +4839,241 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
       </div>
     </div>
 
+    <!-- ═══ MEAL PLAN AI PAGE ═══ -->
+    <div class="page" id="page-mealplan" style="padding-bottom:90px">
+
+      <div class="page-header">
+        <div>
+          <div class="page-title">🥗 Piano Alimentare AI</div>
+          <div class="page-subtitle">Costruisci la tua dieta personalizzata</div>
+        </div>
+      </div>
+
+      <!-- ── STEPPER ── -->
+      <div class="mp-stepper" id="mp-stepper">
+        <div class="mp-step active" id="mp-stp-0">
+          <div class="mp-step-dot">1</div>
+          <div class="mp-step-lbl">Alimenti</div>
+          <div class="mp-step-line"></div>
+        </div>
+        <div class="mp-step" id="mp-stp-1">
+          <div class="mp-step-dot">2</div>
+          <div class="mp-step-lbl">Macro</div>
+          <div class="mp-step-line"></div>
+        </div>
+        <div class="mp-step" id="mp-stp-2">
+          <div class="mp-step-dot">3</div>
+          <div class="mp-step-lbl">Pasti</div>
+          <div class="mp-step-line"></div>
+        </div>
+        <div class="mp-step" id="mp-stp-3">
+          <div class="mp-step-dot">4</div>
+          <div class="mp-step-lbl">Piano</div>
+        </div>
+      </div>
+
+      <!-- ── STEP 1: ALIMENTI ── -->
+      <div class="mp-panel active" id="mp-panel-0">
+        <div class="card" style="margin-bottom:14px">
+          <div style="font-family:var(--font-brand);font-weight:900;font-size:16px;margin-bottom:4px">Che alimenti vuoi includere?</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Seleziona i tuoi preferiti (puoi aggiungere anche alimenti personalizzati)</div>
+
+          <!-- Categorie rapide -->
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.2px;margin-bottom:8px">// PROTEINE</div>
+          <div class="mp-food-tags" id="mp-tags-proteine"></div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.2px;margin-bottom:8px;margin-top:4px">// CARBOIDRATI</div>
+          <div class="mp-food-tags" id="mp-tags-carbs"></div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.2px;margin-bottom:8px;margin-top:4px">// VERDURE & FRUTTA</div>
+          <div class="mp-food-tags" id="mp-tags-verdure"></div>
+          <div style="font-family:var(--font-mono);font-size:9px;color:var(--muted);letter-spacing:1.2px;margin-bottom:8px;margin-top:4px">// GRASSI & LATTICINI</div>
+          <div class="mp-food-tags" id="mp-tags-grassi"></div>
+
+          <!-- Custom food input -->
+          <div style="display:flex;gap:8px;margin-top:14px">
+            <input type="text" id="mp-custom-food" placeholder="Aggiungi alimento personalizzato..." style="flex:1;font-size:13px" onkeydown="if(event.key==='Enter')mpAddCustomFood()">
+            <button class="btn btn-green btn-sm" onclick="mpAddCustomFood()">+</button>
+          </div>
+          <div class="mp-food-tags" id="mp-tags-custom" style="margin-top:10px"></div>
+        </div>
+
+        <!-- Note aggiuntive -->
+        <div class="card" style="margin-bottom:16px">
+          <div style="font-family:var(--font-brand);font-weight:800;font-size:13px;margin-bottom:8px">Note e preferenze</div>
+          <textarea id="mp-notes" rows="2" placeholder="Es: sono intollerante al lattosio, preferisco pasti veloci, no pesce..." style="width:100%;font-size:12px;resize:none;border-radius:10px;border:1.5px solid var(--border);padding:10px;background:var(--cream);color:var(--text);font-family:inherit"></textarea>
+        </div>
+
+        <button class="btn btn-green" style="width:100%" onclick="mpNextStep(0)">
+          Avanti → Imposta Macro
+        </button>
+      </div>
+
+      <!-- ── STEP 2: MACRO ── -->
+      <div class="mp-panel" id="mp-panel-1">
+        <div class="card" style="margin-bottom:14px">
+          <div style="font-family:var(--font-brand);font-weight:900;font-size:16px;margin-bottom:4px">Obiettivi nutrizionali</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:20px">Imposta le kcal totali e la distribuzione dei macronutrienti</div>
+
+          <!-- KCAL slider -->
+          <div class="mp-macro-row">
+            <div class="mp-macro-icon">🔥</div>
+            <div class="mp-macro-body">
+              <div class="mp-macro-label">
+                <span>KCAL GIORNALIERE</span>
+                <span class="mp-macro-val" id="mp-kcal-val">2000</span>
+              </div>
+              <input type="range" class="mp-macro-input" id="mp-kcal" min="1000" max="4000" step="50" value="2000"
+                oninput="mpUpdateMacroDisplay()">
+              <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:3px">
+                <span>1000</span><span>2500</span><span>4000</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- PROTEINE -->
+          <div class="mp-macro-row">
+            <div class="mp-macro-icon">💪</div>
+            <div class="mp-macro-body">
+              <div class="mp-macro-label">
+                <span>PROTEINE</span>
+                <span class="mp-macro-val" id="mp-prot-val">150<span style="font-size:10px;font-weight:400">g</span></span>
+              </div>
+              <input type="range" class="mp-macro-input" id="mp-prot" min="50" max="300" step="5" value="150"
+                oninput="mpUpdateMacroDisplay()">
+              <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:3px">
+                <span>50g</span><span>175g</span><span>300g</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARBOIDRATI -->
+          <div class="mp-macro-row">
+            <div class="mp-macro-icon">🌾</div>
+            <div class="mp-macro-body">
+              <div class="mp-macro-label">
+                <span>CARBOIDRATI</span>
+                <span class="mp-macro-val" id="mp-carbs-val">200<span style="font-size:10px;font-weight:400">g</span></span>
+              </div>
+              <input type="range" class="mp-macro-input" id="mp-carbs" min="50" max="500" step="5" value="200"
+                oninput="mpUpdateMacroDisplay()">
+              <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:3px">
+                <span>50g</span><span>275g</span><span>500g</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- GRASSI -->
+          <div class="mp-macro-row">
+            <div class="mp-macro-icon">🥑</div>
+            <div class="mp-macro-body">
+              <div class="mp-macro-label">
+                <span>GRASSI</span>
+                <span class="mp-macro-val" id="mp-fat-val">65<span style="font-size:10px;font-weight:400">g</span></span>
+              </div>
+              <input type="range" class="mp-macro-input" id="mp-fat" min="20" max="200" step="5" value="65"
+                oninput="mpUpdateMacroDisplay()">
+              <div style="display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9px;color:var(--muted);margin-top:3px">
+                <span>20g</span><span>110g</span><span>200g</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Riepilogo kcal calcolate -->
+          <div id="mp-kcal-check" style="background:var(--cream);border-radius:12px;padding:12px;margin-top:8px;text-align:center">
+            <div style="font-family:var(--font-mono);font-size:10px;color:var(--muted)">KCAL DAI MACRO</div>
+            <div id="mp-kcal-from-macros" style="font-family:var(--font-brand);font-weight:900;font-size:22px;margin:4px 0"></div>
+            <div id="mp-kcal-diff" style="font-size:11px"></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" style="flex:1" onclick="mpPrevStep(1)">← Indietro</button>
+          <button class="btn btn-green" style="flex:2" onclick="mpNextStep(1)">Avanti → Distribuzione Pasti</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 3: DISTRIBUZIONE PASTI ── -->
+      <div class="mp-panel" id="mp-panel-2">
+        <div class="card" style="margin-bottom:14px">
+          <div style="font-family:var(--font-brand);font-weight:900;font-size:16px;margin-bottom:4px">Quanti pasti al giorno?</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:16px">Scegli la distribuzione più adatta al tuo stile di vita</div>
+
+          <div class="mp-meal-cards" id="mp-meal-cards">
+            <div class="mp-meal-card" onclick="mpSelectMeals(3, this)">
+              <div class="mp-meal-card-num">3</div>
+              <div class="mp-meal-card-lbl">PASTI</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:6px;line-height:1.4">🌅 Colazione<br>🌞 Pranzo<br>🌙 Cena</div>
+            </div>
+            <div class="mp-meal-card selected" onclick="mpSelectMeals(4, this)">
+              <div class="mp-meal-card-num">4</div>
+              <div class="mp-meal-card-lbl">PASTI</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:6px;line-height:1.4">🌅 Colazione<br>🌞 Pranzo<br>🍎 Spuntino<br>🌙 Cena</div>
+            </div>
+            <div class="mp-meal-card" onclick="mpSelectMeals(5, this)">
+              <div class="mp-meal-card-num">5</div>
+              <div class="mp-meal-card-lbl">PASTI</div>
+              <div style="font-size:10px;color:var(--muted);margin-top:6px;line-height:1.4">🌅 Colazione<br>🍎 Spuntino<br>🌞 Pranzo<br>🍎 Spuntino<br>🌙 Cena</div>
+            </div>
+          </div>
+
+          <!-- Preferenza oraria -->
+          <div style="font-family:var(--font-brand);font-weight:800;font-size:13px;margin-bottom:10px;margin-top:4px">Obiettivo dietetico</div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px" id="mp-goal-tags">
+            <div class="mp-food-tag" onclick="mpToggleGoal(this)" data-val="dimagrimento">🔥 Dimagrimento</div>
+            <div class="mp-food-tag" onclick="mpToggleGoal(this)" data-val="massa">💪 Massa muscolare</div>
+            <div class="mp-food-tag" onclick="mpToggleGoal(this)" data-val="mantenimento">⚖️ Mantenimento</div>
+            <div class="mp-food-tag" onclick="mpToggleGoal(this)" data-val="performance">⚡ Performance</div>
+            <div class="mp-food-tag" onclick="mpToggleGoal(this)" data-val="salute">🫀 Salute generale</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" style="flex:1" onclick="mpPrevStep(2)">← Indietro</button>
+          <button class="btn btn-green" style="flex:2" onclick="mpGenerate()">🤖 Genera Piano AI</button>
+        </div>
+      </div>
+
+      <!-- ── STEP 4: RISULTATO ── -->
+      <div class="mp-panel" id="mp-panel-3">
+
+        <!-- Loading state -->
+        <div class="mp-loading" id="mp-loading">
+          <div class="mp-loading-dots">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="mp-loading-text" id="mp-loading-text">L'AI sta elaborando il tuo piano...</div>
+          <div class="mp-loading-sub">Sto bilanciando macro, alimenti e preferenze</div>
+        </div>
+
+        <!-- Result state -->
+        <div id="mp-result" style="display:none">
+          <!-- Riepilogo macro -->
+          <div class="card" style="margin-bottom:14px">
+            <div style="font-family:var(--font-brand);font-weight:900;font-size:15px;margin-bottom:12px">📊 Riepilogo giornaliero</div>
+            <div class="mp-macro-strip" id="mp-result-strip"></div>
+            <div id="mp-result-note" style="font-size:12px;color:var(--muted);line-height:1.5;border-top:1px solid var(--border);padding-top:10px"></div>
+          </div>
+
+          <!-- Pasti -->
+          <div id="mp-result-meals"></div>
+
+          <!-- Actions -->
+          <div style="display:flex;gap:8px;margin-top:4px">
+            <button class="btn btn-ghost" style="flex:1" onclick="mpReset()">🔄 Ricomincia</button>
+            <button class="btn btn-green" style="flex:2" onclick="mpSavePlan()">💾 Salva nel diario</button>
+          </div>
+        </div>
+
+        <!-- Error state -->
+        <div id="mp-error" style="display:none;text-align:center;padding:32px 16px">
+          <div style="font-size:40px;margin-bottom:12px">⚠️</div>
+          <div id="mp-error-text" style="font-family:var(--font-brand);font-weight:700;font-size:14px;margin-bottom:16px"></div>
+          <button class="btn btn-ghost" onclick="mpPrevStep(3)">← Riprova</button>
+        </div>
+
+      </div>
+
+    </div><!-- /page-mealplan -->
+
     <!-- ═══ ADMIN PAGE ═══ -->
     <div class="page" id="page-admin">
       <div class="page-header">
@@ -5652,6 +6130,7 @@ function goPage(id) {
   if (nb) nb.classList.add('active');
   if (id === 'admin') loadAdminUsers();
   if (id === 'goals') { loadGoal(); renderRicette(); }
+  if (id === 'mealplan') { initMealPlanPage(); }
   if (id === 'diary') { setDiaryToday(); switchDiaryTab('diary'); }
   if (id === 'home') { loadMacroWeekChart(); updateHomeDiarySummary(); injectActiveProgramTargets?.(); }
   if (id === 'rewards') { renderPointsUI(); loadReferralData(); refreshLeagueGroup().then(()=>renderLeagueUI()).catch(()=>{}); }
@@ -5672,7 +6151,7 @@ function _syncMobileNav(pageId) {
   // Pages reachable directly from bottom bar
   const directMap = { home:'home', peso:'peso', rewards:'rewards' };
   // Pages reachable via drawer
-  const drawerPages = new Set(['diary','food-goals','goals','settings','performance','periodization','legenda','admin','food']);
+  const drawerPages = new Set(['diary','food-goals','goals','settings','performance','periodization','legenda','admin','food','mealplan']);
 
   document.querySelectorAll('.mbn-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.mbn-drawer-btn').forEach(b => b.classList.remove('active'));
@@ -12634,6 +13113,222 @@ function _shareRicetta(id) {
   } else {
     navigator.clipboard?.writeText(text).then(()=>toast('📋 Copiato negli appunti!')).catch(()=>{});
   }
+}
+
+// ══════════════════════════════════════════════════════════════
+// MEAL PLAN AI WIZARD
+// ══════════════════════════════════════════════════════════════
+
+const MP_FOODS = {
+  proteine: ['🍗 Pollo','🥩 Manzo','🐟 Salmone','🐟 Tonno','🥚 Uova','🧀 Ricotta','🫘 Legumi','🍤 Gamberi','🐷 Tacchino','🥛 Yogurt greco','🧈 Albume'],
+  carbs:    ['🍚 Riso','🍝 Pasta','🥔 Patate','🥖 Pane integrale','🥣 Avena','🫓 Farro','🍠 Patata dolce','🌾 Quinoa'],
+  verdure:  ['🥦 Broccoli','🥗 Insalata','🍅 Pomodori','🥒 Zucchine','🫑 Peperoni','🥕 Carote','🥬 Spinaci','🍌 Banana','🍎 Mela','🍊 Arancia'],
+  grassi:   ['🥑 Avocado','🫒 Olio EVO','🧀 Parmigiano','🥜 Mandorle','🌰 Noci','🧈 Burro','🥛 Latte intero','🧀 Mozzarella']
+};
+
+let mpSelectedFoods  = new Set();
+let mpCustomFoods    = [];
+let mpSelectedMeals  = 4;
+let mpSelectedGoal   = '';
+let mpCurrentStep    = 0;
+let mpLastPlan       = null;
+
+function initMealPlanPage() {
+  mpRenderFoodTags();
+  mpUpdateMacroDisplay();
+  if (userTargets) {
+    if (userTargets.tdee)    document.getElementById('mp-kcal').value  = Math.min(4000,Math.max(1000,userTargets.tdee));
+    if (userTargets.protein) document.getElementById('mp-prot').value  = Math.min(300,Math.max(50,userTargets.protein));
+    if (userTargets.carbs)   document.getElementById('mp-carbs').value = Math.min(500,Math.max(50,userTargets.carbs));
+    if (userTargets.fat)     document.getElementById('mp-fat').value   = Math.min(200,Math.max(20,userTargets.fat));
+    mpUpdateMacroDisplay();
+  }
+}
+
+function mpRenderFoodTags() {
+  for (const [cat, foods] of Object.entries(MP_FOODS)) {
+    const el = document.getElementById('mp-tags-' + cat);
+    if (!el) continue;
+    el.innerHTML = foods.map(f => {
+      const sel = mpSelectedFoods.has(f) ? 'selected' : '';
+      const safe = f.replace(/'/g,"\'");
+      return `<div class="mp-food-tag ${sel}" onclick="mpToggleFood(this,'${safe}')">${f}</div>`;
+    }).join('');
+  }
+}
+
+function mpToggleFood(el, food) {
+  if (mpSelectedFoods.has(food)) { mpSelectedFoods.delete(food); el.classList.remove('selected'); }
+  else { mpSelectedFoods.add(food); el.classList.add('selected'); }
+}
+
+function mpAddCustomFood() {
+  const inp = document.getElementById('mp-custom-food');
+  const val = inp.value.trim();
+  if (!val) return;
+  mpCustomFoods.push(val);
+  mpSelectedFoods.add(val);
+  inp.value = '';
+  const container = document.getElementById('mp-tags-custom');
+  const tag = document.createElement('div');
+  tag.className = 'mp-food-tag selected';
+  tag.textContent = val;
+  const v = val;
+  tag.onclick = () => { mpSelectedFoods.delete(v); tag.remove(); };
+  container.appendChild(tag);
+}
+
+function mpUpdateMacroDisplay() {
+  const kcal  = parseInt(document.getElementById('mp-kcal').value);
+  const prot  = parseInt(document.getElementById('mp-prot').value);
+  const carbs = parseInt(document.getElementById('mp-carbs').value);
+  const fat   = parseInt(document.getElementById('mp-fat').value);
+  document.getElementById('mp-kcal-val').textContent = kcal;
+  document.getElementById('mp-prot-val').innerHTML   = prot  + '<span style="font-size:10px;font-weight:400">g</span>';
+  document.getElementById('mp-carbs-val').innerHTML  = carbs + '<span style="font-size:10px;font-weight:400">g</span>';
+  document.getElementById('mp-fat-val').innerHTML    = fat   + '<span style="font-size:10px;font-weight:400">g</span>';
+  const fromMacros = prot*4 + carbs*4 + fat*9;
+  const diff = fromMacros - kcal;
+  const fromEl = document.getElementById('mp-kcal-from-macros');
+  const diffEl = document.getElementById('mp-kcal-diff');
+  fromEl.textContent = fromMacros + ' kcal';
+  fromEl.style.color = Math.abs(diff)<100 ? 'var(--green)' : 'var(--orange)';
+  if (Math.abs(diff)<30)       { diffEl.textContent='✅ Perfettamente bilanciato'; diffEl.style.color='var(--green)'; }
+  else if (diff>0)             { diffEl.textContent='⚠️ Macro eccedono di '+diff+' kcal'; diffEl.style.color='var(--orange)'; }
+  else                         { diffEl.textContent='ℹ️ Macro inferiori di '+Math.abs(diff)+' kcal'; diffEl.style.color='var(--muted)'; }
+}
+
+function mpSelectMeals(n, el) {
+  mpSelectedMeals = n;
+  document.querySelectorAll('.mp-meal-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function mpToggleGoal(el) {
+  document.querySelectorAll('#mp-goal-tags .mp-food-tag').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+  mpSelectedGoal = el.dataset.val;
+}
+
+function mpNextStep(current) {
+  if (current===0 && mpSelectedFoods.size<3) { toast('Seleziona almeno 3 alimenti!','var(--orange)'); return; }
+  mpGoStep(current+1);
+}
+function mpPrevStep(current) { mpGoStep(current-1); }
+
+function mpGoStep(step) {
+  mpCurrentStep = step;
+  document.querySelectorAll('.mp-panel').forEach((p,i) => p.classList.toggle('active', i===step));
+  document.querySelectorAll('.mp-step').forEach((s,i) => {
+    s.classList.toggle('active', i===step);
+    s.classList.toggle('done', i<step);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+async function mpGenerate() {
+  if (!mpSelectedGoal) { toast('Seleziona un obiettivo!','var(--orange)'); return; }
+  mpGoStep(3);
+  document.getElementById('mp-loading').style.display='flex';
+  document.getElementById('mp-result').style.display='none';
+  document.getElementById('mp-error').style.display='none';
+
+  const msgs=['Analizzo i tuoi alimenti preferiti...','Calcolo le grammature ideali...','Distribuisco i macro sui pasti...','Ottimizzazione finale...'];
+  let mi=0;
+  const interval=setInterval(()=>{ mi=(mi+1)%msgs.length; const el=document.getElementById('mp-loading-text'); if(el)el.textContent=msgs[mi]; },2200);
+
+  try {
+    const kcal =parseInt(document.getElementById('mp-kcal').value);
+    const prot =parseInt(document.getElementById('mp-prot').value);
+    const carbs=parseInt(document.getElementById('mp-carbs').value);
+    const fat  =parseInt(document.getElementById('mp-fat').value);
+    const notes=document.getElementById('mp-notes').value.trim();
+    const foods=[...mpSelectedFoods].map(f=>f.replace(/^[\S]+ /,''));
+    const mealNames={3:['Colazione','Pranzo','Cena'],4:['Colazione','Pranzo','Spuntino pomeridiano','Cena'],5:['Colazione','Spuntino mattutino','Pranzo','Spuntino pomeridiano','Cena']}[mpSelectedMeals]||['Colazione','Pranzo','Cena'];
+
+    const prompt=`Sei un nutrizionista esperto. Crea un piano alimentare giornaliero REALISTICO rispettando:
+KCAL: ${kcal} | Proteine: ${prot}g | Carboidrati: ${carbs}g | Grassi: ${fat}g
+Obiettivo: ${mpSelectedGoal} | Pasti: ${mpSelectedMeals} (${mealNames.join(', ')})
+Alimenti disponibili: ${foods.join(', ')}${notes?'\nNote: '+notes:''}
+
+Rispondi SOLO con JSON valido senza markdown:
+{"totale":{"kcal":N,"prot":N,"carbs":N,"fat":N},"nota":"2 righe di consiglio pratico","pasti":[{"nome":"Colazione","emoji":"🌅","kcal":N,"prot":N,"carbs":N,"fat":N,"alimenti":[{"nome":"Avena","grammi":80,"kcal":290,"prot":10,"carbs":50,"fat":5}]}]}
+Rispetta ESATTAMENTE i macro target (±5%). Grammature realistiche. Usa solo gli alimenti forniti.`;
+
+    const {httpsCallable}=await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js');
+    if (!window._fbFunctions) throw new Error('Firebase Functions non disponibile');
+    const fn=httpsCallable(window._fbFunctions,'generateMealPlan',{timeout:60000});
+    const result=await fn({prompt,kcal,prot,carbs,fat,meals:mpSelectedMeals});
+
+    clearInterval(interval);
+    if (!result.data?.success) throw new Error(result.data?.error||'Errore server');
+    mpLastPlan=result.data.plan;
+    mpRenderResult(mpLastPlan);
+  } catch(e) {
+    clearInterval(interval);
+    document.getElementById('mp-loading').style.display='none';
+    document.getElementById('mp-error').style.display='block';
+    document.getElementById('mp-error-text').textContent='Errore: '+(e.message||'Riprova');
+  }
+}
+
+function mpRenderResult(plan) {
+  document.getElementById('mp-loading').style.display='none';
+  document.getElementById('mp-result').style.display='block';
+  const t=plan.totale||{};
+  document.getElementById('mp-result-strip').innerHTML=`
+    <div class="mp-macro-strip-cell"><div class="mp-macro-strip-val" style="color:var(--orange)">${Math.round(t.kcal||0)}</div><div class="mp-macro-strip-lbl">KCAL</div></div>
+    <div class="mp-macro-strip-cell"><div class="mp-macro-strip-val" style="color:#3b82f6">${Math.round(t.prot||0)}g</div><div class="mp-macro-strip-lbl">PROT</div></div>
+    <div class="mp-macro-strip-cell"><div class="mp-macro-strip-val" style="color:var(--green)">${Math.round(t.carbs||0)}g</div><div class="mp-macro-strip-lbl">CARB</div></div>
+    <div class="mp-macro-strip-cell"><div class="mp-macro-strip-val" style="color:#f59e0b">${Math.round(t.fat||0)}g</div><div class="mp-macro-strip-lbl">GRASSI</div></div>`;
+  document.getElementById('mp-result-note').textContent=plan.nota||'';
+  document.getElementById('mp-result-meals').innerHTML=(plan.pasti||[]).map((p,i)=>`
+    <div class="mp-result-meal">
+      <div class="mp-result-meal-header" onclick="mpToggleMeal(${i})">
+        <span class="mp-result-meal-icon">${p.emoji||'🍽️'}</span>
+        <span class="mp-result-meal-name">${p.nome}</span>
+        <span class="mp-result-meal-kcal">${Math.round(p.kcal||0)} kcal</span>
+        <span style="color:var(--muted);font-size:12px;margin-left:6px" id="mp-meal-arrow-${i}">▼</span>
+      </div>
+      <div class="mp-result-meal-body" id="mp-meal-body-${i}">
+        <div style="display:flex;gap:12px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid var(--border)">
+          <span style="font-family:var(--font-mono);font-size:10px;color:#3b82f6">P: ${Math.round(p.prot||0)}g</span>
+          <span style="font-family:var(--font-mono);font-size:10px;color:var(--green)">C: ${Math.round(p.carbs||0)}g</span>
+          <span style="font-family:var(--font-mono);font-size:10px;color:#f59e0b">G: ${Math.round(p.fat||0)}g</span>
+        </div>
+        ${(p.alimenti||[]).map(a=>`<div class="mp-result-food-row"><span class="mp-result-food-name">${a.nome}</span><span class="mp-result-food-grams">${a.grammi}g</span><span class="mp-result-food-kcal">${Math.round(a.kcal||0)} kcal</span></div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function mpToggleMeal(i) {
+  const body=document.getElementById('mp-meal-body-'+i);
+  const arrow=document.getElementById('mp-meal-arrow-'+i);
+  if (!body) return;
+  const isOpen=body.style.display!=='none';
+  body.style.display=isOpen?'none':'block';
+  if (arrow) arrow.textContent=isOpen?'▶':'▼';
+}
+
+async function mpSavePlan() {
+  if (!mpLastPlan) return;
+  try {
+    const {db,doc,setDoc}=window._fb;
+    await setDoc(doc(db,'users',uid(),'mealplans',Date.now().toString()),{
+      plan:mpLastPlan, kcal:parseInt(document.getElementById('mp-kcal').value),
+      createdAt:new Date().toISOString(), foods:[...mpSelectedFoods],
+      meals:mpSelectedMeals, goal:mpSelectedGoal
+    });
+    toast('✅ Piano salvato!','var(--green)');
+    if (typeof awardPoints==='function') awardPoints(20,'Piano alimentare AI generato');
+  } catch(e) { toast('Errore salvataggio','var(--danger)'); }
+}
+
+function mpReset() {
+  mpSelectedFoods.clear(); mpCustomFoods=[]; mpSelectedGoal='';
+  document.getElementById('mp-tags-custom').innerHTML='';
+  document.querySelectorAll('#mp-tags-proteine .mp-food-tag, #mp-tags-carbs .mp-food-tag, #mp-tags-verdure .mp-food-tag, #mp-tags-grassi .mp-food-tag').forEach(t=>t.classList.remove('selected'));
+  mpGoStep(0);
 }
 
 </script>
