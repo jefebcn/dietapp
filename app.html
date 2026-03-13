@@ -167,7 +167,7 @@ function _authErr(code) {
 function _showErr(msg) {
   const el = document.getElementById('auth-error');
   if (el) { el.textContent = msg; el.style.display = 'block'; }
-  if (typeof toast === 'function') toast('\u274c ' + msg, 'var(--danger)');
+  if (typeof toast === 'function') toast('❌ ' + msg, 'var(--danger)');
 }
 
 async function _doLogin() {
@@ -187,7 +187,7 @@ async function _doLogin() {
     await signInWithEmailAndPassword(auth, email, pass);
   } catch(e) {
     _showErr(_authErr(e.code));
-    if (btn) { btn.disabled=false; btn.textContent='Accedi \u2192'; }
+    if (btn) { btn.disabled=false; btn.textContent='Accedi →'; }
   }
 }
 
@@ -207,7 +207,7 @@ async function _doRegister() {
     await setDoc(doc(db,'users',cred.user.uid), {name,email,role,createdAt:Date.now()});
   } catch(e) {
     _showErr(_authErr(e.code));
-    if (btn) { btn.disabled=false; btn.textContent='Crea account \u2192'; }
+    if (btn) { btn.disabled=false; btn.textContent='Crea account →'; }
   }
 }
 
@@ -244,16 +244,16 @@ async function _doForgot() {
   const btn = document.getElementById('forgot-btn');
   const eStyle = 'display:block;padding:12px;border-radius:10px;font-size:13px;background:rgba(239,68,68,0.08);color:var(--danger);border:1px solid rgba(239,68,68,0.2)';
   const oStyle = 'display:block;padding:12px;border-radius:10px;font-size:13px;background:var(--green-bg);color:var(--green);border:1px solid rgba(74,122,53,0.3)';
-  if (!email) { if(st){st.textContent='\u26a0\ufe0f Inserisci la tua email.';st.style.cssText=eStyle;} return; }
-  if (btn) { btn.textContent='\u23f3 Invio...'; btn.disabled=true; }
+  if (!email) { if(st){st.textContent='⚠️ Inserisci la tua email.';st.style.cssText=eStyle;} return; }
+  if (btn) { btn.textContent='⏳ Invio...'; btn.disabled=true; }
   try {
     await sendPasswordResetEmail(auth, email);
-    if (st) { st.innerHTML='\u2705 <strong>Email inviata!</strong><br>Controlla la casella (e spam).'; st.style.cssText=oStyle; }
-    if (btn) btn.textContent='\u2705 Email inviata';
+    if (st) { st.innerHTML='✅ <strong>Email inviata!</strong><br>Controlla la casella (e spam).'; st.style.cssText=oStyle; }
+    if (btn) btn.textContent='✅ Email inviata';
     setTimeout(() => { if(typeof window.closeForgotFlow==='function') window.closeForgotFlow(); }, 4000);
   } catch(e) {
-    if (st) { st.textContent='\u26a0\ufe0f '+_authErr(e.code); st.style.cssText=eStyle; }
-    if (btn) { btn.textContent='\U0001f4e7 Invia link'; btn.disabled=false; }
+    if (st) { st.textContent='⚠️ '+_authErr(e.code); st.style.cssText=eStyle; }
+    if (btn) { btn.textContent='📧 Invia link'; btn.disabled=false; }
   }
 }
 
