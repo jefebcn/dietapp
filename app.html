@@ -95,8 +95,10 @@ window._fb = { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassw
 onAuthStateChanged(auth, async user => {
   if (user) {
     localStorage.setItem('nt_logged_in', '1');
+    // getDoc con timeout 6s — non rischia di bloccare showApp() per sempre
+    const _timeout = ms => new Promise((_,rej) => setTimeout(() => rej(new Error('timeout')), ms));
     try {
-      const snap = await getDoc(doc(db, 'users', user.uid));
+      const snap = await Promise.race([getDoc(doc(db, 'users', user.uid)), _timeout(6000)]);
       if (snap.exists()) {
         window._currentUser = { uid: user.uid, email: user.email, ...snap.data() };
       } else {
@@ -105,9 +107,11 @@ onAuthStateChanged(auth, async user => {
         try { await setDoc(doc(db,'users',user.uid), window._currentUser); } catch(we){}
       }
     } catch(e) {
+      // Firestore non raggiungibile o timeout → usa dati minimi dall'auth object
       window._currentUser = { uid: user.uid, email: user.email||'',
         name: user.displayName || (user.email||'Utente').split('@')[0], role: 'user' };
     }
+    // showApp() sempre chiamata, qualunque cosa succeda sopra
     setTimeout(() => { if (typeof window.showApp === 'function') window.showApp(); }, 0);
     if (window._initFCM) window._initFCM().catch(()=>{});
   } else {
@@ -182,6 +186,9 @@ async function _doLogin() {
   }
   try {
     await signInWithEmailAndPassword(auth, email, pass);
+    // ✅ login OK — onAuthStateChanged chiamerà showApp() in modo asincrono
+    // Reset bottone subito così non resta mai frozen
+    if (btn) { btn.disabled=false; btn.textContent='Accedi →'; }
   } catch(e) {
     _showErr(_authErr(e.code));
     if (btn) { btn.disabled=false; btn.textContent='Accedi →'; }
