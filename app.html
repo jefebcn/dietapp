@@ -93,12 +93,14 @@ window._fb = { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassw
 // setPersistence influisce solo sulle operazioni FUTURE, non sulla lettura
 // dello stato corrente → non serve aspettarla prima di registrare il listener.
 onAuthStateChanged(auth, async user => {
+  console.log('[NT] onAuthStateChanged fired, user:', user ? user.email : 'null');
   if (user) {
     localStorage.setItem('nt_logged_in', '1');
-    // getDoc con timeout 6s — non rischia di bloccare showApp() per sempre
     const _timeout = ms => new Promise((_,rej) => setTimeout(() => rej(new Error('timeout')), ms));
     try {
+      console.log('[NT] getDoc users/' + user.uid + ' → start');
       const snap = await Promise.race([getDoc(doc(db, 'users', user.uid)), _timeout(6000)]);
+      console.log('[NT] getDoc → OK, exists:', snap.exists());
       if (snap.exists()) {
         window._currentUser = { uid: user.uid, email: user.email, ...snap.data() };
       } else {
@@ -107,16 +109,21 @@ onAuthStateChanged(auth, async user => {
         try { await setDoc(doc(db,'users',user.uid), window._currentUser); } catch(we){}
       }
     } catch(e) {
-      // Firestore non raggiungibile o timeout → usa dati minimi dall'auth object
+      console.warn('[NT] getDoc ERROR/TIMEOUT:', e.message || e.code);
       window._currentUser = { uid: user.uid, email: user.email||'',
         name: user.displayName || (user.email||'Utente').split('@')[0], role: 'user' };
     }
-    // showApp() sempre chiamata, qualunque cosa succeda sopra
-    setTimeout(() => { if (typeof window.showApp === 'function') window.showApp(); }, 0);
+    console.log('[NT] _currentUser set:', window._currentUser?.email, '→ calling showApp()');
+    setTimeout(() => {
+      console.log('[NT] showApp typeof:', typeof window.showApp);
+      if (typeof window.showApp === 'function') window.showApp();
+      else console.error('[NT] showApp NOT DEFINED!');
+    }, 0);
     if (window._initFCM) window._initFCM().catch(()=>{});
   } else {
     localStorage.removeItem('nt_logged_in');
     window._currentUser = null;
+    console.log('[NT] user null → calling showAuth()');
     setTimeout(() => { if (typeof window.showAuth === 'function') window.showAuth(); }, 0);
   }
 });
@@ -185,11 +192,12 @@ async function _doLogin() {
       ' Accesso...</span>';
   }
   try {
+    console.log('[NT] signInWithEmailAndPassword → start');
     await signInWithEmailAndPassword(auth, email, pass);
-    // ✅ login OK — onAuthStateChanged chiamerà showApp() in modo asincrono
-    // Reset bottone subito così non resta mai frozen
+    console.log('[NT] signInWithEmailAndPassword → OK, aspetto onAuthStateChanged...');
     if (btn) { btn.disabled=false; btn.textContent='Accedi →'; }
   } catch(e) {
+    console.error('[NT] signInWithEmailAndPassword → ERROR', e.code, e.message);
     _showErr(_authErr(e.code));
     if (btn) { btn.disabled=false; btn.textContent='Accedi →'; }
   }
