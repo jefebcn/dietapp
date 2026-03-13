@@ -128,13 +128,153 @@ onAuthStateChanged(auth, async user => {
       console.warn('Firestore error:', firestoreErr.code || firestoreErr.message);
       window._currentUser = { uid: user.uid, email: user.email || '', name: user.displayName || (user.email||'').split('@')[0] || 'Utente', role: 'user' };
     }
-    window.showApp ? window.showApp() : window.addEventListener('DOMContentLoaded', () => window.showApp && window.showApp());
+    if (window.showApp) window.showApp();
+    else document.addEventListener('DOMContentLoaded', () => window.showApp && window.showApp());
+    // FCM
+    if (window._initFCM) window._initFCM().catch(()=>{});
   } else {
     localStorage.removeItem('nt_logged_in');
     window._currentUser = null;
-    window.showAuth ? window.showAuth() : window.addEventListener('DOMContentLoaded', () => window.showAuth && window.showAuth());
+    if (window.showAuth) window.showAuth();
+    else document.addEventListener('DOMContentLoaded', () => window.showAuth && window.showAuth());
   }
 });
+
+// ── Funzioni Auth esposte come window.* (accessibili da onclick HTML) ──────
+
+const ADMIN_EMAIL_MODULE = 'admin@nutritrack.it';
+
+function _authErrMsg(code) {
+  const map = {
+    'auth/user-not-found':           'Nessun account trovato con questa email.',
+    'auth/wrong-password':           'Password errata.',
+    'auth/invalid-email':            'Email non valida.',
+    'auth/invalid-login-credentials':'Email o password errati.',
+    'auth/invalid-credential':       'Email o password errati.',
+    'auth/too-many-requests':        'Troppi tentativi. Aspetta qualche minuto.',
+    'auth/network-request-failed':   'Errore di rete. Controlla la connessione.',
+    'auth/user-disabled':            'Account disabilitato.',
+    'auth/email-already-in-use':     'Email già in uso.',
+    'auth/weak-password':            'Password troppo debole (min. 6 caratteri).',
+  };
+  return map[code] || ('Errore: ' + (code || 'Riprova'));
+}
+
+function _showAuthErr(msg) {
+  const el = document.getElementById('auth-error');
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+  if (typeof toast === 'function') toast('❌ ' + msg, 'var(--danger)');
+  console.error('Auth error:', msg);
+}
+
+window.doLogin = async function() {
+  const emailEl = document.getElementById('login-email');
+  const passEl  = document.getElementById('login-pass');
+  const btn     = document.getElementById('login-btn');
+  const errEl   = document.getElementById('auth-error');
+  if (errEl) errEl.style.display = 'none';
+
+  const email = (emailEl?.value || '').trim();
+  const pass  = passEl?.value || '';
+  if (!email || !pass) { _showAuthErr('Inserisci email e password.'); return; }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:8px">'
+      + '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="animation:spin 0.7s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>'
+      + ' Accesso...</span>';
+  }
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    // onAuthStateChanged chiama showApp()
+  } catch(e) {
+    console.error('doLogin error:', e.code, e.message);
+    _showAuthErr(_authErrMsg(e.code));
+    if (btn) { btn.disabled = false; btn.textContent = 'Accedi →'; }
+  }
+};
+
+window.doRegister = async function() {
+  const name  = (document.getElementById('reg-name')?.value || '').trim();
+  const email = (document.getElementById('reg-email')?.value || '').trim();
+  const pass  = document.getElementById('reg-pass')?.value || '';
+  const errEl = document.getElementById('auth-error');
+  if (errEl) errEl.style.display = 'none';
+
+  if (!name||!email||!pass) { _showAuthErr('Compila tutti i campi.'); return; }
+  if (pass.length < 6) { _showAuthErr('Password minimo 6 caratteri.'); return; }
+
+  const btn = document.getElementById('reg-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Registrazione...'; }
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    const role = email.toLowerCase() === ADMIN_EMAIL_MODULE.toLowerCase() ? 'admin' : 'user';
+    await setDoc(doc(db, 'users', cred.user.uid), { name, email, role, createdAt: Date.now() });
+    // onAuthStateChanged chiama showApp()
+  } catch(e) {
+    console.error('doRegister error:', e.code, e.message);
+    _showAuthErr(_authErrMsg(e.code));
+    if (btn) { btn.disabled = false; btn.textContent = 'Crea account →'; }
+  }
+};
+
+window.doGoogleSignIn = async function() {
+  const errEl = document.getElementById('auth-error');
+  if (errEl) errEl.style.display = 'none';
+  try {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({ prompt: 'select_account' });
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+                   || window.matchMedia('(display-mode: standalone)').matches
+                   || window.navigator.standalone === true;
+    if (isMobile) {
+      const rl = document.getElementById('social-redirect-loading');
+      if (rl) { rl.style.display = 'flex'; }
+      const rm = document.getElementById('social-redirect-msg');
+      if (rm) rm.textContent = 'Accesso con Google…';
+      await signInWithRedirect(auth, provider);
+    } else {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const userRef = doc(db, 'users', user.uid);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists()) {
+        await setDoc(userRef, { name: user.displayName||'Utente', email: user.email||'', role:'user', createdAt: Date.now() });
+      }
+    }
+  } catch(e) {
+    if (e.code==='auth/popup-closed-by-user'||e.code==='auth/cancelled-popup-request') return;
+    _showAuthErr(_authErrMsg(e.code) || 'Errore accesso Google.');
+  }
+};
+
+window.doForgot = async function() {
+  const email   = (document.getElementById('forgot-email')?.value || '').trim();
+  const statusEl = document.getElementById('forgot-status');
+  const btn      = document.getElementById('forgot-btn');
+  if (!email) {
+    if (statusEl) { statusEl.textContent='⚠️ Inserisci la tua email.'; statusEl.style.cssText='display:block;padding:12px;border-radius:10px;font-size:13px;background:rgba(239,68,68,0.08);color:var(--danger);border:1px solid rgba(239,68,68,0.2)'; }
+    return;
+  }
+  if (btn) { btn.textContent='⏳ Invio...'; btn.disabled=true; }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    if (statusEl) { statusEl.innerHTML='✅ <strong>Email inviata!</strong><br>Controlla la casella (e la cartella spam).'; statusEl.style.cssText='display:block;padding:12px;border-radius:10px;font-size:13px;background:var(--green-bg);color:var(--green);border:1px solid rgba(74,122,53,0.3)'; }
+    if (btn) btn.textContent='✅ Email inviata';
+    setTimeout(() => window.closeForgotFlow && window.closeForgotFlow(), 4000);
+  } catch(e) {
+    if (statusEl) { statusEl.textContent='⚠️ ' + _authErrMsg(e.code); statusEl.style.cssText='display:block;padding:12px;border-radius:10px;font-size:13px;background:rgba(239,68,68,0.08);color:var(--danger);border:1px solid rgba(239,68,68,0.2)'; }
+    if (btn) { btn.textContent='📧 Invia link'; btn.disabled=false; }
+  }
+};
+
+window.doLogout = async function() {
+  if (window._premiumListener) { window._premiumListener(); window._premiumListener = null; }
+  window.isPremium = false;
+  localStorage.removeItem('nt_logged_in');
+  await signOut(auth);
+};
+
 </script>
 
 <style>
@@ -6399,7 +6539,7 @@ function switchFoodGoalsTab(tab) {
 }
 
 // ══════════════════════════════════
-// AUTH
+// AUTH — funzioni esposte dal modulo Firebase (window.doLogin, ecc.)
 // ══════════════════════════════════
 function switchAuthTab(tab) {
   document.querySelectorAll('.auth-tab').forEach((t,i) => {
@@ -6407,221 +6547,62 @@ function switchAuthTab(tab) {
   });
   document.getElementById('form-login').classList.toggle('hidden', tab!=='login');
   document.getElementById('form-register').classList.toggle('hidden', tab!=='register');
-  clearAuthError();
+  const errEl = document.getElementById('auth-error');
+  if (errEl) errEl.style.display = 'none';
 }
 
 function showAuthError(msg) {
   const el = document.getElementById('auth-error');
   if (el) { el.textContent = msg; el.style.display = 'block'; }
-  // Mostra sempre come toast su mobile
   if (typeof toast === 'function') toast('❌ ' + msg, 'var(--danger)');
 }
-function clearAuthError() { document.getElementById('auth-error').style.display = 'none'; }
-
-async function doLogin() {
-  clearAuthError();
-  const emailEl = document.getElementById('login-email');
-  const passEl  = document.getElementById('login-pass');
-  const btn     = document.getElementById('login-btn');
-  if (!emailEl || !passEl || !btn) {
-    alert('Errore UI: elementi login non trovati. Ricarica la pagina.');
-    return;
-  }
-  const email = emailEl.value.trim();
-  const pass  = passEl.value;
-  if (!email || !pass) {
-    showAuthError('Inserisci email e password.');
-    return;
-  }
-  // Feedback immediato
-  btn.disabled = true;
-  btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:8px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="animation:spin 0.7s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Accesso...</span>';
-  // Guard: Firebase non ancora pronto
-  if (!window._fb || !window._fb.signInWithEmailAndPassword) {
-    await new Promise(r => setTimeout(r, 3000));
-    if (!window._fb || !window._fb.signInWithEmailAndPassword) {
-      const msg = 'Connessione non riuscita. Ricarica la pagina e riprova.';
-      showAuthError(msg);
-      alert(msg); // fallback visibile sempre su mobile
-      btn.disabled = false; btn.textContent = 'Accedi →';
-      return;
-    }
-  }
-  try {
-    await window._fb.signInWithEmailAndPassword(window._fb.auth, email, pass);
-    // successo: onAuthStateChanged chiama showApp()
-  } catch(e) {
-    console.error('Login error:', e.code, e.message);
-    const msg = firebaseErrMsg(e.code) || ('Errore: ' + (e.message || e.code || 'Riprova'));
-    showAuthError(msg);
-    btn.disabled = false; btn.textContent = 'Accedi →';
-  }
+function clearAuthError() {
+  const el = document.getElementById('auth-error');
+  if (el) el.style.display = 'none';
 }
 
-// ═══════════════════════════════════════════
-// CREDENZIALI ADMIN — modifica qui
+// doLogin / doRegister / doGoogleSignIn / doForgot / doLogout
+// queste funzioni saranno SOVRASCRITTE dal modulo Firebase (window.doXxx)
+// Questi stub evitano errori "not defined" se l'utente è velocissimo
+function doLogin()        { console.warn('Firebase non ancora pronto, riprova'); }
+function doRegister()     { console.warn('Firebase non ancora pronto, riprova'); }
+function doGoogleSignIn() { console.warn('Firebase non ancora pronto, riprova'); }
+function doForgot()       { console.warn('Firebase non ancora pronto, riprova'); }
+function doLogout()       { console.warn('Firebase non ancora pronto, riprova'); }
+
+// ADMIN_EMAIL — deve esistere nel contesto globale per showApp
 const ADMIN_EMAIL = 'admin@nutritrack.it';
-// Crea l'account admin registrandoti con questa email.
-// Solo chi accede con questa email vedrà il pannello utenti.
-// ═══════════════════════════════════════════
-
-async function doRegister() {
-  const name  = document.getElementById('reg-name').value.trim();
-  const email = document.getElementById('reg-email').value.trim();
-  const pass  = document.getElementById('reg-pass').value;
-  if (!name||!email||!pass) { showAuthError('Compila tutti i campi.'); return; }
-  if (pass.length < 6) { showAuthError('Password minimo 6 caratteri.'); return; }
-  const isAdmin = email.toLowerCase() === ADMIN_EMAIL.toLowerCase();
-  const btn = document.getElementById('reg-btn');
-  btn.disabled = true; btn.textContent = 'Registrazione...';
-  if (!window._fb || !window._fb.createUserWithEmailAndPassword) {
-    await new Promise(r => setTimeout(r, 2500));
-    if (!window._fb || !window._fb.createUserWithEmailAndPassword) {
-      showAuthError('Connessione al server non riuscita. Controlla la rete e ricarica la pagina.');
-      btn.disabled = false; btn.textContent = 'Crea account →';
-      return;
-    }
-  }
-  try {
-    const {auth, db, createUserWithEmailAndPassword, doc, setDoc} = window._fb;
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    // Ruolo determinato esclusivamente dall'email, non dall'ordine di registrazione
-    const role = isAdmin ? 'admin' : 'user';
-    await setDoc(doc(db,'users', cred.user.uid), {
-      name, email, role, createdAt: Date.now()
-    });
-  } catch(e) {
-    showAuthError(firebaseErrMsg(e.code));
-    btn.disabled = false; btn.textContent = 'Crea account →';
-  }
-}
-
-/* ── SOCIAL AUTH: Google ── */
-// Rileva se siamo su mobile / PWA installed (popup bloccati)
-function isMobileOrPWA() {
-  const standalone = window.matchMedia('(display-mode: standalone)').matches
-    || window.navigator.standalone === true;
-  const mobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  return standalone || mobile;
-}
-
-async function doGoogleSignIn() {
-  clearAuthError();
-  try {
-    const { auth, db, GoogleAuthProvider, signInWithPopup, signInWithRedirect, doc, setDoc, getDoc } = window._fb;
-    const provider = new GoogleAuthProvider();
-    provider.setCustomParameters({ prompt: 'select_account' });
-
-    if (isMobileOrPWA()) {
-      // Su mobile/PWA usa redirect — il risultato viene gestito al riavvio in getRedirectResult
-      const rl = document.getElementById('social-redirect-loading');
-      if (rl) { rl.style.display = 'flex'; document.getElementById('social-redirect-msg').textContent = 'Accesso con Google…'; }
-      await signInWithRedirect(auth, provider);
-      return; // la pagina verrà ricaricata dopo il redirect
-    }
-
-    // Desktop: usa popup
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-    const userRef = doc(db, 'users', user.uid);
-    const userSnap = await getDoc(userRef);
-    if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        name: user.displayName || 'Utente',
-        email: user.email || '',
-        role: 'user',
-        createdAt: Date.now()
-      });
-    }
-  } catch(e) {
-    if (e.code === 'auth/popup-closed-by-user') return;
-    if (e.code === 'auth/cancelled-popup-request') return;
-    showAuthError(firebaseErrMsg(e.code) || 'Errore accesso Google. Riprova.');
-  }
-}
-
-
 
 function openForgotFlow() {
-  // Pre-fill email if already typed in login
-  const loginEmail = document.getElementById('login-email').value.trim();
-  if (loginEmail) document.getElementById('forgot-email').value = loginEmail;
-  document.getElementById('forgot-status').style.display = 'none';
-  document.getElementById('forgot-btn').textContent = '📧 Invia link di recupero';
-  document.getElementById('forgot-btn').disabled = false;
-  // Hide login, show forgot
-  document.getElementById('form-login').classList.add('hidden');
-  document.getElementById('form-forgot').classList.remove('hidden');
-  document.getElementById('forgot-email').focus();
+  const loginEmail = (document.getElementById('login-email')?.value || '').trim();
+  if (loginEmail) { const fe = document.getElementById('forgot-email'); if(fe) fe.value = loginEmail; }
+  const fs = document.getElementById('forgot-status'); if(fs) fs.style.display='none';
+  const fb = document.getElementById('forgot-btn'); if(fb){fb.textContent='📧 Invia link di recupero';fb.disabled=false;}
+  document.getElementById('form-login')?.classList.add('hidden');
+  document.getElementById('form-forgot')?.classList.remove('hidden');
+  document.getElementById('forgot-email')?.focus();
   clearAuthError();
 }
 
 function closeForgotFlow() {
-  document.getElementById('form-forgot').classList.add('hidden');
-  document.getElementById('form-login').classList.remove('hidden');
+  document.getElementById('form-forgot')?.classList.add('hidden');
+  document.getElementById('form-login')?.classList.remove('hidden');
   clearAuthError();
 }
 
-async function doForgot() {
-  const email = document.getElementById('forgot-email').value.trim();
-  const statusEl = document.getElementById('forgot-status');
-  const btn = document.getElementById('forgot-btn');
-
-  if (!email) {
-    statusEl.textContent = '⚠️ Inserisci la tua email.';
-    statusEl.style.background = 'rgba(239,68,68,0.08)';
-    statusEl.style.color = 'var(--danger)';
-    statusEl.style.border = '1px solid rgba(239,68,68,0.2)';
-    statusEl.style.display = 'block';
-    document.getElementById('forgot-email').focus();
-    return;
-  }
-
-  btn.textContent = '⏳ Invio in corso...';
-  btn.disabled = true;
-
-  try {
-    await window._fb.sendPasswordResetEmail(window._fb.auth, email);
-    statusEl.innerHTML = '✅ <strong>Email inviata!</strong><br>Controlla la casella di posta (e la cartella spam). Il link è valido per 1 ora.';
-    statusEl.style.background = 'var(--green-bg)';
-    statusEl.style.color = 'var(--green)';
-    statusEl.style.border = '1px solid rgba(74,122,53,0.3)';
-    statusEl.style.display = 'block';
-    btn.textContent = '✅ Email inviata';
-    // Auto-back to login after 4s
-    setTimeout(() => closeForgotFlow(), 4000);
-  } catch(e) {
-    statusEl.textContent = '⚠️ ' + firebaseErrMsg(e.code);
-    statusEl.style.background = 'rgba(239,68,68,0.08)';
-    statusEl.style.color = 'var(--danger)';
-    statusEl.style.border = '1px solid rgba(239,68,68,0.2)';
-    statusEl.style.display = 'block';
-    btn.textContent = '📧 Invia link di recupero';
-    btn.disabled = false;
-  }
-}
-
-async function doLogout() {
-  // Cancella il listener premium prima del logout per evitare errori di permesso
-  if (_premiumListener) { _premiumListener(); _premiumListener = null; }
-  isPremium = false;
-  sessionStorage.removeItem('nt_logged_in');
-  await window._fb.signOut(window._fb.auth);
-}
-
+// Backup: firebaseErrMsg in caso usata altrove
 function firebaseErrMsg(code) {
   const map = {
-    'auth/user-not-found': 'Nessun account trovato con questa email.',
-    'auth/wrong-password': 'Password errata.',
-    'auth/invalid-email': 'Email non valida.',
-    'auth/invalid-login-credentials': 'Email o password errati.',
-    'auth/too-many-requests': 'Troppi tentativi. Aspetta qualche minuto.',
-    'auth/network-request-failed': 'Errore di rete. Controlla la connessione.',
-    'auth/user-disabled': 'Account disabilitato. Contatta il supporto.',
-    'auth/email-already-in-use': 'Email già in uso.',
-    'auth/weak-password': 'Password troppo debole (min. 6 caratteri).',
-    'auth/invalid-credential': 'Credenziali non valide.',
-    'auth/too-many-requests': 'Troppi tentativi. Riprova più tardi.',
+    'auth/user-not-found':'Nessun account trovato con questa email.',
+    'auth/wrong-password':'Password errata.',
+    'auth/invalid-email':'Email non valida.',
+    'auth/invalid-login-credentials':'Email o password errati.',
+    'auth/invalid-credential':'Email o password errati.',
+    'auth/too-many-requests':'Troppi tentativi. Aspetta qualche minuto.',
+    'auth/network-request-failed':'Errore di rete. Controlla la connessione.',
+    'auth/user-disabled':'Account disabilitato.',
+    'auth/email-already-in-use':'Email già in uso.',
+    'auth/weak-password':'Password troppo debole (min. 6 caratteri).',
   };
   return map[code] || 'Errore: ' + code;
 }
