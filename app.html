@@ -87,14 +87,40 @@ window._fb = { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassw
                collection, doc, setDoc, getDoc, getDocs, addDoc, query,
                orderBy, onSnapshot, updateDoc, deleteDoc, where, serverTimestamp, limit, arrayUnion };
 
-// ── Init: setPersistence → getRedirectResult → onAuthStateChanged ──────────
-// ORDINE CRITICO: onAuthStateChanged va registrato DOPO setPersistence
-// altrimenti Firebase legge lo stato senza persistenza → auto-login fallisce
-(async () => {
-  // 1. Imposta persistenza locale (sessione sopravvive al refresh)
-  try { await setPersistence(auth, browserLocalPersistence); } catch(e) {}
+// ── onAuthStateChanged: SINCRONO, registrato subito ─────────────────────────
+// DEVE stare fuori da qualsiasi async/await altrimenti se getRedirectResult
+// si blocca, onAuthStateChanged non viene mai registrato e il login si freezza.
+// setPersistence influisce solo sulle operazioni FUTURE, non sulla lettura
+// dello stato corrente → non serve aspettarla prima di registrare il listener.
+onAuthStateChanged(auth, async user => {
+  if (user) {
+    localStorage.setItem('nt_logged_in', '1');
+    try {
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (snap.exists()) {
+        window._currentUser = { uid: user.uid, email: user.email, ...snap.data() };
+      } else {
+        window._currentUser = { uid: user.uid, email: user.email,
+          name: (user.displayName || (user.email||'Utente').split('@')[0]), role: 'user' };
+        try { await setDoc(doc(db,'users',user.uid), window._currentUser); } catch(we){}
+      }
+    } catch(e) {
+      window._currentUser = { uid: user.uid, email: user.email||'',
+        name: user.displayName || (user.email||'Utente').split('@')[0], role: 'user' };
+    }
+    setTimeout(() => { if (typeof window.showApp === 'function') window.showApp(); }, 0);
+    if (window._initFCM) window._initFCM().catch(()=>{});
+  } else {
+    localStorage.removeItem('nt_logged_in');
+    window._currentUser = null;
+    setTimeout(() => { if (typeof window.showAuth === 'function') window.showAuth(); }, 0);
+  }
+});
 
-  // 2. Gestisci eventuale redirect Google (iOS PWA)
+// ── setPersistence + getRedirectResult: fire-and-forget async ────────────
+// Separato da onAuthStateChanged per non bloccare mai il listener.
+(async () => {
+  try { await setPersistence(auth, browserLocalPersistence); } catch(e) {}
   try {
     const result = await getRedirectResult(auth);
     if (result?.user) {
@@ -113,32 +139,6 @@ window._fb = { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassw
   } catch(e) {
     if (e?.code !== 'auth/null-user') console.log('Redirect result:', e?.code);
   }
-
-  // 3. ORA registra onAuthStateChanged (persistenza già impostata → auto-login funziona)
-  onAuthStateChanged(auth, async user => {
-    if (user) {
-      localStorage.setItem('nt_logged_in', '1');
-      try {
-        const snap = await getDoc(doc(db, 'users', user.uid));
-        if (snap.exists()) {
-          window._currentUser = { uid: user.uid, email: user.email, ...snap.data() };
-        } else {
-          window._currentUser = { uid: user.uid, email: user.email,
-            name: (user.displayName || (user.email||'Utente').split('@')[0]), role: 'user' };
-          try { await setDoc(doc(db,'users',user.uid), window._currentUser); } catch(we){}
-        }
-      } catch(e) {
-        window._currentUser = { uid: user.uid, email: user.email||'',
-          name: user.displayName || (user.email||'Utente').split('@')[0], role: 'user' };
-      }
-      setTimeout(() => { if (typeof window.showApp === 'function') window.showApp(); }, 0);
-      if (window._initFCM) window._initFCM().catch(()=>{});
-    } else {
-      localStorage.removeItem('nt_logged_in');
-      window._currentUser = null;
-      setTimeout(() => { if (typeof window.showAuth === 'function') window.showAuth(); }, 0);
-    }
-  });
 })();
 
 // ── Auth helpers ──────────────────────────────────────────────────────────
