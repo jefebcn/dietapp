@@ -128,15 +128,19 @@ onAuthStateChanged(auth, async user => {
       console.warn('Firestore error:', firestoreErr.code || firestoreErr.message);
       window._currentUser = { uid: user.uid, email: user.email || '', name: user.displayName || (user.email||'').split('@')[0] || 'Utente', role: 'user' };
     }
-    if (window.showApp) window.showApp();
-    else document.addEventListener('DOMContentLoaded', () => window.showApp && window.showApp());
+    // showApp è in script regolare che gira prima del modulo — sempre disponibile
+    // setTimeout(0) garantisce che tutte le init del modulo siano complete
+    setTimeout(() => {
+      if (typeof window.showApp === 'function') window.showApp();
+    }, 0);
     // FCM
     if (window._initFCM) window._initFCM().catch(()=>{});
   } else {
     localStorage.removeItem('nt_logged_in');
     window._currentUser = null;
-    if (window.showAuth) window.showAuth();
-    else document.addEventListener('DOMContentLoaded', () => window.showAuth && window.showAuth());
+    setTimeout(() => {
+      if (typeof window.showAuth === 'function') window.showAuth();
+    }, 0);
   }
 });
 
@@ -6545,8 +6549,15 @@ function switchAuthTab(tab) {
   document.querySelectorAll('.auth-tab').forEach((t,i) => {
     t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register'));
   });
+  // Nascondi sempre form-forgot quando si cambia tab
+  document.getElementById('form-forgot')?.classList.add('hidden');
   document.getElementById('form-login').classList.toggle('hidden', tab!=='login');
   document.getElementById('form-register').classList.toggle('hidden', tab!=='register');
+  // Reset bottoni
+  const lb = document.getElementById('login-btn');
+  if (lb) { lb.disabled = false; lb.textContent = 'Accedi →'; }
+  const rb = document.getElementById('reg-btn');
+  if (rb) { rb.disabled = false; rb.textContent = 'Crea account →'; }
   const errEl = document.getElementById('auth-error');
   if (errEl) errEl.style.display = 'none';
 }
@@ -6562,13 +6573,13 @@ function clearAuthError() {
 }
 
 // doLogin / doRegister / doGoogleSignIn / doForgot / doLogout
-// queste funzioni saranno SOVRASCRITTE dal modulo Firebase (window.doXxx)
-// Questi stub evitano errori "not defined" se l'utente è velocissimo
-function doLogin()        { console.warn('Firebase non ancora pronto, riprova'); }
-function doRegister()     { console.warn('Firebase non ancora pronto, riprova'); }
-function doGoogleSignIn() { console.warn('Firebase non ancora pronto, riprova'); }
-function doForgot()       { console.warn('Firebase non ancora pronto, riprova'); }
-function doLogout()       { console.warn('Firebase non ancora pronto, riprova'); }
+// Il modulo Firebase (deferred) sovrascriverà questi stub con window.doXxx = async function
+// Questi stub mostrano un errore visibile se premuto prima che il modulo carichi
+function doLogin()        { showAuthError('Caricamento in corso, riprova tra un secondo.'); }
+function doRegister()     { showAuthError('Caricamento in corso, riprova tra un secondo.'); }
+function doGoogleSignIn() { showAuthError('Caricamento in corso, riprova tra un secondo.'); }
+function doForgot()       { }
+function doLogout()       { }
 
 // ADMIN_EMAIL — deve esistere nel contesto globale per showApp
 const ADMIN_EMAIL = 'admin@nutritrack.it';
