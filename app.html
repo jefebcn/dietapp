@@ -93,15 +93,12 @@ window._fb = { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassw
 // setPersistence influisce solo sulle operazioni FUTURE, non sulla lettura
 // dello stato corrente → non serve aspettarla prima di registrare il listener.
 onAuthStateChanged(auth, async user => {
-  console.log('[NT] onAuthStateChanged fired, user:', user ? user.email : 'null');
   if (user) {
     localStorage.setItem('nt_logged_in', '1');
     const _timeout = ms => new Promise((_,rej) => setTimeout(() => rej(new Error('timeout')), ms));
     try {
-      console.log('[NT] getDoc users/' + user.uid + ' → start');
-      const snap = await Promise.race([getDoc(doc(db, 'users', user.uid)), _timeout(6000)]);
-      console.log('[NT] getDoc → OK, exists:', snap.exists());
-      if (snap.exists()) {
+        const snap = await Promise.race([getDoc(doc(db, 'users', user.uid)), _timeout(6000)]);
+        if (snap.exists()) {
         window._currentUser = { uid: user.uid, email: user.email, ...snap.data() };
       } else {
         window._currentUser = { uid: user.uid, email: user.email,
@@ -109,21 +106,14 @@ onAuthStateChanged(auth, async user => {
         try { await setDoc(doc(db,'users',user.uid), window._currentUser); } catch(we){}
       }
     } catch(e) {
-      console.warn('[NT] getDoc ERROR/TIMEOUT:', e.message || e.code);
-      window._currentUser = { uid: user.uid, email: user.email||'',
+        window._currentUser = { uid: user.uid, email: user.email||'',
         name: user.displayName || (user.email||'Utente').split('@')[0], role: 'user' };
     }
-    console.log('[NT] _currentUser set:', window._currentUser?.email, '→ calling showApp()');
-    setTimeout(() => {
-      console.log('[NT] showApp typeof:', typeof window.showApp);
-      if (typeof window.showApp === 'function') window.showApp();
-      else console.error('[NT] showApp NOT DEFINED!');
-    }, 0);
+    setTimeout(() => { if (typeof window.showApp === 'function') window.showApp(); }, 0);
     if (window._initFCM) window._initFCM().catch(()=>{});
   } else {
     localStorage.removeItem('nt_logged_in');
     window._currentUser = null;
-    console.log('[NT] user null → calling showAuth()');
     setTimeout(() => { if (typeof window.showAuth === 'function') window.showAuth(); }, 0);
   }
 });
@@ -192,12 +182,9 @@ async function _doLogin() {
       ' Accesso...</span>';
   }
   try {
-    console.log('[NT] signInWithEmailAndPassword → start');
     await signInWithEmailAndPassword(auth, email, pass);
-    console.log('[NT] signInWithEmailAndPassword → OK, aspetto onAuthStateChanged...');
     if (btn) { btn.disabled=false; btn.textContent='Accedi →'; }
   } catch(e) {
-    console.error('[NT] signInWithEmailAndPassword → ERROR', e.code, e.message);
     _showErr(_authErr(e.code));
     if (btn) { btn.disabled=false; btn.textContent='Accedi →'; }
   }
@@ -13389,13 +13376,13 @@ async function mpGenerate() {
 
     // Training context
     const trainingContext = {
-      no_training:    'L'utente NON si allena. Nessun pasto pre/post workout necessario.',
-      mattina_presto: 'L'utente si allena MATTINA PRESTO (6-9). Pre-workout: carboidrati veloci leggeri (banana, riso soffiato) ~30-45 min prima. Post-workout: proteine + carboidrati ad alto IG entro 30 min (whey + frutta o riso bianco).',
-      mattina:        'L'utente si allena la MATTINA (9-12). Colazione abbondante con carboidrati complessi 2h prima. Post-workout (pranzo): proteine elevate + carboidrati medi-alti.',
-      pranzo:         'L'utente si allena a ORA DI PRANZO (12-14). Spuntino pre-workout leggero (frutta + una fonte proteica). Il pranzo diventa pasto post-workout: ricco di proteine e carboidrati.',
-      pomeriggio:     'L'utente si allena nel POMERIGGIO (14-18). Pranzo equilibrato 2-3h prima (carboidrati complessi + proteine). Spuntino pre-workout (15-30 min prima): carboidrati veloci. Cena post-workout: proteine abbondanti + carboidrati medi.',
-      sera:           'L'utente si allena di SERA (18-21). Pranzo normale. Spuntino pomeridiano abbondante (carboidrati + proteine). Cena post-workout: proteine ELEVATE, carboidrati RIDOTTI (favorire recupero notturno), grassi sani.',
-      notte:          'L'utente si allena TARDA SERA (21+). Cena leggera PRE-workout. Pasto post-workout tardivo: proteine a digestione lenta (ricotta, caseina, uova), carboidrati minimi, NO stimolanti.'
+      no_training:    'L\'utente NON si allena. Nessun pasto pre/post workout necessario.',
+      mattina_presto: 'L\'utente si allena MATTINA PRESTO (6-9). Pre-workout: carboidrati veloci leggeri (banana, riso soffiato) ~30-45 min prima. Post-workout: proteine + carboidrati ad alto IG entro 30 min (whey + frutta o riso bianco).',
+      mattina:        'L\'utente si allena la MATTINA (9-12). Colazione abbondante con carboidrati complessi 2h prima. Post-workout (pranzo): proteine elevate + carboidrati medi-alti.',
+      pranzo:         'L\'utente si allena a ORA DI PRANZO (12-14). Spuntino pre-workout leggero (frutta + una fonte proteica). Il pranzo diventa pasto post-workout: ricco di proteine e carboidrati.',
+      pomeriggio:     'L\'utente si allena nel POMERIGGIO (14-18). Pranzo equilibrato 2-3h prima (carboidrati complessi + proteine). Spuntino pre-workout (15-30 min prima): carboidrati veloci. Cena post-workout: proteine abbondanti + carboidrati medi.',
+      sera:           'L\'utente si allena di SERA (18-21). Pranzo normale. Spuntino pomeridiano abbondante (carboidrati + proteine). Cena post-workout: proteine ELEVATE, carboidrati RIDOTTI (favorire recupero notturno), grassi sani.',
+      notte:          'L\'utente si allena TARDA SERA (21+). Cena leggera PRE-workout. Pasto post-workout tardivo: proteine a digestione lenta (ricotta, caseina, uova), carboidrati minimi, NO stimolanti.'
     }[mpSelectedTraining] || 'Informazioni allenamento non specificate.';
 
     // Work context
