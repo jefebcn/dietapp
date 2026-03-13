@@ -49,9 +49,9 @@ const firebaseConfig = {
   appId: "1:903928286116:web:84a2013356a2740fed8f31"
 };
 
-const app   = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 
-// ── Firebase Functions + Messaging ────────────────────────────
+// ── Firebase Functions + Messaging (lazy) ─────────────────────
 import('https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js').then(m => {
   window._fbFunctions = m.getFunctions(app, 'europe-west1');
 }).catch(() => {});
@@ -60,7 +60,6 @@ import('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js').then(a
   try {
     const messaging = m.getMessaging(app);
     window._fbMessaging = messaging;
-    // Richiedi permesso notifiche dopo login (chiamato da onAuthStateChanged)
     window._initFCM = async () => {
       try {
         const permission = await Notification.requestPermission();
@@ -73,12 +72,13 @@ import('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js').then(a
           const saveFn = httpsCallable(window._fbFunctions, 'saveFcmToken');
           await saveFn({ token }).catch(() => {});
         }
-      } catch(e) { /* notifiche non disponibili o negate */ }
+      } catch(e) {}
     };
-  } catch(e) { /* messaging non supportato su questo browser */ }
+  } catch(e) {}
 }).catch(() => {});
-const auth  = getAuth(app);
-const db    = getFirestore(app);
+
+const auth = getAuth(app);
+const db   = getFirestore(app);
 
 window._auth = auth;
 window._fb = { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassword,
@@ -87,66 +87,62 @@ window._fb = { auth, db, createUserWithEmailAndPassword, signInWithEmailAndPassw
                collection, doc, setDoc, getDoc, getDocs, addDoc, query,
                orderBy, onSnapshot, updateDoc, deleteDoc, where, serverTimestamp, limit, arrayUnion };
 
-// Auth state listener → bootstrap app
-// Gestione risultato redirect (necessario per iOS PWA / mobile Safari)
+// ── Init: setPersistence → getRedirectResult → onAuthStateChanged ──────────
+// ORDINE CRITICO: onAuthStateChanged va registrato DOPO setPersistence
+// altrimenti Firebase legge lo stato senza persistenza → auto-login fallisce
 (async () => {
+  // 1. Imposta persistenza locale (sessione sopravvive al refresh)
+  try { await setPersistence(auth, browserLocalPersistence); } catch(e) {}
+
+  // 2. Gestisci eventuale redirect Google (iOS PWA)
   try {
-    await setPersistence(auth, browserLocalPersistence);
     const result = await getRedirectResult(auth);
     if (result?.user) {
-      const user = result.user;
-      const { db, doc, setDoc, getDoc } = window._fb;
-      const userRef = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userRef);
-      if (!userSnap.exists()) {
-        await setDoc(userRef, {
-          name: user.displayName || user.email?.split('@')[0] || 'Utente',
-          email: user.email || '',
+      const u = result.user;
+      const ref = doc(db, 'users', u.uid);
+      const snap = await getDoc(ref);
+      if (!snap.exists()) {
+        await setDoc(ref, {
+          name: u.displayName || u.email?.split('@')[0] || 'Utente',
+          email: u.email || '',
           role: 'user',
           createdAt: Date.now()
         });
       }
     }
   } catch(e) {
-    // getRedirectResult fallisce silenziosamente se non c'è redirect in corso
-    if (e.code !== 'auth/null-user') console.log('Redirect result:', e.code);
+    if (e?.code !== 'auth/null-user') console.log('Redirect result:', e?.code);
   }
+
+  // 3. ORA registra onAuthStateChanged (persistenza già impostata → auto-login funziona)
+  onAuthStateChanged(auth, async user => {
+    if (user) {
+      localStorage.setItem('nt_logged_in', '1');
+      try {
+        const snap = await getDoc(doc(db, 'users', user.uid));
+        if (snap.exists()) {
+          window._currentUser = { uid: user.uid, email: user.email, ...snap.data() };
+        } else {
+          window._currentUser = { uid: user.uid, email: user.email,
+            name: (user.displayName || (user.email||'Utente').split('@')[0]), role: 'user' };
+          try { await setDoc(doc(db,'users',user.uid), window._currentUser); } catch(we){}
+        }
+      } catch(e) {
+        window._currentUser = { uid: user.uid, email: user.email||'',
+          name: user.displayName || (user.email||'Utente').split('@')[0], role: 'user' };
+      }
+      setTimeout(() => { if (typeof window.showApp === 'function') window.showApp(); }, 0);
+      if (window._initFCM) window._initFCM().catch(()=>{});
+    } else {
+      localStorage.removeItem('nt_logged_in');
+      window._currentUser = null;
+      setTimeout(() => { if (typeof window.showAuth === 'function') window.showAuth(); }, 0);
+    }
+  });
 })();
 
-onAuthStateChanged(auth, async user => {
-  if (user) {
-    localStorage.setItem('nt_logged_in', '1');
-    try {
-      const snap = await getDoc(doc(db, 'users', user.uid));
-      if (snap.exists()) {
-        window._currentUser = { uid: user.uid, email: user.email, ...snap.data() };
-      } else {
-        window._currentUser = { uid: user.uid, email: user.email, name: (user.displayName || (user.email||'').split('@')[0] || 'Utente'), role: 'user' };
-        try { await setDoc(doc(db,'users',user.uid), window._currentUser); } catch(we){}
-      }
-    } catch(firestoreErr) {
-      console.warn('Firestore error:', firestoreErr.code || firestoreErr.message);
-      window._currentUser = { uid: user.uid, email: user.email || '', name: user.displayName || (user.email||'').split('@')[0] || 'Utente', role: 'user' };
-    }
-    // showApp è in script regolare che gira prima del modulo — sempre disponibile
-    // setTimeout(0) garantisce che tutte le init del modulo siano complete
-    setTimeout(() => {
-      if (typeof window.showApp === 'function') window.showApp();
-    }, 0);
-    // FCM
-    if (window._initFCM) window._initFCM().catch(()=>{});
-  } else {
-    localStorage.removeItem('nt_logged_in');
-    window._currentUser = null;
-    setTimeout(() => {
-      if (typeof window.showAuth === 'function') window.showAuth();
-    }, 0);
-  }
-});
-
-// ── AUTH: binding diretto dal modulo (Firebase disponibile immediatamente) ──
-
-const ADMIN_EMAIL_MODULE = 'admin@nutritrack.it';
+// ── Auth helpers ──────────────────────────────────────────────────────────
+const ADMIN_EM = 'admin@nutritrack.it';
 
 function _authErr(code) {
   const m = {
@@ -170,8 +166,9 @@ function _showErr(msg) {
   if (typeof toast === 'function') toast('❌ ' + msg, 'var(--danger)');
 }
 
+// ── Auth functions ────────────────────────────────────────────────────────
 async function _doLogin() {
-  const email = (document.getElementById('login-email')?.value||'').trim();
+  const email = (document.getElementById('login-email')?.value||''). trim();
   const pass  =  document.getElementById('login-pass')?.value||'';
   const btn   =  document.getElementById('login-btn');
   const errEl =  document.getElementById('auth-error');
@@ -179,9 +176,9 @@ async function _doLogin() {
   if (!email||!pass) { _showErr('Inserisci email e password.'); return; }
   if (btn) {
     btn.disabled = true;
-    btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px">'
-      + '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="animation:spin .7s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>'
-      + ' Accesso...</span>';
+    btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px">' +
+      '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" style="animation:spin .7s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>' +
+      ' Accesso...</span>';
   }
   try {
     await signInWithEmailAndPassword(auth, email, pass);
@@ -192,8 +189,8 @@ async function _doLogin() {
 }
 
 async function _doRegister() {
-  const name  = (document.getElementById('reg-name')?.value||'').trim();
-  const email = (document.getElementById('reg-email')?.value||'').trim();
+  const name  = (document.getElementById('reg-name')?.value||''). trim();
+  const email = (document.getElementById('reg-email')?.value||''). trim();
   const pass  =  document.getElementById('reg-pass')?.value||'';
   const btn   =  document.getElementById('reg-btn');
   const errEl =  document.getElementById('auth-error');
@@ -203,7 +200,7 @@ async function _doRegister() {
   if (btn) { btn.disabled=true; btn.textContent='Registrazione...'; }
   try {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    const role = email.toLowerCase()===ADMIN_EMAIL_MODULE ? 'admin' : 'user';
+    const role = email.toLowerCase()===ADMIN_EM ? 'admin' : 'user';
     await setDoc(doc(db,'users',cred.user.uid), {name,email,role,createdAt:Date.now()});
   } catch(e) {
     _showErr(_authErr(e.code));
@@ -239,25 +236,25 @@ async function _doGoogle() {
 }
 
 async function _doForgot() {
-  const email = (document.getElementById('forgot-email')?.value||'').trim();
+  const email = (document.getElementById('forgot-email')?.value||''). trim();
   const st  = document.getElementById('forgot-status');
   const btn = document.getElementById('forgot-btn');
-  const eStyle = 'display:block;padding:12px;border-radius:10px;font-size:13px;background:rgba(239,68,68,0.08);color:var(--danger);border:1px solid rgba(239,68,68,0.2)';
-  const oStyle = 'display:block;padding:12px;border-radius:10px;font-size:13px;background:var(--green-bg);color:var(--green);border:1px solid rgba(74,122,53,0.3)';
-  if (!email) { if(st){st.textContent='⚠️ Inserisci la tua email.';st.style.cssText=eStyle;} return; }
+  const eS = 'display:block;padding:12px;border-radius:10px;font-size:13px;background:rgba(239,68,68,0.08);color:var(--danger);border:1px solid rgba(239,68,68,0.2)';
+  const oS = 'display:block;padding:12px;border-radius:10px;font-size:13px;background:var(--green-bg);color:var(--green);border:1px solid rgba(74,122,53,0.3)';
+  if (!email) { if(st){st.textContent='⚠️ Inserisci la tua email.';st.style.cssText=eS;} return; }
   if (btn) { btn.textContent='⏳ Invio...'; btn.disabled=true; }
   try {
     await sendPasswordResetEmail(auth, email);
-    if (st) { st.innerHTML='✅ <strong>Email inviata!</strong><br>Controlla la casella (e spam).'; st.style.cssText=oStyle; }
+    if (st) { st.innerHTML='✅ <strong>Email inviata!</strong><br>Controlla la casella (e spam).'; st.style.cssText=oS; }
     if (btn) btn.textContent='✅ Email inviata';
     setTimeout(() => { if(typeof window.closeForgotFlow==='function') window.closeForgotFlow(); }, 4000);
   } catch(e) {
-    if (st) { st.textContent='⚠️ '+_authErr(e.code); st.style.cssText=eStyle; }
+    if (st) { st.textContent='⚠️ '+_authErr(e.code); st.style.cssText=eS; }
     if (btn) { btn.textContent='📧 Invia link'; btn.disabled=false; }
   }
 }
 
-// Esponi per chiamate onclick esterne (logout, google)
+// ── Esponi funzioni per onclick residui ───────────────────────────────────
 window.doLogout = async function() {
   if (window._premiumListener) { window._premiumListener(); window._premiumListener = null; }
   window.isPremium = false;
@@ -267,35 +264,64 @@ window.doLogout = async function() {
 window.doGoogleSignIn = _doGoogle;
 window.doForgot = _doForgot;
 
-// ── Binding diretto sui bottoni: sicuro perché il modulo gira dopo il DOM ──
-(function() {
+// ── Funzione tab switch (duplicata nel modulo per sicurezza) ──────────────
+function _switchTab(tab) {
+  // Attiva il tab corretto
+  document.querySelectorAll('.auth-tab').forEach((t, i) => {
+    t.classList.toggle('active', (i===0&&tab==='login')||(i===1&&tab==='register'));
+  });
+  // Nascondi tutti i form, poi mostra quello corretto
+  const fl = document.getElementById('form-login');
+  const fr = document.getElementById('form-register');
+  const ff = document.getElementById('form-forgot');
+  if (ff) ff.classList.add('hidden');
+  if (fl) fl.classList.toggle('hidden', tab!=='login');
+  if (fr) fr.classList.toggle('hidden', tab!=='register');
+  // Reset errori e bottoni
+  const errEl = document.getElementById('auth-error');
+  if (errEl) errEl.style.display = 'none';
+  const lb = document.getElementById('login-btn');
+  if (lb) { lb.disabled=false; lb.textContent='Accedi →'; }
+  const rb = document.getElementById('reg-btn');
+  if (rb) { rb.disabled=false; rb.textContent='Crea account →'; }
+}
+// Esponi anche globalmente così onclick HTML continua a funzionare
+window.switchAuthTab = _switchTab;
+
+// ── Binding diretto da modulo su TUTTI i bottoni auth ─────────────────────
+(function bindAll() {
   function q(id) { return document.getElementById(id); }
 
-  // Login
+  // LOGIN button + Enter su password
   const lb = q('login-btn');
   if (lb) { lb.removeAttribute('onclick'); lb.addEventListener('click', _doLogin); }
   const lp = q('login-pass');
-  if (lp) { lp.addEventListener('keydown', e => { if(e.key==='Enter') _doLogin(); }); }
+  if (lp) lp.addEventListener('keydown', e => { if(e.key==='Enter') _doLogin(); });
 
-  // Register
+  // REGISTER button + Enter su password
   const rb = q('reg-btn');
   if (rb) { rb.removeAttribute('onclick'); rb.addEventListener('click', _doRegister); }
   const rp = q('reg-pass');
-  if (rp) { rp.addEventListener('keydown', e => { if(e.key==='Enter') _doRegister(); }); }
+  if (rp) rp.addEventListener('keydown', e => { if(e.key==='Enter') _doRegister(); });
 
-  // Forgot password
+  // FORGOT button + Enter su email
   const fb = q('forgot-btn');
   if (fb) { fb.removeAttribute('onclick'); fb.addEventListener('click', _doForgot); }
   const fe = q('forgot-email');
-  if (fe) { fe.addEventListener('keydown', e => { if(e.key==='Enter') _doForgot(); }); }
+  if (fe) fe.addEventListener('keydown', e => { if(e.key==='Enter') _doForgot(); });
 
-  // Google (tutti i bottoni .google-btn)
+  // GOOGLE buttons
   document.querySelectorAll('.google-btn').forEach(b => {
     b.removeAttribute('onclick');
     b.addEventListener('click', _doGoogle);
   });
-})();
 
+  // AUTH TABS — binding diretto, bypass onclick HTML
+  document.querySelectorAll('.auth-tab').forEach((btn, i) => {
+    btn.removeAttribute('onclick');
+    btn.addEventListener('click', () => _switchTab(i === 0 ? 'login' : 'register'));
+  });
+})();
 </script>
 
 <style>
