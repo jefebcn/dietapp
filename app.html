@@ -1002,7 +1002,9 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
    MOBILE BOTTOM NAV — nuova versione
 ══════════════════════════════════ */
 /* La bottom-nav mobile è un elemento separato, nascosto su desktop */
-#mobile-bottom-nav {
+#mobile-bottom-nav,
+.mbn-more-overlay,
+.mbn-more-drawer {
   display: none;
 }
 
@@ -1113,6 +1115,7 @@ h3 { font-family: var(--font-brand); font-weight: 700; font-size: 16px; color: v
   .mbn-more-overlay.open { display: block; }
 
   .mbn-more-drawer {
+    display: block; /* always block on mobile, hidden via bottom: -100% */
     position: fixed;
     bottom: -100%;
     left: 0; right: 0;
