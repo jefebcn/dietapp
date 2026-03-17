@@ -1,24 +1,22 @@
 'use client';
 
 /**
- * SprintyAssistant  –  NutriTrack's official mascot
+ * SprintyAssistant – "Sprinty the Avocado"
  *
- * Sprinty is an athletic cheetah wearing NutriTrack kit and a biometric
- * smartwatch. He renders as a fully inline SVG (no external assets needed)
- * and uses Framer Motion for micro-animations.
+ * A humanised avocado mascot with a sporty attitude.
+ * Flat retro-cartoon style: headband, sneakers, expressive face.
  *
  * Moods:
- *  • 'idle'      – Gentle float; shown in empty states / corners
- *  • 'loading'   – Sprint lean with running legs; during API fetches
- *  • 'success'   – Bounce + raised fist; when goals / meals are hit
- *  • 'error'     – Horizontal shake + worried brows; for error boundaries
- *  • 'tip'       – Float + pointing finger; nutritional tips
- *  • 'greeting'  – Float + waving hand; dashboard welcome / onboarding
+ *  idle     – gentle floating (empty-state: holds a pencil)
+ *  loading  – running on a treadmill (animated legs & belt)
+ *  success  – flexing "keto-power" arms pose
+ *  error    – worried eyes & downturned mouth
+ *  tip      – pointing finger, curious expression
+ *  greeting – waving hand, big happy eyes
  */
 
-import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence, type TargetAndTransition } from 'framer-motion';
-import clsx from 'clsx';
+import { useId } from 'react';
+import { motion, type Variants } from 'framer-motion';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -32,473 +30,472 @@ export type SprintyMood =
 
 export type SprintySize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
-export interface SprintyAssistantProps {
-  /** Visual mood / animation variant */
+interface SprintyAssistantProps {
   mood?: SprintyMood;
-  /** Optional speech bubble message */
-  message?: string;
-  /** Component size – scales both SVG and bubble text */
   size?: SprintySize;
-  /** Additional class names for the wrapper */
+  message?: string;
   className?: string;
-  /** Accessible label */
-  ariaLabel?: string;
 }
 
 // ── Size map ────────────────────────────────────────────────────────────────
 
-const SIZE_MAP: Record<SprintySize, { svg: number; text: string; bubble: string }> = {
-  xs: { svg: 40,  text: 'text-xs',   bubble: 'text-xs px-2 py-1'   },
-  sm: { svg: 56,  text: 'text-sm',   bubble: 'text-sm px-3 py-1.5' },
-  md: { svg: 80,  text: 'text-base', bubble: 'text-sm px-4 py-2'   },
-  lg: { svg: 112, text: 'text-lg',   bubble: 'text-base px-4 py-3' },
-  xl: { svg: 160, text: 'text-xl',   bubble: 'text-base px-5 py-3' },
+const SIZE_PX: Record<SprintySize, number> = {
+  xs: 40,
+  sm: 64,
+  md: 96,
+  lg: 128,
+  xl: 160,
 };
 
-// ── Brand + cheetah palette ─────────────────────────────────────────────────
+// ── Colour palette ──────────────────────────────────────────────────────────
 
 const C = {
-  fur:    '#F0A830',   // warm golden cheetah fur
-  furLt:  '#FDD88A',   // lighter muzzle / belly
-  spots:  '#5C3317',   // dark-brown spots & tear marks
-  green:  '#3a6b27',   // NutriTrack primary (jersey)
-  greenM: '#4e8f34',   // medium green (jersey details / sneakers)
-  greenL: '#7db560',   // light green (accents)
-  dark:   '#2c1f0e',   // shorts / pupils
-  gold:   '#c8861a',   // ear inner / tail tip accent
-  blush:  '#E8844A',   // cheek flush
-  w:      '#FFFFFF',
-} as const;
-
-// ── Framer Motion body animation variants ───────────────────────────────────
-
-const BODY_ANIMATE: Record<SprintyMood, TargetAndTransition> = {
-  idle:     { y: [0, -5, 0] },
-  loading:  { rotate: [-8, 8] },
-  success:  { scale: [1, 1.15, 0.95, 1] },
-  error:    { x: [-4, 4, -4, 4, 0] },
-  tip:      { y: [0, -3, 0] },
-  greeting: { y: [0, -4, 0] },
+  avo_dark:   '#2d6a4f',
+  avo_mid:    '#40916c',
+  avo_light:  '#74c69d',
+  avo_flesh:  '#d8f3dc',
+  avo_cream:  '#f0f7ee',
+  pit:        '#6d4c41',
+  pit_hi:     '#a0745e',
+  headband:   '#f59e0b',
+  headband_s: '#d97706',
+  shoe_w:     '#f1f5f9',
+  shoe_b:     '#3b82f6',
+  shoe_s:     '#1d4ed8',
+  eye_w:      '#ffffff',
+  eye_d:      '#1e293b',
+  eye_sh:     '#ffffff',
+  brow:       '#1e3a2a',
+  mouth:      '#1e293b',
+  cheek:      'rgba(248,113,113,0.30)',
+  arm:        '#2d6a4f',
+  arm_hi:     '#40916c',
+  bubble_bg:  'rgba(15,23,42,0.88)',
+  bubble_bdr: 'rgba(74,222,128,0.45)',
 };
 
-const BODY_TRANSITION: Record<SprintyMood, Parameters<typeof motion.div>[0]['transition']> = {
-  idle:     { repeat: Infinity, duration: 2.5, ease: 'easeInOut' },
-  loading:  { repeat: Infinity, repeatType: 'reverse' as const, duration: 0.35, ease: 'linear' },
-  success:  { duration: 0.6, ease: [0.34, 1.56, 0.64, 1] },
-  error:    { duration: 0.45, ease: 'easeInOut' },
-  tip:      { repeat: Infinity, duration: 3, ease: 'easeInOut' },
-  greeting: { repeat: Infinity, duration: 2, ease: 'easeInOut' },
+// ── Body animation variants per mood ────────────────────────────────────────
+
+const bodyVariants: Record<SprintyMood, Variants> = {
+  idle: {
+    animate: {
+      y: [0, -7, 0],
+      transition: { duration: 2.8, repeat: Infinity, ease: 'easeInOut' },
+    },
+  },
+  loading: {
+    animate: {
+      x: [0, 3, -3, 0],
+      rotate: [-1.5, 1.5, -1.5],
+      transition: { duration: 0.35, repeat: Infinity, ease: 'linear' },
+    },
+  },
+  success: {
+    animate: {
+      y: [0, -15, 0],
+      transition: {
+        duration: 0.55,
+        repeat: Infinity,
+        ease: [0.34, 1.56, 0.64, 1] as [number, number, number, number],
+      },
+    },
+  },
+  error: {
+    animate: {
+      x: [-5, 5, -5, 5, 0],
+      transition: { duration: 0.45, repeat: 2, ease: 'easeInOut' },
+    },
+  },
+  tip: {
+    animate: {
+      y: [0, -5, 0],
+      transition: { duration: 3, repeat: Infinity, ease: 'easeInOut' },
+    },
+  },
+  greeting: {
+    animate: {
+      y: [0, -5, 0],
+      transition: { duration: 2, repeat: Infinity, ease: 'easeInOut' },
+    },
+  },
 };
 
-// ── Bubble colour tokens ────────────────────────────────────────────────────
+// ── Sub-components ───────────────────────────────────────────────────────────
 
-const BUBBLE_COLORS: Record<SprintyMood, string> = {
-  idle:     'bg-[#e8f3e2] border-[#7db560] text-[#2c1f0e]',
-  loading:  'bg-white border-[#ddd3c4] text-[#2c1f0e]',
-  success:  'bg-[#e8f3e2] border-[#7db560] text-[#2c1f0e]',
-  error:    'bg-[#fff0e8] border-[#d4622a] text-[#2c1f0e]',
-  tip:      'bg-[#fffbeb] border-[#c8861a] text-[#2c1f0e]',
-  greeting: 'bg-[#e8f3e2] border-[#7db560] text-[#2c1f0e]',
-};
+function Eyes({ mood }: { mood: SprintyMood }) {
+  switch (mood) {
+    case 'loading':
+      return (
+        <>
+          <ellipse cx="39" cy="54" rx="5" ry="3" fill={C.eye_d} />
+          <ellipse cx="61" cy="54" rx="5" ry="3" fill={C.eye_d} />
+          <circle cx="40" cy="53" r="1" fill={C.eye_sh} />
+          <circle cx="62" cy="53" r="1" fill={C.eye_sh} />
+        </>
+      );
+    case 'success':
+      return (
+        <>
+          <path d="M34 56 Q39 50 44 56" stroke={C.eye_d} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+          <path d="M56 56 Q61 50 66 56" stroke={C.eye_d} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+          <text x="50" y="45" fontSize="8" textAnchor="middle" fill="#fbbf24">★</text>
+        </>
+      );
+    case 'error':
+      return (
+        <>
+          <path d="M33 48 Q38 45 43 47" stroke={C.brow} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+          <path d="M57 47 Q62 45 67 48" stroke={C.brow} strokeWidth="2.5" fill="none" strokeLinecap="round" />
+          <circle cx="39" cy="55" r="5" fill={C.eye_w} />
+          <circle cx="61" cy="55" r="5" fill={C.eye_w} />
+          <circle cx="39" cy="56" r="3" fill={C.eye_d} />
+          <circle cx="61" cy="56" r="3" fill={C.eye_d} />
+        </>
+      );
+    case 'tip':
+      return (
+        <>
+          <circle cx="39" cy="54" r="6" fill={C.eye_w} />
+          <circle cx="61" cy="54" r="4.5" fill={C.eye_w} />
+          <circle cx="40" cy="54" r="3.5" fill={C.eye_d} />
+          <circle cx="62" cy="54" r="2.5" fill={C.eye_d} />
+          <circle cx="41" cy="52" r="1.2" fill={C.eye_sh} />
+          <circle cx="63" cy="52" r="0.9" fill={C.eye_sh} />
+        </>
+      );
+    case 'greeting':
+      return (
+        <>
+          <circle cx="39" cy="54" r="6" fill={C.eye_w} />
+          <circle cx="61" cy="54" r="6" fill={C.eye_w} />
+          <circle cx="40" cy="55" r="3.5" fill={C.eye_d} />
+          <circle cx="62" cy="55" r="3.5" fill={C.eye_d} />
+          <circle cx="41.5" cy="53" r="1.3" fill={C.eye_sh} />
+          <circle cx="63.5" cy="53" r="1.3" fill={C.eye_sh} />
+          <ellipse cx="33" cy="61" rx="4" ry="2.5" fill={C.cheek} />
+          <ellipse cx="67" cy="61" rx="4" ry="2.5" fill={C.cheek} />
+        </>
+      );
+    default: // idle
+      return (
+        <>
+          <circle cx="39" cy="54" r="5.5" fill={C.eye_w} />
+          <circle cx="61" cy="54" r="5.5" fill={C.eye_w} />
+          <circle cx="40" cy="55" r="3" fill={C.eye_d} />
+          <circle cx="62" cy="55" r="3" fill={C.eye_d} />
+          <circle cx="41" cy="53.5" r="1" fill={C.eye_sh} />
+          <circle cx="63" cy="53.5" r="1" fill={C.eye_sh} />
+        </>
+      );
+  }
+}
 
-const ARROW_COLORS: Record<SprintyMood, string> = {
-  idle:     'border-b-[#7db560]',
-  loading:  'border-b-[#ddd3c4]',
-  success:  'border-b-[#7db560]',
-  error:    'border-b-[#d4622a]',
-  tip:      'border-b-[#c8861a]',
-  greeting: 'border-b-[#7db560]',
-};
+function Mouth({ mood }: { mood: SprintyMood }) {
+  switch (mood) {
+    case 'loading':
+      return <path d="M43 67 Q50 64 57 67" stroke={C.mouth} strokeWidth="2" fill="none" strokeLinecap="round" />;
+    case 'success':
+      return (
+        <>
+          <path d="M40 67 Q50 76 60 67" stroke={C.mouth} strokeWidth="2.5" fill="rgba(255,255,255,0.2)" strokeLinecap="round" />
+          <rect x="47" y="67" width="6" height="4" rx="1" fill="white" />
+        </>
+      );
+    case 'error':
+      return <path d="M42 71 Q50 65 58 71" stroke={C.mouth} strokeWidth="2" fill="none" strokeLinecap="round" />;
+    case 'tip':
+      return <path d="M43 67 Q50 72 57 67" stroke={C.mouth} strokeWidth="2" fill="none" strokeLinecap="round" />;
+    default:
+      return <path d="M41 67 Q50 74 59 67" stroke={C.mouth} strokeWidth="2.5" fill="none" strokeLinecap="round" />;
+  }
+}
 
-// ── SVG sub-elements ────────────────────────────────────────────────────────
-
-/** Eye variants – green irises match NutriTrack brand colour */
-const Eyes: Record<SprintyMood, React.ReactNode> = {
-  idle: (
-    <>
-      <circle cx="38" cy="36" r="5.5" fill={C.w}/>
-      <circle cx="38" cy="36" r="3.5" fill={C.green}/>
-      <circle cx="38" cy="36" r="2"   fill={C.dark}/>
-      <circle cx="39.5" cy="34.5" r="1" fill={C.w}/>
-      <circle cx="62" cy="36" r="5.5" fill={C.w}/>
-      <circle cx="62" cy="36" r="3.5" fill={C.green}/>
-      <circle cx="62" cy="36" r="2"   fill={C.dark}/>
-      <circle cx="63.5" cy="34.5" r="1" fill={C.w}/>
-    </>
-  ),
-  loading: (
-    /* Focused / determined – ellipses slightly narrowed */
-    <>
-      <ellipse cx="38" cy="36" rx="5.5" ry="4"  fill={C.w}/>
-      <circle  cx="38" cy="36" r="3"             fill={C.green}/>
-      <circle  cx="38" cy="36" r="1.8"           fill={C.dark}/>
-      <circle  cx="39"  cy="35" r="0.8"          fill={C.w}/>
-      <ellipse cx="62" cy="36" rx="5.5" ry="4"  fill={C.w}/>
-      <circle  cx="62" cy="36" r="3"             fill={C.green}/>
-      <circle  cx="62" cy="36" r="1.8"           fill={C.dark}/>
-      <circle  cx="63"  cy="35" r="0.8"          fill={C.w}/>
-    </>
-  ),
-  success: (
-    /* Happy squint arcs */
-    <>
-      <path d="M33 36 Q38 42 43 36" stroke={C.dark} strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-      <path d="M57 36 Q62 42 67 36" stroke={C.dark} strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-    </>
-  ),
-  error: (
-    /* Worried – inner brows raised */
-    <>
-      <circle cx="38" cy="37" r="5.5" fill={C.w}/>
-      <circle cx="38" cy="37" r="3.5" fill={C.green}/>
-      <circle cx="38" cy="37" r="2"   fill={C.dark}/>
-      <circle cx="62" cy="37" r="5.5" fill={C.w}/>
-      <circle cx="62" cy="37" r="3.5" fill={C.green}/>
-      <circle cx="62" cy="37" r="2"   fill={C.dark}/>
-      <path d="M34 29 Q38 26 42 29" stroke={C.spots} strokeWidth="2" fill="none" strokeLinecap="round"/>
-      <path d="M58 29 Q62 26 66 29" stroke={C.spots} strokeWidth="2" fill="none" strokeLinecap="round"/>
-    </>
-  ),
-  tip: (
-    /* Bright + curious – irises shifted up slightly */
-    <>
-      <circle cx="38" cy="35"   r="5.5" fill={C.w}/>
-      <circle cx="38" cy="34.5" r="3.5" fill={C.green}/>
-      <circle cx="38" cy="34.5" r="2"   fill={C.dark}/>
-      <circle cx="39.5" cy="33" r="1"   fill={C.w}/>
-      <circle cx="62" cy="35"   r="5.5" fill={C.w}/>
-      <circle cx="62" cy="34.5" r="3.5" fill={C.green}/>
-      <circle cx="62" cy="34.5" r="2"   fill={C.dark}/>
-      <circle cx="63.5" cy="33" r="1"   fill={C.w}/>
-    </>
-  ),
-  greeting: (
-    /* Big happy squint arcs */
-    <>
-      <path d="M33 36 Q38 42 43 36" stroke={C.dark} strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-      <path d="M57 36 Q62 42 67 36" stroke={C.dark} strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-    </>
-  ),
-};
-
-/** Mouth variants */
-const Mouths: Record<SprintyMood, React.ReactNode> = {
-  idle:     <path d="M43 51 Q50 57 57 51" stroke={C.spots} strokeWidth="2"   fill="none" strokeLinecap="round"/>,
-  loading:  <ellipse cx="50" cy="50" rx="5" ry="3.5" fill={C.spots}/>,
-  success:  <path d="M39 50 Q50 61 61 50" stroke={C.spots} strokeWidth="2.5" fill="none" strokeLinecap="round"/>,
-  error:    <path d="M42 55 Q50 49 58 55" stroke={C.spots} strokeWidth="2"   fill="none" strokeLinecap="round"/>,
-  tip:      <path d="M43 51 Q50 57 57 51" stroke={C.spots} strokeWidth="2"   fill="none" strokeLinecap="round"/>,
-  greeting: <path d="M39 50 Q50 61 61 50" stroke={C.spots} strokeWidth="2.5" fill="none" strokeLinecap="round"/>,
-};
-
-// ── Smartwatch (SVG-safe component) ─────────────────────────────────────────
-
-function Watch({ x, y }: { x: number; y: number }) {
+function Arms({ mood }: { mood: SprintyMood }) {
+  if (mood === 'loading') {
+    return (
+      <>
+        <motion.g
+          animate={{ rotate: [20, -20, 20] }}
+          transition={{ duration: 0.3, repeat: Infinity, ease: 'linear' }}
+          style={{ originX: '28px', originY: '72px' } as React.CSSProperties}
+        >
+          <path d="M28 72 Q15 64 12 58" stroke={C.arm} strokeWidth="5" strokeLinecap="round" fill="none" />
+        </motion.g>
+        <motion.g
+          animate={{ rotate: [-20, 20, -20] }}
+          transition={{ duration: 0.3, repeat: Infinity, ease: 'linear' }}
+          style={{ originX: '72px', originY: '72px' } as React.CSSProperties}
+        >
+          <path d="M72 72 Q85 64 88 58" stroke={C.arm} strokeWidth="5" strokeLinecap="round" fill="none" />
+        </motion.g>
+      </>
+    );
+  }
+  if (mood === 'success') {
+    return (
+      <>
+        <path d="M28 70 Q18 57 20 46" stroke={C.arm} strokeWidth="5" strokeLinecap="round" fill="none" />
+        <path d="M72 70 Q82 57 80 46" stroke={C.arm} strokeWidth="5" strokeLinecap="round" fill="none" />
+        <ellipse cx="19" cy="52" rx="5" ry="7" fill={C.avo_mid} />
+        <ellipse cx="81" cy="52" rx="5" ry="7" fill={C.avo_mid} />
+        <circle cx="19" cy="44" r="5" fill={C.avo_mid} />
+        <circle cx="81" cy="44" r="5" fill={C.avo_mid} />
+      </>
+    );
+  }
+  if (mood === 'greeting') {
+    return (
+      <>
+        <path d="M28 72 Q18 82 16 90" stroke={C.arm} strokeWidth="5" strokeLinecap="round" fill="none" />
+        <motion.g
+          animate={{ rotate: [-18, 18, -18] }}
+          transition={{ duration: 0.6, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ originX: '72px', originY: '72px' } as React.CSSProperties}
+        >
+          <path d="M72 72 Q82 58 84 46" stroke={C.arm} strokeWidth="5" strokeLinecap="round" fill="none" />
+          <circle cx="84" cy="44" r="5.5" fill={C.avo_mid} />
+        </motion.g>
+      </>
+    );
+  }
+  if (mood === 'tip') {
+    return (
+      <>
+        <path d="M28 72 Q18 82 16 90" stroke={C.arm} strokeWidth="5" strokeLinecap="round" fill="none" />
+        <path d="M72 72 Q82 58 80 44" stroke={C.arm} strokeWidth="5" strokeLinecap="round" fill="none" />
+        <ellipse cx="80" cy="40" rx="3" ry="5" fill={C.avo_mid} />
+      </>
+    );
+  }
+  // idle / error / default
   return (
     <>
-      <rect x={x}   y={y}   width="8" height="6" rx="2"   fill={C.dark}/>
-      <rect x={x+1} y={y+1} width="6" height="4" rx="1"   fill="#00e676"/>
-      <line x1={x+2} y1={y+2} x2={x+5} y2={y+2} stroke={C.dark} strokeWidth="0.5"/>
-      <line x1={x+2} y1={y+3.5} x2={x+4} y2={y+3.5} stroke={C.dark} strokeWidth="0.5"/>
+      <path d="M28 72 Q18 82 16 90" stroke={C.arm} strokeWidth="5" strokeLinecap="round" fill="none" />
+      <path d="M72 72 Q82 82 84 90" stroke={C.arm} strokeWidth="5" strokeLinecap="round" fill="none" />
     </>
   );
 }
 
-// ── Main character SVG ───────────────────────────────────────────────────────
+function Legs({ mood }: { mood: SprintyMood }) {
+  if (mood === 'loading') {
+    return (
+      <>
+        <motion.g
+          animate={{ rotate: [32, -32, 32] }}
+          transition={{ duration: 0.3, repeat: Infinity, ease: 'linear' }}
+          style={{ originX: '42px', originY: '102px' } as React.CSSProperties}
+        >
+          <path d="M42 102 Q38 114 34 122" stroke={C.avo_dark} strokeWidth="6" strokeLinecap="round" fill="none" />
+          <ellipse cx="32" cy="125" rx="10" ry="5" fill={C.shoe_w} />
+          <path d="M24 122 Q32 118 40 122" fill={C.shoe_b} />
+        </motion.g>
+        <motion.g
+          animate={{ rotate: [-32, 32, -32] }}
+          transition={{ duration: 0.3, repeat: Infinity, ease: 'linear' }}
+          style={{ originX: '58px', originY: '102px' } as React.CSSProperties}
+        >
+          <path d="M58 102 Q62 114 66 122" stroke={C.avo_dark} strokeWidth="6" strokeLinecap="round" fill="none" />
+          <ellipse cx="68" cy="125" rx="10" ry="5" fill={C.shoe_w} />
+          <path d="M60 122 Q68 118 76 122" fill={C.shoe_b} />
+        </motion.g>
+      </>
+    );
+  }
+  return (
+    <>
+      <path d="M42 102 L38 122" stroke={C.avo_dark} strokeWidth="6" strokeLinecap="round" />
+      <path d="M58 102 L62 122" stroke={C.avo_dark} strokeWidth="6" strokeLinecap="round" />
+      <ellipse cx="36" cy="125" rx="11" ry="5" fill={C.shoe_w} />
+      <path d="M27 122 Q36 117 45 122" fill={C.shoe_b} />
+      <ellipse cx="64" cy="125" rx="11" ry="5" fill={C.shoe_w} />
+      <path d="M55 122 Q64 117 73 122" fill={C.shoe_b} />
+    </>
+  );
+}
 
-function SprintySVG({ mood, size }: { mood: SprintyMood; size: number }) {
-  const running = mood === 'loading';
+function Accessory({ mood }: { mood: SprintyMood }) {
+  if (mood === 'idle') {
+    // Pencil prop for "empty state – log your first meal"
+    return (
+      <>
+        <path d="M16 90 L10 106 L14 108 L20 92 Z" fill="#fbbf24" />
+        <path d="M10 106 L12 110 L14 108 Z" fill="#f5f5dc" />
+        <path d="M18 90 L20 92 L14 93 Z" fill="#94a3b8" />
+      </>
+    );
+  }
+  return null;
+}
 
+function Treadmill({ mood }: { mood: SprintyMood }) {
+  if (mood !== 'loading') return null;
+  return (
+    <>
+      <rect x="8" y="130" width="84" height="9" rx="4.5" fill="#1e293b" />
+      <motion.g
+        animate={{ x: [-20, 0] }}
+        transition={{ duration: 0.4, repeat: Infinity, ease: 'linear' }}
+        clipPath="url(#tm-clip)"
+      >
+        {[8, 24, 40, 56, 72, 88].map((x) => (
+          <line key={x} x1={x} y1="130" x2={x + 10} y2="139" stroke="#334155" strokeWidth="2" />
+        ))}
+      </motion.g>
+      <defs>
+        <clipPath id="tm-clip">
+          <rect x="8" y="130" width="84" height="9" />
+        </clipPath>
+      </defs>
+      <rect x="6" y="126" width="5" height="17" rx="2.5" fill="#0f172a" />
+      <rect x="89" y="126" width="5" height="17" rx="2.5" fill="#0f172a" />
+    </>
+  );
+}
+
+function SprintySVG({ mood }: { mood: SprintyMood }) {
   return (
     <svg
-      viewBox="0 0 100 128"
-      width={size}
-      height={size}
+      viewBox="0 0 100 148"
+      xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
-      style={{ overflow: 'visible', display: 'block' }}
+      overflow="visible"
+      style={{ width: '100%', height: '100%' }}
     >
+      {/* Drop shadow */}
+      <ellipse cx="50" cy="140" rx="22" ry="5" fill="rgba(0,0,0,0.22)" />
 
-      {/* ── TAIL (drawn behind body) ──────────────────────────────── */}
-      <path
-        d="M67 90 Q83 86 89 76 Q95 65 88 60"
-        stroke={C.fur}
-        strokeWidth="7"
-        fill="none"
-        strokeLinecap="round"
-      />
-      {/* Tail rings / tip */}
-      <path
-        d="M87 62 Q91 58 89 55"
-        stroke={C.gold}
-        strokeWidth="5"
-        fill="none"
-        strokeLinecap="round"
-      />
-      <circle cx="89" cy="55" r="3" fill={C.spots}/>
+      {/* Treadmill (loading only) */}
+      <Treadmill mood={mood} />
 
-      {/* ── LEGS ──────────────────────────────────────────────────── */}
-      {running ? (
-        <>
-          {/* Left leg kicked back */}
-          <path d="M38 99 Q27 108 20 114" stroke={C.dark} strokeWidth="8" fill="none" strokeLinecap="round"/>
-          {/* Right leg forward / lifted */}
-          <path d="M62 99 Q72 104 78 97"  stroke={C.dark} strokeWidth="8" fill="none" strokeLinecap="round"/>
-          <ellipse cx="18" cy="115" rx="7" ry="3.5" fill={C.greenM}/>
-          <ellipse cx="80" cy="96"  rx="7" ry="3.5" fill={C.greenM}/>
-        </>
-      ) : (
-        <>
-          <path d="M38 100 Q33 112 31 119" stroke={C.dark} strokeWidth="8" fill="none" strokeLinecap="round"/>
-          <path d="M62 100 Q67 112 69 119" stroke={C.dark} strokeWidth="8" fill="none" strokeLinecap="round"/>
-          {/* Green NutriTrack sneakers */}
-          <ellipse cx="29" cy="120" rx="7" ry="3.5" fill={C.greenM}/>
-          <ellipse cx="71" cy="120" rx="7" ry="3.5" fill={C.greenM}/>
-        </>
-      )}
+      {/* Arms – drawn before body so body overlaps them */}
+      <Arms mood={mood} />
 
-      {/* ── SHORTS ────────────────────────────────────────────────── */}
-      {!running && (
-        <>
-          <rect x="30" y="93" width="17" height="13" rx="5" fill={C.dark}/>
-          <rect x="53" y="93" width="17" height="13" rx="5" fill={C.dark}/>
-          <line x1="30" y1="100" x2="47" y2="100" stroke={C.greenL} strokeWidth="1.5" opacity="0.6"/>
-          <line x1="53" y1="100" x2="70" y2="100" stroke={C.greenL} strokeWidth="1.5" opacity="0.6"/>
-        </>
-      )}
+      {/* Avocado body */}
+      <ellipse cx="50" cy="76" rx="26" ry="36" fill={C.avo_dark} />
+      <ellipse cx="50" cy="72" rx="23" ry="32" fill={C.avo_mid} />
+      {/* Flesh interior */}
+      <ellipse cx="50" cy="74" rx="17" ry="26" fill={C.avo_flesh} />
+      <ellipse cx="50" cy="72" rx="9"  ry="11" fill={C.avo_cream} opacity="0.55" />
+      {/* Pit */}
+      <ellipse cx="50" cy="78" rx="9"  ry="11" fill={C.pit} />
+      <ellipse cx="47" cy="74" rx="4"  ry="5"  fill={C.pit_hi} />
 
-      {/* ── JERSEY / BODY ─────────────────────────────────────────── */}
-      <rect x="27" y="62" width="46" height="36" rx="14" fill={C.green}/>
-      {/* Horizontal jersey stripes */}
-      <path d="M27 70 Q50 73 73 70" stroke={C.greenL} strokeWidth="2"   fill="none" opacity="0.7"/>
-      <path d="M27 78 Q50 80 73 78" stroke={C.greenM} strokeWidth="1.5" fill="none" opacity="0.4"/>
-      {/* NT chest logo */}
-      <text
-        x="50" y="88"
-        textAnchor="middle"
-        fontSize="7.5"
-        fontWeight="bold"
-        fill={C.greenL}
-        fontFamily="system-ui,sans-serif"
-        letterSpacing="1"
-      >NT</text>
+      {/* Head bump */}
+      <ellipse cx="50" cy="42" rx="17" ry="11" fill={C.avo_mid} />
 
-      {/* ── SPOTS on visible fur (arms / sides) ───────────────────── */}
-      <circle cx="19" cy="76" r="2.5" fill={C.spots} opacity="0.6"/>
-      <circle cx="15" cy="84" r="2"   fill={C.spots} opacity="0.5"/>
-      <circle cx="81" cy="76" r="2.5" fill={C.spots} opacity="0.6"/>
-      <circle cx="85" cy="84" r="2"   fill={C.spots} opacity="0.5"/>
+      {/* Headband */}
+      <path d="M33 46 Q50 39 67 46 Q67 53 50 55 Q33 53 33 46 Z" fill={C.headband} />
+      <path d="M35 48 Q50 42 65 48" stroke={C.headband_s} strokeWidth="1.5" fill="none" strokeLinecap="round" />
+      {/* Headband knot */}
+      <ellipse cx="67" cy="47" rx="4" ry="3" fill={C.headband} />
+      <path d="M65 45 Q71 43 69 49" stroke={C.headband_s} strokeWidth="1" fill="none" />
 
-      {/* ── LEFT ARM ──────────────────────────────────────────────── */}
-      {running
-        ? <path d="M30 70 Q18 64 12 56" stroke={C.fur} strokeWidth="7" fill="none" strokeLinecap="round"/>
-        : <path d="M30 72 Q20 82 17 92" stroke={C.fur} strokeWidth="7" fill="none" strokeLinecap="round"/>
-      }
+      {/* Face */}
+      <Eyes mood={mood} />
+      <Mouth mood={mood} />
 
-      {/* ── RIGHT ARM + SMARTWATCH ────────────────────────────────── */}
-      {mood === 'success' ? (
-        <g>
-          <path d="M70 72 Q78 60 76 47" stroke={C.fur} strokeWidth="7" fill="none" strokeLinecap="round"/>
-          {/* Raised fist */}
-          <circle cx="76" cy="44" r="5.5" fill={C.fur}/>
-          {/* Thumb up */}
-          <path d="M76 41 Q80 37 81 39 Q82 42 78 43" stroke={C.fur} strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-          <Watch x={72} y={62}/>
-        </g>
-      ) : mood === 'tip' ? (
-        <g>
-          <path d="M70 70 Q82 60 84 47" stroke={C.fur} strokeWidth="7" fill="none" strokeLinecap="round"/>
-          {/* Pointing finger */}
-          <ellipse cx="84" cy="44" rx="3.5" ry="5" fill={C.fur}/>
-          <Watch x={80} y={60}/>
-        </g>
-      ) : mood === 'greeting' ? (
-        /* CSS wave animation applied on this <g> */
-        <g style={{
-          animation: 'sprinty-wave 0.5s ease-in-out infinite alternate',
-          transformOrigin: '70px 72px',
-        }}>
-          <path d="M70 70 Q80 58 77 45" stroke={C.fur} strokeWidth="7" fill="none" strokeLinecap="round"/>
-          <circle cx="77" cy="42" r="5.5" fill={C.fur}/>
-          {/* Spread fingers */}
-          <path d="M73 40 Q72 36 74 35" stroke={C.fur} strokeWidth="3" strokeLinecap="round"/>
-          <path d="M77 38 Q77 34 79 33" stroke={C.fur} strokeWidth="3" strokeLinecap="round"/>
-          <path d="M81 40 Q82 36 84 35" stroke={C.fur} strokeWidth="3" strokeLinecap="round"/>
-          <Watch x={73} y={60}/>
-        </g>
-      ) : running ? (
-        <g>
-          <path d="M70 70 Q82 64 88 56" stroke={C.fur} strokeWidth="7" fill="none" strokeLinecap="round"/>
-          <Watch x={84} y={58}/>
-        </g>
-      ) : (
-        <g>
-          <path d="M70 72 Q80 82 83 92" stroke={C.fur} strokeWidth="7" fill="none" strokeLinecap="round"/>
-          <Watch x={79} y={87}/>
-        </g>
-      )}
+      {/* Accessory (pencil in idle) */}
+      <Accessory mood={mood} />
 
-      {/* ── NECK ──────────────────────────────────────────────────── */}
-      <ellipse cx="50" cy="62" rx="14" ry="7" fill={C.fur}/>
-
-      {/* ── EARS (behind head layer) ──────────────────────────────── */}
-      <polygon points="30,22 24,8 38,18"  fill={C.fur}/>
-      <polygon points="30,21 26,10 36,17" fill={C.gold}/>
-      <polygon points="70,22 76,8 62,18"  fill={C.fur}/>
-      <polygon points="70,21 74,10 64,17" fill={C.gold}/>
-
-      {/* ── HEAD ──────────────────────────────────────────────────── */}
-      <ellipse cx="50" cy="38" rx="23" ry="26" fill={C.fur}/>
-
-      {/* Head spots */}
-      <circle cx="34" cy="27" r="2.5" fill={C.spots} opacity="0.65"/>
-      <circle cx="42" cy="20" r="1.8" fill={C.spots} opacity="0.6"/>
-      <circle cx="50" cy="16" r="1.5" fill={C.spots} opacity="0.5"/>
-      <circle cx="58" cy="20" r="1.8" fill={C.spots} opacity="0.6"/>
-      <circle cx="66" cy="27" r="2.5" fill={C.spots} opacity="0.65"/>
-      <circle cx="37" cy="32" r="1.5" fill={C.spots} opacity="0.5"/>
-      <circle cx="63" cy="32" r="1.5" fill={C.spots} opacity="0.5"/>
-
-      {/* Muzzle – lighter cream area */}
-      <ellipse cx="50" cy="48" rx="13" ry="10" fill={C.furLt}/>
-
-      {/* Cheetah TEAR MARKS – the species' signature feature */}
-      <path d="M43 42 Q40 50 38 56" stroke={C.spots} strokeWidth="1.8" fill="none" strokeLinecap="round" opacity="0.75"/>
-      <path d="M57 42 Q60 50 62 56" stroke={C.spots} strokeWidth="1.8" fill="none" strokeLinecap="round" opacity="0.75"/>
-
-      {/* Cheek blush */}
-      <ellipse cx="30" cy="47" rx="5.5" ry="3.5" fill={C.blush} opacity="0.3"/>
-      <ellipse cx="70" cy="47" rx="5.5" ry="3.5" fill={C.blush} opacity="0.3"/>
-
-      {/* Eyes */}
-      {Eyes[mood]}
-
-      {/* Nose */}
-      <ellipse cx="50" cy="44" rx="3.5" ry="2.5" fill={C.spots}/>
-      <ellipse cx="50" cy="43.5" rx="2" ry="1.2" fill={C.blush} opacity="0.5"/>
-
-      {/* Mouth */}
-      {Mouths[mood]}
-
+      {/* Legs & sneakers */}
+      <Legs mood={mood} />
     </svg>
   );
 }
 
-// ── Loading dots ─────────────────────────────────────────────────────────────
+// ── Speech bubble ────────────────────────────────────────────────────────────
 
-function LoadingDots() {
+function SpeechBubble({
+  message,
+  mood,
+}: {
+  message: string;
+  mood: SprintyMood;
+}) {
+  const borderColor =
+    mood === 'error'
+      ? 'rgba(251,113,133,0.55)'
+      : mood === 'success'
+      ? 'rgba(74,222,128,0.55)'
+      : mood === 'loading'
+      ? 'rgba(96,165,250,0.55)'
+      : C.bubble_bdr;
+
+  const isLoadingMood = mood === 'loading';
+
   return (
-    <span className="inline-flex gap-1 items-center" aria-hidden="true">
-      {[0, 1, 2].map((i) => (
-        <span
-          key={i}
-          className="w-1.5 h-1.5 rounded-full bg-current"
-          style={{ animation: `sprinty-dot 1.2s ease-in-out ${i * 0.2}s infinite` }}
-        />
-      ))}
-    </span>
+    <motion.div
+      initial={{ opacity: 0, y: 6, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.22 }}
+      style={{
+        background: C.bubble_bg,
+        border: `1px solid ${borderColor}`,
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+      }}
+      className="mt-2 px-3 py-2 rounded-2xl text-sm text-slate-200 leading-snug max-w-[200px] text-center shadow-lg"
+    >
+      {isLoadingMood ? (
+        <span className="flex items-center justify-center gap-1">
+          {[0, 1, 2].map((i) => (
+            <motion.span
+              key={i}
+              className="w-1.5 h-1.5 rounded-full bg-blue-400 inline-block"
+              animate={{ opacity: [0.3, 1, 0.3], y: [0, -4, 0] }}
+              transition={{ duration: 0.8, repeat: Infinity, delay: i * 0.2 }}
+            />
+          ))}
+        </span>
+      ) : (
+        message
+      )}
+    </motion.div>
   );
 }
 
-// ── Main component ───────────────────────────────────────────────────────────
+// ── Exported component ───────────────────────────────────────────────────────
 
 export default function SprintyAssistant({
   mood = 'idle',
-  message,
   size = 'md',
-  className,
-  ariaLabel,
+  message,
+  className = '',
 }: SprintyAssistantProps) {
-  const { svg: svgSize, text: textSize, bubble: bubbleClass } = SIZE_MAP[size];
-  const [mounted, setMounted] = useState(false);
+  const px = SIZE_PX[size];
+  const labelId = useId();
 
-  // Prevents hydration mismatch – animations only start client-side
-  useEffect(() => { setMounted(true); }, []);
-
-  const defaultMessages: Partial<Record<SprintyMood, string>> = {
-    loading:  'Sto caricando i tuoi dati...',
-    error:    'Ops! Qualcosa è andato storto.',
-    tip:      'Suggerimento nutrizionale',
-    greeting: 'Ciao! Pronto a tracciare oggi?',
+  const ariaLabels: Record<SprintyMood, string> = {
+    idle:     'Sprinty l\'avocado è in attesa – registra il tuo primo pasto',
+    loading:  'Sprinty sta correndo sul tapis roulant – caricamento in corso',
+    success:  'Sprinty esulta in posa keto-power – obiettivo raggiunto!',
+    error:    'Sprinty è preoccupato – si è verificato un errore',
+    tip:      'Sprinty indica un consiglio utile',
+    greeting: 'Sprinty ti saluta con un cenno',
   };
 
-  const displayMessage = message ?? defaultMessages[mood];
+  const variants = bodyVariants[mood];
 
   return (
-    <>
-      {/* Inline keyframes – isolated to this component, no globals needed */}
-      <style>{`
-        @keyframes sprinty-dot {
-          0%,80%,100% { transform: scale(.6); opacity: .4; }
-          40%          { transform: scale(1);  opacity: 1;  }
-        }
-        @keyframes sprinty-wave {
-          from { transform: rotate(-15deg); }
-          to   { transform: rotate(10deg);  }
-        }
-        @keyframes sprinty-fadein {
-          from { opacity: 0; transform: translateY(8px); }
-          to   { opacity: 1; transform: translateY(0);   }
-        }
-      `}</style>
-
-      <div
-        className={clsx(
-          'flex flex-col items-center gap-3',
-          mounted && 'animate-[sprinty-fadein_0.4s_ease_both]',
-          className
-        )}
-        role={mood === 'error' ? 'alert' : 'img'}
-        aria-label={ariaLabel ?? `Sprinty – ${mood}`}
+    <div
+      className={`flex flex-col items-center gap-0.5 ${className}`}
+      role="img"
+      aria-label={ariaLabels[mood]}
+      aria-live={mood === 'error' ? 'assertive' : 'polite'}
+      aria-atomic="true"
+      id={labelId}
+    >
+      <motion.div
+        style={{ width: px, height: Math.round(px * 1.48) }}
+        variants={variants}
+        animate="animate"
       >
-        {/* Character – Framer Motion handles body-level animation client-side */}
-        {mounted ? (
-          <motion.div
-            animate={BODY_ANIMATE[mood]}
-            transition={BODY_TRANSITION[mood]}
-          >
-            <SprintySVG mood={mood} size={svgSize} />
-          </motion.div>
-        ) : (
-          <SprintySVG mood={mood} size={svgSize} />
-        )}
+        <SprintySVG mood={mood} />
+      </motion.div>
 
-        {/* Speech bubble */}
-        <AnimatePresence mode="wait">
-          {displayMessage && (
-            <motion.div
-              key={`${mood}-${displayMessage}`}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.25 }}
-              className={clsx(
-                'relative max-w-xs rounded-2xl shadow-sm border',
-                bubbleClass,
-                textSize,
-                'font-medium text-center leading-snug',
-                BUBBLE_COLORS[mood]
-              )}
-            >
-              {/* Upward-pointing triangle */}
-              <span
-                className={clsx(
-                  'absolute -top-2 left-1/2 -translate-x-1/2',
-                  'w-0 h-0',
-                  'border-l-[8px] border-l-transparent',
-                  'border-r-[8px] border-r-transparent',
-                  'border-b-[8px]',
-                  ARROW_COLORS[mood]
-                )}
-                aria-hidden="true"
-              />
-              {displayMessage}
-              {mood === 'loading' && (
-                <span className="ml-1"><LoadingDots /></span>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-    </>
+      {message !== undefined && (
+        <SpeechBubble message={message} mood={mood} />
+      )}
+    </div>
   );
 }
