@@ -6,11 +6,11 @@
  *
  * Session duration: 14 days (matching Firebase's max session cookie expiry).
  * Firebase Admin verifies the cookie on every protected route via
- * adminAuth.verifySessionCookie().
+ * getAdminAuth().verifySessionCookie().
  */
 
 import { NextResponse } from 'next/server';
-import { adminAuth } from '@/lib/firebase-admin.config';
+import { getAdminAuth } from '@/lib/firebase-admin.config';
 
 const SESSION_DURATION_MS = 14 * 24 * 60 * 60 * 1000; // 14 days
 
@@ -29,10 +29,10 @@ export async function POST(request) {
 
   try {
     // Verify the ID token first to prevent forged tokens
-    await adminAuth.verifyIdToken(idToken);
+    await getAdminAuth().verifyIdToken(idToken);
 
     // Create a session cookie valid for 14 days
-    const sessionCookie = await adminAuth.createSessionCookie(idToken, {
+    const sessionCookie = await getAdminAuth().createSessionCookie(idToken, {
       expiresIn: SESSION_DURATION_MS,
     });
 

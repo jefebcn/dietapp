@@ -20,7 +20,7 @@ import {
   getRedirectResult,
   updateProfile,
 } from 'firebase/auth';
-import { auth, googleProvider } from '@/lib/firebase-client.config';
+import { getClientAuth, googleProvider } from '@/lib/firebase-client.config';
 import SprintyAssistant from '@/components/SprintyAssistant';
 import type { Metadata } from 'next';
 
@@ -74,7 +74,7 @@ export default function LoginPage() {
     startTransition(async () => {
       setError('');
       try {
-        const cred = await signInWithEmailAndPassword(auth, email, password);
+        const cred = await signInWithEmailAndPassword(getClientAuth(), email, password);
         await handleSuccess(await cred.user.getIdToken());
       } catch (e: any) {
         setError(authError(e.code));
@@ -86,7 +86,7 @@ export default function LoginPage() {
     startTransition(async () => {
       setError('');
       try {
-        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        const cred = await createUserWithEmailAndPassword(getClientAuth(), email, password);
         if (name) await updateProfile(cred.user, { displayName: name });
 
         // Create user profile in Firestore via server action
@@ -113,10 +113,10 @@ export default function LoginPage() {
       setError('');
       try {
         if (isMobile) {
-          await signInWithRedirect(auth, googleProvider);
+          await signInWithRedirect(getClientAuth(), googleProvider);
           // getRedirectResult handled in useEffect on page load
         } else {
-          const cred = await signInWithPopup(auth, googleProvider);
+          const cred = await signInWithPopup(getClientAuth(), googleProvider);
           await handleSuccess(await cred.user.getIdToken());
         }
       } catch (e: any) {
@@ -130,7 +130,7 @@ export default function LoginPage() {
       setError('');
       setSuccess('');
       try {
-        await sendPasswordResetEmail(auth, email);
+        await sendPasswordResetEmail(getClientAuth(), email);
         setSuccess(`Email di reset inviata a ${email}. Controlla la tua casella.`);
       } catch (e: any) {
         setError(authError(e.code));

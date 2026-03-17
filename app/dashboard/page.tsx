@@ -14,7 +14,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 
-import { adminAuth } from '@/lib/firebase-admin.config';
+import { getAdminAuth } from '@/lib/firebase-admin.config';
 import { getUserById } from '@/lib/repositories/userRepository';
 import { getDailyStats, getDailyStatsRange, getMealsByDate } from '@/lib/repositories/mealRepository';
 
@@ -75,7 +75,7 @@ export default async function DashboardPage() {
 
   let uid: string;
   try {
-    const decoded = await adminAuth.verifySessionCookie(sessionCookie, true);
+    const decoded = await getAdminAuth().verifySessionCookie(sessionCookie, true);
     uid = decoded.uid;
   } catch {
     redirect('/login');

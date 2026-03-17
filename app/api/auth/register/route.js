@@ -7,7 +7,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { adminAuth } from '@/lib/firebase-admin.config';
+import { getAdminAuth } from '@/lib/firebase-admin.config';
 import { createUser } from '@/lib/repositories/userRepository';
 
 const SESSION_DURATION_MS = 14 * 24 * 60 * 60 * 1000;
@@ -28,7 +28,7 @@ export async function POST(request) {
 
   try {
     // Verify identity
-    const decoded = await adminAuth.verifyIdToken(idToken);
+    const decoded = await getAdminAuth().verifyIdToken(idToken);
     if (decoded.uid !== uid) {
       return NextResponse.json({ error: 'UID mismatch.' }, { status: 403 });
     }
@@ -37,7 +37,7 @@ export async function POST(request) {
     const user = await createUser(uid, { email, name: name ?? '' });
 
     // Create session cookie
-    const sessionCookie = await adminAuth.createSessionCookie(idToken, {
+    const sessionCookie = await getAdminAuth().createSessionCookie(idToken, {
       expiresIn: SESSION_DURATION_MS,
     });
 
