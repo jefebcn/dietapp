@@ -22,7 +22,7 @@
  */
 
 import { NextResponse } from 'next/server';
-import { adminStorage } from '@/lib/firebase-admin.config';
+import { getAdminStorage } from '@/lib/firebase-admin.config';
 import { verifyIdToken } from '@/lib/repositories/userRepository';
 
 // Allowed file contexts and their storage path prefixes
@@ -105,7 +105,7 @@ export async function POST(request) {
 
   // ── Generate signed URL ───────────────────────────────────────────────
   try {
-    const bucket = adminStorage.bucket();
+    const bucket = getAdminStorage().bucket();
     const file = bucket.file(storagePath);
 
     const expiresInMs = 15 * 60 * 1000; // 15 minutes

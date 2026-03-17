@@ -4,7 +4,7 @@
  */
 import { redirect } from 'next/navigation';
 import { cookies } from 'next/headers';
-import { adminAuth } from '@/lib/firebase-admin.config';
+import { getAdminAuth } from '@/lib/firebase-admin.config';
 
 export default async function RootPage() {
   // Attempt to verify the session cookie set by /api/auth/session
@@ -13,7 +13,7 @@ export default async function RootPage() {
 
   if (sessionCookie) {
     try {
-      await adminAuth.verifySessionCookie(sessionCookie, true /* checkRevoked */);
+      await getAdminAuth().verifySessionCookie(sessionCookie, true /* checkRevoked */);
       redirect('/dashboard');
     } catch {
       // Cookie invalid/expired – fall through to login
