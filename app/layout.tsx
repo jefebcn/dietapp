@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { DM_Sans, DM_Mono, Playfair_Display } from 'next/font/google';
 import './globals.css';
+import { AuthProvider } from '@/components/AuthProvider';
 
 // ── Font loading ───────────────────────────────────────────────────────────
 
@@ -75,8 +76,10 @@ export default function RootLayout({
       lang="it"
       className={`${dmSans.variable} ${dmMono.variable} ${playfair.variable}`}
     >
-      <body className="bg-[#f5efe4] text-[#2c1f0e] antialiased min-h-screen">
-        {children}
+      <body className="bg-[#0f172a] text-slate-100 antialiased min-h-screen">
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
