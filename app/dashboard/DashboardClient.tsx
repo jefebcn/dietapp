@@ -1,16 +1,17 @@
 'use client';
 
 /**
- * DashboardClient  –  Glassmorphic Bento Grid Dashboard
+ * DashboardClient  –  Claymorphic Bento Grid Dashboard
  *
- * Design language: Deep Slate + Glassmorphism + Bento Grid
- * Palette: Avocado Green (#4ade80) · Electric Blue (#60a5fa) · Amber (#fbbf24)
- * Animation: Framer Motion micro-interactions (card tilt on hover, counters)
+ * Design language: Claymorphism – warm cream (#f7f3e9) base, clay card surfaces
+ * Palette: Avocado Green (#88b04b) · Amber (#d97706) · Rose (#f43f5e)
+ * Animation: Framer Motion micro-interactions via ClayCard interactive prop
  */
 
 import { useState } from 'react';
 import useSWR from 'swr';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ClayCard } from '@/components/ClayCard';
 import SprintyAssistant from '@/components/SprintyAssistant';
 
 // ── Types ───────────────────────────────────────────────────────────────────
@@ -57,48 +58,6 @@ interface Props {
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
-// ── Tilt card wrapper ────────────────────────────────────────────────────────
-
-function TiltCard({
-  children,
-  className = '',
-  style,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  style?: React.CSSProperties;
-}) {
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [4, -4]), { stiffness: 300, damping: 30 });
-  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-4, 4]), { stiffness: 300, damping: 30 });
-
-  function handleMouseMove(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const nx = (e.clientX - rect.left) / rect.width - 0.5;
-    const ny = (e.clientY - rect.top) / rect.height - 0.5;
-    x.set(nx);
-    y.set(ny);
-  }
-  function handleMouseLeave() {
-    x.set(0);
-    y.set(0);
-  }
-
-  return (
-    <motion.div
-      style={{ rotateX, rotateY, transformStyle: 'preserve-3d', ...style }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      whileHover={{ scale: 1.015 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
-      className={`glass-card p-4 ${className}`}
-    >
-      {children}
-    </motion.div>
-  );
-}
-
 // ── Calorie ring ─────────────────────────────────────────────────────────────
 
 function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
@@ -112,7 +71,6 @@ function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
   return (
     <div className="relative flex items-center justify-center" style={{ width: 148, height: 148 }}>
       <svg width="148" height="148" viewBox="0 0 148 148" aria-hidden="true">
-        {/* Glow filter */}
         <defs>
           <filter id="ring-glow">
             <feGaussianBlur stdDeviation="3" result="blur" />
@@ -123,14 +81,14 @@ function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
           </filter>
         </defs>
         {/* Track */}
-        <circle cx="74" cy="74" r={radius} fill="none" stroke="rgba(255,255,255,0.07)" strokeWidth="12" />
+        <circle cx="74" cy="74" r={radius} fill="none" stroke="rgba(90,58,20,0.12)" strokeWidth="12" />
         {/* Progress */}
         <motion.circle
           cx="74"
           cy="74"
           r={radius}
           fill="none"
-          stroke={isOver ? '#fb7185' : '#4ade80'}
+          stroke={isOver ? '#f43f5e' : '#88b04b'}
           strokeWidth="12"
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -143,21 +101,24 @@ function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <motion.span
-          className="text-2xl font-bold font-mono text-white leading-none"
+          className="text-2xl font-bold font-mono leading-none"
+          style={{ color: '#3d2a0a' }}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3, duration: 0.4 }}
         >
           {consumed.toLocaleString('it-IT')}
         </motion.span>
-        <span className="text-xs text-slate-400 mt-0.5">/ {goal.toLocaleString('it-IT')} kcal</span>
+        <span className="text-xs mt-0.5" style={{ color: '#a08060' }}>
+          / {goal.toLocaleString('it-IT')} kcal
+        </span>
         <span
-          className={[
-            'text-xs font-semibold mt-1.5 px-2 py-0.5 rounded-full',
+          className="text-xs font-semibold mt-1.5 px-2 py-0.5 rounded-full"
+          style={
             isOver
-              ? 'bg-rose-500/20 text-rose-400'
-              : 'bg-green-500/20 text-green-400',
-          ].join(' ')}
+              ? { background: 'rgba(244,63,94,0.12)', color: '#e11d48' }
+              : { background: 'rgba(136,176,75,0.15)', color: '#5a7a1a' }
+          }
         >
           {isOver
             ? `+${remaining.toLocaleString('it-IT')} oltre`
@@ -175,29 +136,32 @@ function MacroBar({
   value,
   goal,
   color,
-  glowColor,
 }: {
   label: string;
   value: number;
   goal: number;
   color: string;
-  glowColor: string;
 }) {
   const pct = Math.min((value / Math.max(goal, 1)) * 100, 100);
 
   return (
     <div>
       <div className="flex justify-between items-baseline mb-1.5">
-        <span className="text-xs font-semibold text-slate-400 uppercase tracking-wide">{label}</span>
-        <span className="text-xs font-mono text-slate-300">
+        <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#a08060' }}>
+          {label}
+        </span>
+        <span className="text-xs font-mono" style={{ color: '#5c3d1a' }}>
           {Math.round(value)}g
-          <span className="text-slate-500"> / {goal}g</span>
+          <span style={{ color: '#c8a878' }}> / {goal}g</span>
         </span>
       </div>
-      <div className="progress-bar">
+      <div
+        className="h-2 rounded-full overflow-hidden"
+        style={{ background: 'rgba(90,58,20,0.10)' }}
+      >
         <motion.div
-          className="progress-fill"
-          style={{ backgroundColor: color, boxShadow: `0 0 8px ${glowColor}` }}
+          className="h-full rounded-full"
+          style={{ backgroundColor: color }}
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
           transition={{ duration: 0.9, ease: 'easeOut', delay: 0.2 }}
@@ -219,26 +183,36 @@ function WaterTracker({ glasses = 0 }: { glasses?: number }) {
 
   return (
     <div>
-      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Acqua</p>
+      <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: '#a08060' }}>
+        Acqua
+      </p>
       <div className="flex flex-wrap gap-1.5">
         {Array.from({ length: goal }).map((_, i) => (
           <motion.button
             key={i}
             onClick={() => setCount(i < count ? i : i + 1)}
-            whileTap={{ scale: 0.85 }}
-            className={[
-              'w-7 h-7 rounded-lg flex items-center justify-center text-base transition-all',
+            whileTap={{ scale: 0.82 }}
+            className="w-7 h-7 rounded-lg flex items-center justify-center text-base transition-all"
+            style={
               i < count
-                ? 'bg-blue-500/30 border border-blue-400/50 text-blue-300'
-                : 'bg-white/5 border border-white/10 text-slate-600',
-            ].join(' ')}
+                ? {
+                    background: 'rgba(96,165,250,0.18)',
+                    border: '1.5px solid rgba(96,165,250,0.45)',
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6)',
+                  }
+                : {
+                    background: 'rgba(90,58,20,0.06)',
+                    border: '1.5px solid rgba(90,58,20,0.12)',
+                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.5)',
+                  }
+            }
             aria-label={`Bicchiere ${i + 1}${i < count ? ' (bevuto)' : ''}`}
           >
             💧
           </motion.button>
         ))}
       </div>
-      <p className="text-xs text-slate-500 mt-1.5">
+      <p className="text-xs mt-1.5" style={{ color: '#c8a878' }}>
         {count} / {goal} bicchieri
       </p>
     </div>
@@ -254,7 +228,9 @@ function WeeklyChart({ weekStats, goalKcal }: { weekStats: DailyStats[]; goalKca
 
   return (
     <div>
-      <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-3">Ultime 7 giornate</p>
+      <p className="text-xs font-semibold uppercase tracking-wide mb-3" style={{ color: '#a08060' }}>
+        Ultime 7 giornate
+      </p>
       <div className="flex items-end gap-1.5 h-16">
         {weekStats.map((day, idx) => {
           const pct = Math.min((day.totalKcal / max) * 100, 100);
@@ -268,9 +244,11 @@ function WeeklyChart({ weekStats, goalKcal }: { weekStats: DailyStats[]; goalKca
                 <motion.div
                   className="w-full rounded-t-md"
                   style={{
-                    backgroundColor: isToday ? '#4ade80' : isOver ? '#fb7185' : '#60a5fa',
-                    opacity: isToday ? 1 : 0.55,
-                    boxShadow: isToday ? '0 0 8px rgba(74,222,128,0.4)' : undefined,
+                    backgroundColor: isToday ? '#88b04b' : isOver ? '#f43f5e' : '#c8a878',
+                    opacity: isToday ? 1 : 0.6,
+                    boxShadow: isToday
+                      ? '0 0 8px rgba(136,176,75,0.45), inset 0 1px 0 rgba(255,255,255,0.4)'
+                      : undefined,
                   }}
                   initial={{ height: 0 }}
                   animate={{ height: `${Math.max(pct, day.totalKcal > 0 ? 10 : 2)}%` }}
@@ -278,14 +256,17 @@ function WeeklyChart({ weekStats, goalKcal }: { weekStats: DailyStats[]; goalKca
                   title={`${day.date}: ${Math.round(day.totalKcal)} kcal`}
                 />
               </div>
-              <span className={`text-[10px] ${isToday ? 'text-green-400 font-bold' : 'text-slate-500'}`}>
+              <span
+                className="text-[10px]"
+                style={{ color: isToday ? '#5a7a1a' : '#c8a878', fontWeight: isToday ? 700 : 400 }}
+              >
                 {days[d.getDay()]}
               </span>
             </div>
           );
         })}
       </div>
-      <p className="text-xs text-slate-500 mt-2">
+      <p className="text-xs mt-2" style={{ color: '#c8a878' }}>
         Obiettivo: {goalKcal.toLocaleString('it-IT')} kcal/gg
       </p>
     </div>
@@ -309,23 +290,35 @@ function MealRow({ meal, onDelete }: { meal: Meal; onDelete: (id: string) => voi
       initial={{ opacity: 0, x: -8 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 8, height: 0 }}
-      className="flex items-center gap-3 py-2.5 border-b border-white/5 last:border-0"
+      className="flex items-center gap-3 py-2.5 last:border-0"
+      style={{ borderBottom: '1.5px solid rgba(90,58,20,0.07)' }}
     >
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-slate-200 truncate">{meal.name}</p>
-        <p className="text-xs text-slate-500">
+        <p className="text-sm font-medium truncate" style={{ color: '#3d2a0a' }}>
+          {meal.name}
+        </p>
+        <p className="text-xs" style={{ color: '#a08060' }}>
           {meal.qty}{meal.unit} · P {Math.round(meal.protein)}g · C {Math.round(meal.carbs)}g · G {Math.round(meal.fat)}g
         </p>
       </div>
       <div className="flex items-center gap-2 flex-shrink-0">
-        <span className="text-sm font-bold font-mono text-slate-200">
+        <span className="text-sm font-bold font-mono" style={{ color: '#5c3d1a' }}>
           {Math.round(meal.kcal)} kcal
         </span>
         <button
           onClick={handleDelete}
           disabled={deleting}
           aria-label={`Elimina ${meal.name}`}
-          className="p-1.5 rounded-lg text-slate-500 hover:bg-rose-500/15 hover:text-rose-400 transition-colors disabled:opacity-40"
+          className="p-1.5 rounded-lg transition-colors disabled:opacity-40"
+          style={{ color: '#c8a878' }}
+          onMouseEnter={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.color = '#e11d48';
+            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(244,63,94,0.10)';
+          }}
+          onMouseLeave={(e) => {
+            (e.currentTarget as HTMLButtonElement).style.color = '#c8a878';
+            (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
+          }}
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
             <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
@@ -371,80 +364,92 @@ export default function DashboardClient({
   return (
     <div className="space-y-4">
 
-      {/* ── Row 1: Calorie ring + Macros (2-col bento) ── */}
+      {/* ── Row 1: Calorie ring + Macros ── */}
       <div className="grid grid-cols-2 gap-4">
 
-        {/* Calorie ring */}
-        <TiltCard className="flex flex-col items-center justify-center gap-2 col-span-1">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide self-start">Calorie</p>
+        <ClayCard elevated interactive className="flex flex-col items-center justify-center gap-2 p-4 col-span-1">
+          <p className="text-xs font-semibold uppercase tracking-wide self-start" style={{ color: '#a08060' }}>
+            Calorie
+          </p>
           <CalorieRing consumed={Math.round(stats.totalKcal)} goal={goals.kcal} />
           {hitGoal && (
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex items-center gap-1.5 text-xs font-semibold text-green-400 bg-green-500/15 px-2 py-1 rounded-full border border-green-500/30"
+              className="flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full"
+              style={{
+                background: 'rgba(136,176,75,0.15)',
+                color: '#5a7a1a',
+                border: '1px solid rgba(136,176,75,0.35)',
+              }}
             >
               <SprintyAssistant mood="success" size="xs" />
               Obiettivo!
             </motion.div>
           )}
-        </TiltCard>
+        </ClayCard>
 
-        {/* Macros */}
-        <TiltCard className="flex flex-col justify-center gap-4 col-span-1">
-          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Macro</p>
-          <MacroBar label="Proteine"    value={stats.totalProtein} goal={goals.protein} color="#4ade80" glowColor="rgba(74,222,128,0.4)" />
-          <MacroBar label="Carboidrati" value={stats.totalCarbs}   goal={goals.carbs}   color="#fbbf24" glowColor="rgba(251,191,36,0.4)" />
-          <MacroBar label="Grassi"      value={stats.totalFat}     goal={goals.fat}     color="#fb7185" glowColor="rgba(251,113,133,0.4)" />
-        </TiltCard>
+        <ClayCard elevated interactive className="flex flex-col justify-center gap-4 p-4 col-span-1">
+          <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#a08060' }}>
+            Macro
+          </p>
+          <MacroBar label="Proteine"    value={stats.totalProtein} goal={goals.protein} color="#88b04b" />
+          <MacroBar label="Carboidrati" value={stats.totalCarbs}   goal={goals.carbs}   color="#d97706" />
+          <MacroBar label="Grassi"      value={stats.totalFat}     goal={goals.fat}     color="#f43f5e" />
+        </ClayCard>
       </div>
 
-      {/* ── Row 2: Quick actions (3-col bento) ── */}
+      {/* ── Row 2: Quick actions ── */}
       <div className="grid grid-cols-3 gap-3">
         {[
-          { label: 'Cerca cibo',  icon: '🔍', href: '/diary',        color: 'rgba(96,165,250,0.15)',  border: 'rgba(96,165,250,0.3)' },
-          { label: 'Scansiona',   icon: '📷', href: '/diary?scan=1', color: 'rgba(74,222,128,0.15)', border: 'rgba(74,222,128,0.3)' },
-          { label: 'Peso',        icon: '⚖️', href: '/weight',       color: 'rgba(251,191,36,0.12)', border: 'rgba(251,191,36,0.3)' },
+          { label: 'Cerca cibo',  icon: '🔍', href: '/diary',        glow: 'blue'  as const },
+          { label: 'Scansiona',   icon: '📷', href: '/diary?scan=1', glow: 'green' as const },
+          { label: 'Peso',        icon: '⚖️', href: '/weight',       glow: 'amber' as const },
         ].map((action) => (
-          <motion.a
+          <ClayCard
             key={action.label}
-            href={action.href}
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.96 }}
-            style={{ background: action.color, borderColor: action.border }}
-            className="glass-card-sm flex flex-col items-center gap-2 text-center border transition-all"
+            interactive
+            glow={action.glow}
+            className="flex flex-col items-center gap-2 p-4 text-center"
+            role="link"
+            onClick={() => { window.location.href = action.href; }}
+            tabIndex={0}
+            aria-label={action.label}
           >
             <span className="text-2xl" aria-hidden="true">{action.icon}</span>
-            <span className="text-xs font-medium text-slate-300">{action.label}</span>
-          </motion.a>
+            <span className="text-xs font-semibold" style={{ color: '#7a5c2e' }}>{action.label}</span>
+          </ClayCard>
         ))}
       </div>
 
-      {/* ── Row 3: Weekly chart + Water (2-col bento) ── */}
+      {/* ── Row 3: Weekly chart + Water ── */}
       {weekStats.length > 0 && (
         <div className="grid grid-cols-3 gap-4">
-          <TiltCard className="col-span-2">
+          <ClayCard elevated interactive className="col-span-2 p-4">
             <WeeklyChart weekStats={weekStats} goalKcal={goals.kcal} />
-          </TiltCard>
-          <TiltCard className="col-span-1">
+          </ClayCard>
+          <ClayCard elevated interactive className="col-span-1 p-4">
             <WaterTracker />
-          </TiltCard>
+          </ClayCard>
         </div>
       )}
 
       {/* ── Row 4: Today's meals ── */}
-      <TiltCard>
+      <ClayCard elevated className="p-4">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-slate-200">
+          <h3 className="text-sm font-semibold" style={{ color: '#3d2a0a' }}>
             Pasti di oggi
             {meals.length > 0 && (
-              <span className="ml-2 text-xs font-normal text-slate-500">({meals.length})</span>
+              <span className="ml-2 text-xs font-normal" style={{ color: '#c8a878' }}>
+                ({meals.length})
+              </span>
             )}
           </h3>
           <motion.a
             href="/diary"
             whileHover={{ scale: 1.05 }}
-            className="text-xs text-green-400 font-semibold hover:text-green-300 transition-colors"
+            className="text-xs font-semibold transition-colors"
+            style={{ color: '#88b04b' }}
           >
             + Aggiungi
           </motion.a>
@@ -463,13 +468,15 @@ export default function DashboardClient({
             />
           </motion.div>
         ) : (
-          <ul>
-            {meals.map((meal) => (
-              <MealRow key={meal.id} meal={meal} onDelete={handleDeleteMeal} />
-            ))}
-          </ul>
+          <AnimatePresence>
+            <ul>
+              {meals.map((meal) => (
+                <MealRow key={meal.id} meal={meal} onDelete={handleDeleteMeal} />
+              ))}
+            </ul>
+          </AnimatePresence>
         )}
-      </TiltCard>
+      </ClayCard>
     </div>
   );
 }
