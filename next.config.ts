@@ -7,12 +7,9 @@ const nextConfig: NextConfig = {
   // firebase-admin uses Node.js-only APIs; keep it out of the browser bundle
   serverExternalPackages: ['firebase-admin'],
 
-  experimental: {
-    // Cache React Server Component render output between requests
-    cacheComponents: true,
-    // Turbopack is the default bundler in Next.js 15 dev mode;
-    // no extra flags needed – just ensure no webpack-only plugins remain.
-  },
+  // Turbopack is the default bundler in Next.js 15 dev mode;
+  // no extra flags needed – just ensure no webpack-only plugins remain.
+  // Note: cacheComponents requires Next.js canary and is not used here.
 
   // ── Image optimisation ───────────────────────────────────────────────────
   images: {
