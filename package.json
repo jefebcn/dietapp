@@ -1,6 +1,6 @@
 {
   "name": "nutritrack",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -10,6 +10,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
     "autoprefixer": "^10.4.19",
     "chart.js": "^4.4.3",
     "clsx": "^2.1.1",
@@ -18,6 +19,7 @@
     "framer-motion": "^12.38.0",
     "html5-qrcode": "^2.3.8",
     "next": "^15.2.0",
+    "next-firebase-auth-edge": "^1.6.0",
     "postcss": "^8.4.38",
     "react": "^18.3.0",
     "react-chartjs-2": "^5.2.0",
