@@ -2,12 +2,9 @@
 
 /**
  * /app/dashboard/error.tsx  –  Error boundary for the dashboard route
- *
- * Disney Cartoon theme – vibrant colors, friendly Sprinty error state.
  */
 
 import { useEffect } from 'react';
-import SprintyAssistant from '@/components/SprintyAssistant';
 
 interface Props {
   error: Error & { digest?: string };
@@ -23,15 +20,11 @@ export default function DashboardError({ error, reset }: Props) {
     <div
       className="min-h-screen flex flex-col items-center justify-center px-4 text-center gap-6"
       style={{
-        background: 'linear-gradient(160deg, #FFFDE7 0%, #F1F8E9 45%, #E3F2FD 100%)',
+        background: 'linear-gradient(160deg, #EEF2FF 0%, #F5F0FF 40%, #ECFDF5 100%)',
         backgroundAttachment: 'fixed',
       }}
     >
-      <SprintyAssistant
-        mood="error"
-        size="xl"
-        message="Ops! Non riesco a caricare i tuoi dati."
-      />
+      <span className="text-6xl">😵</span>
 
       <div
         className="p-6 rounded-3xl space-y-2"
@@ -42,10 +35,7 @@ export default function DashboardError({ error, reset }: Props) {
           maxWidth: 360,
         }}
       >
-        <h2
-          className="text-xl font-black"
-          style={{ color: '#881337' }}
-        >
+        <h2 className="text-xl font-black" style={{ color: '#881337' }}>
           Qualcosa è andato storto 😓
         </h2>
         <p className="text-sm font-bold" style={{ color: '#BE123C', opacity: 0.85 }}>
@@ -61,10 +51,10 @@ export default function DashboardError({ error, reset }: Props) {
           onClick={reset}
           className="font-extrabold px-5 py-2.5 rounded-full text-sm"
           style={{
-            background: 'linear-gradient(180deg, #4ADE80 0%, #22C55E 45%, #16A34A 100%)',
+            background: 'linear-gradient(145deg, #818CF8, #6366F1)',
             color: '#fff',
             border: 'none',
-            boxShadow: '0 5px 0 #14532D, 0 8px 20px rgba(20,83,45,0.30)',
+            boxShadow: '0 5px 0 #3730A3',
             cursor: 'pointer',
           }}
         >
@@ -74,10 +64,10 @@ export default function DashboardError({ error, reset }: Props) {
           href="/"
           className="font-extrabold px-5 py-2.5 rounded-full text-sm"
           style={{
-            background: 'linear-gradient(145deg, #FFFFFF, #F0FDF4)',
-            color: '#14532D',
-            border: '2px solid #86EFAC',
-            boxShadow: '0 5px 0 #16A34A',
+            background: 'linear-gradient(145deg, #EEF2FF, #E0E7FF)',
+            color: '#3730A3',
+            border: '2px solid #A5B4FC',
+            boxShadow: '0 5px 0 #4338CA',
             textDecoration: 'none',
             display: 'inline-block',
           }}

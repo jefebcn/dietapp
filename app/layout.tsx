@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     default: 'NutriTrack – Il tuo diario nutrizionale intelligente',
   },
   description:
-    'Traccia pasti, calorie e macro con NutriTrack. Il tuo assistente nutrizionale personale con Sprinty.',
+    'Traccia pasti, calorie e macro con NutriTrack. Il tuo diario nutrizionale intelligente.',
   keywords: ['dieta', 'nutrizione', 'calorie', 'macro', 'diario alimentare', 'salute'],
   authors: [{ name: 'NutriTrack' }],
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://nutritrack.it'),
