@@ -1,8 +1,9 @@
 /**
  * /app/dashboard/page.tsx  –  NutriTrack Dashboard
  *
- * Server Component: auth-gated via __session cookie + firebase-admin,
- * fetches today's stats and 7-day history, passes to Bento Grid client.
+ * Server Component: auth-gated via __session cookie + firebase-admin.
+ * Fetches today's stats and 7-day history, passes to Bento Grid client.
+ * Includes persistent BottomTabBar via layout wrapper.
  */
 
 import { Suspense } from 'react';
@@ -13,9 +14,11 @@ import type { Metadata } from 'next';
 import { getAdminAuth } from '@/lib/firebase-admin.config';
 import { getUserById } from '@/lib/repositories/userRepository';
 import { getDailyStats, getDailyStatsRange, getMealsByDate } from '@/lib/repositories/mealRepository';
+import { getStreakState } from '@/lib/repositories/streakRepository';
 
 import DashboardClient from './DashboardClient';
 import SprintyAssistant from '@/components/SprintyAssistant';
+import { BottomTabBar } from '@/components/BottomTabBar';
 
 export const metadata: Metadata = { title: 'Dashboard' };
 
@@ -33,22 +36,24 @@ function getSprintyTip(
   totalKcal: number,
   goalKcal: number,
   totalProtein: number,
-  goalProtein: number
+  goalProtein: number,
+  streak: number,
 ): string {
-  const kcalPct = goalKcal > 0 ? totalKcal / goalKcal : 0;
-  const proteinPct = goalProtein > 0 ? totalProtein / goalProtein : 0;
-
+  if (streak >= 7)
+    return `🔥 ${streak} giorni di fila! Sei inarrestabile! Continua così!`;
   if (totalKcal === 0)
     return 'Inizia la giornata con una colazione nutriente! Registra il tuo primo pasto.';
+  const kcalPct = goalKcal > 0 ? totalKcal / goalKcal : 0;
+  const proteinPct = goalProtein > 0 ? totalProtein / goalProtein : 0;
   if (kcalPct < 0.3 && new Date().getHours() >= 14)
-    return 'Stai mangiando poco oggi! Ricorda di fare pasti regolari per mantenere il metabolismo attivo.';
+    return 'Stai mangiando poco oggi! Ricorda di fare pasti regolari.';
   if (kcalPct > 1.1)
-    return 'Hai superato il tuo obiettivo calorico. Scegli cibi leggeri per il resto della giornata.';
+    return 'Hai superato il tuo obiettivo calorico. Scegli cibi leggeri per stasera.';
   if (proteinPct < 0.5 && new Date().getHours() >= 13)
-    return 'Le tue proteine sono basse oggi. Aggiungi una fonte proteica al prossimo pasto.';
+    return 'Le proteine sono basse oggi. Aggiungi una fonte proteica al prossimo pasto.';
   if (kcalPct >= 0.85 && kcalPct <= 1.0)
-    return 'Ottimo lavoro! Sei vicino al tuo obiettivo calorico giornaliero. 💪';
-  return 'Stai andando alla grande! Continua a tracciare i tuoi pasti con costanza.';
+    return 'Ottimo lavoro! Sei vicino al tuo obiettivo calorico. 💪';
+  return 'Stai andando alla grande! Continua a tracciare i tuoi pasti.';
 }
 
 export default async function DashboardPage() {
@@ -76,13 +81,14 @@ export default async function DashboardPage() {
       getDailyStats(uid, today),
       getDailyStatsRange(uid, sevenDaysAgo, today),
       getMealsByDate(uid, today),
+      getStreakState(uid),
     ]);
   } catch (err) {
     console.error('[Dashboard] data fetch failed:', err);
-    throw err; // re-throw so error.tsx catches it with the actual message
+    throw err;
   }
 
-  const [user, todayStats, weekStats, todayMeals] = fetchResult;
+  const [user, todayStats, weekStats, todayMeals, streakState] = fetchResult;
 
   if (!user) redirect('/login');
 
@@ -96,12 +102,22 @@ export default async function DashboardPage() {
   };
 
   const goals = user.goals ?? { kcal: 2000, protein: 150, carbs: 200, fat: 65 };
-  const sprintyTip = getSprintyTip(stats.totalKcal, goals.kcal, stats.totalProtein, goals.protein);
+  const streak = streakState?.currentStreak ?? 0;
+  const sprintyTip = getSprintyTip(
+    stats.totalKcal, goals.kcal,
+    stats.totalProtein, goals.protein,
+    streak,
+  );
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="relative min-h-screen" style={{ background: 'linear-gradient(160deg, #FFFDE7 0%, #F1F8E9 45%, #E3F2FD 100%)', backgroundAttachment: 'fixed' }}>
-
+    <div
+      className="relative min-h-screen"
+      style={{
+        background: 'linear-gradient(160deg, #FFFDE7 0%, #F1F8E9 45%, #E3F2FD 100%)',
+        backgroundAttachment: 'fixed',
+      }}
+    >
       {/* Header */}
       <header
         className="sticky top-0 z-30"
@@ -122,28 +138,46 @@ export default async function DashboardPage() {
                 month: 'long',
               })}
             </p>
-            <h1 className="text-lg font-black leading-tight" style={{ color: '#14532D' }}>
-              Ciao, {user.name?.split(' ')[0] || 'amico'}! 👋
+            <h1
+              className="text-xl leading-tight"
+              style={{ fontFamily: 'var(--font-display)', color: '#14532D' }}
+            >
+              Ciao, {user.name?.split(' ')[0] || 'amico'}!
             </h1>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {/* Streak badge */}
+            {streak > 0 && (
+              <span
+                className="streak-badge text-xs font-bold px-2.5 py-1.5 rounded-full"
+                style={{
+                  fontFamily: 'var(--font-ui)',
+                  background: 'linear-gradient(145deg, #FEF3C7, #FDE68A)',
+                  color: '#92400E',
+                  border: '2px solid #FBBF24',
+                  boxShadow: '0 3px 0 #D97706',
+                }}
+              >
+                🔥 {streak}
+              </span>
+            )}
             <span
               className="text-xs font-extrabold px-3 py-1.5 rounded-full"
               style={{
+                fontFamily: 'var(--font-display)',
                 background: 'linear-gradient(145deg, #F0FDF4, #DCFCE7)',
                 color: '#14532D',
                 border: '2px solid #86EFAC',
                 boxShadow: '0 3px 0 #16A34A',
               }}
             >
-              🌿 NutriTrack
+              NutriTrack
             </span>
           </div>
         </div>
       </header>
 
-      <main className="relative z-10 max-w-2xl mx-auto px-4 pb-24 pt-4 space-y-4">
-
+      <main className="relative z-10 max-w-2xl mx-auto px-4 pt-4 space-y-4 page-content">
         {/* Sprinty tip card */}
         <section aria-label="Consiglio di Sprinty">
           <div
@@ -157,10 +191,18 @@ export default async function DashboardPage() {
           >
             <SprintyAssistant mood="tip" size="sm" className="flex-shrink-0" />
             <div className="min-w-0">
-              <p className="text-xs font-extrabold uppercase tracking-wide mb-0.5" style={{ color: '#059669' }}>
+              <p
+                className="text-xs uppercase tracking-wide mb-0.5"
+                style={{ fontFamily: 'var(--font-ui)', fontWeight: 600, color: '#059669' }}
+              >
                 Consiglio di Sprinty
               </p>
-              <p className="text-sm font-bold leading-snug" style={{ color: '#064E3B' }}>{sprintyTip}</p>
+              <p
+                className="text-sm leading-snug"
+                style={{ fontFamily: 'var(--font-ui)', fontWeight: 500, color: '#064E3B' }}
+              >
+                {sprintyTip}
+              </p>
             </div>
           </div>
         </section>
@@ -193,8 +235,10 @@ export default async function DashboardPage() {
             />
           </Suspense>
         </section>
-
       </main>
+
+      {/* Persistent bottom navigation */}
+      <BottomTabBar />
     </div>
   );
 }

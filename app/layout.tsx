@@ -1,23 +1,6 @@
 import type { Metadata, Viewport } from 'next';
-import { Nunito, Nunito_Sans } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/components/AuthProvider';
-
-// ── Font loading ───────────────────────────────────────────────────────────
-
-const nunito = Nunito({
-  subsets: ['latin'],
-  variable: '--font-sans',
-  display: 'swap',
-  weight: ['400', '600', '700', '800', '900'],
-});
-
-const nunitoSans = Nunito_Sans({
-  subsets: ['latin'],
-  variable: '--font-serif',
-  display: 'swap',
-  weight: ['700', '800', '900'],
-});
 
 // ── Metadata ───────────────────────────────────────────────────────────────
 
@@ -53,10 +36,11 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#4CAF50',
+  themeColor: '#22C55E',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
+  viewportFit: 'cover', // Required for iOS safe-area insets
 };
 
 // ── Root Layout ────────────────────────────────────────────────────────────
@@ -67,10 +51,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html
-      lang="it"
-      className={`${nunito.variable} ${nunitoSans.variable}`}
-    >
+    <html lang="it">
+      <head>
+        {/* Preconnect for performance */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* Nunito (body), Nunito Sans (headings), Fredoka (UI labels) */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@700;800;900&family=Fredoka:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet"
+        />
+      </head>
       <body className="antialiased min-h-screen">
         <AuthProvider>
           {children}
