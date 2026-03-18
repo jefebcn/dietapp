@@ -8,7 +8,7 @@ import { getAdminAuth } from '@/lib/firebase-admin.config';
 
 export default async function RootPage() {
   // Attempt to verify the session cookie set by /api/auth/session
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionCookie = cookieStore.get('__session')?.value;
 
   if (sessionCookie) {
