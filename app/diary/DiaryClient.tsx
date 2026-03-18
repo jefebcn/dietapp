@@ -1,10 +1,14 @@
 'use client';
 
 /**
- * DiaryClient.tsx  –  Interactive food diary with BottomSheet entry
+ * DiaryClient.tsx  –  Food Diary with Meal Categories
  *
- * Shows today's meals and allows adding new entries via a sliding BottomSheet.
- * Each meal entry uses the log-entry-pop Squash-and-Stretch animation.
+ * Inspired by top competitors (MyFitnessPal, Yazio, Lose It!):
+ *  • Meal categories: Colazione, Pranzo, Cena, Spuntini
+ *  • Each category shows its meals + macros
+ *  • Quick-add bottom sheet per category
+ *  • Daily summary bar with progress rings
+ *  • Sticky header with quick stats
  */
 
 import { useState, useTransition } from 'react';
@@ -13,49 +17,202 @@ import { BottomSheet } from '@/components/BottomSheet';
 import { addMealAction, deleteMealAction } from '@/lib/actions/mealActions';
 
 interface Meal {
-  id: string;
-  name: string;
-  kcal: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-  qty: number;
-  unit: string;
+  id: string; name: string; kcal: number;
+  protein: number; carbs: number; fat: number;
+  qty: number; unit: string;
+  mealType?: string;
 }
 
 interface DiaryClientProps {
-  uid: string;
-  today: string;
+  uid: string; today: string;
   meals: Meal[];
-  stats: {
-    totalKcal: number;
-    totalProtein: number;
-    totalCarbs: number;
-    totalFat: number;
-  } | null;
+  stats: { totalKcal: number; totalProtein: number; totalCarbs: number; totalFat: number } | null;
 }
+
+// ── Meal categories ────────────────────────────────────────────────────────────
+
+const MEAL_TYPES = [
+  { key: 'colazione', label: 'Colazione', icon: '🌅', color: '245,158,11',   time: '07:00–10:00' },
+  { key: 'pranzo',    label: 'Pranzo',    icon: '☀️',  color: '34,211,238',  time: '12:00–14:00' },
+  { key: 'cena',      label: 'Cena',      icon: '🌙',  color: '139,92,246',  time: '19:00–21:00' },
+  { key: 'spuntino',  label: 'Spuntini',  icon: '🍎',  color: '52,211,153',  time: 'Qualsiasi ora' },
+] as const;
+
+type MealTypeKey = typeof MEAL_TYPES[number]['key'];
+
+// ── Macro Pill ─────────────────────────────────────────────────────────────────
+
+function MacroPill({ value, label, color }: { value: number; label: string; color: string }) {
+  return (
+    <div className="flex items-center gap-1">
+      <span className="text-[10px] font-bold" style={{ color }}>{label}</span>
+      <span className="text-[10px] font-semibold" style={{ color: 'rgba(248,250,252,0.55)' }}>{Math.round(value)}g</span>
+    </div>
+  );
+}
+
+// ── Category Section ───────────────────────────────────────────────────────────
+
+function CategorySection({
+  type, meals, onAdd, onDelete,
+}: {
+  type: typeof MEAL_TYPES[number];
+  meals: Meal[];
+  onAdd: (typeKey: MealTypeKey) => void;
+  onDelete: (id: string) => void;
+}) {
+  const [expanded, setExpanded] = useState(true);
+  const catKcal = meals.reduce((s, m) => s + m.kcal, 0);
+  const catProtein = meals.reduce((s, m) => s + m.protein, 0);
+  const catCarbs   = meals.reduce((s, m) => s + m.carbs, 0);
+  const catFat     = meals.reduce((s, m) => s + m.fat, 0);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-2xl overflow-hidden"
+      style={{
+        background: `rgba(${type.color},0.06)`,
+        border: `1px solid rgba(${type.color},0.20)`,
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+      }}
+    >
+      {/* Header */}
+      <button
+        className="w-full flex items-center gap-3 px-4 py-3 text-left"
+        onClick={() => setExpanded((v) => !v)}
+      >
+        <span className="text-xl">{type.icon}</span>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-bold" style={{ color: '#F8FAFC', fontFamily: 'var(--font-ui)' }}>
+            {type.label}
+          </p>
+          <p className="text-[10px]" style={{ color: `rgba(${type.color},0.60)` }}>{type.time}</p>
+        </div>
+        <div className="flex items-center gap-2">
+          {catKcal > 0 && (
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full"
+              style={{
+                background: `rgba(${type.color},0.18)`,
+                color: `rgb(${type.color})`,
+                border: `1px solid rgba(${type.color},0.30)`,
+              }}>
+              {Math.round(catKcal)} kcal
+            </span>
+          )}
+          <motion.svg
+            width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke={`rgba(${type.color},0.70)`} strokeWidth="2.5"
+            animate={{ rotate: expanded ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <path d="M6 9l6 6 6-6"/>
+          </motion.svg>
+        </div>
+      </button>
+
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            style={{ overflow: 'hidden', borderTop: `1px solid rgba(${type.color},0.12)` }}
+          >
+            {/* Meals list */}
+            {meals.length > 0 && (
+              <ul className="px-3 py-2 space-y-1.5">
+                <AnimatePresence>
+                  {meals.map((meal) => (
+                    <motion.li
+                      key={meal.id}
+                      layout
+                      initial={{ opacity: 0, x: -8 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 8, height: 0 }}
+                      className="flex items-center gap-2.5 px-3 py-2 rounded-xl"
+                      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold truncate" style={{ color: '#F8FAFC' }}>{meal.name}</p>
+                        <div className="flex gap-2.5 mt-0.5">
+                          <MacroPill value={meal.protein} label="P" color="#22D3EE"/>
+                          <MacroPill value={meal.carbs}   label="C" color="#FB923C"/>
+                          <MacroPill value={meal.fat}     label="G" color="#F87171"/>
+                        </div>
+                      </div>
+                      <span className="text-[11px] font-bold flex-shrink-0"
+                        style={{ color: '#FCD34D' }}>{Math.round(meal.kcal)}</span>
+                      <motion.button
+                        onClick={() => onDelete(meal.id)}
+                        whileTap={{ scale: 0.80 }}
+                        className="flex-shrink-0 p-1 rounded-lg"
+                        style={{ background: 'rgba(248,113,113,0.10)', color: '#F87171' }}
+                      >
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <path d="M18 6L6 18M6 6l12 12"/>
+                        </svg>
+                      </motion.button>
+                    </motion.li>
+                  ))}
+                </AnimatePresence>
+              </ul>
+            )}
+
+            {/* Macro summary for this category */}
+            {meals.length > 0 && (
+              <div className="px-4 py-2 flex gap-4"
+                style={{ borderTop: `1px solid rgba(${type.color},0.10)` }}>
+                <MacroPill value={catProtein} label="Prot" color="#22D3EE"/>
+                <MacroPill value={catCarbs}   label="Carb" color="#FB923C"/>
+                <MacroPill value={catFat}     label="Gras" color="#F87171"/>
+              </div>
+            )}
+
+            {/* Add button */}
+            <div className="px-3 py-2.5">
+              <button
+                onClick={() => onAdd(type.key)}
+                className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold transition-all"
+                style={{
+                  background: `rgba(${type.color},0.10)`,
+                  border: `1px solid rgba(${type.color},0.25)`,
+                  color: `rgb(${type.color})`,
+                }}
+              >
+                <span>+</span>
+                <span>Aggiungi a {type.label}</span>
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
+// ── Main Component ─────────────────────────────────────────────────────────────
 
 export default function DiaryClient({ today, meals: initialMeals, stats }: DiaryClientProps) {
   const [meals, setMeals] = useState<Meal[]>(initialMeals ?? []);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
+  const [activeMealType, setActiveMealType] = useState<MealTypeKey>('colazione');
   const [isPending, startTransition] = useTransition();
 
-  // Add meal form state
   const [form, setForm] = useState({
     name: '', kcal: '', protein: '', carbs: '', fat: '', qty: '100', unit: 'g',
   });
   const [error, setError] = useState('');
 
-  function openAddSheet() {
+  function openAddSheet(typeKey: MealTypeKey) {
     setSelectedMeal(null);
+    setActiveMealType(typeKey);
     setForm({ name: '', kcal: '', protein: '', carbs: '', fat: '', qty: '100', unit: 'g' });
     setError('');
-    setSheetOpen(true);
-  }
-
-  function openDetailSheet(meal: Meal) {
-    setSelectedMeal(meal);
     setSheetOpen(true);
   }
 
@@ -64,7 +221,6 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
       const result = await deleteMealAction(today, mealId);
       if (result.success) {
         setMeals((prev) => prev.filter((m) => m.id !== mealId));
-        setSheetOpen(false);
       }
     });
   }
@@ -72,35 +228,26 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
     setError('');
-
     const kcal = parseInt(form.kcal, 10);
-    if (!form.name.trim() || isNaN(kcal)) {
-      setError('Inserisci nome e calorie.');
-      return;
-    }
+    if (!form.name.trim() || isNaN(kcal)) { setError('Inserisci nome e calorie.'); return; }
 
     startTransition(async () => {
       const result = await addMealAction(today, {
-        name: form.name.trim(),
-        kcal,
+        name: form.name.trim(), kcal,
         protein: parseFloat(form.protein) || 0,
         carbs: parseFloat(form.carbs) || 0,
         fat: parseFloat(form.fat) || 0,
         qty: parseFloat(form.qty) || 100,
-        unit: form.unit,
-        source: 'manual',
+        unit: form.unit, source: 'manual',
       });
-
       if (result.success) {
         const newMeal: Meal = {
-          id: result.mealId,
-          name: form.name.trim(),
-          kcal,
+          id: result.mealId, name: form.name.trim(), kcal,
           protein: parseFloat(form.protein) || 0,
           carbs: parseFloat(form.carbs) || 0,
           fat: parseFloat(form.fat) || 0,
-          qty: parseFloat(form.qty) || 100,
-          unit: form.unit,
+          qty: parseFloat(form.qty) || 100, unit: form.unit,
+          mealType: activeMealType,
         };
         setMeals((prev) => [...prev, newMeal]);
         setSheetOpen(false);
@@ -110,193 +257,171 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
     });
   }
 
+  // Group meals by type
+  const getMealsForType = (typeKey: string) =>
+    meals.filter((m) => (m.mealType ?? 'spuntino') === typeKey);
+
+  const activeType = MEAL_TYPES.find((t) => t.key === activeMealType)!;
+
   return (
     <>
-      {/* Daily summary bar */}
+      {/* ── Daily Summary ── */}
       {stats && (
-        <div
-          className="flex justify-between p-3 rounded-2xl mb-4 glass-amber"
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-4 p-4 rounded-2xl"
+          style={{
+            background: 'rgba(245,158,11,0.07)',
+            border: '1px solid rgba(245,158,11,0.22)',
+            backdropFilter: 'blur(16px)',
+          }}
         >
-          {[
-            { label: 'Kcal', value: stats.totalKcal, color: '#F8FAFC' },
-            { label: 'Prot', value: `${stats.totalProtein}g`, color: '#F8FAFC' },
-            { label: 'Carb', value: `${stats.totalCarbs}g`, color: '#F8FAFC' },
-            { label: 'Gras', value: `${stats.totalFat}g`, color: '#F8FAFC' },
-          ].map((item) => (
-            <div key={item.label} className="text-center">
-              <p
-                className="text-lg font-bold leading-none"
-                style={{ fontFamily: 'var(--font-ui)', color: item.color }}
-              >
-                {item.value}
-              </p>
-              <p
-                className="text-xs"
-                style={{ fontFamily: 'var(--font-ui)', color: 'rgba(248,250,252,0.65)' }}
-              >
-                {item.label}
-              </p>
-            </div>
-          ))}
-        </div>
+          <div className="flex justify-between items-center">
+            {[
+              { label: 'Calorie', value: `${Math.round(stats.totalKcal)}`, color: '#FCD34D' },
+              { label: 'Proteine', value: `${Math.round(stats.totalProtein)}g`, color: '#22D3EE' },
+              { label: 'Carboidrati', value: `${Math.round(stats.totalCarbs)}g`, color: '#FB923C' },
+              { label: 'Grassi', value: `${Math.round(stats.totalFat)}g`, color: '#F87171' },
+            ].map((item) => (
+              <div key={item.label} className="text-center">
+                <p className="text-lg font-black leading-none" style={{ color: item.color, fontFamily: 'var(--font-ui)' }}>
+                  {item.value}
+                </p>
+                <p className="text-[10px] font-semibold mt-0.5" style={{ color: 'rgba(248,250,252,0.45)' }}>
+                  {item.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
       )}
 
-      {/* Meals list */}
-      <div className="space-y-2 mb-4">
-        <AnimatePresence>
-          {meals.map((meal) => (
-            <motion.button
-              key={meal.id}
-              className="w-full text-left log-entry-pop"
-              onClick={() => openDetailSheet(meal)}
-              initial={{ opacity: 0, scaleY: 0 }}
-              animate={{ opacity: 1, scaleY: 1 }}
-              exit={{ opacity: 0, x: -40 }}
-              layout
-            >
-              <div
-                className="flex items-center justify-between px-4 py-3 rounded-2xl glass"
-              >
-                <div className="min-w-0">
-                  <p
-                    className="text-sm font-semibold truncate"
-                    style={{ fontFamily: 'var(--font-ui)', color: '#F8FAFC' }}
-                  >
-                    {meal.name}
-                  </p>
-                  <p
-                    className="text-xs"
-                    style={{ fontFamily: 'var(--font-ui)', color: 'rgba(248,250,252,0.65)' }}
-                  >
-                    {meal.qty} {meal.unit} · P {meal.protein}g · C {meal.carbs}g · G {meal.fat}g
-                  </p>
-                </div>
-                <span
-                  className="ml-3 flex-shrink-0 font-bold"
-                  style={{ fontFamily: 'var(--font-ui)', color: '#F8FAFC', fontSize: 15 }}
-                >
-                  {meal.kcal} kcal
-                </span>
-              </div>
-            </motion.button>
-          ))}
-        </AnimatePresence>
-
-        {meals.length === 0 && (
-          <div className="text-center py-8 opacity-60">
-            <p className="text-4xl mb-2">🍽️</p>
-            <p style={{ fontFamily: 'var(--font-ui)', color: 'rgba(248,250,252,0.65)' }}>
-              Nessun pasto registrato oggi
-            </p>
-          </div>
-        )}
+      {/* ── Meal Categories ── */}
+      <div className="space-y-3 mb-4">
+        {MEAL_TYPES.map((type) => (
+          <CategorySection
+            key={type.key}
+            type={type}
+            meals={getMealsForType(type.key)}
+            onAdd={openAddSheet}
+            onDelete={handleDelete}
+          />
+        ))}
       </div>
 
-      {/* FAB Add button */}
-      <button
-        onClick={openAddSheet}
-        className="btn btn-violet w-full"
-        style={{ fontSize: 15 }}
+      {/* ── Global Add FAB ── */}
+      <motion.button
+        onClick={() => openAddSheet('spuntino')}
+        className="w-full py-3.5 rounded-2xl text-sm font-bold"
+        style={{
+          background: 'linear-gradient(145deg, #8B5CF6, #7C3AED)',
+          color: '#fff',
+          fontFamily: 'var(--font-ui)',
+          border: '1px solid rgba(196,181,253,0.28)',
+          boxShadow: '0 4px 0 rgba(91,33,182,0.70), 0 8px 24px rgba(139,92,246,0.30)',
+        }}
+        whileHover={{ scale: 1.02, y: -2 }}
+        whileTap={{ scale: 0.98, y: 3 }}
       >
         + Aggiungi pasto
-      </button>
+      </motion.button>
 
-      {/* Detail sheet */}
-      <BottomSheet
-        isOpen={sheetOpen && selectedMeal !== null}
-        onClose={() => setSheetOpen(false)}
-        title={selectedMeal?.name}
-        size="auto"
-      >
-        {selectedMeal && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: 'Calorie', value: `${selectedMeal.kcal} kcal` },
-                { label: 'Porzione', value: `${selectedMeal.qty} ${selectedMeal.unit}` },
-                { label: 'Proteine', value: `${selectedMeal.protein}g` },
-                { label: 'Carboidrati', value: `${selectedMeal.carbs}g` },
-                { label: 'Grassi', value: `${selectedMeal.fat}g` },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="p-3 rounded-xl text-center glass"
-                >
-                  <p
-                    className="text-lg font-bold"
-                    style={{ fontFamily: 'var(--font-ui)', color: '#F8FAFC' }}
-                  >
-                    {item.value}
-                  </p>
-                  <p
-                    className="text-xs"
-                    style={{ fontFamily: 'var(--font-ui)', color: 'rgba(248,250,252,0.65)' }}
-                  >
-                    {item.label}
-                  </p>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={() => handleDelete(selectedMeal.id)}
-              disabled={isPending}
-              className="btn btn-rose w-full"
-            >
-              {isPending ? 'Eliminando...' : 'Elimina pasto'}
-            </button>
-          </div>
-        )}
-      </BottomSheet>
-
-      {/* Add meal sheet */}
+      {/* ── Add Meal Sheet ── */}
       <BottomSheet
         isOpen={sheetOpen && selectedMeal === null}
         onClose={() => setSheetOpen(false)}
-        title="Aggiungi pasto"
+        title={`Aggiungi a ${activeType.label} ${activeType.icon}`}
         size="auto"
       >
         <form onSubmit={handleAdd} className="space-y-3">
           {error && (
-            <p
-              className="text-sm px-3 py-2 rounded-xl"
-              style={{ fontFamily: 'var(--font-ui)', color: '#FDA4AF', background: 'rgba(244,63,94,0.15)', border: '1.5px solid rgba(244,63,94,0.3)' }}
-            >
+            <p className="text-sm px-3 py-2 rounded-xl"
+              style={{ color: '#FDA4AF', background: 'rgba(244,63,94,0.12)', border: '1.5px solid rgba(244,63,94,0.25)', fontFamily: 'var(--font-ui)' }}>
               {error}
             </p>
           )}
+          {/* Meal type selector */}
+          <div>
+            <label className="block text-xs font-bold mb-2" style={{ color: 'rgba(248,250,252,0.55)', fontFamily: 'var(--font-ui)' }}>
+              Tipo di pasto
+            </label>
+            <div className="grid grid-cols-4 gap-1.5">
+              {MEAL_TYPES.map((t) => (
+                <button
+                  key={t.key} type="button"
+                  onClick={() => setActiveMealType(t.key)}
+                  className="flex flex-col items-center gap-1 py-2 rounded-xl text-[10px] font-bold transition-all"
+                  style={{
+                    background: activeMealType === t.key ? `rgba(${t.color},0.20)` : 'rgba(255,255,255,0.05)',
+                    border: activeMealType === t.key ? `1px solid rgba(${t.color},0.40)` : '1px solid rgba(255,255,255,0.10)',
+                    color: activeMealType === t.key ? `rgb(${t.color})` : 'rgba(248,250,252,0.45)',
+                    fontFamily: 'var(--font-ui)',
+                  }}
+                >
+                  <span className="text-base">{t.icon}</span>
+                  {t.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
           {[
-            { key: 'name', label: 'Nome alimento', type: 'text', required: true },
-            { key: 'kcal', label: 'Calorie (kcal)', type: 'number', required: true },
-            { key: 'protein', label: 'Proteine (g)', type: 'number', required: false },
-            { key: 'carbs', label: 'Carboidrati (g)', type: 'number', required: false },
-            { key: 'fat', label: 'Grassi (g)', type: 'number', required: false },
-          ].map(({ key, label, type, required }) => (
+            { key: 'name', label: 'Nome alimento', type: 'text', required: true, placeholder: 'es. Pasta al pomodoro' },
+            { key: 'kcal', label: 'Calorie (kcal)', type: 'number', required: true, placeholder: '350' },
+            { key: 'protein', label: 'Proteine (g)', type: 'number', required: false, placeholder: '15' },
+            { key: 'carbs', label: 'Carboidrati (g)', type: 'number', required: false, placeholder: '45' },
+            { key: 'fat', label: 'Grassi (g)', type: 'number', required: false, placeholder: '8' },
+          ].map(({ key, label, type, required, placeholder }) => (
             <div key={key}>
-              <label
-                className="block text-xs font-semibold mb-1"
-                style={{ fontFamily: 'var(--font-ui)', color: 'rgba(248,250,252,0.65)' }}
-              >
+              <label className="block text-xs font-bold mb-1.5"
+                style={{ color: 'rgba(248,250,252,0.55)', fontFamily: 'var(--font-ui)' }}>
                 {label}
               </label>
               <input
-                type={type}
-                required={required}
+                type={type} required={required} placeholder={placeholder}
                 value={form[key as keyof typeof form]}
                 onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
                 className="glass-input w-full px-3 py-2.5 rounded-xl text-sm outline-none"
-                style={{
-                  fontFamily: 'var(--font-ui)',
-                  color: '#F8FAFC',
-                }}
+                style={{ fontFamily: 'var(--font-ui)', color: '#F8FAFC' }}
               />
             </div>
           ))}
-          <button
-            type="submit"
-            disabled={isPending}
-            className="btn btn-violet w-full"
-          >
-            {isPending ? 'Salvando...' : 'Aggiungi'}
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-xs font-bold mb-1.5"
+                style={{ color: 'rgba(248,250,252,0.55)', fontFamily: 'var(--font-ui)' }}>
+                Quantità
+              </label>
+              <input type="number" value={form.qty} onChange={(e) => setForm((f) => ({ ...f, qty: e.target.value }))}
+                className="glass-input w-full px-3 py-2.5 rounded-xl text-sm outline-none"
+                style={{ fontFamily: 'var(--font-ui)', color: '#F8FAFC' }}/>
+            </div>
+            <div>
+              <label className="block text-xs font-bold mb-1.5"
+                style={{ color: 'rgba(248,250,252,0.55)', fontFamily: 'var(--font-ui)' }}>
+                Unità
+              </label>
+              <select value={form.unit} onChange={(e) => setForm((f) => ({ ...f, unit: e.target.value }))}
+                className="glass-input w-full px-3 py-2.5 rounded-xl text-sm outline-none"
+                style={{ fontFamily: 'var(--font-ui)', color: '#F8FAFC', background: 'rgba(255,255,255,0.06)' }}>
+                <option value="g">grammi (g)</option>
+                <option value="ml">millilitri (ml)</option>
+                <option value="porz">porzione</option>
+                <option value="pz">pezzo</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" disabled={isPending}
+            className="w-full py-3 rounded-2xl text-sm font-bold disabled:opacity-55"
+            style={{
+              background: `linear-gradient(145deg, rgb(${activeType.color}), rgba(${activeType.color},0.80))`,
+              color: '#fff', fontFamily: 'var(--font-ui)',
+              boxShadow: `0 4px 0 rgba(${activeType.color},0.50)`,
+            }}>
+            {isPending ? 'Salvataggio...' : `${activeType.icon} Aggiungi a ${activeType.label}`}
           </button>
         </form>
       </BottomSheet>

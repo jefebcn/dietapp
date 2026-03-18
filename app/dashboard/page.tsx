@@ -147,6 +147,7 @@ export default async function DashboardPage() {
           <DashboardClient
             uid={uid} today={today} stats={stats} goals={goals}
             todayMeals={todayMeals} weekStats={weekStats} userName={user.name ?? ''}
+            streak={streak} tip={tip}
           />
         </Suspense>
       </main>

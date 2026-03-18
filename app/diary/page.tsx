@@ -42,30 +42,14 @@ export default async function DiaryPage() {
   return (
     <div className="relative min-h-screen">
       {/* Header */}
-      <header
-        className="sticky top-0 z-30"
-        style={{
-          background: 'rgba(8,11,20,0.82)',
-          backdropFilter: 'blur(28px)',
-          WebkitBackdropFilter: 'blur(28px)',
-          borderBottom: '1px solid rgba(255,255,255,0.07)',
-        }}
-      >
+      <header className="page-header">
         <div className="max-w-2xl mx-auto px-4 py-3">
-          <h1
-            className="text-2xl"
-            style={{ fontFamily: 'var(--font-display)', color: '#F8FAFC' }}
-          >
+          <p className="text-xs font-semibold capitalize" style={{ color: 'rgba(248,250,252,0.45)' }}>
+            {new Date().toLocaleDateString('it-IT', { weekday: 'long', day: 'numeric', month: 'long' })}
+          </p>
+          <h1 className="text-xl" style={{ fontFamily: 'var(--font-display)', color: '#F8FAFC', textShadow: '0 0 24px rgba(245,158,11,0.40)' }}>
             📖 Diario Alimentare
           </h1>
-          <p
-            className="text-xs"
-            style={{ fontFamily: 'var(--font-ui)', color: 'rgba(248,250,252,0.65)' }}
-          >
-            {new Date().toLocaleDateString('it-IT', {
-              weekday: 'long', day: 'numeric', month: 'long',
-            })}
-          </p>
         </div>
       </header>
 
