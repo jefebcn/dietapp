@@ -92,36 +92,39 @@ export default async function DashboardPage() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="relative min-h-screen bg-slate-900">
+    <div className="relative min-h-screen" style={{ background: '#f7f3e9' }}>
 
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-white/8"
+      <header
+        className="sticky top-0 z-30"
         style={{
-          background: 'rgba(15,23,42,0.80)',
+          background: 'rgba(247,243,233,0.88)',
           backdropFilter: 'blur(16px)',
           WebkitBackdropFilter: 'blur(16px)',
+          borderBottom: '1.5px solid rgba(210,185,140,0.30)',
+          boxShadow: '0 2px 12px rgba(90,58,20,0.08)',
         }}
       >
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <div>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs" style={{ color: '#a08060' }}>
               {new Date().toLocaleDateString('it-IT', {
                 weekday: 'long',
                 day: 'numeric',
                 month: 'long',
               })}
             </p>
-            <h1 className="font-serif text-lg font-bold text-white leading-tight">
+            <h1 className="font-serif text-lg font-bold leading-tight" style={{ color: '#3d2a0a' }}>
               Ciao, {user.name?.split(' ')[0] || 'amico'}! 👋
             </h1>
           </div>
           <div className="flex items-center gap-3">
             <span
-              className="text-xs font-semibold px-3 py-1 rounded-full border"
+              className="text-xs font-semibold px-3 py-1 rounded-full"
               style={{
-                background: 'rgba(74,222,128,0.12)',
-                color: '#4ade80',
-                borderColor: 'rgba(74,222,128,0.3)',
+                background: 'rgba(136,176,75,0.15)',
+                color: '#5a7a1a',
+                border: '1.5px solid rgba(136,176,75,0.35)',
               }}
             >
               NutriPoints
@@ -135,15 +138,23 @@ export default async function DashboardPage() {
         {/* Sprinty tip card */}
         <section aria-label="Consiglio di Sprinty">
           <div
-            className="glass-card flex gap-4 items-center p-4"
-            style={{ borderColor: 'rgba(251,191,36,0.3)' }}
+            className="flex gap-4 items-center p-4"
+            style={{
+              background: 'linear-gradient(160deg, #fffdf8 0%, #faf5ea 100%)',
+              borderRadius: '1.5rem',
+              border: '1.5px solid rgba(217,119,6,0.22)',
+              boxShadow: [
+                '0 8px 24px rgba(90,58,20,0.10)',
+                'inset 0 1.5px 0 rgba(255,255,255,0.80)',
+              ].join(', '),
+            }}
           >
             <SprintyAssistant mood="tip" size="sm" className="flex-shrink-0" />
             <div className="min-w-0">
-              <p className="text-xs font-semibold text-amber-400 uppercase tracking-wide mb-0.5">
+              <p className="text-xs font-semibold uppercase tracking-wide mb-0.5" style={{ color: '#d97706' }}>
                 Consiglio di Sprinty
               </p>
-              <p className="text-sm text-slate-300 leading-snug">{sprintyTip}</p>
+              <p className="text-sm leading-snug" style={{ color: '#7a5c2e' }}>{sprintyTip}</p>
             </div>
           </div>
         </section>
@@ -152,7 +163,14 @@ export default async function DashboardPage() {
         <section aria-label="Riepilogo nutrizionale odierno">
           <Suspense
             fallback={
-              <div className="glass-card flex justify-center py-10">
+              <div
+                className="flex justify-center py-10"
+                style={{
+                  background: 'linear-gradient(160deg,#fffdf8 0%,#faf5ea 100%)',
+                  borderRadius: '2rem',
+                  boxShadow: '0 10px 32px rgba(90,58,20,0.14), inset 0 1.5px 0 rgba(255,255,255,0.80)',
+                }}
+              >
                 <SprintyAssistant mood="loading" size="md" />
               </div>
             }
