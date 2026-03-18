@@ -394,7 +394,6 @@ function MealRow({ meal, onDelete }: { meal: Meal; onDelete: (id: string) => voi
           className="p-1.5 rounded-xl transition-colors disabled:opacity-40"
           style={{ background: '#FFE4E6', color: '#BE123C', border: '1.5px solid #FECDD3' }}
           whileTap={{ scale: 0.85 }}
-          whileHover={{ background: '#FECDD3' } as React.CSSProperties}
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
             <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
