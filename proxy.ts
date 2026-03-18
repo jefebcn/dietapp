@@ -2,7 +2,8 @@
  * proxy.ts  –  NutriTrack Session Proxy
  *
  * This file contains the full session-gate logic for the Next.js Edge Runtime.
- * It is re-exported by middleware.ts (the required Next.js entry point).
+ * It is re-exported by middleware.ts (the required Next.js entry point) as
+ * `middleware` to satisfy Next.js routing conventions.
  *
  * Strategy
  * ────────
@@ -72,9 +73,9 @@ function isSessionApparentlyValid(cookie: string | undefined): boolean {
   return exp * 1000 > Date.now();
 }
 
-// ── Middleware (exported for middleware.ts to re-export) ──────────────────────
+// ── Proxy function (exported for middleware.ts to re-export as middleware) ────
 
-export function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const sessionCookie = request.cookies.get('__session')?.value;
   const valid = isSessionApparentlyValid(sessionCookie);
@@ -107,7 +108,7 @@ export function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// ── Route matcher config (re-exported alongside middleware) ───────────────────
+// ── Route matcher config (re-exported alongside proxy) ───────────────────────
 
 export const config = {
   /**

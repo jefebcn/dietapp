@@ -1,14 +1,26 @@
 /**
  * middleware.ts  –  Next.js Edge Runtime entry point
  *
- * Re-exports the full session proxy logic from proxy.ts.
- * Keeping the implementation in proxy.ts makes it independently testable
- * and follows the "proxy convention" for session-cookie middleware.
- *
- * The firebase-admin __session cookie is verified in two stages:
- *   1. Edge (here via proxy.ts) – lightweight JWT expiry check (atob, no crypto).
- *   2. Node.js runtime           – full cryptographic check per API/page route
- *      via getAdminAuth().verifySessionCookie(cookie, true).
+ * Next.js requires `middleware` and `config` to be defined (or re-exported)
+ * directly from this file — it cannot statically analyse re-exports from
+ * other modules. The `config` matcher is therefore inlined here, while the
+ * full proxy logic lives in proxy.ts for independent testability.
  */
 
-export { middleware, config } from './proxy';
+export { proxy as middleware } from './proxy';
+
+/**
+ * Route matcher – inlined here because Next.js static analysis cannot follow
+ * re-exports from other files for the `config` field.
+ *
+ * Matches everything EXCEPT:
+ *   _next/static|image  – internal Next.js assets
+ *   favicon.ico         – browser favicon
+ *   manifest.json       – PWA manifest
+ *   *.png|jpg|svg|webp  – static image files
+ */
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon\\.ico|manifest\\.json|icons/|images/|.*\\.(?:png|jpg|jpeg|svg|webp|ico)).*)',
+  ],
+};

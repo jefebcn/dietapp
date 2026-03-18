@@ -6,6 +6,13 @@
  * Design language: Claymorphism – warm cream (#f7f3e9) base, clay card surfaces
  * Palette: Avocado Green (#88b04b) · Amber (#d97706) · Rose (#f43f5e)
  * Animation: Framer Motion micro-interactions via ClayCard interactive prop
+ *
+ * Bento Grid Layout:
+ *   Row 1: [Calorie ring – col-span-1 row-span-2] [Macros – col-span-1]
+ *                                                  [NutriPoints – col-span-1]
+ *   Row 2: [Weekly chart – col-span-2]             [Water – col-span-1]
+ *   Row 3: [Quick actions – col-span-3 3x1-col grid]
+ *   Row 4: [Today's meals – col-span-3]
  */
 
 import { useState } from 'react';
@@ -13,6 +20,16 @@ import useSWR from 'swr';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ClayCard } from '@/components/ClayCard';
 import SprintyAssistant from '@/components/SprintyAssistant';
+
+// ── Shared Claymorphic shadow preset (applied to all grid items) ─────────────
+
+const CLAY_SHADOW_ELEVATED = [
+  '0 24px 64px rgba(90,58,20,0.18)',
+  '0 8px 24px rgba(90,58,20,0.12)',
+  '0 2px 6px rgba(90,58,20,0.08)',
+  'inset 0 2px 0 rgba(255,255,255,0.85)',
+  'inset 0 -2px 0 rgba(90,58,20,0.08)',
+].join(', ');
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -84,9 +101,7 @@ function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
         <circle cx="74" cy="74" r={radius} fill="none" stroke="rgba(90,58,20,0.12)" strokeWidth="12" />
         {/* Progress */}
         <motion.circle
-          cx="74"
-          cy="74"
-          r={radius}
+          cx="74" cy="74" r={radius}
           fill="none"
           stroke={isOver ? '#f43f5e' : '#88b04b'}
           strokeWidth="12"
@@ -132,15 +147,9 @@ function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
 // ── Macro bar ────────────────────────────────────────────────────────────────
 
 function MacroBar({
-  label,
-  value,
-  goal,
-  color,
+  label, value, goal, color,
 }: {
-  label: string;
-  value: number;
-  goal: number;
-  color: string;
+  label: string; value: number; goal: number; color: string;
 }) {
   const pct = Math.min((value / Math.max(goal, 1)) * 100, 100);
 
@@ -155,10 +164,7 @@ function MacroBar({
           <span style={{ color: '#c8a878' }}> / {goal}g</span>
         </span>
       </div>
-      <div
-        className="h-2 rounded-full overflow-hidden"
-        style={{ background: 'rgba(90,58,20,0.10)' }}
-      >
+      <div className="h-2.5 rounded-full overflow-hidden" style={{ background: 'rgba(90,58,20,0.10)' }}>
         <motion.div
           className="h-full rounded-full"
           style={{ backgroundColor: color }}
@@ -175,6 +181,38 @@ function MacroBar({
   );
 }
 
+// ── NutriPoints mini-card ─────────────────────────────────────────────────────
+
+function NutriPointsCard({ stats, goals }: { stats: DailyStats; goals: Goals }) {
+  const kcalPct = goals.kcal > 0 ? stats.totalKcal / goals.kcal : 0;
+  const proteinPct = goals.protein > 0 ? stats.totalProtein / goals.protein : 0;
+  const avgPct = (kcalPct + proteinPct) / 2;
+  const points = Math.round(Math.min(avgPct, 1) * 100);
+
+  return (
+    <div className="flex flex-col items-center justify-center gap-1 h-full">
+      <span className="text-3xl font-black font-mono" style={{ color: '#88b04b' }}>
+        {points}
+      </span>
+      <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#a08060' }}>
+        NutriPoints
+      </span>
+      <div
+        className="mt-1 px-2 py-0.5 rounded-full text-xs font-semibold"
+        style={{
+          background: points >= 80
+            ? 'rgba(136,176,75,0.15)' : points >= 50
+            ? 'rgba(217,119,6,0.12)' : 'rgba(244,63,94,0.10)',
+          color: points >= 80 ? '#5a7a1a' : points >= 50 ? '#92400e' : '#e11d48',
+          border: `1px solid ${points >= 80 ? 'rgba(136,176,75,0.30)' : points >= 50 ? 'rgba(217,119,6,0.25)' : 'rgba(244,63,94,0.25)'}`,
+        }}
+      >
+        {points >= 80 ? '🌟 Ottimo!' : points >= 50 ? '👍 Buono' : '💪 Continua'}
+      </div>
+    </div>
+  );
+}
+
 // ── Water tracker ────────────────────────────────────────────────────────────
 
 function WaterTracker({ glasses = 0 }: { glasses?: number }) {
@@ -184,15 +222,15 @@ function WaterTracker({ glasses = 0 }: { glasses?: number }) {
   return (
     <div>
       <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: '#a08060' }}>
-        Acqua
+        Acqua 💧
       </p>
       <div className="flex flex-wrap gap-1.5">
         {Array.from({ length: goal }).map((_, i) => (
           <motion.button
             key={i}
             onClick={() => setCount(i < count ? i : i + 1)}
-            whileTap={{ scale: 0.82 }}
-            className="w-7 h-7 rounded-lg flex items-center justify-center text-base transition-all"
+            whileTap={{ scale: 0.80 }}
+            className="w-7 h-7 rounded-xl flex items-center justify-center text-base transition-all"
             style={
               i < count
                 ? {
@@ -212,7 +250,7 @@ function WaterTracker({ glasses = 0 }: { glasses?: number }) {
           </motion.button>
         ))}
       </div>
-      <p className="text-xs mt-1.5" style={{ color: '#c8a878' }}>
+      <p className="text-xs mt-2" style={{ color: '#c8a878' }}>
         {count} / {goal} bicchieri
       </p>
     </div>
@@ -245,7 +283,7 @@ function WeeklyChart({ weekStats, goalKcal }: { weekStats: DailyStats[]; goalKca
                   className="w-full rounded-t-md"
                   style={{
                     backgroundColor: isToday ? '#88b04b' : isOver ? '#f43f5e' : '#c8a878',
-                    opacity: isToday ? 1 : 0.6,
+                    opacity: isToday ? 1 : 0.65,
                     boxShadow: isToday
                       ? '0 0 8px rgba(136,176,75,0.45), inset 0 1px 0 rgba(255,255,255,0.4)'
                       : undefined,
@@ -364,10 +402,24 @@ export default function DashboardClient({
   return (
     <div className="space-y-4">
 
-      {/* ── Row 1: Calorie ring + Macros ── */}
-      <div className="grid grid-cols-2 gap-4">
+      {/*
+        ── Row 1: 3-column Bento ─────────────────────────────────────────────
+        Col 0: Calorie ring (col-span-1, row-span-2 via grid rows trick)
+        Col 1: Macros
+        Col 2: NutriPoints
+      */}
+      <div className="grid grid-cols-3 gap-4">
 
-        <ClayCard elevated interactive className="flex flex-col items-center justify-center gap-2 p-4 col-span-1">
+        {/* Calorie Ring – large hero card (col-span-1 tall) */}
+        <div
+          className="rounded-[2rem] flex flex-col items-center justify-center gap-2 p-4 col-span-1 row-span-2"
+          style={{
+            background: 'linear-gradient(160deg, #fffdf8 0%, #faf5ea 100%)',
+            border: '1.5px solid rgba(210,185,140,0.30)',
+            boxShadow: CLAY_SHADOW_ELEVATED,
+            gridRow: 'span 2',
+          }}
+        >
           <p className="text-xs font-semibold uppercase tracking-wide self-start" style={{ color: '#a08060' }}>
             Calorie
           </p>
@@ -387,9 +439,15 @@ export default function DashboardClient({
               Obiettivo!
             </motion.div>
           )}
-        </ClayCard>
+        </div>
 
-        <ClayCard elevated interactive className="flex flex-col justify-center gap-4 p-4 col-span-1">
+        {/* Macros – col-span-2 to fill remaining space on row 1 */}
+        <ClayCard
+          elevated
+          interactive
+          className="flex flex-col justify-center gap-3.5 p-4 col-span-2"
+          style={{ boxShadow: CLAY_SHADOW_ELEVATED }}
+        >
           <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#a08060' }}>
             Macro
           </p>
@@ -399,7 +457,45 @@ export default function DashboardClient({
         </ClayCard>
       </div>
 
-      {/* ── Row 2: Quick actions ── */}
+      {/*
+        ── Row 2: Weekly chart + Water (below macros, right of calorie ring) ──
+        Uses a separate grid to avoid spanning complexity
+      */}
+      {weekStats.length > 0 && (
+        <div className="grid grid-cols-3 gap-4">
+          <ClayCard
+            elevated
+            interactive
+            className="col-span-2 p-4"
+            style={{ boxShadow: CLAY_SHADOW_ELEVATED }}
+          >
+            <WeeklyChart weekStats={weekStats} goalKcal={goals.kcal} />
+          </ClayCard>
+          <ClayCard
+            elevated
+            interactive
+            className="col-span-1 p-4 flex flex-col"
+            style={{ boxShadow: CLAY_SHADOW_ELEVATED }}
+          >
+            <WaterTracker />
+            {/* NutriPoints mini inside water card on mobile */}
+            <div
+              className="mt-auto pt-3 flex items-center gap-2"
+              style={{ borderTop: '1px solid rgba(90,58,20,0.08)' }}
+            >
+              <span className="text-2xl font-black font-mono" style={{ color: '#88b04b' }}>
+                {Math.round(Math.min((stats.totalKcal / Math.max(goals.kcal, 1)), 1) * 100)}
+              </span>
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide leading-tight" style={{ color: '#a08060' }}>NutriPts</p>
+                <p className="text-xs" style={{ color: '#c8a878' }}>oggi</p>
+              </div>
+            </div>
+          </ClayCard>
+        </div>
+      )}
+
+      {/* ── Row 3: Quick actions (3-col) ── */}
       <div className="grid grid-cols-3 gap-3">
         {[
           { label: 'Cerca cibo',  icon: '🔍', href: '/diary',        glow: 'blue'  as const },
@@ -411,31 +507,31 @@ export default function DashboardClient({
             interactive
             glow={action.glow}
             className="flex flex-col items-center gap-2 p-4 text-center"
+            style={{ boxShadow: CLAY_SHADOW_ELEVATED }}
             role="link"
             onClick={() => { window.location.href = action.href; }}
             tabIndex={0}
             aria-label={action.label}
           >
-            <span className="text-2xl" aria-hidden="true">{action.icon}</span>
+            <motion.span
+              className="text-2xl"
+              aria-hidden="true"
+              animate={{ y: [0, -4, 0] }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: Math.random() * 1 }}
+            >
+              {action.icon}
+            </motion.span>
             <span className="text-xs font-semibold" style={{ color: '#7a5c2e' }}>{action.label}</span>
           </ClayCard>
         ))}
       </div>
 
-      {/* ── Row 3: Weekly chart + Water ── */}
-      {weekStats.length > 0 && (
-        <div className="grid grid-cols-3 gap-4">
-          <ClayCard elevated interactive className="col-span-2 p-4">
-            <WeeklyChart weekStats={weekStats} goalKcal={goals.kcal} />
-          </ClayCard>
-          <ClayCard elevated interactive className="col-span-1 p-4">
-            <WaterTracker />
-          </ClayCard>
-        </div>
-      )}
-
-      {/* ── Row 4: Today's meals ── */}
-      <ClayCard elevated className="p-4">
+      {/* ── Row 4: Today's meals (full width) ── */}
+      <ClayCard
+        elevated
+        className="p-4 col-span-3"
+        style={{ boxShadow: CLAY_SHADOW_ELEVATED }}
+      >
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold" style={{ color: '#3d2a0a' }}>
             Pasti di oggi

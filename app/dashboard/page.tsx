@@ -53,7 +53,7 @@ function getSprintyTip(
 
 export default async function DashboardPage() {
   // ── Auth ─────────────────────────────────────────────────────────────────
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const sessionCookie = cookieStore.get('__session')?.value;
   if (!sessionCookie) redirect('/login');
 

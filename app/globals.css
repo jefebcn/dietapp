@@ -79,6 +79,37 @@
   --orange:   #f59e0b;
   --muted:    #94a3b8;
   --border:   rgba(255,255,255,0.12);
+
+  /* ── Claymorphic / Puffy UI tokens ── */
+  --clay-bg:        linear-gradient(160deg, #fffdf8 0%, #faf5ea 100%);
+  --clay-bg-page:   #f7f3e9;
+  --clay-border:    rgba(210,185,140,0.30);
+  --clay-shadow:
+    0 24px 64px rgba(90,58,20,0.18),
+    0 8px 24px rgba(90,58,20,0.12),
+    0 2px 6px rgba(90,58,20,0.08),
+    inset 0 2px 0 rgba(255,255,255,0.85),
+    inset 0 -2px 0 rgba(90,58,20,0.08);
+  --clay-shadow-sm:
+    0 10px 32px rgba(90,58,20,0.14),
+    0 3px 10px rgba(90,58,20,0.08),
+    inset 0 1.5px 0 rgba(255,255,255,0.80),
+    inset 0 -1.5px 0 rgba(90,58,20,0.06);
+  --puffy-shadow:
+    34px 34px 68px rgba(178,155,120,0.55),
+    -34px -34px 68px rgba(255,255,255,0.90),
+    inset -6px -6px 14px rgba(90,58,20,0.12),
+    inset 8px 8px 18px rgba(255,255,255,0.92);
+
+  /* Avocado green (clay palette) */
+  --clay-green:     #88b04b;
+  --clay-green-dk:  #6b8e23;
+  --clay-green-lt:  #b0cc60;
+  --clay-amber:     #d97706;
+  --clay-rose:      #f43f5e;
+  --clay-text:      #3d2a0a;
+  --clay-muted:     #a08060;
+  --clay-subtle:    #c8a878;
 }
 
 /* ── Base reset / defaults ───────────────────────────────────────────────── */
@@ -262,4 +293,90 @@ body::before {
   0%   { transform: translateX(0) scaleX(1);  }
   50%  { transform: translateX(4px) scaleX(1.05); }
   100% { transform: translateX(0) scaleX(1);  }
+}
+
+/* ── Puffy UI / Claymorphic extra keyframes ──────────────────────────────── */
+
+/* Animated gradient background drift (login page, hero sections) */
+@keyframes bg-drift {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Floating translateY for interactive elements */
+@keyframes float-interactive {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-6px); }
+}
+
+/* Gentle float for decorative food props */
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  33%       { transform: translateY(-10px) rotate(1.5deg); }
+  66%       { transform: translateY(-5px) rotate(-1deg); }
+}
+
+/* Spin for loading spinners */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Clay card entrance */
+@keyframes clay-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── Utility classes ─────────────────────────────────────────────────────── */
+
+/* Animated cream gradient background (used by login page) */
+.bg-cream-animated {
+  background: linear-gradient(-45deg, #f7f3e9, #fdf0e8, #f3ede0, #faf5ec);
+  background-size: 400% 400%;
+  animation: bg-drift 12s ease infinite;
+}
+
+/* Floating interactive element */
+.float-interactive {
+  animation: float-interactive 3s ease-in-out infinite;
+}
+
+/* Slow float for decorations */
+.float-slow {
+  animation: float-slow 5s ease-in-out infinite;
+}
+
+/* Clay card with Claymorphic shadow preset */
+.clay-card {
+  background: linear-gradient(160deg, #fffdf8 0%, #faf5ea 100%);
+  border: 1.5px solid rgba(210,185,140,0.30);
+  border-radius: 2rem;
+  box-shadow:
+    0 24px 64px rgba(90,58,20,0.18),
+    0 8px 24px rgba(90,58,20,0.12),
+    0 2px 6px rgba(90,58,20,0.08),
+    inset 0 2px 0 rgba(255,255,255,0.85),
+    inset 0 -2px 0 rgba(90,58,20,0.08);
+  animation: clay-enter 0.4s ease both;
+}
+
+/* Puffy card (larger border-radius, glass effect) */
+.puffy-card {
+  background: rgba(255, 255, 255, 0.60);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: 50px;
+  border: 1.5px solid rgba(255,255,255,0.45);
+  box-shadow:
+    34px 34px 68px rgba(178,155,120,0.55),
+    -34px -34px 68px rgba(255,255,255,0.90),
+    inset -6px -6px 14px rgba(90,58,20,0.12),
+    inset 8px 8px 18px rgba(255,255,255,0.92);
 }

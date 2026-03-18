@@ -56,8 +56,8 @@ async function searchEdamam(query, page = 0) {
 
   const res = await fetch(url.toString(), {
     headers: { Accept: 'application/json' },
-    // Next.js fetch cache – revalidate every 5 minutes
-    next: { revalidate: 300 },
+    // Next.js Data Cache – 24-hour stale-while-revalidate window for nutritional data
+    next: { revalidate: 86400, tags: ['nutrition'] },
   });
 
   if (!res.ok) {
@@ -108,7 +108,8 @@ async function searchOpenFoodFacts(query) {
 
   const res = await fetch(url.toString(), {
     headers: { 'User-Agent': 'NutriTrack/2.0 (nutritrack.it)' },
-    next: { revalidate: 300 },
+    // Next.js Data Cache – 24-hour stale-while-revalidate window
+    next: { revalidate: 86400, tags: ['nutrition'] },
   });
 
   if (!res.ok) {
@@ -172,9 +173,9 @@ export async function GET(request) {
 
     return NextResponse.json(payload, {
       headers: {
-        // Serve fresh for 10s, use stale while revalidating for up to 60s,
-        // CDN/Vercel Edge caches for 5 minutes
-        'Cache-Control': 'public, max-age=10, stale-while-revalidate=60, s-maxage=300',
+        // Serve fresh for 10s, use stale while revalidating for up to 24 hours,
+        // CDN/Vercel Edge caches for 24 hours (nutritional data changes rarely)
+        'Cache-Control': 'public, max-age=10, stale-while-revalidate=86400, s-maxage=86400',
       },
     });
   } catch (err) {
