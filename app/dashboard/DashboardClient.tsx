@@ -1,116 +1,89 @@
 'use client';
 
 /**
- * DashboardClient  –  Disney Cartoon Bento Grid Dashboard
+ * DashboardClient  –  Dark Glass Dashboard
  *
- * Design language: Vibrant cartoon style – each data card has its own
- * color identity with a 3D stamp shadow (0 6px 0 [accent]).
- *
- * Card themes:
- *   Calorie ring  – Green  (#F0FDF4 / #16A34A stamp)
- *   Macros        – Blue   (#EFF6FF / #1D4ED8 stamp)
- *   Weekly chart  – Amber  (#FFFBEB / #B45309 stamp)
- *   Water         – Cyan   (#ECFEFF / #0E7490 stamp)
- *   Quick actions – individual vivid colors
- *   Meals list    – Warm neutral (#FFFBEB / #CA8A04 stamp)
+ * Design: Deep space backdrop + frosted glass cards + neon data.
+ * Data colors: Amber (calories) · Cyan (protein) · Orange (carbs) · Rose (fat)
  */
 
 import { useState } from 'react';
 import useSWR from 'swr';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// ── Types ───────────────────────────────────────────────────────────────────
+// ── Types ────────────────────────────────────────────────────────────────────
 
 interface Meal {
-  id: string;
-  name: string;
-  kcal: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-  qty: number;
-  unit: string;
-  addedAt: string;
+  id: string; name: string; kcal: number;
+  protein: number; carbs: number; fat: number;
+  qty: number; unit: string; addedAt: string;
 }
-
 interface DailyStats {
-  date: string;
-  totalKcal: number;
-  totalProtein: number;
-  totalCarbs: number;
-  totalFat: number;
-  mealCount: number;
+  date: string; totalKcal: number; totalProtein: number;
+  totalCarbs: number; totalFat: number; mealCount: number;
 }
-
-interface Goals {
-  kcal: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-}
-
+interface Goals { kcal: number; protein: number; carbs: number; fat: number; }
 interface Props {
-  uid: string;
-  today: string;
-  stats: DailyStats;
-  goals: Goals;
-  todayMeals: Meal[];
-  weekStats: DailyStats[];
-  userName: string;
+  uid: string; today: string; stats: DailyStats; goals: Goals;
+  todayMeals: Meal[]; weekStats: DailyStats[]; userName: string;
 }
 
-// ── SWR fetcher ─────────────────────────────────────────────────────────────
+// ── Glass card presets ────────────────────────────────────────────────────────
 
-const fetcher = (url: string) => fetch(url).then((r) => r.json());
-
-// ── Card style presets ───────────────────────────────────────────────────────
-
-const CARD = {
-  indigo: {
-    background: 'linear-gradient(145deg, #EEF2FF 0%, #E0E7FF 100%)',
-    border: '2.5px solid #A5B4FC',
+const G = {
+  base: {
+    background: 'rgba(255,255,255,0.07)',
+    border: '1px solid rgba(255,255,255,0.12)',
     borderRadius: '1.5rem',
-    boxShadow: '0 6px 0 #4338CA, 0 10px 28px rgba(67,56,202,0.18), inset 0 2px 0 rgba(255,255,255,0.70)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    boxShadow: '0 8px 32px rgba(0,0,0,0.32), inset 0 1px 0 rgba(255,255,255,0.08)',
   },
-  blue: {
-    background: 'linear-gradient(145deg, #EFF6FF 0%, #DBEAFE 100%)',
-    border: '2.5px solid #93C5FD',
+  violet: {
+    background: 'rgba(139,92,246,0.10)',
+    border: '1px solid rgba(139,92,246,0.30)',
     borderRadius: '1.5rem',
-    boxShadow: '0 6px 0 #1D4ED8, 0 10px 28px rgba(29,78,216,0.15), inset 0 2px 0 rgba(255,255,255,0.70)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    boxShadow: '0 8px 32px rgba(139,92,246,0.14), inset 0 1px 0 rgba(255,255,255,0.08)',
   },
   amber: {
-    background: 'linear-gradient(145deg, #FFFBEB 0%, #FEF3C7 100%)',
-    border: '2.5px solid #FDE68A',
+    background: 'rgba(245,158,11,0.08)',
+    border: '1px solid rgba(245,158,11,0.28)',
     borderRadius: '1.5rem',
-    boxShadow: '0 6px 0 #B45309, 0 10px 28px rgba(180,83,9,0.15), inset 0 2px 0 rgba(255,255,255,0.70)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    boxShadow: '0 8px 32px rgba(245,158,11,0.10)',
+  },
+  cyan: {
+    background: 'rgba(34,211,238,0.07)',
+    border: '1px solid rgba(34,211,238,0.22)',
+    borderRadius: '1.5rem',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    boxShadow: '0 8px 32px rgba(34,211,238,0.08)',
   },
   emerald: {
-    background: 'linear-gradient(145deg, #ECFDF5 0%, #D1FAE5 100%)',
-    border: '2.5px solid #6EE7B7',
+    background: 'rgba(52,211,153,0.07)',
+    border: '1px solid rgba(52,211,153,0.22)',
     borderRadius: '1.5rem',
-    boxShadow: '0 6px 0 #059669, 0 10px 28px rgba(5,150,105,0.15), inset 0 2px 0 rgba(255,255,255,0.70)',
-  },
-  purple: {
-    background: 'linear-gradient(145deg, #F5F3FF 0%, #EDE9FE 100%)',
-    border: '2.5px solid #C4B5FD',
-    borderRadius: '1.5rem',
-    boxShadow: '0 6px 0 #6D28D9, 0 10px 28px rgba(109,40,217,0.15), inset 0 2px 0 rgba(255,255,255,0.70)',
-  },
-  neutral: {
-    background: 'linear-gradient(145deg, #F8FAFC 0%, #F1F5F9 100%)',
-    border: '2.5px solid #CBD5E1',
-    borderRadius: '1.5rem',
-    boxShadow: '0 6px 0 #475569, 0 10px 28px rgba(71,85,105,0.12), inset 0 2px 0 rgba(255,255,255,0.70)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    boxShadow: '0 8px 32px rgba(52,211,153,0.08)',
   },
   rose: {
-    background: 'linear-gradient(145deg, #FFF1F2 0%, #FFE4E6 100%)',
-    border: '2.5px solid #FECDD3',
+    background: 'rgba(248,113,113,0.07)',
+    border: '1px solid rgba(248,113,113,0.22)',
     borderRadius: '1.5rem',
-    boxShadow: '0 6px 0 #BE123C, 0 10px 28px rgba(190,18,60,0.15), inset 0 2px 0 rgba(255,255,255,0.70)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    boxShadow: '0 8px 32px rgba(248,113,113,0.08)',
   },
 } as const;
 
-// ── Calorie ring ─────────────────────────────────────────────────────────────
+const fetcher = (url: string) => fetch(url).then((r) => r.json());
+
+// ── Calorie Ring ─────────────────────────────────────────────────────────────
 
 function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
   const radius = 52;
@@ -125,89 +98,81 @@ function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
       <svg width="148" height="148" viewBox="0 0 148 148" aria-hidden="true">
         <defs>
           <filter id="ring-glow">
-            <feGaussianBlur stdDeviation="3" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
+            <feGaussianBlur stdDeviation="4" result="blur" />
+            <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
           </filter>
+          <linearGradient id="kcal-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor={isOver ? '#F87171' : '#F59E0B'} />
+            <stop offset="100%" stopColor={isOver ? '#EF4444' : '#FCD34D'} />
+          </linearGradient>
         </defs>
         {/* Track */}
-        <circle cx="74" cy="74" r={radius} fill="none" stroke="rgba(67,56,202,0.15)" strokeWidth="13" />
+        <circle cx="74" cy="74" r={radius} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="13" />
         {/* Progress */}
         <motion.circle
           cx="74" cy="74" r={radius}
           fill="none"
-          stroke={isOver ? '#F43F5E' : 'url(#kcal-grad)'}
+          stroke="url(#kcal-grad)"
           strokeWidth="13"
           strokeLinecap="round"
           strokeDasharray={circumference}
           initial={{ strokeDashoffset: circumference }}
           animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 1.2, ease: 'easeOut' }}
+          transition={{ duration: 1.4, ease: 'easeOut' }}
           transform="rotate(-90 74 74)"
           filter="url(#ring-glow)"
         />
-        <defs>
-          <linearGradient id="kcal-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#818CF8" />
-            <stop offset="100%" stopColor="#6366F1" />
-          </linearGradient>
-        </defs>
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <motion.span
-          className="text-2xl leading-none"
-          style={{ color: '#312E81', fontWeight: 900 }}
+          className="text-2xl leading-none font-black"
+          style={{ color: isOver ? '#F87171' : '#FCD34D' }}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3, duration: 0.4 }}
         >
           {consumed.toLocaleString('it-IT')}
         </motion.span>
-        <span className="text-xs mt-0.5 font-bold" style={{ color: '#4338CA' }}>
+        <span className="text-[10px] mt-0.5 font-bold" style={{ color: 'rgba(248,250,252,0.55)' }}>
           / {goal.toLocaleString('it-IT')} kcal
         </span>
         <span
-          className="text-xs font-extrabold mt-1.5 px-2 py-0.5 rounded-full"
+          className="text-[10px] font-bold mt-1.5 px-2 py-0.5 rounded-full"
           style={
             isOver
-              ? { background: '#FFE4E6', color: '#BE123C', border: '1.5px solid #FECDD3' }
-              : { background: '#E0E7FF', color: '#3730A3', border: '1.5px solid #A5B4FC' }
+              ? { background: 'rgba(248,113,113,0.18)', color: '#FCA5A5', border: '1px solid rgba(248,113,113,0.35)' }
+              : { background: 'rgba(245,158,11,0.18)', color: '#FCD34D', border: '1px solid rgba(245,158,11,0.35)' }
           }
         >
-          {isOver
-            ? `+${remaining.toLocaleString('it-IT')} oltre`
-            : `${remaining.toLocaleString('it-IT')} rimaste`}
+          {isOver ? `+${remaining.toLocaleString('it-IT')} oltre` : `${remaining.toLocaleString('it-IT')} rim.`}
         </span>
       </div>
     </div>
   );
 }
 
-// ── Macro bar ────────────────────────────────────────────────────────────────
+// ── Macro Bar ─────────────────────────────────────────────────────────────────
 
 function MacroBar({
-  label, value, goal, color, trackColor, textColor,
+  label, value, goal, fillClass, labelColor, trackColor,
 }: {
-  label: string; value: number; goal: number; color: string; trackColor: string; textColor: string;
+  label: string; value: number; goal: number;
+  fillClass: string; labelColor: string; trackColor?: string;
 }) {
   const pct = Math.min((value / Math.max(goal, 1)) * 100, 100);
-
   return (
     <div>
       <div className="flex justify-between items-baseline mb-1.5">
-        <span className="text-xs font-extrabold uppercase tracking-wide" style={{ color: textColor }}>
+        <span className="text-xs font-bold uppercase tracking-wide" style={{ color: labelColor }}>
           {label}
         </span>
-        <span className="text-xs font-bold" style={{ color: textColor, opacity: 0.8 }}>
+        <span className="text-xs font-semibold" style={{ color: 'rgba(248,250,252,0.55)' }}>
           {Math.round(value)}<span style={{ opacity: 0.6 }}>/{goal}g</span>
         </span>
       </div>
-      <div className="h-3 rounded-full overflow-hidden" style={{ background: trackColor, border: '1.5px solid rgba(0,0,0,0.06)' }}>
+      <div className="macro-track" style={trackColor ? { background: trackColor } : {}}>
         <motion.div
-          className="h-full rounded-full"
-          style={{ background: color }}
+          className={`h-full rounded-full ${fillClass}`}
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
           transition={{ duration: 0.9, ease: 'easeOut', delay: 0.2 }}
@@ -221,50 +186,38 @@ function MacroBar({
   );
 }
 
-// ── Water tracker ────────────────────────────────────────────────────────────
+// ── Water Tracker ─────────────────────────────────────────────────────────────
 
 function WaterTracker({ glasses = 0 }: { glasses?: number }) {
   const [count, setCount] = useState(glasses);
   const goal = 8;
-
   return (
     <div>
-      <p className="text-xs font-extrabold uppercase tracking-wide mb-2" style={{ color: '#4338CA' }}>
-        Acqua
-      </p>
-      <div className="flex flex-wrap gap-1.5">
+      <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: '#22D3EE' }}>Acqua</p>
+      <div className="flex flex-wrap gap-1">
         {Array.from({ length: goal }).map((_, i) => (
           <motion.button
             key={i}
             onClick={() => setCount(i < count ? i : i + 1)}
-            whileTap={{ scale: 0.75 }}
-            className="w-7 h-7 rounded-xl flex items-center justify-center text-base transition-all"
+            whileTap={{ scale: 0.72 }}
+            className="w-6 h-6 rounded-lg flex items-center justify-center text-xs transition-all"
             style={
               i < count
-                ? {
-                    background: 'linear-gradient(145deg, #A5F3FC, #67E8F9)',
-                    border: '2px solid #0E7490',
-                    boxShadow: '0 3px 0 #0E7490',
-                  }
-                : {
-                    background: 'rgba(14,116,144,0.08)',
-                    border: '2px solid rgba(14,116,144,0.20)',
-                  }
+                ? { background: 'rgba(34,211,238,0.25)', border: '1px solid rgba(34,211,238,0.60)', boxShadow: '0 0 10px rgba(34,211,238,0.40)' }
+                : { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.12)' }
             }
-            aria-label={`Bicchiere ${i + 1}${i < count ? ' (bevuto)' : ''}`}
-          >
-            💧
-          </motion.button>
+            aria-label={`Bicchiere ${i + 1}`}
+          >💧</motion.button>
         ))}
       </div>
-      <p className="text-xs mt-2 font-bold" style={{ color: '#4338CA' }}>
-        {count} / {goal} bicchieri
+      <p className="text-xs mt-1.5 font-semibold" style={{ color: 'rgba(34,211,238,0.70)' }}>
+        {count}/{goal} bicchieri
       </p>
     </div>
   );
 }
 
-// ── Weekly mini-chart ────────────────────────────────────────────────────────
+// ── Weekly Chart ──────────────────────────────────────────────────────────────
 
 function WeeklyChart({ weekStats, goalKcal }: { weekStats: DailyStats[]; goalKcal: number }) {
   const max = Math.max(goalKcal * 1.25, ...weekStats.map((d) => d.totalKcal), 100);
@@ -273,7 +226,7 @@ function WeeklyChart({ weekStats, goalKcal }: { weekStats: DailyStats[]; goalKca
 
   return (
     <div>
-      <p className="text-xs font-extrabold uppercase tracking-wide mb-3" style={{ color: '#4338CA' }}>
+      <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: 'rgba(248,250,252,0.55)' }}>
         Ultime 7 giornate
       </p>
       <div className="flex items-end gap-1.5 h-16">
@@ -282,86 +235,64 @@ function WeeklyChart({ weekStats, goalKcal }: { weekStats: DailyStats[]; goalKca
           const isToday = day.date === today;
           const isOver = day.totalKcal > goalKcal;
           const d = new Date(day.date + 'T12:00:00');
-
           return (
             <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
               <div className="w-full flex flex-col justify-end" style={{ height: 52 }}>
                 <motion.div
-                  className="w-full rounded-t-lg"
+                  className="w-full rounded-t-md"
                   style={{
                     background: isToday
-                      ? 'linear-gradient(180deg, #818CF8 0%, #6366F1 100%)'
+                      ? 'linear-gradient(180deg, #FBBF24, #F59E0B)'
                       : isOver
-                      ? 'linear-gradient(180deg, #FB7185 0%, #F43F5E 100%)'
-                      : 'linear-gradient(180deg, #C7D2FE 0%, #A5B4FC 100%)',
-                    boxShadow: isToday ? '0 3px 0 #4338CA' : undefined,
-                    border: isToday ? '2px solid #818CF8' : '1px solid rgba(0,0,0,0.08)',
+                      ? 'linear-gradient(180deg, #F87171, #EF4444)'
+                      : 'rgba(255,255,255,0.12)',
+                    boxShadow: isToday ? '0 0 12px rgba(245,158,11,0.60)' : undefined,
                   }}
                   initial={{ height: 0 }}
-                  animate={{ height: `${Math.max(pct, day.totalKcal > 0 ? 10 : 2)}%` }}
+                  animate={{ height: `${Math.max(pct, day.totalKcal > 0 ? 8 : 2)}%` }}
                   transition={{ duration: 0.6, delay: idx * 0.05, ease: 'easeOut' }}
                   title={`${day.date}: ${Math.round(day.totalKcal)} kcal`}
                 />
               </div>
-              <span
-                className="text-[10px] font-extrabold"
-                style={{ color: isToday ? '#4338CA' : '#6366F1', opacity: isToday ? 1 : 0.55 }}
-              >
+              <span className="text-[9px] font-bold" style={{ color: isToday ? '#FBBF24' : 'rgba(248,250,252,0.40)' }}>
                 {days[d.getDay()]}
               </span>
             </div>
           );
         })}
       </div>
-      <p className="text-xs mt-2 font-bold" style={{ color: '#4338CA', opacity: 0.7 }}>
-        Obiettivo: {goalKcal.toLocaleString('it-IT')} kcal/gg
+      <p className="text-[10px] mt-2 font-semibold" style={{ color: 'rgba(248,250,252,0.38)' }}>
+        Target: {goalKcal.toLocaleString('it-IT')} kcal/gg
       </p>
     </div>
   );
 }
 
-// ── NutriPoints mini-widget ───────────────────────────────────────────────────
+// ── NutriPoints ───────────────────────────────────────────────────────────────
 
 function NutriPointsWidget({ stats, goals }: { stats: DailyStats; goals: Goals }) {
-  const kcalPct = goals.kcal > 0 ? stats.totalKcal / goals.kcal : 0;
-  const proteinPct = goals.protein > 0 ? stats.totalProtein / goals.protein : 0;
-  const avgPct = (kcalPct + proteinPct) / 2;
-  const points = Math.round(Math.min(avgPct, 1) * 100);
-
-  const badge =
-    points >= 80 ? { label: '🌟 Ottimo!', bg: '#BBF7D0', color: '#14532D' }
-    : points >= 50 ? { label: '👍 Buono',  bg: '#FEF3C7', color: '#92400E' }
-    : { label: '💪 Dai!',   bg: '#FFE4E6', color: '#BE123C' };
-
+  const avg = ((stats.totalKcal / Math.max(goals.kcal, 1)) + (stats.totalProtein / Math.max(goals.protein, 1))) / 2;
+  const points = Math.round(Math.min(avg, 1) * 100);
+  const badge = points >= 80 ? { label: '🌟 Top!', color: '#34D399' }
+    : points >= 50 ? { label: '👍 Bene', color: '#FBBF24' }
+    : { label: '💪 Dai!', color: '#F87171' };
   return (
-    <div className="flex items-center gap-2 pt-3 mt-auto" style={{ borderTop: '2px solid rgba(67,56,202,0.12)' }}>
-      <span className="text-2xl font-black leading-none" style={{ color: '#4338CA' }}>
+    <div className="flex items-center gap-2 pt-2.5 mt-auto" style={{ borderTop: '1px solid rgba(255,255,255,0.08)' }}>
+      <span className="text-2xl font-black" style={{ color: '#A78BFA', textShadow: '0 0 16px rgba(167,139,250,0.60)' }}>
         {points}
       </span>
       <div>
-        <p className="text-xs font-extrabold uppercase tracking-wide" style={{ color: '#4338CA' }}>NutriPts</p>
-        <span
-          className="text-xs font-bold px-1.5 py-0.5 rounded-full"
-          style={{ background: badge.bg, color: badge.color }}
-        >
-          {badge.label}
-        </span>
+        <p className="text-[10px] font-bold uppercase tracking-wide" style={{ color: 'rgba(167,139,250,0.70)' }}>NutriPts</p>
+        <span className="text-[10px] font-bold" style={{ color: badge.color }}>{badge.label}</span>
       </div>
     </div>
   );
 }
 
-// ── Meal row ─────────────────────────────────────────────────────────────────
+// ── Meal Row ──────────────────────────────────────────────────────────────────
 
 function MealRow({ meal, onDelete }: { meal: Meal; onDelete: (id: string) => void }) {
   const [deleting, setDeleting] = useState(false);
-
-  const handleDelete = async () => {
-    setDeleting(true);
-    await onDelete(meal.id);
-    setDeleting(false);
-  };
-
   return (
     <motion.li
       layout
@@ -369,32 +300,33 @@ function MealRow({ meal, onDelete }: { meal: Meal; onDelete: (id: string) => voi
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 8, height: 0 }}
       className="flex items-center gap-3 py-2.5 last:border-0"
-      style={{ borderBottom: '2px solid rgba(67,56,202,0.10)' }}
+      style={{ borderBottom: '1px solid rgba(255,255,255,0.06)' }}
     >
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-extrabold truncate" style={{ color: '#1A2E1A' }}>
-          {meal.name}
-        </p>
-        <p className="text-xs font-bold" style={{ color: '#4338CA', opacity: 0.75 }}>
-          {meal.qty}{meal.unit} · P <span style={{ color: '#1D4ED8' }}>{Math.round(meal.protein)}g</span> · C <span style={{ color: '#D97706' }}>{Math.round(meal.carbs)}g</span> · G <span style={{ color: '#BE123C' }}>{Math.round(meal.fat)}g</span>
+        <p className="text-sm font-bold truncate" style={{ color: '#F8FAFC' }}>{meal.name}</p>
+        <p className="text-xs" style={{ color: 'rgba(248,250,252,0.50)' }}>
+          {meal.qty}{meal.unit} ·{' '}
+          <span style={{ color: '#67E8F9' }}>P {Math.round(meal.protein)}g</span>{' '}·{' '}
+          <span style={{ color: '#FDBA74' }}>C {Math.round(meal.carbs)}g</span>{' '}·{' '}
+          <span style={{ color: '#FCA5A5' }}>G {Math.round(meal.fat)}g</span>
         </p>
       </div>
       <div className="flex items-center gap-2 flex-shrink-0">
         <span
-          className="text-sm font-black px-2 py-0.5 rounded-full"
-          style={{ background: '#E0E7FF', color: '#3730A3', border: '1.5px solid #A5B4FC' }}
+          className="text-xs font-bold px-2 py-0.5 rounded-full"
+          style={{ background: 'rgba(245,158,11,0.18)', color: '#FCD34D', border: '1px solid rgba(245,158,11,0.30)' }}
         >
           {Math.round(meal.kcal)} kcal
         </span>
         <motion.button
-          onClick={handleDelete}
+          onClick={async () => { setDeleting(true); await onDelete(meal.id); setDeleting(false); }}
           disabled={deleting}
           aria-label={`Elimina ${meal.name}`}
-          className="p-1.5 rounded-xl transition-colors disabled:opacity-40"
-          style={{ background: '#FFE4E6', color: '#BE123C', border: '1.5px solid #FECDD3' }}
+          className="p-1.5 rounded-xl disabled:opacity-40"
+          style={{ background: 'rgba(248,113,113,0.12)', color: '#F87171', border: '1px solid rgba(248,113,113,0.22)' }}
           whileTap={{ scale: 0.85 }}
         >
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
           </svg>
         </motion.button>
@@ -403,64 +335,52 @@ function MealRow({ meal, onDelete }: { meal: Meal; onDelete: (id: string) => voi
   );
 }
 
-// ── Quick action card ─────────────────────────────────────────────────────────
+// ── Quick Action ──────────────────────────────────────────────────────────────
 
-function QuickAction({
-  label, icon, href, cardStyle, labelColor,
-}: {
-  label: string; icon: string; href: string;
-  cardStyle: React.CSSProperties; labelColor: string;
+function QuickAction({ label, icon, href, accent }: {
+  label: string; icon: string; href: string; accent: string;
 }) {
   return (
     <motion.div
-      role="link"
-      tabIndex={0}
+      role="link" tabIndex={0}
       onClick={() => { window.location.href = href; }}
       onKeyDown={(e) => { if (e.key === 'Enter') window.location.href = href; }}
-      className="flex flex-col items-center gap-2 p-4 text-center cursor-pointer select-none"
-      style={cardStyle}
-      whileHover={{ scale: 1.04, y: -3, transition: { type: 'spring', stiffness: 340, damping: 22 } }}
-      whileTap={{ scale: 0.96, y: 4 }}
+      className="flex flex-col items-center gap-1.5 py-3 px-2 text-center cursor-pointer select-none rounded-2xl"
+      style={{
+        background: `rgba(${accent},0.08)`,
+        border: `1px solid rgba(${accent},0.22)`,
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+      }}
+      whileHover={{ scale: 1.06, y: -3, transition: { type: 'spring', stiffness: 340, damping: 22 } }}
+      whileTap={{ scale: 0.94, y: 2 }}
     >
       <motion.span
         className="text-2xl"
-        aria-hidden="true"
         animate={{ y: [0, -5, 0] }}
-        transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+        transition={{ duration: 2.6, repeat: Infinity, ease: 'easeInOut' }}
       >
         {icon}
       </motion.span>
-      <span className="text-xs font-extrabold" style={{ color: labelColor }}>{label}</span>
+      <span className="text-[10px] font-bold" style={{ color: `rgba(248,250,252,0.70)` }}>{label}</span>
     </motion.div>
   );
 }
 
-// ── Main component ───────────────────────────────────────────────────────────
+// ── Main Component ────────────────────────────────────────────────────────────
 
 export default function DashboardClient({
-  uid,
-  today,
-  stats: initialStats,
-  goals,
-  todayMeals: initialMeals,
-  weekStats,
-  userName,
+  uid, today, stats: initialStats, goals, todayMeals: initialMeals, weekStats, userName,
 }: Props) {
-  const { data: mealsData, mutate } = useSWR(
-    `/api/meals?date=${today}`,
-    fetcher,
-    {
-      fallbackData: { meals: initialMeals, stats: initialStats },
-      refreshInterval: 30_000,
-      revalidateOnFocus: true,
-    }
-  );
+  const { data: mealsData, mutate } = useSWR(`/api/meals?date=${today}`, fetcher, {
+    fallbackData: { meals: initialMeals, stats: initialStats },
+    refreshInterval: 30_000,
+    revalidateOnFocus: true,
+  });
 
   const meals: Meal[] = mealsData?.meals ?? initialMeals;
   const stats: DailyStats = mealsData?.stats ?? initialStats;
-
-  const goalPct = Math.min((stats.totalKcal / Math.max(goals.kcal, 1)) * 100, 100);
-  const hitGoal = goalPct >= 85 && stats.totalKcal <= goals.kcal * 1.05;
+  const hitGoal = stats.totalKcal >= goals.kcal * 0.85 && stats.totalKcal <= goals.kcal * 1.05;
 
   const handleDeleteMeal = async (mealId: string) => {
     await fetch(`/api/meals/${mealId}?date=${today}`, { method: 'DELETE' });
@@ -468,20 +388,19 @@ export default function DashboardClient({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
 
-      {/* ── Row 1: Calorie Ring (tall) + Macros ── */}
-      <div className="grid grid-cols-3 gap-4">
-
-        {/* Calorie Ring – indigo hero card, spans 2 rows */}
+      {/* ── Row 1: Calorie Ring + Macros ── */}
+      <div className="grid grid-cols-3 gap-3">
+        {/* Calorie card — spans 2 rows */}
         <motion.div
           className="col-span-1 flex flex-col items-center justify-center gap-2 p-4"
-          style={{ ...CARD.indigo, gridRow: 'span 2' }}
+          style={{ ...G.amber, gridRow: 'span 2' }}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: 'easeOut' }}
         >
-          <p className="text-xs font-extrabold uppercase tracking-wide self-start" style={{ color: '#3730A3' }}>
+          <p className="text-xs font-bold uppercase tracking-wide self-start" style={{ color: 'rgba(252,211,77,0.70)' }}>
             Calorie
           </p>
           <CalorieRing consumed={Math.round(stats.totalKcal)} goal={goals.kcal} />
@@ -489,46 +408,37 @@ export default function DashboardClient({
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex items-center gap-1.5 text-xs font-extrabold px-2 py-1 rounded-full"
-              style={{ background: '#E0E7FF', color: '#3730A3', border: '2px solid #A5B4FC' }}
+              className="flex items-center gap-1 text-xs font-bold px-2 py-1 rounded-full"
+              style={{ background: 'rgba(52,211,153,0.18)', color: '#6EE7B7', border: '1px solid rgba(52,211,153,0.30)' }}
             >
               ✨ Obiettivo!
             </motion.div>
           )}
         </motion.div>
 
-        {/* Macros – blue card, col-span-2 */}
+        {/* Macros */}
         <motion.div
           className="col-span-2 flex flex-col justify-center gap-3.5 p-4"
-          style={CARD.blue}
+          style={G.base}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: 'easeOut', delay: 0.08 }}
         >
-          <p className="text-xs font-extrabold uppercase tracking-wide" style={{ color: '#1D4ED8' }}>
+          <p className="text-xs font-bold uppercase tracking-wide" style={{ color: 'rgba(248,250,252,0.55)' }}>
             Macronutrienti
           </p>
-          <MacroBar
-            label="Proteine" value={stats.totalProtein} goal={goals.protein}
-            color="linear-gradient(90deg, #60A5FA, #3B82F6)" trackColor="#BFDBFE" textColor="#1E3A8A"
-          />
-          <MacroBar
-            label="Carboidrati" value={stats.totalCarbs} goal={goals.carbs}
-            color="linear-gradient(90deg, #FBBF24, #F59E0B)" trackColor="#FDE68A" textColor="#78350F"
-          />
-          <MacroBar
-            label="Grassi" value={stats.totalFat} goal={goals.fat}
-            color="linear-gradient(90deg, #FB7185, #F43F5E)" trackColor="#FECDD3" textColor="#881337"
-          />
+          <MacroBar label="Proteine"    value={stats.totalProtein} goal={goals.protein} fillClass="macro-fill-cyan"   labelColor="#22D3EE" />
+          <MacroBar label="Carboidrati" value={stats.totalCarbs}   goal={goals.carbs}   fillClass="macro-fill-orange" labelColor="#FB923C" />
+          <MacroBar label="Grassi"      value={stats.totalFat}     goal={goals.fat}     fillClass="macro-fill-rose"   labelColor="#F87171" />
         </motion.div>
       </div>
 
-      {/* ── Row 2: Weekly chart + Water (below macros, right of calorie ring) ── */}
+      {/* ── Row 2: Weekly Chart + Water ── */}
       {weekStats.length > 0 && (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-3">
           <motion.div
             className="col-span-2 p-4"
-            style={CARD.indigo}
+            style={G.base}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: 'easeOut', delay: 0.16 }}
@@ -536,8 +446,8 @@ export default function DashboardClient({
             <WeeklyChart weekStats={weekStats} goalKcal={goals.kcal} />
           </motion.div>
           <motion.div
-            className="col-span-1 p-4 flex flex-col"
-            style={CARD.emerald}
+            className="col-span-1 p-3.5 flex flex-col"
+            style={G.cyan}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: 'easeOut', delay: 0.22 }}
@@ -548,53 +458,29 @@ export default function DashboardClient({
         </div>
       )}
 
-      {/* ── Row 3: Quick actions ── */}
-      <div className="grid grid-cols-4 gap-3">
-        <QuickAction
-          label="Diario"
-          icon="📋"
-          href="/diary"
-          cardStyle={CARD.blue}
-          labelColor="#1D4ED8"
-        />
-        <QuickAction
-          label="Peso"
-          icon="⚖️"
-          href="/weight"
-          cardStyle={CARD.indigo}
-          labelColor="#4338CA"
-        />
-        <QuickAction
-          label="Leghe"
-          icon="🏆"
-          href="/leagues"
-          cardStyle={CARD.purple}
-          labelColor="#6D28D9"
-        />
-        <QuickAction
-          label="Impost."
-          icon="⚙️"
-          href="/settings"
-          cardStyle={CARD.amber}
-          labelColor="#B45309"
-        />
+      {/* ── Row 3: Quick Actions ── */}
+      <div className="grid grid-cols-4 gap-2.5">
+        <QuickAction label="Diario"   icon="📋" href="/diary"     accent="34,211,238" />
+        <QuickAction label="Peso"     icon="⚖️" href="/weight"    accent="245,158,11" />
+        <QuickAction label="Leghe"    icon="🏆" href="/leagues"   accent="168,85,247" />
+        <QuickAction label="Imposta." icon="⚙️" href="/settings"  accent="248,113,113" />
       </div>
 
-      {/* ── Row 4: Today's meals ── */}
+      {/* ── Row 4: Today's Meals ── */}
       <motion.div
         className="p-4"
-        style={CARD.indigo}
+        style={G.base}
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: 'easeOut', delay: 0.30 }}
       >
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-extrabold" style={{ color: '#1E1B4B' }}>
+          <h3 className="text-sm font-bold" style={{ color: '#F8FAFC' }}>
             Pasti di oggi
             {meals.length > 0 && (
               <span
-                className="ml-2 text-xs font-extrabold px-2 py-0.5 rounded-full"
-                style={{ background: '#E0E7FF', color: '#3730A3', border: '1.5px solid #A5B4FC' }}
+                className="ml-2 text-xs font-bold px-2 py-0.5 rounded-full"
+                style={{ background: 'rgba(139,92,246,0.18)', color: '#C4B5FD', border: '1px solid rgba(139,92,246,0.30)' }}
               >
                 {meals.length}
               </span>
@@ -602,15 +488,15 @@ export default function DashboardClient({
           </h3>
           <motion.a
             href="/diary"
-            className="text-xs font-extrabold px-3 py-1.5 rounded-full"
+            className="text-xs font-bold px-3 py-1.5 rounded-full"
             style={{
-              background: 'linear-gradient(145deg, #EEF2FF, #E0E7FF)',
-              color: '#3730A3',
-              border: '2px solid #A5B4FC',
-              boxShadow: '0 3px 0 #4338CA',
+              background: 'rgba(139,92,246,0.18)',
+              color: '#C4B5FD',
+              border: '1px solid rgba(139,92,246,0.35)',
+              boxShadow: '0 0 12px rgba(139,92,246,0.25)',
             }}
-            whileHover={{ scale: 1.05, y: -1 }}
-            whileTap={{ scale: 0.97, y: 2 }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.97 }}
           >
             + Aggiungi
           </motion.a>
@@ -623,11 +509,9 @@ export default function DashboardClient({
             className="py-8 flex flex-col items-center gap-2 text-center"
           >
             <span className="text-4xl">🍽️</span>
-            <p className="text-sm font-bold" style={{ color: '#4338CA' }}>
-              Nessun pasto ancora
-            </p>
-            <p className="text-xs" style={{ color: '#6366F1', opacity: 0.8 }}>
-              Aggiungi il tuo primo pasto per iniziare a tracciare!
+            <p className="text-sm font-bold" style={{ color: 'rgba(248,250,252,0.65)' }}>Nessun pasto ancora</p>
+            <p className="text-xs" style={{ color: 'rgba(248,250,252,0.40)' }}>
+              Aggiungi il tuo primo pasto per iniziare!
             </p>
           </motion.div>
         ) : (

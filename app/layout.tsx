@@ -30,17 +30,17 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'NutriTrack',
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#22C55E',
+  themeColor: '#080B14',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
-  viewportFit: 'cover', // Required for iOS safe-area insets
+  viewportFit: 'cover',
 };
 
 // ── Root Layout ────────────────────────────────────────────────────────────
@@ -53,16 +53,22 @@ export default function RootLayout({
   return (
     <html lang="it">
       <head>
-        {/* Preconnect for performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* Nunito (body), Nunito Sans (headings), Fredoka (UI labels) */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Nunito+Sans:wght@700;800;900&family=Fredoka:wght@300;400;500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka:wght@300;400;500;600;700&display=swap"
           rel="stylesheet"
         />
       </head>
       <body className="antialiased min-h-screen">
+        {/* ── Animated Dark Background ── */}
+        <div className="app-bg" aria-hidden="true">
+          <div className="bg-orb bg-orb-violet" />
+          <div className="bg-orb bg-orb-cyan" />
+          <div className="bg-orb bg-orb-amber" />
+        </div>
+
+        {/* ── App Content ── */}
         <AuthProvider>
           {children}
         </AuthProvider>

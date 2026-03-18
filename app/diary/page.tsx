@@ -40,34 +40,27 @@ export default async function DiaryPage() {
   ]);
 
   return (
-    <div
-      className="relative min-h-screen"
-      style={{
-        background: 'linear-gradient(160deg, #FFFBEB 0%, #FEF3C7 45%, #FFF7ED 100%)',
-        backgroundAttachment: 'fixed',
-      }}
-    >
+    <div className="relative min-h-screen">
       {/* Header */}
       <header
         className="sticky top-0 z-30"
         style={{
-          background: 'rgba(255,251,235,0.92)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '2.5px solid #FDE68A',
-          boxShadow: '0 4px 20px rgba(180,83,9,0.10)',
+          background: 'rgba(8,11,20,0.82)',
+          backdropFilter: 'blur(28px)',
+          WebkitBackdropFilter: 'blur(28px)',
+          borderBottom: '1px solid rgba(255,255,255,0.07)',
         }}
       >
         <div className="max-w-2xl mx-auto px-4 py-3">
           <h1
             className="text-2xl"
-            style={{ fontFamily: 'var(--font-display)', color: '#78350F' }}
+            style={{ fontFamily: 'var(--font-display)', color: '#F8FAFC' }}
           >
             📖 Diario Alimentare
           </h1>
           <p
             className="text-xs"
-            style={{ fontFamily: 'var(--font-ui)', color: '#B45309' }}
+            style={{ fontFamily: 'var(--font-ui)', color: 'rgba(248,250,252,0.65)' }}
           >
             {new Date().toLocaleDateString('it-IT', {
               weekday: 'long', day: 'numeric', month: 'long',
