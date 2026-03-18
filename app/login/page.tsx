@@ -22,7 +22,6 @@
  */
 
 import { useState, useTransition, useEffect } from 'react';
-import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
   motion,
@@ -40,6 +39,8 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { getClientAuth, googleProvider } from '@/lib/firebase-client.config';
+import Sprinty3D from '@/components/Sprinty3D';
+import { Apple3D, Olives3D, Spatula3D } from '@/components/FoodProps3D';
 
 // ── Error map ────────────────────────────────────────────────────────────────
 
@@ -102,20 +103,14 @@ const CLAY_SHADOW_DEEP =
 
 /** Floating food decoration */
 function FloatProp({
-  src,
-  alt,
-  width,
-  height,
+  children,
   style,
   floatDelay = 0,
   floatY = 15,
   blur = false,
   rotate = 0,
 }: {
-  src: string;
-  alt: string;
-  width: number;
-  height: number;
+  children: React.ReactNode;
   style?: React.CSSProperties;
   floatDelay?: number;
   floatY?: number;
@@ -127,20 +122,13 @@ function FloatProp({
       style={{
         position: 'absolute',
         filter: blur ? 'blur(2px)' : undefined,
+        transform: rotate ? `rotate(${rotate}deg)` : undefined,
         ...style,
       }}
       animate={{ y: [0, -floatY, 0] }}
       transition={{ duration: 4.2, repeat: Infinity, ease: 'easeInOut', delay: floatDelay }}
     >
-      <Image
-        src={src}
-        alt={alt}
-        width={width}
-        height={height}
-        style={{ transform: rotate ? `rotate(${rotate}deg)` : undefined, objectFit: 'contain' }}
-        priority={false}
-        unoptimized
-      />
+      {children}
     </motion.div>
   );
 }
@@ -428,26 +416,20 @@ export default function LoginPage() {
         {/* ── Depth-of-field floating decorations ── */}
         <div style={{ position: 'fixed', inset: 0, pointerEvents: 'none', zIndex: 1 }} aria-hidden="true">
 
-          {/* Apple – top-left, sharpest (closest) */}
-          <FloatProp
-            src="/apple.png" alt="" width={130} height={140}
-            style={{ left: -18, top: 48 }}
-            floatDelay={0} floatY={15}
-          />
+          {/* Apple – top-left */}
+          <FloatProp style={{ left: -18, top: 48 }} floatDelay={0} floatY={15}>
+            <Apple3D size={130} />
+          </FloatProp>
 
-          {/* Olives – bottom-left, blurred (mid distance) */}
-          <FloatProp
-            src="/olives.png" alt="" width={110} height={90}
-            style={{ left: -6, bottom: 80 }}
-            floatDelay={0.8} floatY={12} blur
-          />
+          {/* Olives – bottom-left, blurred */}
+          <FloatProp style={{ left: -6, bottom: 80 }} floatDelay={0.8} floatY={12} blur>
+            <Olives3D size={110} />
+          </FloatProp>
 
           {/* Spatula – top-right, rotated */}
-          <FloatProp
-            src="/spatula.png" alt="" width={100} height={180}
-            style={{ right: -10, top: 30 }}
-            floatDelay={0.4} floatY={15} rotate={-15}
-          />
+          <FloatProp style={{ right: -10, top: 30 }} floatDelay={0.4} floatY={15} rotate={-15}>
+            <Spatula3D size={100} />
+          </FloatProp>
         </div>
 
         {/* ── Content column ── */}
@@ -469,29 +451,50 @@ export default function LoginPage() {
                 ? { x: [0, 4, -4, 4, 0], transition: { duration: 0.4, repeat: Infinity } }
                 : { scale: [1, 1.022, 1], transition: { duration: 3.6, repeat: Infinity, ease: 'easeInOut' } }
               }
+              aria-label="Sprinty, la mascotte avocado di NutriTrack"
             >
-              <Image
-                src="/sprinty.png"
-                alt="Sprinty, la mascotte avocado di NutriTrack"
-                width={200}
-                height={240}
-                style={{ objectFit: 'contain', display: 'block' }}
-                priority
-                unoptimized
-              />
+              <Sprinty3D width={200} />
             </motion.div>
 
             {/* Pedestal – sits directly below Sprinty, overlaps feet */}
             <div style={{ marginTop: -22, position: 'relative', zIndex: -1 }}>
-              <Image
-                src="/pedestal.png"
-                alt=""
-                width={240}
-                height={90}
-                style={{ objectFit: 'contain', display: 'block' }}
-                priority
-                unoptimized
-              />
+              <svg width="240" height="90" viewBox="0 0 240 90" aria-hidden="true">
+                <defs>
+                  <linearGradient id="ped-top" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#d4a96a" />
+                    <stop offset="100%" stopColor="#b8863c" />
+                  </linearGradient>
+                  <linearGradient id="ped-front" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#c8903a" />
+                    <stop offset="100%" stopColor="#8a5c1a" />
+                  </linearGradient>
+                  <linearGradient id="ped-side" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor="#a06c22" />
+                    <stop offset="100%" stopColor="#6e4410" />
+                  </linearGradient>
+                  <filter id="ped-shadow">
+                    <feDropShadow dx="0" dy="8" stdDeviation="10" floodColor="#5a3010" floodOpacity="0.35" />
+                  </filter>
+                </defs>
+                {/* Shadow */}
+                <ellipse cx="120" cy="84" rx="96" ry="10" fill="rgba(80,40,10,0.18)" />
+                <g filter="url(#ped-shadow)">
+                  {/* Top face */}
+                  <path d="M30 22 L210 22 L224 34 L16 34 Z" fill="url(#ped-top)" />
+                  {/* Front face */}
+                  <rect x="16" y="34" width="208" height="44" rx="2" fill="url(#ped-front)" />
+                  {/* Side face */}
+                  <path d="M210 22 L224 34 L224 78 L210 66 Z" fill="url(#ped-side)" />
+                  {/* Wood grain lines */}
+                  {[38, 46, 54, 62, 70].map((y) => (
+                    <line key={y} x1="16" y1={y} x2="224" y2={y} stroke="rgba(0,0,0,0.06)" strokeWidth="1" />
+                  ))}
+                  {/* Top highlight */}
+                  <path d="M30 22 L210 22 L224 34 L16 34 Z" fill="rgba(255,255,255,0.18)" />
+                  {/* Front bottom edge */}
+                  <rect x="16" y="74" width="208" height="4" rx="2" fill="rgba(0,0,0,0.18)" />
+                </g>
+              </svg>
             </div>
           </motion.div>
 
