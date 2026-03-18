@@ -241,7 +241,8 @@ function ClayButton({
         fontWeight: 900, fontSize: 15.5, letterSpacing: '0.02em',
         cursor: disabled || loading ? 'not-allowed' : 'pointer',
         opacity: disabled ? 0.65 : 1,
-        border: 'none', position: 'relative', overflow: 'hidden',
+        border: primary ? 'none' : '2px solid #86EFAC',
+        position: 'relative', overflow: 'hidden',
         background: primary
           ? 'linear-gradient(180deg, #4ADE80 0%, #22C55E 45%, #16A34A 100%)'
           : 'linear-gradient(145deg, #FFFFFF 0%, #F0FDF4 100%)',
@@ -250,7 +251,6 @@ function ClayButton({
           ? '0 7px 0 #14532D, 0 10px 28px rgba(20,83,45,0.35), inset 0 2px 0 rgba(255,255,255,0.30)'
           : '0 5px 0 #86EFAC, 0 8px 20px rgba(134,239,172,0.25)',
         textShadow: primary ? '0 1.5px 3px rgba(0,0,0,0.22)' : 'none',
-        border: primary ? 'none' : '2px solid #86EFAC',
         fontFamily: 'var(--font-sans)',
         backdropFilter: !primary ? 'blur(8px)' : undefined,
       }}
