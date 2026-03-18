@@ -1,17 +1,18 @@
 'use client';
 
 /**
- * Login – 3D Claymorphic · Image 2 pixel-match
+ * Login – Puffy UI / Claymorphic · Full spec implementation
  *
- * Visual tokens (strictly per spec):
- *   Page bg          : #f7f3e9
- *   Card bg          : #f0ede4
- *   Card shadow      : 20px 20px 60px #d9d6ce, -20px -20px 60px #ffffff
- *   Card inner glow  : inset 6px 6px 12px rgba(255,255,255,0.8)
- *   Card radius      : rounded-[2.5rem]  (40px)
- *   Food props       : next/image  +  blur-[1.5px]  +  opacity-90  (Tailwind)
- *   Mascot           : sprinty.png on top of pedestal.png, anchored to card
- *                      top border via position:absolute / bottom:100%
+ * Visual tokens:
+ *   Page bg          : animated linear-gradient from #f7f3e9 (cream) → soft blush
+ *   Card bg          : rgba(255,255,255,0.60) — bg-white/60 equivalent
+ *   Card blur        : backdrop-blur-xl (24px)
+ *   Card shadow      : 34px outer drop shadow (68px blur) + dark bottom-right inner
+ *                      + light top-left inner glow
+ *   Card radius      : rounded-[50px]
+ *   Food props       : next/image + blur-[1.5px] + opacity-90 (floating)
+ *   Mascot           : sprinty.png on top of pedestal.png, anchored above card
+ *   Interactive els  : CSS translateY floating keyframes
  *
  * Auth persistence:
  *   POST /api/login → 7-day HttpOnly __session cookie (firebase-admin)
@@ -58,17 +59,27 @@ async function mintSession(idToken: string) {
   if (!r.ok) throw new Error('session-mint-failed');
 }
 
-// ── Design tokens ─────────────────────────────────────────────────────────────
+// ── Puffy UI Design tokens ────────────────────────────────────────────────────
 
-/** Exact dual-shadow per Image 2 spec – outer elevation + inner highlight */
-const CARD_SHADOW =
-  '20px 20px 60px #d9d6ce, -20px -20px 60px #ffffff, inset 6px 6px 12px rgba(255,255,255,0.8)';
+/**
+ * Multi-layered Puffy shadow per spec:
+ *  - Outer drop shadow: 34px offset, 68px blur (warm tan)
+ *  - Counter outer: -34px offset for light reflection
+ *  - Dark bottom-right inner shadow (depth ridge)
+ *  - Light top-left inner glow (highlight)
+ */
+const CARD_SHADOW = [
+  '34px 34px 68px rgba(178,155,120,0.55)',       // outer drop – bottom right
+  '-34px -34px 68px rgba(255,255,255,0.90)',      // outer counter – top left highlight
+  'inset -6px -6px 14px rgba(90,58,20,0.12)',    // dark bottom-right inner shadow
+  'inset 8px 8px 18px rgba(255,255,255,0.92)',   // light top-left inner glow
+].join(', ');
 
 const FIELD_SHADOW =
   'inset 4px 4px 8px rgba(155,125,80,0.12), inset -3px -3px 6px rgba(255,255,255,0.75)';
 
 const FIELD_SHADOW_FOCUS =
-  'inset 4px 4px 8px rgba(155,125,80,0.12), inset -3px -3px 6px rgba(255,255,255,0.75), 0 0 0 2.5px #88b04b88';
+  'inset 4px 4px 8px rgba(155,125,80,0.12), inset -3px -3px 6px rgba(255,255,255,0.75), 0 0 0 2.5px rgba(136,176,75,0.55)';
 
 // ── Framer variants ───────────────────────────────────────────────────────────
 
@@ -77,14 +88,11 @@ const stagger: Variants = {
   show:   { transition: { staggerChildren: 0.065, delayChildren: 0.04 } },
 };
 const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 16, scale: 0.97 },
+  hidden: { opacity: 0, y: 18, scale: 0.96 },
   show:   { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 360, damping: 28 } },
 };
 
 // ── FloatProp ─────────────────────────────────────────────────────────────────
-// Uses next/image with Tailwind blur-[1.5px] + opacity-90 per spec.
-// Rotation applied to outer wrapper; motion.div animates the y-float only
-// (avoids CSS transform conflicts with Framer Motion).
 
 function FloatProp({
   src, width, height, top, right, bottom, left, rotate = 0, delay = 0, yAmt = 13,
@@ -183,11 +191,12 @@ function ClayField({
       </label>
       <div
         style={{
-          position: 'relative', borderRadius: 16,
-          background: 'linear-gradient(155deg, #fdfaf5 0%, #f5eedf 100%)',
+          position: 'relative', borderRadius: 18,
+          background: 'linear-gradient(155deg, rgba(255,253,248,0.92) 0%, rgba(245,238,223,0.88) 100%)',
           boxShadow: focused ? FIELD_SHADOW_FOCUS : FIELD_SHADOW,
           border: `1.5px solid ${focused ? 'rgba(136,176,75,0.5)' : 'rgba(195,165,110,0.22)'}`,
           transition: 'box-shadow 0.17s, border-color 0.17s',
+          backdropFilter: 'blur(8px)',
         }}
       >
         <input
@@ -200,7 +209,7 @@ function ClayField({
             width: '100%', background: 'transparent',
             padding: icon ? '13px 48px 13px 16px' : '13px 16px',
             fontSize: 14.5, color: '#4a2e0a', outline: 'none',
-            borderRadius: 16, caretColor: '#88b04b',
+            borderRadius: 18, caretColor: '#88b04b',
           }}
         />
         {icon && (
@@ -237,20 +246,21 @@ function ClayButton({
         border: 'none', position: 'relative', overflow: 'hidden',
         background: primary
           ? 'linear-gradient(180deg, #b0cc60 0%, #88b04b 50%, #6b8e23 100%)'
-          : 'linear-gradient(160deg, #fdfaf5 0%, #e8e0cf 100%)',
+          : 'linear-gradient(160deg, rgba(255,253,248,0.9) 0%, rgba(232,224,207,0.9) 100%)',
         color: primary ? '#fff' : '#5c3d1a',
         boxShadow: primary
           ? '0 7px 0 #4a6612, 0 10px 28px rgba(100,135,30,0.38), inset 0 1.5px 0 rgba(255,255,255,0.28)'
-          : '6px 6px 16px #d9d6ce, -6px -6px 16px #ffffff',
+          : '6px 6px 16px rgba(178,155,120,0.45), -6px -6px 16px rgba(255,255,255,0.90)',
         textShadow: primary ? '0 1.5px 3px rgba(0,0,0,0.28)' : 'none',
         fontFamily: 'var(--font-sans)',
+        backdropFilter: !primary ? 'blur(8px)' : undefined,
       }}
-      whileHover={!disabled && !loading ? { scale: 1.015, y: -1 } : {}}
+      whileHover={!disabled && !loading ? { scale: 1.015, y: -1.5 } : {}}
       whileTap={!disabled && !loading ? {
         scale: 0.97, y: primary ? 5 : 2,
         boxShadow: primary
           ? '0 2px 0 #4a6612, 0 4px 14px rgba(100,135,30,0.28), inset 0 1.5px 0 rgba(255,255,255,0.28)'
-          : '2px 2px 8px #d9d6ce, -2px -2px 8px #ffffff',
+          : '2px 2px 8px rgba(178,155,120,0.35), -2px -2px 8px rgba(255,255,255,0.80)',
       } : {}}
       transition={{ type: 'spring', stiffness: 500, damping: 30 }}
     >
@@ -284,7 +294,7 @@ function ClayButton({
   );
 }
 
-// ── Sparkle decorations (matches Image 2 dashes near tabs) ───────────────────
+// ── Sparkle decorations ───────────────────────────────────────────────────────
 
 function Sparkle({ style }: { style?: React.CSSProperties }) {
   return (
@@ -320,7 +330,7 @@ export default function LoginPage() {
     getRedirectResult(getClientAuth()).then(async (r) => {
       if (r?.user) { await mintSession(await r.user.getIdToken()); router.push('/dashboard'); }
     }).catch(() => {});
-  }, []);
+  }, []);  // eslint-disable-line react-hooks/exhaustive-deps
 
   const go = async (token: string) => {
     await mintSession(token);
@@ -332,7 +342,7 @@ export default function LoginPage() {
     try {
       const c = await signInWithEmailAndPassword(getClientAuth(), email, pass);
       await go(await c.user.getIdToken());
-    } catch (e: any) { setError(authErr(e.code)); }
+    } catch (e: unknown) { setError(authErr((e as { code: string }).code)); }
   });
 
   const doRegister = () => startTransition(async () => {
@@ -346,7 +356,7 @@ export default function LoginPage() {
         body: JSON.stringify({ uid: c.user.uid, email, name, idToken: await c.user.getIdToken() }),
       });
       await go(await c.user.getIdToken());
-    } catch (e: any) { setError(authErr(e.code)); }
+    } catch (e: unknown) { setError(authErr((e as { code: string }).code)); }
   });
 
   const doGoogle = () => startTransition(async () => {
@@ -354,7 +364,7 @@ export default function LoginPage() {
     try {
       if (isMobile) { await signInWithRedirect(getClientAuth(), googleProvider); }
       else { const c = await signInWithPopup(getClientAuth(), googleProvider); await go(await c.user.getIdToken()); }
-    } catch (e: any) { setError(authErr(e.code)); }
+    } catch (e: unknown) { setError(authErr((e as { code: string }).code)); }
   });
 
   const doForgot = () => startTransition(async () => {
@@ -362,7 +372,7 @@ export default function LoginPage() {
     try {
       await sendPasswordResetEmail(getClientAuth(), email);
       setSuccess(`Email di reset inviata a ${email}.`);
-    } catch (e: any) { setError(authErr(e.code)); }
+    } catch (e: unknown) { setError(authErr((e as { code: string }).code)); }
   });
 
   const submit = (e: React.FormEvent) => {
@@ -376,17 +386,35 @@ export default function LoginPage() {
 
   return (
     <>
-      {/* Spinner keyframe */}
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      {/* Keyframes */}
+      <style>{`
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes bg-drift {
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes float-interactive {
+          0%, 100% { transform: translateY(0px); }
+          50%       { transform: translateY(-6px); }
+        }
+        .float-interactive {
+          animation: float-interactive 3s ease-in-out infinite;
+        }
+      `}</style>
 
       {/*
         ── ROOT ─────────────────────────────────────────────────────────────
-        Cream background #f7f3e9. Food props are position:fixed so they
-        stay pinned to the viewport corners regardless of scroll.
+        Animated cream → blush gradient background
       */}
       <main
         className="min-h-screen overflow-x-hidden"
-        style={{ background: '#f7f3e9', fontFamily: 'var(--font-sans)' }}
+        style={{
+          background: 'linear-gradient(-45deg, #f7f3e9, #fdf0e8, #f3ede0, #faf5ec)',
+          backgroundSize: '400% 400%',
+          animation: 'bg-drift 12s ease infinite',
+          fontFamily: 'var(--font-sans)',
+        }}
       >
 
         {/* ── Subtle dot-grid texture ── */}
@@ -395,20 +423,18 @@ export default function LoginPage() {
           className="fixed inset-0 pointer-events-none"
           style={{
             zIndex: 0,
-            backgroundImage: 'radial-gradient(rgba(165,125,60,0.08) 1.5px, transparent 1.5px)',
-            backgroundSize: '26px 26px',
+            backgroundImage: 'radial-gradient(rgba(165,125,60,0.07) 1.5px, transparent 1.5px)',
+            backgroundSize: '28px 28px',
           }}
         />
 
         {/*
           ── FLOATING FOOD PROPS ──────────────────────────────────────────
-          position:fixed  →  pinned to viewport corners
-          Tailwind blur-[1.5px] + opacity-90  →  depth-of-field per spec
-          Outer div: rotation (static, avoids Framer transform conflict)
-          motion.div: y-float animation only
+          position:fixed → pinned to viewport corners
+          Tailwind blur-[1.5px] + opacity-90 → depth-of-field per spec
         */}
 
-        {/* Apple – top-left, partially off-screen */}
+        {/* Apple – top-left */}
         <FloatProp
           src="/apple.png" width={148} height={160}
           top={80} left={-24}
@@ -429,7 +455,7 @@ export default function LoginPage() {
           rotate={18} delay={0.45} yAmt={15}
         />
 
-        {/* Spatula again bottom-right (brown bread in mockup – reuse spatula) */}
+        {/* Spatula – bottom-right */}
         <FloatProp
           src="/spatula.png" width={100} height={140}
           bottom={60} right={-20}
@@ -438,8 +464,6 @@ export default function LoginPage() {
 
         {/*
           ── CONTENT COLUMN ────────────────────────────────────────────────
-          Flex-col center. marginTop on the card-wrapper creates space for
-          the mascot that overflows above the card via bottom:100%.
         */}
         <div
           className="relative flex flex-col items-center"
@@ -447,11 +471,10 @@ export default function LoginPage() {
         >
 
           {/*
-            ── CARD + MASCOT WRAPPER ────────────────────────────────────────
-            marginTop = height of the mascot group that lives above the card.
+            ── CARD + MASCOT WRAPPER ─────────────────────────────────────────
+            marginTop = height of the mascot group above the card.
             Mascot is position:absolute, bottom:100%, so its bottom edge
-            aligns with the card's top border (the wooden pedestal "rests on"
-            the card edge, as seen in Image 2).
+            aligns with the card's top border.
           */}
           <motion.div
             className="relative w-full"
@@ -463,9 +486,8 @@ export default function LoginPage() {
 
             {/*
               ── MASCOT GROUP ──────────────────────────────────────────────
-              position:absolute, bottom:100% → sits entirely above the card.
-              sprinty.png (character) on top, pedestal.png (wooden banner)
-              below with -22px overlap so they merge naturally.
+              Claymorphic pedestal effect: sprinty.png (character) sits on
+              pedestal.png (wooden banner) with -22px overlap.
             */}
             <div
               aria-label="Sprinty, la mascotte di NutriTrack"
@@ -481,6 +503,23 @@ export default function LoginPage() {
                 zIndex: 20,
               }}
             >
+              {/* Pedestal shadow (Claymorphic base effect) */}
+              <div
+                aria-hidden="true"
+                style={{
+                  position: 'absolute',
+                  bottom: -8,
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: 200,
+                  height: 24,
+                  borderRadius: '50%',
+                  background: 'radial-gradient(ellipse, rgba(90,58,20,0.22) 0%, transparent 70%)',
+                  filter: 'blur(8px)',
+                  zIndex: -1,
+                }}
+              />
+
               {/* Sprinty – breathing animation, shakes while loading */}
               <motion.div
                 animate={
@@ -501,14 +540,14 @@ export default function LoginPage() {
                 />
               </motion.div>
 
-              {/* Pedestal / wooden banner "Bentornato su NutriTrack!" */}
+              {/* Pedestal / wooden banner */}
               <div style={{ marginTop: -22 }}>
                 <Image
                   src="/pedestal.png"
                   alt="Bentornato su NutriTrack!"
                   width={260}
                   height={80}
-                  className="block object-contain"
+                  className="block object-contain drop-shadow-[0_4px_12px_rgba(90,58,20,0.18)]"
                   priority
                   unoptimized
                 />
@@ -516,20 +555,24 @@ export default function LoginPage() {
             </div>
 
             {/*
-              ── CLAYMORPHIC CARD ──────────────────────────────────────────
-              bg #f0ede4 (very close to page bg #f7f3e9 → seamless top edge).
-              Exact shadow:
-                outer: 20px 20px 60px #d9d6ce, -20px -20px 60px #ffffff
-                inner: inset 6px 6px 12px rgba(255,255,255,0.8)
-              Border radius: rounded-[2.5rem] = 40px
+              ── PUFFY CLAYMORPHIC CARD ────────────────────────────────────
+              bg-white/60 equivalent (rgba(255,255,255,0.60))
+              backdrop-blur-xl (24px blur)
+              Multi-layered shadow per spec:
+                - Outer: 34px offset, 68px blur drop shadow
+                - Dark bottom-right inner shadow
+                - Light top-left inner glow
+              Border radius: 50px (rounded-[50px])
             */}
             <div
-              className="rounded-[2.5rem]"
               style={{
-                background: '#f0ede4',
+                background: 'rgba(255,255,255,0.60)',
+                backdropFilter: 'blur(24px)',
+                WebkitBackdropFilter: 'blur(24px)',
+                borderRadius: 50,
                 boxShadow: CARD_SHADOW,
-                border: '1.5px solid rgba(218,205,180,0.28)',
-                padding: '28px 22px 32px',
+                border: '1.5px solid rgba(255,255,255,0.45)',
+                padding: '32px 26px 36px',
                 position: 'relative',
                 zIndex: 10,
               }}
@@ -538,9 +581,9 @@ export default function LoginPage() {
               {/* ── "NutriTrack" heading ── */}
               <motion.div variants={fadeUp} style={{ textAlign: 'center', marginBottom: 2 }}>
                 <h1
-                  className="font-serif"
+                  className="font-serif float-interactive"
                   style={{
-                    fontWeight: 900, fontSize: 46, lineHeight: 1.05, margin: 0,
+                    fontWeight: 900, fontSize: 48, lineHeight: 1.05, margin: 0,
                     userSelect: 'none',
                     background: 'linear-gradient(180deg, #b5d26c 0%, #88b04b 38%, #587a1c 100%)',
                     WebkitBackgroundClip: 'text',
@@ -558,10 +601,10 @@ export default function LoginPage() {
                 </p>
               </motion.div>
 
-              {/* ── Decorative gold dashes (matches Image 2 sparkles) ── */}
+              {/* ── Decorative gold sparkles ── */}
               <motion.div
                 variants={fadeUp}
-                style={{ display: 'flex', justifyContent: 'center', gap: 20, margin: '14px 0 16px' }}
+                style={{ display: 'flex', justifyContent: 'center', gap: 20, margin: '14px 0 18px' }}
               >
                 <Sparkle style={{ transform: 'rotate(180deg)' }} />
                 <Sparkle />
@@ -578,9 +621,10 @@ export default function LoginPage() {
                   <motion.div key="err"
                     initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
                     style={{
-                      marginBottom: 14, padding: '10px 14px', borderRadius: 14, overflow: 'hidden',
-                      background: '#fff0eb', border: '1.5px solid #fca5a5',
+                      marginBottom: 14, padding: '10px 14px', borderRadius: 16, overflow: 'hidden',
+                      background: 'rgba(255,240,235,0.85)', border: '1.5px solid #fca5a5',
                       color: '#b91c1c', fontSize: 13, fontWeight: 600,
+                      backdropFilter: 'blur(8px)',
                     }}
                   >
                     {error}
@@ -590,9 +634,10 @@ export default function LoginPage() {
                   <motion.div key="ok"
                     initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }}
                     style={{
-                      marginBottom: 14, padding: '10px 14px', borderRadius: 14, overflow: 'hidden',
-                      background: '#f0fdf4', border: '1.5px solid #86efac',
+                      marginBottom: 14, padding: '10px 14px', borderRadius: 16, overflow: 'hidden',
+                      background: 'rgba(240,253,244,0.85)', border: '1.5px solid #86efac',
                       color: '#15803d', fontSize: 13, fontWeight: 600,
+                      backdropFilter: 'blur(8px)',
                     }}
                   >
                     {success}
@@ -606,7 +651,7 @@ export default function LoginPage() {
                 variants={stagger}
                 initial="hidden"
                 animate="show"
-                key={tab}   /* re-triggers stagger when tab switches */
+                key={tab}
                 style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
               >
                 {/* Name – register only */}
@@ -647,8 +692,8 @@ export default function LoginPage() {
                   </motion.div>
                 )}
 
-                {/* Submit */}
-                <motion.div variants={fadeUp}>
+                {/* Submit – floating interactive animation */}
+                <motion.div variants={fadeUp} className="float-interactive">
                   <ClayButton type="submit" variant="primary" fullWidth loading={pending} disabled={pending}>
                     {tab === 'login'     ? 'Accedi'
                      : tab === 'register' ? 'Crea account'
@@ -658,7 +703,7 @@ export default function LoginPage() {
               </motion.form>
 
               {/* ── Forgot / back links ── */}
-              <div style={{ marginTop: 12, textAlign: 'center' }}>
+              <div style={{ marginTop: 14, textAlign: 'center' }}>
                 {tab === 'login' && (
                   <button
                     type="button"
@@ -689,7 +734,7 @@ export default function LoginPage() {
 
               {/* ── Google sign-in ── */}
               {tab !== 'forgot' && (
-                <motion.div variants={fadeUp} style={{ marginTop: 18 }}>
+                <motion.div variants={fadeUp} style={{ marginTop: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
                     <div style={{ flex: 1, height: 1, background: 'rgba(155,115,60,0.22)' }} />
                     <span style={{ fontSize: 12, fontWeight: 600, color: '#b09570', whiteSpace: 'nowrap' }}>
@@ -698,18 +743,20 @@ export default function LoginPage() {
                     <div style={{ flex: 1, height: 1, background: 'rgba(155,115,60,0.22)' }} />
                   </div>
 
-                  <ClayButton variant="secondary" fullWidth disabled={pending} onClick={doGoogle}>
-                    <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-                      {/* Google "G" logo */}
-                      <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                      </svg>
-                      Google
-                    </span>
-                  </ClayButton>
+                  <div className="float-interactive">
+                    <ClayButton variant="secondary" fullWidth disabled={pending} onClick={doGoogle}>
+                      <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+                        {/* Google "G" logo */}
+                        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+                          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                        </svg>
+                        Google
+                      </span>
+                    </ClayButton>
+                  </div>
                 </motion.div>
               )}
 

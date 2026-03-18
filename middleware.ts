@@ -1,9 +1,11 @@
 /**
  * middleware.ts  –  Next.js Edge Runtime entry point
  *
- * Re-exports the full session proxy logic from proxy.ts.
- * Keeping the implementation in proxy.ts makes it independently testable
- * and follows the "proxy convention" for session-cookie middleware.
+ * Re-exports the session proxy logic from proxy.ts as `middleware`
+ * (the name Next.js requires for Edge middleware).
+ *
+ * The `proxy` function in proxy.ts is the canonical implementation;
+ * this file exists solely to satisfy Next.js's naming convention.
  *
  * The firebase-admin __session cookie is verified in two stages:
  *   1. Edge (here via proxy.ts) – lightweight JWT expiry check (atob, no crypto).
@@ -11,4 +13,4 @@
  *      via getAdminAuth().verifySessionCookie(cookie, true).
  */
 
-export { middleware, config } from './proxy';
+export { proxy as middleware, config } from './proxy';
