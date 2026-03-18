@@ -4,8 +4,14 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
 
   // ── Next.js 15 / Turbopack compatibility ─────────────────────────────────
-  // firebase-admin uses Node.js-only APIs; keep it out of the browser bundle
-  serverExternalPackages: ['firebase-admin'],
+  // firebase-admin uses Node.js-only APIs; keep all sub-packages out of the browser bundle
+  serverExternalPackages: [
+    'firebase-admin',
+    '@google-cloud/firestore',
+    '@google-cloud/storage',
+    'google-auth-library',
+    'google-gax',
+  ],
 
   // Turbopack is the default bundler in Next.js 15 dev mode;
   // no extra flags needed – just ensure no webpack-only plugins remain.

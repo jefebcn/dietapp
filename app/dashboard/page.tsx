@@ -69,12 +69,20 @@ export default async function DashboardPage() {
   const today = dateStr(new Date());
   const sevenDaysAgo = daysAgo(6);
 
-  const [user, todayStats, weekStats, todayMeals] = await Promise.all([
-    getUserById(uid),
-    getDailyStats(uid, today),
-    getDailyStatsRange(uid, sevenDaysAgo, today),
-    getMealsByDate(uid, today),
-  ]);
+  let fetchResult;
+  try {
+    fetchResult = await Promise.all([
+      getUserById(uid),
+      getDailyStats(uid, today),
+      getDailyStatsRange(uid, sevenDaysAgo, today),
+      getMealsByDate(uid, today),
+    ]);
+  } catch (err) {
+    console.error('[Dashboard] data fetch failed:', err);
+    throw err; // re-throw so error.tsx catches it with the actual message
+  }
+
+  const [user, todayStats, weekStats, todayMeals] = fetchResult;
 
   if (!user) redirect('/login');
 
