@@ -1,27 +1,22 @@
 import type { Metadata, Viewport } from 'next';
-import { DM_Sans, DM_Mono, Playfair_Display } from 'next/font/google';
+import { Nunito, Nunito_Sans } from 'next/font/google';
 import './globals.css';
 import { AuthProvider } from '@/components/AuthProvider';
 
 // ── Font loading ───────────────────────────────────────────────────────────
 
-const dmSans = DM_Sans({
+const nunito = Nunito({
   subsets: ['latin'],
   variable: '--font-sans',
   display: 'swap',
+  weight: ['400', '600', '700', '800', '900'],
 });
 
-const dmMono = DM_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500'],
-  variable: '--font-mono',
-  display: 'swap',
-});
-
-const playfair = Playfair_Display({
+const nunitoSans = Nunito_Sans({
   subsets: ['latin'],
   variable: '--font-serif',
   display: 'swap',
+  weight: ['700', '800', '900'],
 });
 
 // ── Metadata ───────────────────────────────────────────────────────────────
@@ -58,7 +53,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#3a6b27',
+  themeColor: '#4CAF50',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
@@ -74,9 +69,9 @@ export default function RootLayout({
   return (
     <html
       lang="it"
-      className={`${dmSans.variable} ${dmMono.variable} ${playfair.variable}`}
+      className={`${nunito.variable} ${nunitoSans.variable}`}
     >
-      <body className="bg-[#0f172a] text-slate-100 antialiased min-h-screen">
+      <body className="antialiased min-h-screen">
         <AuthProvider>
           {children}
         </AuthProvider>

@@ -50,28 +50,33 @@ const SIZE_PX: Record<SprintySize, number> = {
 // ── Colour palette ──────────────────────────────────────────────────────────
 
 const C = {
-  avo_dark:   '#2d6a4f',
-  avo_mid:    '#40916c',
-  avo_light:  '#74c69d',
-  avo_flesh:  '#d8f3dc',
-  avo_cream:  '#f0f7ee',
-  pit:        '#6d4c41',
-  pit_hi:     '#a0745e',
-  headband:   '#f59e0b',
-  headband_s: '#d97706',
-  shoe_w:     '#f1f5f9',
-  shoe_b:     '#3b82f6',
-  shoe_s:     '#1d4ed8',
-  eye_w:      '#ffffff',
-  eye_d:      '#1e293b',
-  eye_sh:     '#ffffff',
-  brow:       '#1e3a2a',
-  mouth:      '#1e293b',
-  cheek:      'rgba(248,113,113,0.30)',
-  arm:        '#2d6a4f',
-  arm_hi:     '#40916c',
-  bubble_bg:  'rgba(15,23,42,0.88)',
-  bubble_bdr: 'rgba(74,222,128,0.45)',
+  // Vibrant Disney-style avocado
+  avo_dark:   '#166534',   // deep forest green
+  avo_mid:    '#22C55E',   // vivid grass green
+  avo_light:  '#4ADE80',   // bright spring green
+  avo_flesh:  '#BBF7D0',   // fresh mint flesh
+  avo_cream:  '#DCFCE7',
+  outline:    '#0F4C2A',   // very dark outline for cartoon stroke
+  pit:        '#6D4C41',
+  pit_hi:     '#A1887F',
+  // Bright Disney headband (vivid orange)
+  headband:   '#FF5722',
+  headband_s: '#D84315',
+  // Bold sneakers
+  shoe_w:     '#FFFFFF',
+  shoe_b:     '#1976D2',
+  shoe_s:     '#0D47A1',
+  shoe_stripe:'#FF1744',
+  eye_w:      '#FFFFFF',
+  eye_d:      '#0D1B2A',   // very dark eye for high contrast
+  eye_sh:     '#FFFFFF',
+  brow:       '#0A3D1A',
+  mouth:      '#0D1B2A',
+  cheek:      'rgba(255,82,82,0.50)',  // more visible blush
+  arm:        '#166534',
+  arm_hi:     '#22C55E',
+  bubble_bg:  'rgba(255,255,255,0.95)',
+  bubble_bdr: 'rgba(34,197,94,0.60)',
 };
 
 // ── Body animation variants per mood ────────────────────────────────────────
@@ -331,14 +336,14 @@ function Treadmill({ mood }: { mood: SprintyMood }) {
   if (mood !== 'loading') return null;
   return (
     <>
-      <rect x="8" y="130" width="84" height="9" rx="4.5" fill="#1e293b" />
+      <rect x="8" y="130" width="84" height="9" rx="4.5" fill="#1565C0" />
       <motion.g
         animate={{ x: [-20, 0] }}
         transition={{ duration: 0.4, repeat: Infinity, ease: 'linear' }}
         clipPath="url(#tm-clip)"
       >
         {[8, 24, 40, 56, 72, 88].map((x) => (
-          <line key={x} x1={x} y1="130" x2={x + 10} y2="139" stroke="#334155" strokeWidth="2" />
+          <line key={x} x1={x} y1="130" x2={x + 10} y2="139" stroke="#1E88E5" strokeWidth="2" />
         ))}
       </motion.g>
       <defs>
@@ -346,8 +351,8 @@ function Treadmill({ mood }: { mood: SprintyMood }) {
           <rect x="8" y="130" width="84" height="9" />
         </clipPath>
       </defs>
-      <rect x="6" y="126" width="5" height="17" rx="2.5" fill="#0f172a" />
-      <rect x="89" y="126" width="5" height="17" rx="2.5" fill="#0f172a" />
+      <rect x="6" y="126" width="5" height="17" rx="2.5" fill="#0D47A1" />
+      <rect x="89" y="126" width="5" height="17" rx="2.5" fill="#0D47A1" />
     </>
   );
 }
@@ -370,17 +375,19 @@ function SprintySVG({ mood }: { mood: SprintyMood }) {
       {/* Arms – drawn before body so body overlaps them */}
       <Arms mood={mood} />
 
-      {/* Avocado body */}
+      {/* Avocado body – cartoon outline layer first */}
+      <ellipse cx="50" cy="76" rx="27.5" ry="37.5" fill={C.outline} />
       <ellipse cx="50" cy="76" rx="26" ry="36" fill={C.avo_dark} />
       <ellipse cx="50" cy="72" rx="23" ry="32" fill={C.avo_mid} />
       {/* Flesh interior */}
       <ellipse cx="50" cy="74" rx="17" ry="26" fill={C.avo_flesh} />
-      <ellipse cx="50" cy="72" rx="9"  ry="11" fill={C.avo_cream} opacity="0.55" />
+      <ellipse cx="50" cy="72" rx="9"  ry="11" fill={C.avo_cream} opacity="0.70" />
       {/* Pit */}
-      <ellipse cx="50" cy="78" rx="9"  ry="11" fill={C.pit} />
+      <ellipse cx="50" cy="78" rx="9"  ry="11" fill={C.pit} stroke={C.outline} strokeWidth="1.5" />
       <ellipse cx="47" cy="74" rx="4"  ry="5"  fill={C.pit_hi} />
 
-      {/* Head bump */}
+      {/* Head bump – with outline */}
+      <ellipse cx="50" cy="42" rx="18.5" ry="12.5" fill={C.outline} />
       <ellipse cx="50" cy="42" rx="17" ry="11" fill={C.avo_mid} />
 
       {/* Headband */}
@@ -430,11 +437,11 @@ function SpeechBubble({
       transition={{ duration: 0.22 }}
       style={{
         background: C.bubble_bg,
-        border: `1px solid ${borderColor}`,
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
+        border: `2.5px solid ${borderColor}`,
+        boxShadow: `0 4px 0 ${borderColor}`,
+        color: '#1A2E1A',
       }}
-      className="mt-2 px-3 py-2 rounded-2xl text-sm text-slate-200 leading-snug max-w-[200px] text-center shadow-lg"
+      className="mt-2 px-3 py-2 rounded-2xl text-sm font-bold leading-snug max-w-[200px] text-center shadow-lg"
     >
       {isLoadingMood ? (
         <span className="flex items-center justify-center gap-1">

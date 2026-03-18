@@ -100,42 +100,43 @@ export default async function DashboardPage() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="relative min-h-screen" style={{ background: '#f7f3e9' }}>
+    <div className="relative min-h-screen" style={{ background: 'linear-gradient(160deg, #FFFDE7 0%, #F1F8E9 45%, #E3F2FD 100%)', backgroundAttachment: 'fixed' }}>
 
       {/* Header */}
       <header
         className="sticky top-0 z-30"
         style={{
-          background: 'rgba(247,243,233,0.88)',
-          backdropFilter: 'blur(16px)',
-          WebkitBackdropFilter: 'blur(16px)',
-          borderBottom: '1.5px solid rgba(210,185,140,0.30)',
-          boxShadow: '0 2px 12px rgba(90,58,20,0.08)',
+          background: 'rgba(240,253,244,0.92)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderBottom: '2.5px solid #86EFAC',
+          boxShadow: '0 4px 20px rgba(21,128,61,0.12)',
         }}
       >
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center justify-between">
           <div>
-            <p className="text-xs" style={{ color: '#a08060' }}>
+            <p className="text-xs font-bold" style={{ color: '#16A34A' }}>
               {new Date().toLocaleDateString('it-IT', {
                 weekday: 'long',
                 day: 'numeric',
                 month: 'long',
               })}
             </p>
-            <h1 className="font-serif text-lg font-bold leading-tight" style={{ color: '#3d2a0a' }}>
+            <h1 className="text-lg font-black leading-tight" style={{ color: '#14532D' }}>
               Ciao, {user.name?.split(' ')[0] || 'amico'}! 👋
             </h1>
           </div>
           <div className="flex items-center gap-3">
             <span
-              className="text-xs font-semibold px-3 py-1 rounded-full"
+              className="text-xs font-extrabold px-3 py-1.5 rounded-full"
               style={{
-                background: 'rgba(136,176,75,0.15)',
-                color: '#5a7a1a',
-                border: '1.5px solid rgba(136,176,75,0.35)',
+                background: 'linear-gradient(145deg, #F0FDF4, #DCFCE7)',
+                color: '#14532D',
+                border: '2px solid #86EFAC',
+                boxShadow: '0 3px 0 #16A34A',
               }}
             >
-              NutriPoints
+              🌿 NutriTrack
             </span>
           </div>
         </div>
@@ -148,21 +149,18 @@ export default async function DashboardPage() {
           <div
             className="flex gap-4 items-center p-4"
             style={{
-              background: 'linear-gradient(160deg, #fffdf8 0%, #faf5ea 100%)',
+              background: 'linear-gradient(145deg, #ECFDF5 0%, #D1FAE5 100%)',
               borderRadius: '1.5rem',
-              border: '1.5px solid rgba(217,119,6,0.22)',
-              boxShadow: [
-                '0 8px 24px rgba(90,58,20,0.10)',
-                'inset 0 1.5px 0 rgba(255,255,255,0.80)',
-              ].join(', '),
+              border: '2.5px solid #6EE7B7',
+              boxShadow: '0 5px 0 #059669, 0 10px 24px rgba(5,150,105,0.15), inset 0 2px 0 rgba(255,255,255,0.70)',
             }}
           >
             <SprintyAssistant mood="tip" size="sm" className="flex-shrink-0" />
             <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-wide mb-0.5" style={{ color: '#d97706' }}>
+              <p className="text-xs font-extrabold uppercase tracking-wide mb-0.5" style={{ color: '#059669' }}>
                 Consiglio di Sprinty
               </p>
-              <p className="text-sm leading-snug" style={{ color: '#7a5c2e' }}>{sprintyTip}</p>
+              <p className="text-sm font-bold leading-snug" style={{ color: '#064E3B' }}>{sprintyTip}</p>
             </div>
           </div>
         </section>
@@ -174,9 +172,10 @@ export default async function DashboardPage() {
               <div
                 className="flex justify-center py-10"
                 style={{
-                  background: 'linear-gradient(160deg,#fffdf8 0%,#faf5ea 100%)',
-                  borderRadius: '2rem',
-                  boxShadow: '0 10px 32px rgba(90,58,20,0.14), inset 0 1.5px 0 rgba(255,255,255,0.80)',
+                  background: 'linear-gradient(145deg, #F0FDF4, #DCFCE7)',
+                  borderRadius: '1.5rem',
+                  border: '2.5px solid #86EFAC',
+                  boxShadow: '0 6px 0 #16A34A, 0 10px 28px rgba(21,128,61,0.15)',
                 }}
               >
                 <SprintyAssistant mood="loading" size="md" />

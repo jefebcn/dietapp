@@ -59,27 +59,24 @@ async function mintSession(idToken: string) {
   if (!r.ok) throw new Error('session-mint-failed');
 }
 
-// ── Puffy UI Design tokens ────────────────────────────────────────────────────
+// ── Disney Cartoon Design tokens ─────────────────────────────────────────────
 
 /**
- * Multi-layered Puffy shadow per spec:
- *  - Outer drop shadow: 34px offset, 68px blur (warm tan)
- *  - Counter outer: -34px offset for light reflection
- *  - Dark bottom-right inner shadow (depth ridge)
- *  - Light top-left inner glow (highlight)
+ * Cartoon card: vibrant white with colorful shadow stack.
+ * The "3D stamp" bottom shadow gives the card a raised, playful feel.
  */
 const CARD_SHADOW = [
-  '34px 34px 68px rgba(178,155,120,0.55)',       // outer drop – bottom right
-  '-34px -34px 68px rgba(255,255,255,0.90)',      // outer counter – top left highlight
-  'inset -6px -6px 14px rgba(90,58,20,0.12)',    // dark bottom-right inner shadow
-  'inset 8px 8px 18px rgba(255,255,255,0.92)',   // light top-left inner glow
+  '0 8px 0 rgba(21,128,61,0.60)',               // thick 3D stamp bottom
+  '0 14px 40px rgba(21,128,61,0.20)',           // ambient green glow
+  '-20px -20px 50px rgba(255,255,255,0.95)',    // top-left light reflection
+  'inset 0 2px 0 rgba(255,255,255,0.90)',       // top highlight
 ].join(', ');
 
 const FIELD_SHADOW =
-  'inset 4px 4px 8px rgba(155,125,80,0.12), inset -3px -3px 6px rgba(255,255,255,0.75)';
+  'inset 2px 2px 6px rgba(21,128,61,0.10), inset -2px -2px 4px rgba(255,255,255,0.80)';
 
 const FIELD_SHADOW_FOCUS =
-  'inset 4px 4px 8px rgba(155,125,80,0.12), inset -3px -3px 6px rgba(255,255,255,0.75), 0 0 0 2.5px rgba(136,176,75,0.55)';
+  'inset 2px 2px 6px rgba(21,128,61,0.10), inset -2px -2px 4px rgba(255,255,255,0.80), 0 0 0 3px rgba(34,197,94,0.45)';
 
 // ── Framer variants ───────────────────────────────────────────────────────────
 
@@ -133,8 +130,9 @@ function Tabs({ tab, onChange }: { tab: string; onChange: (t: 'login' | 'registe
     <div
       style={{
         display: 'flex', padding: 5, borderRadius: 50,
-        background: 'linear-gradient(145deg, #e8e1d4 0%, #d8d0c2 100%)',
-        boxShadow: 'inset 3px 3px 8px rgba(120,90,30,0.18), inset -3px -3px 6px rgba(255,255,255,0.60)',
+        background: 'linear-gradient(145deg, #DCFCE7 0%, #BBF7D0 100%)',
+        boxShadow: '0 3px 0 #16A34A, inset 0 1px 0 rgba(255,255,255,0.70)',
+        border: '2px solid #86EFAC',
       }}
     >
       {(['login', 'register'] as const).map((t) => (
@@ -145,8 +143,8 @@ function Tabs({ tab, onChange }: { tab: string; onChange: (t: 'login' | 'registe
           style={{
             flex: 1, padding: '11px 0', borderRadius: 40, border: 'none',
             background: 'transparent', cursor: 'pointer', position: 'relative',
-            fontWeight: 800, fontSize: 14.5, letterSpacing: '0.005em',
-            color: tab === t ? '#3d2208' : '#9a7555',
+            fontWeight: 900, fontSize: 14.5, letterSpacing: '0.005em',
+            color: tab === t ? '#14532D' : '#166534',
             transition: 'color 0.15s',
             fontFamily: 'var(--font-sans)',
           }}
@@ -156,8 +154,9 @@ function Tabs({ tab, onChange }: { tab: string; onChange: (t: 'login' | 'registe
               layoutId="tab-pill"
               style={{
                 position: 'absolute', inset: 0, borderRadius: 40,
-                background: 'linear-gradient(160deg, #fdfaf7 0%, #ede5d2 100%)',
-                boxShadow: '4px 4px 10px rgba(100,70,20,0.16), -4px -4px 8px rgba(255,255,255,0.85)',
+                background: 'linear-gradient(145deg, #FFFFFF 0%, #F0FDF4 100%)',
+                boxShadow: '0 3px 0 #16A34A, inset 0 1px 0 rgba(255,255,255,0.90)',
+                border: '1.5px solid #86EFAC',
               }}
               transition={{ type: 'spring', stiffness: 440, damping: 34 }}
             />
@@ -185,18 +184,17 @@ function ClayField({
     <div>
       <label
         htmlFor={id}
-        style={{ display: 'block', fontSize: 14, fontWeight: 800, marginBottom: 8, color: '#5c3d1a' }}
+        style={{ display: 'block', fontSize: 14, fontWeight: 900, marginBottom: 8, color: '#14532D' }}
       >
         {label}
       </label>
       <div
         style={{
           position: 'relative', borderRadius: 18,
-          background: 'linear-gradient(155deg, rgba(255,253,248,0.92) 0%, rgba(245,238,223,0.88) 100%)',
+          background: 'linear-gradient(155deg, #F0FDF4 0%, #DCFCE7 100%)',
           boxShadow: focused ? FIELD_SHADOW_FOCUS : FIELD_SHADOW,
-          border: `1.5px solid ${focused ? 'rgba(136,176,75,0.5)' : 'rgba(195,165,110,0.22)'}`,
+          border: `2px solid ${focused ? '#22C55E' : '#86EFAC'}`,
           transition: 'box-shadow 0.17s, border-color 0.17s',
-          backdropFilter: 'blur(8px)',
         }}
       >
         <input
@@ -208,8 +206,8 @@ function ClayField({
           style={{
             width: '100%', background: 'transparent',
             padding: icon ? '13px 48px 13px 16px' : '13px 16px',
-            fontSize: 14.5, color: '#4a2e0a', outline: 'none',
-            borderRadius: 18, caretColor: '#88b04b',
+            fontSize: 14.5, fontWeight: 700, color: '#14532D', outline: 'none',
+            borderRadius: 18, caretColor: '#22C55E',
           }}
         />
         {icon && (
@@ -245,13 +243,14 @@ function ClayButton({
         opacity: disabled ? 0.65 : 1,
         border: 'none', position: 'relative', overflow: 'hidden',
         background: primary
-          ? 'linear-gradient(180deg, #b0cc60 0%, #88b04b 50%, #6b8e23 100%)'
-          : 'linear-gradient(160deg, rgba(255,253,248,0.9) 0%, rgba(232,224,207,0.9) 100%)',
-        color: primary ? '#fff' : '#5c3d1a',
+          ? 'linear-gradient(180deg, #4ADE80 0%, #22C55E 45%, #16A34A 100%)'
+          : 'linear-gradient(145deg, #FFFFFF 0%, #F0FDF4 100%)',
+        color: primary ? '#fff' : '#14532D',
         boxShadow: primary
-          ? '0 7px 0 #4a6612, 0 10px 28px rgba(100,135,30,0.38), inset 0 1.5px 0 rgba(255,255,255,0.28)'
-          : '6px 6px 16px rgba(178,155,120,0.45), -6px -6px 16px rgba(255,255,255,0.90)',
-        textShadow: primary ? '0 1.5px 3px rgba(0,0,0,0.28)' : 'none',
+          ? '0 7px 0 #14532D, 0 10px 28px rgba(20,83,45,0.35), inset 0 2px 0 rgba(255,255,255,0.30)'
+          : '0 5px 0 #86EFAC, 0 8px 20px rgba(134,239,172,0.25)',
+        textShadow: primary ? '0 1.5px 3px rgba(0,0,0,0.22)' : 'none',
+        border: primary ? 'none' : '2px solid #86EFAC',
         fontFamily: 'var(--font-sans)',
         backdropFilter: !primary ? 'blur(8px)' : undefined,
       }}
@@ -259,8 +258,8 @@ function ClayButton({
       whileTap={!disabled && !loading ? {
         scale: 0.97, y: primary ? 5 : 2,
         boxShadow: primary
-          ? '0 2px 0 #4a6612, 0 4px 14px rgba(100,135,30,0.28), inset 0 1.5px 0 rgba(255,255,255,0.28)'
-          : '2px 2px 8px rgba(178,155,120,0.35), -2px -2px 8px rgba(255,255,255,0.80)',
+          ? '0 2px 0 #14532D, 0 4px 14px rgba(20,83,45,0.25), inset 0 2px 0 rgba(255,255,255,0.30)'
+          : '0 2px 0 #86EFAC, 0 4px 8px rgba(134,239,172,0.15)',
       } : {}}
       transition={{ type: 'spring', stiffness: 500, damping: 30 }}
     >
@@ -389,7 +388,7 @@ export default function LoginPage() {
       {/* Keyframes */}
       <style>{`
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes bg-drift {
+        @keyframes rainbow-shift {
           0%   { background-position: 0% 50%; }
           50%  { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
@@ -410,9 +409,9 @@ export default function LoginPage() {
       <main
         className="min-h-screen overflow-x-hidden"
         style={{
-          background: 'linear-gradient(-45deg, #f7f3e9, #fdf0e8, #f3ede0, #faf5ec)',
+          background: 'linear-gradient(-45deg, #FFFDE7, #E8F5E9, #E3F2FD, #F3E5F5, #FFF8E1)',
           backgroundSize: '400% 400%',
-          animation: 'bg-drift 12s ease infinite',
+          animation: 'rainbow-shift 14s ease infinite',
           fontFamily: 'var(--font-sans)',
         }}
       >
@@ -423,7 +422,7 @@ export default function LoginPage() {
           className="fixed inset-0 pointer-events-none"
           style={{
             zIndex: 0,
-            backgroundImage: 'radial-gradient(rgba(165,125,60,0.07) 1.5px, transparent 1.5px)',
+            backgroundImage: 'radial-gradient(rgba(34,197,94,0.10) 1.5px, transparent 1.5px)',
             backgroundSize: '28px 28px',
           }}
         />
@@ -566,12 +565,12 @@ export default function LoginPage() {
             */}
             <div
               style={{
-                background: 'rgba(255,255,255,0.60)',
+                background: 'rgba(255,255,255,0.88)',
                 backdropFilter: 'blur(24px)',
                 WebkitBackdropFilter: 'blur(24px)',
                 borderRadius: 50,
                 boxShadow: CARD_SHADOW,
-                border: '1.5px solid rgba(255,255,255,0.45)',
+                border: '3px solid #86EFAC',
                 padding: '32px 26px 36px',
                 position: 'relative',
                 zIndex: 10,
@@ -585,19 +584,19 @@ export default function LoginPage() {
                   style={{
                     fontWeight: 900, fontSize: 48, lineHeight: 1.05, margin: 0,
                     userSelect: 'none',
-                    background: 'linear-gradient(180deg, #b5d26c 0%, #88b04b 38%, #587a1c 100%)',
+                    background: 'linear-gradient(180deg, #4ADE80 0%, #22C55E 40%, #14532D 100%)',
                     WebkitBackgroundClip: 'text',
                     WebkitTextFillColor: 'transparent',
                     backgroundClip: 'text',
                     filter:
-                      'drop-shadow(0 3px 0 rgba(55,85,12,0.42)) ' +
-                      'drop-shadow(0 6px 14px rgba(55,85,12,0.16))',
+                      'drop-shadow(0 4px 0 rgba(20,83,45,0.55)) ' +
+                      'drop-shadow(0 7px 16px rgba(20,83,45,0.20))',
                   }}
                 >
                   NutriTrack
                 </h1>
-                <p style={{ margin: '6px 0 0', fontSize: 14, fontWeight: 600, color: '#8b6a3e' }}>
-                  Il tuo diario nutrizionale
+                <p style={{ margin: '6px 0 0', fontSize: 14, fontWeight: 800, color: '#166534' }}>
+                  Il tuo diario nutrizionale 🌿
                 </p>
               </motion.div>
 
@@ -710,7 +709,7 @@ export default function LoginPage() {
                     onClick={() => { setTab('forgot'); setError(''); }}
                     style={{
                       background: 'none', border: 'none', cursor: 'pointer',
-                      fontSize: 13, fontWeight: 600, color: '#a08060',
+                      fontSize: 13, fontWeight: 800, color: '#16A34A',
                       textDecoration: 'underline', textUnderlineOffset: 3,
                     }}
                   >
@@ -723,7 +722,7 @@ export default function LoginPage() {
                     onClick={() => { setTab('login'); setError(''); setSuccess(''); }}
                     style={{
                       background: 'none', border: 'none', cursor: 'pointer',
-                      fontSize: 13, fontWeight: 600, color: '#a08060',
+                      fontSize: 13, fontWeight: 800, color: '#16A34A',
                       textDecoration: 'underline', textUnderlineOffset: 3,
                     }}
                   >
@@ -736,11 +735,11 @@ export default function LoginPage() {
               {tab !== 'forgot' && (
                 <motion.div variants={fadeUp} style={{ marginTop: 20 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
-                    <div style={{ flex: 1, height: 1, background: 'rgba(155,115,60,0.22)' }} />
-                    <span style={{ fontSize: 12, fontWeight: 600, color: '#b09570', whiteSpace: 'nowrap' }}>
+                    <div style={{ flex: 1, height: 2, background: '#BBF7D0', borderRadius: 99 }} />
+                    <span style={{ fontSize: 12, fontWeight: 800, color: '#16A34A', whiteSpace: 'nowrap' }}>
                       oppure continua con
                     </span>
-                    <div style={{ flex: 1, height: 1, background: 'rgba(155,115,60,0.22)' }} />
+                    <div style={{ flex: 1, height: 2, background: '#BBF7D0', borderRadius: 99 }} />
                   </div>
 
                   <div className="float-interactive">
