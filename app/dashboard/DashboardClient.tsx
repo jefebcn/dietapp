@@ -1,35 +1,24 @@
 'use client';
 
 /**
- * DashboardClient  –  Claymorphic Bento Grid Dashboard
+ * DashboardClient  –  Disney Cartoon Bento Grid Dashboard
  *
- * Design language: Claymorphism – warm cream (#f7f3e9) base, clay card surfaces
- * Palette: Avocado Green (#88b04b) · Amber (#d97706) · Rose (#f43f5e)
- * Animation: Framer Motion micro-interactions via ClayCard interactive prop
+ * Design language: Vibrant cartoon style – each data card has its own
+ * color identity with a 3D stamp shadow (0 6px 0 [accent]).
  *
- * Bento Grid Layout:
- *   Row 1: [Calorie ring – col-span-1 row-span-2] [Macros – col-span-1]
- *                                                  [NutriPoints – col-span-1]
- *   Row 2: [Weekly chart – col-span-2]             [Water – col-span-1]
- *   Row 3: [Quick actions – col-span-3 3x1-col grid]
- *   Row 4: [Today's meals – col-span-3]
+ * Card themes:
+ *   Calorie ring  – Green  (#F0FDF4 / #16A34A stamp)
+ *   Macros        – Blue   (#EFF6FF / #1D4ED8 stamp)
+ *   Weekly chart  – Amber  (#FFFBEB / #B45309 stamp)
+ *   Water         – Cyan   (#ECFEFF / #0E7490 stamp)
+ *   Quick actions – individual vivid colors
+ *   Meals list    – Warm neutral (#FFFBEB / #CA8A04 stamp)
  */
 
 import { useState } from 'react';
 import useSWR from 'swr';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ClayCard } from '@/components/ClayCard';
 import SprintyAssistant from '@/components/SprintyAssistant';
-
-// ── Shared Claymorphic shadow preset (applied to all grid items) ─────────────
-
-const CLAY_SHADOW_ELEVATED = [
-  '0 24px 64px rgba(90,58,20,0.18)',
-  '0 8px 24px rgba(90,58,20,0.12)',
-  '0 2px 6px rgba(90,58,20,0.08)',
-  'inset 0 2px 0 rgba(255,255,255,0.85)',
-  'inset 0 -2px 0 rgba(90,58,20,0.08)',
-].join(', ');
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -75,6 +64,53 @@ interface Props {
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
+// ── Card style presets ───────────────────────────────────────────────────────
+
+const CARD = {
+  green: {
+    background: 'linear-gradient(145deg, #F0FDF4 0%, #DCFCE7 100%)',
+    border: '2.5px solid #86EFAC',
+    borderRadius: '1.5rem',
+    boxShadow: '0 6px 0 #16A34A, 0 10px 28px rgba(21,128,61,0.18), inset 0 2px 0 rgba(255,255,255,0.70)',
+  },
+  blue: {
+    background: 'linear-gradient(145deg, #EFF6FF 0%, #DBEAFE 100%)',
+    border: '2.5px solid #93C5FD',
+    borderRadius: '1.5rem',
+    boxShadow: '0 6px 0 #1D4ED8, 0 10px 28px rgba(29,78,216,0.15), inset 0 2px 0 rgba(255,255,255,0.70)',
+  },
+  amber: {
+    background: 'linear-gradient(145deg, #FFFBEB 0%, #FEF3C7 100%)',
+    border: '2.5px solid #FDE68A',
+    borderRadius: '1.5rem',
+    boxShadow: '0 6px 0 #B45309, 0 10px 28px rgba(180,83,9,0.15), inset 0 2px 0 rgba(255,255,255,0.70)',
+  },
+  cyan: {
+    background: 'linear-gradient(145deg, #ECFEFF 0%, #CFFAFE 100%)',
+    border: '2.5px solid #67E8F9',
+    borderRadius: '1.5rem',
+    boxShadow: '0 6px 0 #0E7490, 0 10px 28px rgba(14,116,144,0.15), inset 0 2px 0 rgba(255,255,255,0.70)',
+  },
+  purple: {
+    background: 'linear-gradient(145deg, #F5F3FF 0%, #EDE9FE 100%)',
+    border: '2.5px solid #C4B5FD',
+    borderRadius: '1.5rem',
+    boxShadow: '0 6px 0 #6D28D9, 0 10px 28px rgba(109,40,217,0.15), inset 0 2px 0 rgba(255,255,255,0.70)',
+  },
+  neutral: {
+    background: 'linear-gradient(145deg, #FFFEF5 0%, #FFFBEB 100%)',
+    border: '2.5px solid #FDE68A',
+    borderRadius: '1.5rem',
+    boxShadow: '0 6px 0 #CA8A04, 0 10px 28px rgba(202,138,4,0.15), inset 0 2px 0 rgba(255,255,255,0.70)',
+  },
+  rose: {
+    background: 'linear-gradient(145deg, #FFF1F2 0%, #FFE4E6 100%)',
+    border: '2.5px solid #FECDD3',
+    borderRadius: '1.5rem',
+    boxShadow: '0 6px 0 #BE123C, 0 10px 28px rgba(190,18,60,0.15), inset 0 2px 0 rgba(255,255,255,0.70)',
+  },
+} as const;
+
 // ── Calorie ring ─────────────────────────────────────────────────────────────
 
 function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
@@ -98,13 +134,13 @@ function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
           </filter>
         </defs>
         {/* Track */}
-        <circle cx="74" cy="74" r={radius} fill="none" stroke="rgba(90,58,20,0.12)" strokeWidth="12" />
+        <circle cx="74" cy="74" r={radius} fill="none" stroke="rgba(21,128,61,0.15)" strokeWidth="13" />
         {/* Progress */}
         <motion.circle
           cx="74" cy="74" r={radius}
           fill="none"
-          stroke={isOver ? '#f43f5e' : '#88b04b'}
-          strokeWidth="12"
+          stroke={isOver ? '#F43F5E' : 'url(#kcal-grad)'}
+          strokeWidth="13"
           strokeLinecap="round"
           strokeDasharray={circumference}
           initial={{ strokeDashoffset: circumference }}
@@ -113,26 +149,32 @@ function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
           transform="rotate(-90 74 74)"
           filter="url(#ring-glow)"
         />
+        <defs>
+          <linearGradient id="kcal-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#4ADE80" />
+            <stop offset="100%" stopColor="#22C55E" />
+          </linearGradient>
+        </defs>
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <motion.span
-          className="text-2xl font-bold font-mono leading-none"
-          style={{ color: '#3d2a0a' }}
+          className="text-2xl leading-none"
+          style={{ color: '#14532D', fontWeight: 900 }}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3, duration: 0.4 }}
         >
           {consumed.toLocaleString('it-IT')}
         </motion.span>
-        <span className="text-xs mt-0.5" style={{ color: '#a08060' }}>
+        <span className="text-xs mt-0.5 font-bold" style={{ color: '#166534' }}>
           / {goal.toLocaleString('it-IT')} kcal
         </span>
         <span
-          className="text-xs font-semibold mt-1.5 px-2 py-0.5 rounded-full"
+          className="text-xs font-extrabold mt-1.5 px-2 py-0.5 rounded-full"
           style={
             isOver
-              ? { background: 'rgba(244,63,94,0.12)', color: '#e11d48' }
-              : { background: 'rgba(136,176,75,0.15)', color: '#5a7a1a' }
+              ? { background: '#FFE4E6', color: '#BE123C', border: '1.5px solid #FECDD3' }
+              : { background: '#BBF7D0', color: '#14532D', border: '1.5px solid #86EFAC' }
           }
         >
           {isOver
@@ -147,27 +189,26 @@ function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
 // ── Macro bar ────────────────────────────────────────────────────────────────
 
 function MacroBar({
-  label, value, goal, color,
+  label, value, goal, color, trackColor, textColor,
 }: {
-  label: string; value: number; goal: number; color: string;
+  label: string; value: number; goal: number; color: string; trackColor: string; textColor: string;
 }) {
   const pct = Math.min((value / Math.max(goal, 1)) * 100, 100);
 
   return (
     <div>
       <div className="flex justify-between items-baseline mb-1.5">
-        <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#a08060' }}>
+        <span className="text-xs font-extrabold uppercase tracking-wide" style={{ color: textColor }}>
           {label}
         </span>
-        <span className="text-xs font-mono" style={{ color: '#5c3d1a' }}>
-          {Math.round(value)}g
-          <span style={{ color: '#c8a878' }}> / {goal}g</span>
+        <span className="text-xs font-bold" style={{ color: textColor, opacity: 0.8 }}>
+          {Math.round(value)}<span style={{ opacity: 0.6 }}>/{goal}g</span>
         </span>
       </div>
-      <div className="h-2.5 rounded-full overflow-hidden" style={{ background: 'rgba(90,58,20,0.10)' }}>
+      <div className="h-3 rounded-full overflow-hidden" style={{ background: trackColor, border: '1.5px solid rgba(0,0,0,0.06)' }}>
         <motion.div
           className="h-full rounded-full"
-          style={{ backgroundColor: color }}
+          style={{ background: color }}
           initial={{ width: 0 }}
           animate={{ width: `${pct}%` }}
           transition={{ duration: 0.9, ease: 'easeOut', delay: 0.2 }}
@@ -181,38 +222,6 @@ function MacroBar({
   );
 }
 
-// ── NutriPoints mini-card ─────────────────────────────────────────────────────
-
-function NutriPointsCard({ stats, goals }: { stats: DailyStats; goals: Goals }) {
-  const kcalPct = goals.kcal > 0 ? stats.totalKcal / goals.kcal : 0;
-  const proteinPct = goals.protein > 0 ? stats.totalProtein / goals.protein : 0;
-  const avgPct = (kcalPct + proteinPct) / 2;
-  const points = Math.round(Math.min(avgPct, 1) * 100);
-
-  return (
-    <div className="flex flex-col items-center justify-center gap-1 h-full">
-      <span className="text-3xl font-black font-mono" style={{ color: '#88b04b' }}>
-        {points}
-      </span>
-      <span className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#a08060' }}>
-        NutriPoints
-      </span>
-      <div
-        className="mt-1 px-2 py-0.5 rounded-full text-xs font-semibold"
-        style={{
-          background: points >= 80
-            ? 'rgba(136,176,75,0.15)' : points >= 50
-            ? 'rgba(217,119,6,0.12)' : 'rgba(244,63,94,0.10)',
-          color: points >= 80 ? '#5a7a1a' : points >= 50 ? '#92400e' : '#e11d48',
-          border: `1px solid ${points >= 80 ? 'rgba(136,176,75,0.30)' : points >= 50 ? 'rgba(217,119,6,0.25)' : 'rgba(244,63,94,0.25)'}`,
-        }}
-      >
-        {points >= 80 ? '🌟 Ottimo!' : points >= 50 ? '👍 Buono' : '💪 Continua'}
-      </div>
-    </div>
-  );
-}
-
 // ── Water tracker ────────────────────────────────────────────────────────────
 
 function WaterTracker({ glasses = 0 }: { glasses?: number }) {
@@ -221,27 +230,26 @@ function WaterTracker({ glasses = 0 }: { glasses?: number }) {
 
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-wide mb-2" style={{ color: '#a08060' }}>
-        Acqua 💧
+      <p className="text-xs font-extrabold uppercase tracking-wide mb-2" style={{ color: '#0E7490' }}>
+        Acqua
       </p>
       <div className="flex flex-wrap gap-1.5">
         {Array.from({ length: goal }).map((_, i) => (
           <motion.button
             key={i}
             onClick={() => setCount(i < count ? i : i + 1)}
-            whileTap={{ scale: 0.80 }}
+            whileTap={{ scale: 0.75 }}
             className="w-7 h-7 rounded-xl flex items-center justify-center text-base transition-all"
             style={
               i < count
                 ? {
-                    background: 'rgba(96,165,250,0.18)',
-                    border: '1.5px solid rgba(96,165,250,0.45)',
-                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.6)',
+                    background: 'linear-gradient(145deg, #A5F3FC, #67E8F9)',
+                    border: '2px solid #0E7490',
+                    boxShadow: '0 3px 0 #0E7490',
                   }
                 : {
-                    background: 'rgba(90,58,20,0.06)',
-                    border: '1.5px solid rgba(90,58,20,0.12)',
-                    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.5)',
+                    background: 'rgba(14,116,144,0.08)',
+                    border: '2px solid rgba(14,116,144,0.20)',
                   }
             }
             aria-label={`Bicchiere ${i + 1}${i < count ? ' (bevuto)' : ''}`}
@@ -250,7 +258,7 @@ function WaterTracker({ glasses = 0 }: { glasses?: number }) {
           </motion.button>
         ))}
       </div>
-      <p className="text-xs mt-2" style={{ color: '#c8a878' }}>
+      <p className="text-xs mt-2 font-bold" style={{ color: '#0E7490' }}>
         {count} / {goal} bicchieri
       </p>
     </div>
@@ -266,7 +274,7 @@ function WeeklyChart({ weekStats, goalKcal }: { weekStats: DailyStats[]; goalKca
 
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-wide mb-3" style={{ color: '#a08060' }}>
+      <p className="text-xs font-extrabold uppercase tracking-wide mb-3" style={{ color: '#B45309' }}>
         Ultime 7 giornate
       </p>
       <div className="flex items-end gap-1.5 h-16">
@@ -280,13 +288,15 @@ function WeeklyChart({ weekStats, goalKcal }: { weekStats: DailyStats[]; goalKca
             <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
               <div className="w-full flex flex-col justify-end" style={{ height: 52 }}>
                 <motion.div
-                  className="w-full rounded-t-md"
+                  className="w-full rounded-t-lg"
                   style={{
-                    backgroundColor: isToday ? '#88b04b' : isOver ? '#f43f5e' : '#c8a878',
-                    opacity: isToday ? 1 : 0.65,
-                    boxShadow: isToday
-                      ? '0 0 8px rgba(136,176,75,0.45), inset 0 1px 0 rgba(255,255,255,0.4)'
-                      : undefined,
+                    background: isToday
+                      ? 'linear-gradient(180deg, #FBBF24 0%, #F59E0B 100%)'
+                      : isOver
+                      ? 'linear-gradient(180deg, #FB7185 0%, #F43F5E 100%)'
+                      : 'linear-gradient(180deg, #FDE68A 0%, #FCD34D 100%)',
+                    boxShadow: isToday ? '0 3px 0 #B45309' : undefined,
+                    border: isToday ? '2px solid #FBBF24' : '1px solid rgba(0,0,0,0.08)',
                   }}
                   initial={{ height: 0 }}
                   animate={{ height: `${Math.max(pct, day.totalKcal > 0 ? 10 : 2)}%` }}
@@ -295,8 +305,8 @@ function WeeklyChart({ weekStats, goalKcal }: { weekStats: DailyStats[]; goalKca
                 />
               </div>
               <span
-                className="text-[10px]"
-                style={{ color: isToday ? '#5a7a1a' : '#c8a878', fontWeight: isToday ? 700 : 400 }}
+                className="text-[10px] font-extrabold"
+                style={{ color: isToday ? '#B45309' : '#92400E', opacity: isToday ? 1 : 0.55 }}
               >
                 {days[d.getDay()]}
               </span>
@@ -304,9 +314,40 @@ function WeeklyChart({ weekStats, goalKcal }: { weekStats: DailyStats[]; goalKca
           );
         })}
       </div>
-      <p className="text-xs mt-2" style={{ color: '#c8a878' }}>
+      <p className="text-xs mt-2 font-bold" style={{ color: '#92400E', opacity: 0.7 }}>
         Obiettivo: {goalKcal.toLocaleString('it-IT')} kcal/gg
       </p>
+    </div>
+  );
+}
+
+// ── NutriPoints mini-widget ───────────────────────────────────────────────────
+
+function NutriPointsWidget({ stats, goals }: { stats: DailyStats; goals: Goals }) {
+  const kcalPct = goals.kcal > 0 ? stats.totalKcal / goals.kcal : 0;
+  const proteinPct = goals.protein > 0 ? stats.totalProtein / goals.protein : 0;
+  const avgPct = (kcalPct + proteinPct) / 2;
+  const points = Math.round(Math.min(avgPct, 1) * 100);
+
+  const badge =
+    points >= 80 ? { label: '🌟 Ottimo!', bg: '#BBF7D0', color: '#14532D' }
+    : points >= 50 ? { label: '👍 Buono',  bg: '#FEF3C7', color: '#92400E' }
+    : { label: '💪 Dai!',   bg: '#FFE4E6', color: '#BE123C' };
+
+  return (
+    <div className="flex items-center gap-2 pt-3 mt-auto" style={{ borderTop: '2px solid rgba(109,40,217,0.12)' }}>
+      <span className="text-2xl font-black leading-none" style={{ color: '#6D28D9' }}>
+        {points}
+      </span>
+      <div>
+        <p className="text-xs font-extrabold uppercase tracking-wide" style={{ color: '#6D28D9' }}>NutriPts</p>
+        <span
+          className="text-xs font-bold px-1.5 py-0.5 rounded-full"
+          style={{ background: badge.bg, color: badge.color }}
+        >
+          {badge.label}
+        </span>
+      </div>
     </div>
   );
 }
@@ -329,41 +370,69 @@ function MealRow({ meal, onDelete }: { meal: Meal; onDelete: (id: string) => voi
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 8, height: 0 }}
       className="flex items-center gap-3 py-2.5 last:border-0"
-      style={{ borderBottom: '1.5px solid rgba(90,58,20,0.07)' }}
+      style={{ borderBottom: '2px solid rgba(202,138,4,0.10)' }}
     >
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate" style={{ color: '#3d2a0a' }}>
+        <p className="text-sm font-extrabold truncate" style={{ color: '#1A2E1A' }}>
           {meal.name}
         </p>
-        <p className="text-xs" style={{ color: '#a08060' }}>
-          {meal.qty}{meal.unit} · P {Math.round(meal.protein)}g · C {Math.round(meal.carbs)}g · G {Math.round(meal.fat)}g
+        <p className="text-xs font-bold" style={{ color: '#92400E', opacity: 0.75 }}>
+          {meal.qty}{meal.unit} · P <span style={{ color: '#1D4ED8' }}>{Math.round(meal.protein)}g</span> · C <span style={{ color: '#D97706' }}>{Math.round(meal.carbs)}g</span> · G <span style={{ color: '#BE123C' }}>{Math.round(meal.fat)}g</span>
         </p>
       </div>
       <div className="flex items-center gap-2 flex-shrink-0">
-        <span className="text-sm font-bold font-mono" style={{ color: '#5c3d1a' }}>
+        <span
+          className="text-sm font-black px-2 py-0.5 rounded-full"
+          style={{ background: '#DCFCE7', color: '#14532D', border: '1.5px solid #86EFAC' }}
+        >
           {Math.round(meal.kcal)} kcal
         </span>
-        <button
+        <motion.button
           onClick={handleDelete}
           disabled={deleting}
           aria-label={`Elimina ${meal.name}`}
-          className="p-1.5 rounded-lg transition-colors disabled:opacity-40"
-          style={{ color: '#c8a878' }}
-          onMouseEnter={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.color = '#e11d48';
-            (e.currentTarget as HTMLButtonElement).style.background = 'rgba(244,63,94,0.10)';
-          }}
-          onMouseLeave={(e) => {
-            (e.currentTarget as HTMLButtonElement).style.color = '#c8a878';
-            (e.currentTarget as HTMLButtonElement).style.background = 'transparent';
-          }}
+          className="p-1.5 rounded-xl transition-colors disabled:opacity-40"
+          style={{ background: '#FFE4E6', color: '#BE123C', border: '1.5px solid #FECDD3' }}
+          whileTap={{ scale: 0.85 }}
         >
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden="true">
             <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6" />
           </svg>
-        </button>
+        </motion.button>
       </div>
     </motion.li>
+  );
+}
+
+// ── Quick action card ─────────────────────────────────────────────────────────
+
+function QuickAction({
+  label, icon, href, cardStyle, labelColor,
+}: {
+  label: string; icon: string; href: string;
+  cardStyle: React.CSSProperties; labelColor: string;
+}) {
+  return (
+    <motion.div
+      role="link"
+      tabIndex={0}
+      onClick={() => { window.location.href = href; }}
+      onKeyDown={(e) => { if (e.key === 'Enter') window.location.href = href; }}
+      className="flex flex-col items-center gap-2 p-4 text-center cursor-pointer select-none"
+      style={cardStyle}
+      whileHover={{ scale: 1.04, y: -3, transition: { type: 'spring', stiffness: 340, damping: 22 } }}
+      whileTap={{ scale: 0.96, y: 4 }}
+    >
+      <motion.span
+        className="text-2xl"
+        aria-hidden="true"
+        animate={{ y: [0, -5, 0] }}
+        transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+      >
+        {icon}
+      </motion.span>
+      <span className="text-xs font-extrabold" style={{ color: labelColor }}>{label}</span>
+    </motion.div>
   );
 }
 
@@ -402,25 +471,18 @@ export default function DashboardClient({
   return (
     <div className="space-y-4">
 
-      {/*
-        ── Row 1: 3-column Bento ─────────────────────────────────────────────
-        Col 0: Calorie ring (col-span-1, row-span-2 via grid rows trick)
-        Col 1: Macros
-        Col 2: NutriPoints
-      */}
+      {/* ── Row 1: Calorie Ring (tall) + Macros ── */}
       <div className="grid grid-cols-3 gap-4">
 
-        {/* Calorie Ring – large hero card (col-span-1 tall) */}
-        <div
-          className="rounded-[2rem] flex flex-col items-center justify-center gap-2 p-4 col-span-1 row-span-2"
-          style={{
-            background: 'linear-gradient(160deg, #fffdf8 0%, #faf5ea 100%)',
-            border: '1.5px solid rgba(210,185,140,0.30)',
-            boxShadow: CLAY_SHADOW_ELEVATED,
-            gridRow: 'span 2',
-          }}
+        {/* Calorie Ring – green hero card, spans 2 rows */}
+        <motion.div
+          className="col-span-1 flex flex-col items-center justify-center gap-2 p-4"
+          style={{ ...CARD.green, gridRow: 'span 2' }}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: 'easeOut' }}
         >
-          <p className="text-xs font-semibold uppercase tracking-wide self-start" style={{ color: '#a08060' }}>
+          <p className="text-xs font-extrabold uppercase tracking-wide self-start" style={{ color: '#166534' }}>
             Calorie
           </p>
           <CalorieRing consumed={Math.round(stats.totalKcal)} goal={goals.kcal} />
@@ -428,124 +490,122 @@ export default function DashboardClient({
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="flex items-center gap-1.5 text-xs font-semibold px-2 py-1 rounded-full"
-              style={{
-                background: 'rgba(136,176,75,0.15)',
-                color: '#5a7a1a',
-                border: '1px solid rgba(136,176,75,0.35)',
-              }}
+              className="flex items-center gap-1.5 text-xs font-extrabold px-2 py-1 rounded-full"
+              style={{ background: '#BBF7D0', color: '#14532D', border: '2px solid #86EFAC' }}
             >
               <SprintyAssistant mood="success" size="xs" />
               Obiettivo!
             </motion.div>
           )}
-        </div>
+        </motion.div>
 
-        {/* Macros – col-span-2 to fill remaining space on row 1 */}
-        <ClayCard
-          elevated
-          interactive
-          className="flex flex-col justify-center gap-3.5 p-4 col-span-2"
-          style={{ boxShadow: CLAY_SHADOW_ELEVATED }}
+        {/* Macros – blue card, col-span-2 */}
+        <motion.div
+          className="col-span-2 flex flex-col justify-center gap-3.5 p-4"
+          style={CARD.blue}
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.45, ease: 'easeOut', delay: 0.08 }}
         >
-          <p className="text-xs font-semibold uppercase tracking-wide" style={{ color: '#a08060' }}>
-            Macro
+          <p className="text-xs font-extrabold uppercase tracking-wide" style={{ color: '#1D4ED8' }}>
+            Macronutrienti
           </p>
-          <MacroBar label="Proteine"    value={stats.totalProtein} goal={goals.protein} color="#88b04b" />
-          <MacroBar label="Carboidrati" value={stats.totalCarbs}   goal={goals.carbs}   color="#d97706" />
-          <MacroBar label="Grassi"      value={stats.totalFat}     goal={goals.fat}     color="#f43f5e" />
-        </ClayCard>
+          <MacroBar
+            label="Proteine" value={stats.totalProtein} goal={goals.protein}
+            color="linear-gradient(90deg, #60A5FA, #3B82F6)" trackColor="#BFDBFE" textColor="#1E3A8A"
+          />
+          <MacroBar
+            label="Carboidrati" value={stats.totalCarbs} goal={goals.carbs}
+            color="linear-gradient(90deg, #FBBF24, #F59E0B)" trackColor="#FDE68A" textColor="#78350F"
+          />
+          <MacroBar
+            label="Grassi" value={stats.totalFat} goal={goals.fat}
+            color="linear-gradient(90deg, #FB7185, #F43F5E)" trackColor="#FECDD3" textColor="#881337"
+          />
+        </motion.div>
       </div>
 
-      {/*
-        ── Row 2: Weekly chart + Water (below macros, right of calorie ring) ──
-        Uses a separate grid to avoid spanning complexity
-      */}
+      {/* ── Row 2: Weekly chart + Water (below macros, right of calorie ring) ── */}
       {weekStats.length > 0 && (
         <div className="grid grid-cols-3 gap-4">
-          <ClayCard
-            elevated
-            interactive
+          <motion.div
             className="col-span-2 p-4"
-            style={{ boxShadow: CLAY_SHADOW_ELEVATED }}
+            style={CARD.amber}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: 'easeOut', delay: 0.16 }}
           >
             <WeeklyChart weekStats={weekStats} goalKcal={goals.kcal} />
-          </ClayCard>
-          <ClayCard
-            elevated
-            interactive
+          </motion.div>
+          <motion.div
             className="col-span-1 p-4 flex flex-col"
-            style={{ boxShadow: CLAY_SHADOW_ELEVATED }}
+            style={CARD.cyan}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, ease: 'easeOut', delay: 0.22 }}
           >
             <WaterTracker />
-            {/* NutriPoints mini inside water card on mobile */}
-            <div
-              className="mt-auto pt-3 flex items-center gap-2"
-              style={{ borderTop: '1px solid rgba(90,58,20,0.08)' }}
-            >
-              <span className="text-2xl font-black font-mono" style={{ color: '#88b04b' }}>
-                {Math.round(Math.min((stats.totalKcal / Math.max(goals.kcal, 1)), 1) * 100)}
-              </span>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide leading-tight" style={{ color: '#a08060' }}>NutriPts</p>
-                <p className="text-xs" style={{ color: '#c8a878' }}>oggi</p>
-              </div>
-            </div>
-          </ClayCard>
+            <NutriPointsWidget stats={stats} goals={goals} />
+          </motion.div>
         </div>
       )}
 
-      {/* ── Row 3: Quick actions (3-col) ── */}
+      {/* ── Row 3: Quick actions ── */}
       <div className="grid grid-cols-3 gap-3">
-        {[
-          { label: 'Cerca cibo',  icon: '🔍', href: '/diary',        glow: 'blue'  as const },
-          { label: 'Scansiona',   icon: '📷', href: '/diary?scan=1', glow: 'green' as const },
-          { label: 'Peso',        icon: '⚖️', href: '/weight',       glow: 'amber' as const },
-        ].map((action) => (
-          <ClayCard
-            key={action.label}
-            interactive
-            glow={action.glow}
-            className="flex flex-col items-center gap-2 p-4 text-center"
-            style={{ boxShadow: CLAY_SHADOW_ELEVATED }}
-            role="link"
-            onClick={() => { window.location.href = action.href; }}
-            tabIndex={0}
-            aria-label={action.label}
-          >
-            <motion.span
-              className="text-2xl"
-              aria-hidden="true"
-              animate={{ y: [0, -4, 0] }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut', delay: Math.random() * 1 }}
-            >
-              {action.icon}
-            </motion.span>
-            <span className="text-xs font-semibold" style={{ color: '#7a5c2e' }}>{action.label}</span>
-          </ClayCard>
-        ))}
+        <QuickAction
+          label="Cerca cibo"
+          icon="🔍"
+          href="/diary"
+          cardStyle={CARD.blue}
+          labelColor="#1D4ED8"
+        />
+        <QuickAction
+          label="Scansiona"
+          icon="📷"
+          href="/diary?scan=1"
+          cardStyle={CARD.purple}
+          labelColor="#6D28D9"
+        />
+        <QuickAction
+          label="Peso"
+          icon="⚖️"
+          href="/weight"
+          cardStyle={CARD.amber}
+          labelColor="#B45309"
+        />
       </div>
 
-      {/* ── Row 4: Today's meals (full width) ── */}
-      <ClayCard
-        elevated
-        className="p-4 col-span-3"
-        style={{ boxShadow: CLAY_SHADOW_ELEVATED }}
+      {/* ── Row 4: Today's meals ── */}
+      <motion.div
+        className="p-4"
+        style={CARD.neutral}
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, ease: 'easeOut', delay: 0.30 }}
       >
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold" style={{ color: '#3d2a0a' }}>
+          <h3 className="text-sm font-extrabold" style={{ color: '#1A2E1A' }}>
             Pasti di oggi
             {meals.length > 0 && (
-              <span className="ml-2 text-xs font-normal" style={{ color: '#c8a878' }}>
-                ({meals.length})
+              <span
+                className="ml-2 text-xs font-extrabold px-2 py-0.5 rounded-full"
+                style={{ background: '#FEF3C7', color: '#B45309', border: '1.5px solid #FDE68A' }}
+              >
+                {meals.length}
               </span>
             )}
           </h3>
           <motion.a
             href="/diary"
-            whileHover={{ scale: 1.05 }}
-            className="text-xs font-semibold transition-colors"
-            style={{ color: '#88b04b' }}
+            className="text-xs font-extrabold px-3 py-1.5 rounded-full"
+            style={{
+              background: 'linear-gradient(145deg, #F0FDF4, #DCFCE7)',
+              color: '#14532D',
+              border: '2px solid #86EFAC',
+              boxShadow: '0 3px 0 #16A34A',
+            }}
+            whileHover={{ scale: 1.05, y: -1 }}
+            whileTap={{ scale: 0.97, y: 2 }}
           >
             + Aggiungi
           </motion.a>
@@ -572,7 +632,7 @@ export default function DashboardClient({
             </ul>
           </AnimatePresence>
         )}
-      </ClayCard>
+      </motion.div>
     </div>
   );
 }
