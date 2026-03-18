@@ -37,28 +37,21 @@ export default async function LeaguesPage() {
   const currentLeague = LEAGUES[currentTier];
 
   return (
-    <div
-      className="relative min-h-screen"
-      style={{
-        background: 'linear-gradient(160deg, #F5F3FF 0%, #EDE9FE 45%, #DBEAFE 100%)',
-        backgroundAttachment: 'fixed',
-      }}
-    >
+    <div className="relative min-h-screen">
       {/* Header */}
       <header
         className="sticky top-0 z-30"
         style={{
-          background: 'rgba(245,243,255,0.92)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '2.5px solid #C4B5FD',
-          boxShadow: '0 4px 20px rgba(109,40,217,0.10)',
+          background: 'rgba(8,11,20,0.82)',
+          backdropFilter: 'blur(28px)',
+          WebkitBackdropFilter: 'blur(28px)',
+          borderBottom: '1px solid rgba(255,255,255,0.07)',
         }}
       >
         <div className="max-w-2xl mx-auto px-4 py-3">
           <h1
             className="text-2xl"
-            style={{ fontFamily: 'var(--font-display)', color: '#4C1D95' }}
+            style={{ fontFamily: 'var(--font-display)', color: '#F8FAFC' }}
           >
             {currentLeague.emoji} Leghe NutriTrack
           </h1>
@@ -68,29 +61,22 @@ export default async function LeaguesPage() {
       <main className="relative z-10 max-w-2xl mx-auto px-4 pt-4 space-y-4 page-content">
 
         {/* Current tier card */}
-        <div
-          className="p-5 rounded-3xl"
-          style={{
-            background: currentLeague.bgGradient,
-            border: `2.5px solid ${currentLeague.borderColor}`,
-            boxShadow: `0 6px 0 ${currentLeague.shadowColor}, 0 10px 28px rgba(0,0,0,0.10)`,
-          }}
-        >
+        <div className="p-5 rounded-3xl glass-violet">
           <p
             className="text-xs uppercase tracking-wider mb-1"
-            style={{ fontFamily: 'var(--font-ui)', color: currentLeague.color, opacity: 0.7 }}
+            style={{ fontFamily: 'var(--font-ui)', color: 'rgba(248,250,252,0.40)' }}
           >
             La tua lega attuale
           </p>
           <h2
             className="text-3xl mb-1"
-            style={{ fontFamily: 'var(--font-display)', color: currentLeague.color }}
+            style={{ fontFamily: 'var(--font-display)', color: '#F8FAFC' }}
           >
             {currentLeague.emoji} {currentLeague.name}
           </h2>
           <p
             className="text-sm"
-            style={{ fontFamily: 'var(--font-ui)', color: currentLeague.color, opacity: 0.8 }}
+            style={{ fontFamily: 'var(--font-ui)', color: 'rgba(248,250,252,0.65)' }}
           >
             {membership
               ? `${membership.nutriPoints.toLocaleString('it-IT')} NutriPoints`
@@ -102,7 +88,7 @@ export default async function LeaguesPage() {
         <div className="space-y-3">
           <h3
             className="text-base font-semibold px-1"
-            style={{ fontFamily: 'var(--font-ui)', color: '#4C1D95' }}
+            style={{ fontFamily: 'var(--font-ui)', color: '#F8FAFC' }}
           >
             Tutte le leghe
           </h3>
@@ -112,27 +98,20 @@ export default async function LeaguesPage() {
             return (
               <div
                 key={tier}
-                className="flex items-center justify-between p-4 rounded-2xl transition-all"
-                style={{
-                  background: isActive ? league.bgGradient : 'rgba(255,255,255,0.7)',
-                  border: `2px solid ${isActive ? league.borderColor : 'rgba(196,181,253,0.4)'}`,
-                  boxShadow: isActive
-                    ? `0 4px 0 ${league.shadowColor}, 0 8px 16px rgba(0,0,0,0.08)`
-                    : '0 2px 8px rgba(0,0,0,0.05)',
-                }}
+                className={`flex items-center justify-between p-4 rounded-2xl transition-all ${isActive ? 'glass-violet' : 'glass'}`}
               >
                 <div className="flex items-center gap-3">
                   <span className="text-2xl">{league.emoji}</span>
                   <div>
                     <p
                       className="text-sm font-bold"
-                      style={{ fontFamily: 'var(--font-ui)', color: league.color }}
+                      style={{ fontFamily: 'var(--font-ui)', color: '#F8FAFC' }}
                     >
                       {league.name}
                     </p>
                     <p
                       className="text-xs"
-                      style={{ fontFamily: 'var(--font-ui)', color: league.color, opacity: 0.65 }}
+                      style={{ fontFamily: 'var(--font-ui)', color: 'rgba(248,250,252,0.65)' }}
                     >
                       Min. {league.minPoints.toLocaleString('it-IT')} punti
                     </p>
@@ -141,13 +120,13 @@ export default async function LeaguesPage() {
                 <div className="text-right">
                   <p
                     className="text-sm font-bold"
-                    style={{ fontFamily: 'var(--font-ui)', color: league.color }}
+                    style={{ fontFamily: 'var(--font-ui)', color: '#F8FAFC' }}
                   >
                     {totalMembers.toLocaleString('it-IT')}
                   </p>
                   <p
                     className="text-xs"
-                    style={{ fontFamily: 'var(--font-ui)', color: league.color, opacity: 0.6 }}
+                    style={{ fontFamily: 'var(--font-ui)', color: 'rgba(248,250,252,0.40)' }}
                   >
                     membri
                   </p>

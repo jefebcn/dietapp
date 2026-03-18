@@ -115,18 +115,13 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
       {/* Daily summary bar */}
       {stats && (
         <div
-          className="flex justify-between p-3 rounded-2xl mb-4"
-          style={{
-            background: 'linear-gradient(145deg, #FFFBEB, #FEF3C7)',
-            border: '2px solid #FDE68A',
-            boxShadow: '0 4px 0 #D97706, inset 0 1.5px 0 rgba(255,255,255,0.8)',
-          }}
+          className="flex justify-between p-3 rounded-2xl mb-4 glass-amber"
         >
           {[
-            { label: 'Kcal', value: stats.totalKcal, color: '#92400E' },
-            { label: 'Prot', value: `${stats.totalProtein}g`, color: '#1D4ED8' },
-            { label: 'Carb', value: `${stats.totalCarbs}g`, color: '#B45309' },
-            { label: 'Gras', value: `${stats.totalFat}g`, color: '#BE123C' },
+            { label: 'Kcal', value: stats.totalKcal, color: '#F8FAFC' },
+            { label: 'Prot', value: `${stats.totalProtein}g`, color: '#F8FAFC' },
+            { label: 'Carb', value: `${stats.totalCarbs}g`, color: '#F8FAFC' },
+            { label: 'Gras', value: `${stats.totalFat}g`, color: '#F8FAFC' },
           ].map((item) => (
             <div key={item.label} className="text-center">
               <p
@@ -137,7 +132,7 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
               </p>
               <p
                 className="text-xs"
-                style={{ fontFamily: 'var(--font-ui)', color: item.color, opacity: 0.7 }}
+                style={{ fontFamily: 'var(--font-ui)', color: 'rgba(248,250,252,0.65)' }}
               >
                 {item.label}
               </p>
@@ -160,30 +155,25 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
               layout
             >
               <div
-                className="flex items-center justify-between px-4 py-3 rounded-2xl"
-                style={{
-                  background: 'rgba(255,255,255,0.85)',
-                  border: '2px solid #FDE68A',
-                  boxShadow: '0 3px 0 #D97706, 0 5px 12px rgba(180,83,9,0.08)',
-                }}
+                className="flex items-center justify-between px-4 py-3 rounded-2xl glass"
               >
                 <div className="min-w-0">
                   <p
                     className="text-sm font-semibold truncate"
-                    style={{ fontFamily: 'var(--font-ui)', color: '#78350F' }}
+                    style={{ fontFamily: 'var(--font-ui)', color: '#F8FAFC' }}
                   >
                     {meal.name}
                   </p>
                   <p
                     className="text-xs"
-                    style={{ fontFamily: 'var(--font-ui)', color: '#B45309' }}
+                    style={{ fontFamily: 'var(--font-ui)', color: 'rgba(248,250,252,0.65)' }}
                   >
                     {meal.qty} {meal.unit} · P {meal.protein}g · C {meal.carbs}g · G {meal.fat}g
                   </p>
                 </div>
                 <span
                   className="ml-3 flex-shrink-0 font-bold"
-                  style={{ fontFamily: 'var(--font-ui)', color: '#92400E', fontSize: 15 }}
+                  style={{ fontFamily: 'var(--font-ui)', color: '#F8FAFC', fontSize: 15 }}
                 >
                   {meal.kcal} kcal
                 </span>
@@ -195,7 +185,7 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
         {meals.length === 0 && (
           <div className="text-center py-8 opacity-60">
             <p className="text-4xl mb-2">🍽️</p>
-            <p style={{ fontFamily: 'var(--font-ui)', color: '#6B7280' }}>
+            <p style={{ fontFamily: 'var(--font-ui)', color: 'rgba(248,250,252,0.65)' }}>
               Nessun pasto registrato oggi
             </p>
           </div>
@@ -205,7 +195,7 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
       {/* FAB Add button */}
       <button
         onClick={openAddSheet}
-        className="btn-primary w-full"
+        className="btn btn-violet w-full"
         style={{ fontSize: 15 }}
       >
         + Aggiungi pasto
@@ -222,29 +212,25 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               {[
-                { label: 'Calorie', value: `${selectedMeal.kcal} kcal`, color: '#92400E' },
-                { label: 'Porzione', value: `${selectedMeal.qty} ${selectedMeal.unit}`, color: '#15803D' },
-                { label: 'Proteine', value: `${selectedMeal.protein}g`, color: '#1D4ED8' },
-                { label: 'Carboidrati', value: `${selectedMeal.carbs}g`, color: '#B45309' },
-                { label: 'Grassi', value: `${selectedMeal.fat}g`, color: '#BE123C' },
+                { label: 'Calorie', value: `${selectedMeal.kcal} kcal` },
+                { label: 'Porzione', value: `${selectedMeal.qty} ${selectedMeal.unit}` },
+                { label: 'Proteine', value: `${selectedMeal.protein}g` },
+                { label: 'Carboidrati', value: `${selectedMeal.carbs}g` },
+                { label: 'Grassi', value: `${selectedMeal.fat}g` },
               ].map((item) => (
                 <div
                   key={item.label}
-                  className="p-3 rounded-xl text-center"
-                  style={{
-                    background: 'linear-gradient(145deg, #F9FAFB, #F3F4F6)',
-                    border: '2px solid #E5E7EB',
-                  }}
+                  className="p-3 rounded-xl text-center glass"
                 >
                   <p
                     className="text-lg font-bold"
-                    style={{ fontFamily: 'var(--font-ui)', color: item.color }}
+                    style={{ fontFamily: 'var(--font-ui)', color: '#F8FAFC' }}
                   >
                     {item.value}
                   </p>
                   <p
                     className="text-xs"
-                    style={{ fontFamily: 'var(--font-ui)', color: '#6B7280' }}
+                    style={{ fontFamily: 'var(--font-ui)', color: 'rgba(248,250,252,0.65)' }}
                   >
                     {item.label}
                   </p>
@@ -254,7 +240,7 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
             <button
               onClick={() => handleDelete(selectedMeal.id)}
               disabled={isPending}
-              className="btn-danger w-full"
+              className="btn btn-rose w-full"
             >
               {isPending ? 'Eliminando...' : 'Elimina pasto'}
             </button>
@@ -273,7 +259,7 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
           {error && (
             <p
               className="text-sm px-3 py-2 rounded-xl"
-              style={{ fontFamily: 'var(--font-ui)', color: '#BE123C', background: '#FFE4E6', border: '1.5px solid #FECDD3' }}
+              style={{ fontFamily: 'var(--font-ui)', color: '#FDA4AF', background: 'rgba(244,63,94,0.15)', border: '1.5px solid rgba(244,63,94,0.3)' }}
             >
               {error}
             </p>
@@ -288,7 +274,7 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
             <div key={key}>
               <label
                 className="block text-xs font-semibold mb-1"
-                style={{ fontFamily: 'var(--font-ui)', color: '#374151' }}
+                style={{ fontFamily: 'var(--font-ui)', color: 'rgba(248,250,252,0.65)' }}
               >
                 {label}
               </label>
@@ -297,13 +283,10 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
                 required={required}
                 value={form[key as keyof typeof form]}
                 onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
-                className="w-full px-3 py-2.5 rounded-xl text-sm outline-none"
+                className="glass-input w-full px-3 py-2.5 rounded-xl text-sm outline-none"
                 style={{
                   fontFamily: 'var(--font-ui)',
-                  border: '2px solid #FDE68A',
-                  background: '#FFFBEB',
-                  color: '#78350F',
-                  boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.04)',
+                  color: '#F8FAFC',
                 }}
               />
             </div>
@@ -311,7 +294,7 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
           <button
             type="submit"
             disabled={isPending}
-            className="btn-primary w-full"
+            className="btn btn-violet w-full"
           >
             {isPending ? 'Salvando...' : 'Aggiungi'}
           </button>
