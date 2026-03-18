@@ -18,7 +18,6 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import { motion, AnimatePresence } from 'framer-motion';
-import SprintyAssistant from '@/components/SprintyAssistant';
 
 // ── Types ───────────────────────────────────────────────────────────────────
 
@@ -67,11 +66,11 @@ const fetcher = (url: string) => fetch(url).then((r) => r.json());
 // ── Card style presets ───────────────────────────────────────────────────────
 
 const CARD = {
-  green: {
-    background: 'linear-gradient(145deg, #F0FDF4 0%, #DCFCE7 100%)',
-    border: '2.5px solid #86EFAC',
+  indigo: {
+    background: 'linear-gradient(145deg, #EEF2FF 0%, #E0E7FF 100%)',
+    border: '2.5px solid #A5B4FC',
     borderRadius: '1.5rem',
-    boxShadow: '0 6px 0 #16A34A, 0 10px 28px rgba(21,128,61,0.18), inset 0 2px 0 rgba(255,255,255,0.70)',
+    boxShadow: '0 6px 0 #4338CA, 0 10px 28px rgba(67,56,202,0.18), inset 0 2px 0 rgba(255,255,255,0.70)',
   },
   blue: {
     background: 'linear-gradient(145deg, #EFF6FF 0%, #DBEAFE 100%)',
@@ -85,11 +84,11 @@ const CARD = {
     borderRadius: '1.5rem',
     boxShadow: '0 6px 0 #B45309, 0 10px 28px rgba(180,83,9,0.15), inset 0 2px 0 rgba(255,255,255,0.70)',
   },
-  cyan: {
-    background: 'linear-gradient(145deg, #ECFEFF 0%, #CFFAFE 100%)',
-    border: '2.5px solid #67E8F9',
+  emerald: {
+    background: 'linear-gradient(145deg, #ECFDF5 0%, #D1FAE5 100%)',
+    border: '2.5px solid #6EE7B7',
     borderRadius: '1.5rem',
-    boxShadow: '0 6px 0 #0E7490, 0 10px 28px rgba(14,116,144,0.15), inset 0 2px 0 rgba(255,255,255,0.70)',
+    boxShadow: '0 6px 0 #059669, 0 10px 28px rgba(5,150,105,0.15), inset 0 2px 0 rgba(255,255,255,0.70)',
   },
   purple: {
     background: 'linear-gradient(145deg, #F5F3FF 0%, #EDE9FE 100%)',
@@ -98,10 +97,10 @@ const CARD = {
     boxShadow: '0 6px 0 #6D28D9, 0 10px 28px rgba(109,40,217,0.15), inset 0 2px 0 rgba(255,255,255,0.70)',
   },
   neutral: {
-    background: 'linear-gradient(145deg, #FFFEF5 0%, #FFFBEB 100%)',
-    border: '2.5px solid #FDE68A',
+    background: 'linear-gradient(145deg, #F8FAFC 0%, #F1F5F9 100%)',
+    border: '2.5px solid #CBD5E1',
     borderRadius: '1.5rem',
-    boxShadow: '0 6px 0 #CA8A04, 0 10px 28px rgba(202,138,4,0.15), inset 0 2px 0 rgba(255,255,255,0.70)',
+    boxShadow: '0 6px 0 #475569, 0 10px 28px rgba(71,85,105,0.12), inset 0 2px 0 rgba(255,255,255,0.70)',
   },
   rose: {
     background: 'linear-gradient(145deg, #FFF1F2 0%, #FFE4E6 100%)',
@@ -134,7 +133,7 @@ function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
           </filter>
         </defs>
         {/* Track */}
-        <circle cx="74" cy="74" r={radius} fill="none" stroke="rgba(21,128,61,0.15)" strokeWidth="13" />
+        <circle cx="74" cy="74" r={radius} fill="none" stroke="rgba(67,56,202,0.15)" strokeWidth="13" />
         {/* Progress */}
         <motion.circle
           cx="74" cy="74" r={radius}
@@ -151,22 +150,22 @@ function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
         />
         <defs>
           <linearGradient id="kcal-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#4ADE80" />
-            <stop offset="100%" stopColor="#22C55E" />
+            <stop offset="0%" stopColor="#818CF8" />
+            <stop offset="100%" stopColor="#6366F1" />
           </linearGradient>
         </defs>
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <motion.span
           className="text-2xl leading-none"
-          style={{ color: '#14532D', fontWeight: 900 }}
+          style={{ color: '#312E81', fontWeight: 900 }}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.3, duration: 0.4 }}
         >
           {consumed.toLocaleString('it-IT')}
         </motion.span>
-        <span className="text-xs mt-0.5 font-bold" style={{ color: '#166534' }}>
+        <span className="text-xs mt-0.5 font-bold" style={{ color: '#4338CA' }}>
           / {goal.toLocaleString('it-IT')} kcal
         </span>
         <span
@@ -174,7 +173,7 @@ function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
           style={
             isOver
               ? { background: '#FFE4E6', color: '#BE123C', border: '1.5px solid #FECDD3' }
-              : { background: '#BBF7D0', color: '#14532D', border: '1.5px solid #86EFAC' }
+              : { background: '#E0E7FF', color: '#3730A3', border: '1.5px solid #A5B4FC' }
           }
         >
           {isOver
@@ -230,7 +229,7 @@ function WaterTracker({ glasses = 0 }: { glasses?: number }) {
 
   return (
     <div>
-      <p className="text-xs font-extrabold uppercase tracking-wide mb-2" style={{ color: '#0E7490' }}>
+      <p className="text-xs font-extrabold uppercase tracking-wide mb-2" style={{ color: '#4338CA' }}>
         Acqua
       </p>
       <div className="flex flex-wrap gap-1.5">
@@ -258,7 +257,7 @@ function WaterTracker({ glasses = 0 }: { glasses?: number }) {
           </motion.button>
         ))}
       </div>
-      <p className="text-xs mt-2 font-bold" style={{ color: '#0E7490' }}>
+      <p className="text-xs mt-2 font-bold" style={{ color: '#4338CA' }}>
         {count} / {goal} bicchieri
       </p>
     </div>
@@ -274,7 +273,7 @@ function WeeklyChart({ weekStats, goalKcal }: { weekStats: DailyStats[]; goalKca
 
   return (
     <div>
-      <p className="text-xs font-extrabold uppercase tracking-wide mb-3" style={{ color: '#B45309' }}>
+      <p className="text-xs font-extrabold uppercase tracking-wide mb-3" style={{ color: '#4338CA' }}>
         Ultime 7 giornate
       </p>
       <div className="flex items-end gap-1.5 h-16">
@@ -291,12 +290,12 @@ function WeeklyChart({ weekStats, goalKcal }: { weekStats: DailyStats[]; goalKca
                   className="w-full rounded-t-lg"
                   style={{
                     background: isToday
-                      ? 'linear-gradient(180deg, #FBBF24 0%, #F59E0B 100%)'
+                      ? 'linear-gradient(180deg, #818CF8 0%, #6366F1 100%)'
                       : isOver
                       ? 'linear-gradient(180deg, #FB7185 0%, #F43F5E 100%)'
-                      : 'linear-gradient(180deg, #FDE68A 0%, #FCD34D 100%)',
-                    boxShadow: isToday ? '0 3px 0 #B45309' : undefined,
-                    border: isToday ? '2px solid #FBBF24' : '1px solid rgba(0,0,0,0.08)',
+                      : 'linear-gradient(180deg, #C7D2FE 0%, #A5B4FC 100%)',
+                    boxShadow: isToday ? '0 3px 0 #4338CA' : undefined,
+                    border: isToday ? '2px solid #818CF8' : '1px solid rgba(0,0,0,0.08)',
                   }}
                   initial={{ height: 0 }}
                   animate={{ height: `${Math.max(pct, day.totalKcal > 0 ? 10 : 2)}%` }}
@@ -306,7 +305,7 @@ function WeeklyChart({ weekStats, goalKcal }: { weekStats: DailyStats[]; goalKca
               </div>
               <span
                 className="text-[10px] font-extrabold"
-                style={{ color: isToday ? '#B45309' : '#92400E', opacity: isToday ? 1 : 0.55 }}
+                style={{ color: isToday ? '#4338CA' : '#6366F1', opacity: isToday ? 1 : 0.55 }}
               >
                 {days[d.getDay()]}
               </span>
@@ -314,7 +313,7 @@ function WeeklyChart({ weekStats, goalKcal }: { weekStats: DailyStats[]; goalKca
           );
         })}
       </div>
-      <p className="text-xs mt-2 font-bold" style={{ color: '#92400E', opacity: 0.7 }}>
+      <p className="text-xs mt-2 font-bold" style={{ color: '#4338CA', opacity: 0.7 }}>
         Obiettivo: {goalKcal.toLocaleString('it-IT')} kcal/gg
       </p>
     </div>
@@ -335,12 +334,12 @@ function NutriPointsWidget({ stats, goals }: { stats: DailyStats; goals: Goals }
     : { label: '💪 Dai!',   bg: '#FFE4E6', color: '#BE123C' };
 
   return (
-    <div className="flex items-center gap-2 pt-3 mt-auto" style={{ borderTop: '2px solid rgba(109,40,217,0.12)' }}>
-      <span className="text-2xl font-black leading-none" style={{ color: '#6D28D9' }}>
+    <div className="flex items-center gap-2 pt-3 mt-auto" style={{ borderTop: '2px solid rgba(67,56,202,0.12)' }}>
+      <span className="text-2xl font-black leading-none" style={{ color: '#4338CA' }}>
         {points}
       </span>
       <div>
-        <p className="text-xs font-extrabold uppercase tracking-wide" style={{ color: '#6D28D9' }}>NutriPts</p>
+        <p className="text-xs font-extrabold uppercase tracking-wide" style={{ color: '#4338CA' }}>NutriPts</p>
         <span
           className="text-xs font-bold px-1.5 py-0.5 rounded-full"
           style={{ background: badge.bg, color: badge.color }}
@@ -370,20 +369,20 @@ function MealRow({ meal, onDelete }: { meal: Meal; onDelete: (id: string) => voi
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 8, height: 0 }}
       className="flex items-center gap-3 py-2.5 last:border-0"
-      style={{ borderBottom: '2px solid rgba(202,138,4,0.10)' }}
+      style={{ borderBottom: '2px solid rgba(67,56,202,0.10)' }}
     >
       <div className="flex-1 min-w-0">
         <p className="text-sm font-extrabold truncate" style={{ color: '#1A2E1A' }}>
           {meal.name}
         </p>
-        <p className="text-xs font-bold" style={{ color: '#92400E', opacity: 0.75 }}>
+        <p className="text-xs font-bold" style={{ color: '#4338CA', opacity: 0.75 }}>
           {meal.qty}{meal.unit} · P <span style={{ color: '#1D4ED8' }}>{Math.round(meal.protein)}g</span> · C <span style={{ color: '#D97706' }}>{Math.round(meal.carbs)}g</span> · G <span style={{ color: '#BE123C' }}>{Math.round(meal.fat)}g</span>
         </p>
       </div>
       <div className="flex items-center gap-2 flex-shrink-0">
         <span
           className="text-sm font-black px-2 py-0.5 rounded-full"
-          style={{ background: '#DCFCE7', color: '#14532D', border: '1.5px solid #86EFAC' }}
+          style={{ background: '#E0E7FF', color: '#3730A3', border: '1.5px solid #A5B4FC' }}
         >
           {Math.round(meal.kcal)} kcal
         </span>
@@ -474,15 +473,15 @@ export default function DashboardClient({
       {/* ── Row 1: Calorie Ring (tall) + Macros ── */}
       <div className="grid grid-cols-3 gap-4">
 
-        {/* Calorie Ring – green hero card, spans 2 rows */}
+        {/* Calorie Ring – indigo hero card, spans 2 rows */}
         <motion.div
           className="col-span-1 flex flex-col items-center justify-center gap-2 p-4"
-          style={{ ...CARD.green, gridRow: 'span 2' }}
+          style={{ ...CARD.indigo, gridRow: 'span 2' }}
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.45, ease: 'easeOut' }}
         >
-          <p className="text-xs font-extrabold uppercase tracking-wide self-start" style={{ color: '#166534' }}>
+          <p className="text-xs font-extrabold uppercase tracking-wide self-start" style={{ color: '#3730A3' }}>
             Calorie
           </p>
           <CalorieRing consumed={Math.round(stats.totalKcal)} goal={goals.kcal} />
@@ -491,10 +490,9 @@ export default function DashboardClient({
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               className="flex items-center gap-1.5 text-xs font-extrabold px-2 py-1 rounded-full"
-              style={{ background: '#BBF7D0', color: '#14532D', border: '2px solid #86EFAC' }}
+              style={{ background: '#E0E7FF', color: '#3730A3', border: '2px solid #A5B4FC' }}
             >
-              <SprintyAssistant mood="success" size="xs" />
-              Obiettivo!
+              ✨ Obiettivo!
             </motion.div>
           )}
         </motion.div>
@@ -530,7 +528,7 @@ export default function DashboardClient({
         <div className="grid grid-cols-3 gap-4">
           <motion.div
             className="col-span-2 p-4"
-            style={CARD.amber}
+            style={CARD.indigo}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: 'easeOut', delay: 0.16 }}
@@ -539,7 +537,7 @@ export default function DashboardClient({
           </motion.div>
           <motion.div
             className="col-span-1 p-4 flex flex-col"
-            style={CARD.cyan}
+            style={CARD.emerald}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: 'easeOut', delay: 0.22 }}
@@ -551,25 +549,32 @@ export default function DashboardClient({
       )}
 
       {/* ── Row 3: Quick actions ── */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-4 gap-3">
         <QuickAction
-          label="Cerca cibo"
-          icon="🔍"
+          label="Diario"
+          icon="📋"
           href="/diary"
           cardStyle={CARD.blue}
           labelColor="#1D4ED8"
         />
         <QuickAction
-          label="Scansiona"
-          icon="📷"
-          href="/diary?scan=1"
+          label="Peso"
+          icon="⚖️"
+          href="/weight"
+          cardStyle={CARD.indigo}
+          labelColor="#4338CA"
+        />
+        <QuickAction
+          label="Leghe"
+          icon="🏆"
+          href="/leagues"
           cardStyle={CARD.purple}
           labelColor="#6D28D9"
         />
         <QuickAction
-          label="Peso"
-          icon="⚖️"
-          href="/weight"
+          label="Impost."
+          icon="⚙️"
+          href="/settings"
           cardStyle={CARD.amber}
           labelColor="#B45309"
         />
@@ -578,18 +583,18 @@ export default function DashboardClient({
       {/* ── Row 4: Today's meals ── */}
       <motion.div
         className="p-4"
-        style={CARD.neutral}
+        style={CARD.indigo}
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.45, ease: 'easeOut', delay: 0.30 }}
       >
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-extrabold" style={{ color: '#1A2E1A' }}>
+          <h3 className="text-sm font-extrabold" style={{ color: '#1E1B4B' }}>
             Pasti di oggi
             {meals.length > 0 && (
               <span
                 className="ml-2 text-xs font-extrabold px-2 py-0.5 rounded-full"
-                style={{ background: '#FEF3C7', color: '#B45309', border: '1.5px solid #FDE68A' }}
+                style={{ background: '#E0E7FF', color: '#3730A3', border: '1.5px solid #A5B4FC' }}
               >
                 {meals.length}
               </span>
@@ -599,10 +604,10 @@ export default function DashboardClient({
             href="/diary"
             className="text-xs font-extrabold px-3 py-1.5 rounded-full"
             style={{
-              background: 'linear-gradient(145deg, #F0FDF4, #DCFCE7)',
-              color: '#14532D',
-              border: '2px solid #86EFAC',
-              boxShadow: '0 3px 0 #16A34A',
+              background: 'linear-gradient(145deg, #EEF2FF, #E0E7FF)',
+              color: '#3730A3',
+              border: '2px solid #A5B4FC',
+              boxShadow: '0 3px 0 #4338CA',
             }}
             whileHover={{ scale: 1.05, y: -1 }}
             whileTap={{ scale: 0.97, y: 2 }}
@@ -615,13 +620,15 @@ export default function DashboardClient({
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="py-6 flex flex-col items-center gap-3"
+            className="py-8 flex flex-col items-center gap-2 text-center"
           >
-            <SprintyAssistant
-              mood="idle"
-              size="sm"
-              message="Nessun pasto ancora! Inizia ad aggiungere il tuo primo pasto."
-            />
+            <span className="text-4xl">🍽️</span>
+            <p className="text-sm font-bold" style={{ color: '#4338CA' }}>
+              Nessun pasto ancora
+            </p>
+            <p className="text-xs" style={{ color: '#6366F1', opacity: 0.8 }}>
+              Aggiungi il tuo primo pasto per iniziare a tracciare!
+            </p>
           </motion.div>
         ) : (
           <AnimatePresence>
