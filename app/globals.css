@@ -328,70 +328,165 @@ body {
 
 /* ── View Transitions API (smoother page navigation) ────────────────────── */
 
-@view-transition {
-  navigation: auto;
-}
-
+/* Subtle fade between pages — works in Chrome 111+ and Safari 18+ */
 ::view-transition-old(root) {
-  animation: vt-fade-out 0.15s ease forwards;
+  animation: vt-fade-out 0.12s ease forwards;
 }
 
 ::view-transition-new(root) {
-  animation: vt-fade-in 0.18s ease forwards;
+  animation: vt-fade-in 0.14s ease forwards;
 }
 
 @keyframes vt-fade-out {
-  from { opacity: 1; transform: scale(1); }
-  to   { opacity: 0; transform: scale(0.98); }
+  from { opacity: 1; }
+  to   { opacity: 0; }
 }
 
 @keyframes vt-fade-in {
-  from { opacity: 0; transform: scale(0.98); }
-  to   { opacity: 1; transform: scale(1); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
 /* ── PWA Standalone mode ─────────────────────────────────────────────────── */
 
-/* When saved to home screen on iOS/Android, run as a true native-feeling app */
+/* Prevent overscroll bounce without breaking scroll or clicks */
 @media (display-mode: standalone) {
-  /* Prevent Safari-style overscroll bounce at the page level */
-  html, body {
+  html {
     overscroll-behavior: none;
-    /* iOS: prevent the rubber-band bounce that reveals the white background */
-    position: fixed;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
   }
 
-  /* The root scroll container handles overflow instead */
-  #__next,
-  [data-nextjs-scroll-focus-boundary] {
-    height: 100%;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
+  /* Add top padding for status bar (black-translucent on iOS) */
+  .page-header {
+    padding-top: max(env(safe-area-inset-top, 0px), 20px) !important;
   }
-
-  /* Add top padding for the status bar when using black-translucent */
-  .page-header,
-  .app-header {
-    padding-top: max(env(safe-area-inset-top, 0px), 20px);
-  }
-
-  /* Hide any browser-chrome indicators */
-  ::-webkit-scrollbar { display: none; }
-  scrollbar-width: none;
 }
 
-/* iOS Safari: prevent long-press callout on interactive elements */
-button, a, [role="button"] {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
+/* Hide scrollbar app-wide (still scrollable) */
+::-webkit-scrollbar { display: none; }
+* { scrollbar-width: none; }
 
-/* Tap highlight removed app-wide for native feel */
+/* Native-feel: no tap flash, no long-press callout on links/buttons */
 * {
   -webkit-tap-highlight-color: transparent;
 }
+button, a {
+  -webkit-touch-callout: none;
+}
+
+/* ── Dark Theme ──────────────────────────────────────────────────────────── */
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Override design tokens */
+  --bg-app:    #0f1923;
+  --bg-card:   #182032;
+  --bg-input:  #1e2d40;
+  --bg-muted:  #1a2840;
+
+  --text-primary:   #eef2f7;
+  --text-secondary: #94a3b8;
+  --text-muted:     #64748b;
+
+  --border:      #2d3f55;
+  --border-dark: #3d5470;
+
+  --shadow-card:     0 2px 12px rgba(0,0,0,0.4), 0 1px 3px rgba(0,0,0,0.25);
+  --shadow-elevated: 0 8px 28px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.35);
+  --shadow-tab:      0 -4px 24px rgba(0,0,0,0.35);
+}
+
+/* ── Dark: body & app shell ── */
+[data-theme="dark"] body {
+  background: var(--bg-app);
+  color: var(--text-primary);
+}
+
+/* ── Dark: white card backgrounds ── */
+/* Targets inline style="...background: #fff..." and "background: #FFFFFF" */
+[data-theme="dark"] [style*="background: #fff"],
+[data-theme="dark"] [style*="background: #FFFFFF"],
+[data-theme="dark"] [style*="background: #ffffff"],
+[data-theme="dark"] [style*="background: white"],
+[data-theme="dark"] [style*="background:#fff"],
+[data-theme="dark"] [style*="background:#FFFFFF"] {
+  background: var(--bg-card) !important;
+  border-color: var(--border) !important;
+}
+
+/* ── Dark: light sage backgrounds (#F3F6F0, #F8FAF7, #F9FAFB) ── */
+[data-theme="dark"] [style*="background: #F3F6F0"],
+[data-theme="dark"] [style*="background: #F8FAF7"],
+[data-theme="dark"] [style*="background: #F9FAFB"],
+[data-theme="dark"] [style*="background: #f3f6f0"],
+[data-theme="dark"] [style*="background: #f8faf7"] {
+  background: var(--bg-muted) !important;
+}
+
+/* ── Dark: primary text colors ── */
+[data-theme="dark"] [style*="color: #1C1917"],
+[data-theme="dark"] [style*="color: #1c1917"] {
+  color: var(--text-primary) !important;
+}
+[data-theme="dark"] [style*="color: #6B7280"],
+[data-theme="dark"] [style*="color: #6b7280"] {
+  color: var(--text-secondary) !important;
+}
+[data-theme="dark"] [style*="color: #9CA3AF"],
+[data-theme="dark"] [style*="color: #9ca3af"] {
+  color: var(--text-muted) !important;
+}
+
+/* ── Dark: borders ── */
+[data-theme="dark"] [style*="border: 1px solid #E5EBE0"],
+[data-theme="dark"] [style*="border: 1.5px solid #E5EBE0"],
+[data-theme="dark"] [style*="borderColor: #E5EBE0"] {
+  border-color: var(--border) !important;
+}
+
+/* ── Dark: bottom nav bar ── */
+[data-theme="dark"] .bottom-tab-bar {
+  background: #1a2840 !important;
+  border-top-color: #2d3f55 !important;
+  box-shadow: 0 -4px 24px rgba(0,0,0,0.4) !important;
+}
+
+/* ── Dark: bottom sheet / modals ── */
+[data-theme="dark"] .bottom-sheet {
+  background: var(--bg-card) !important;
+}
+
+/* ── Dark: page-header ── */
+[data-theme="dark"] .page-header {
+  background: rgba(15,25,35,0.94) !important;
+  border-bottom-color: var(--border) !important;
+}
+
+/* ── Dark: inputs ── */
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background: var(--bg-input) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border) !important;
+}
+
+/* ── Dark: streak badge ── */
+[data-theme="dark"] .streak-badge {
+  background: rgba(249,115,22,0.20) !important;
+  color: #FB923C !important;
+}
+
+/* ── Dark: app-input utility class ── */
+[data-theme="dark"] .app-input,
+[data-theme="dark"] .glass-input {
+  background: var(--bg-input) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border) !important;
+}
+
+/* ── Dark: Tailwind dark utility overrides ── */
+[data-theme="dark"] .bg-white { background-color: var(--bg-card) !important; }
+[data-theme="dark"] .text-gray-900,
+[data-theme="dark"] .text-stone-900 { color: var(--text-primary) !important; }
+[data-theme="dark"] .border-gray-200 { border-color: var(--border) !important; }
