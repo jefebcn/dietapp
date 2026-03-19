@@ -190,10 +190,10 @@ function MacroCard({
 // ── Meal image card ───────────────────────────────────────────────────────────
 
 const MEAL_IMAGES = [
-  { label: 'Colazione', emoji: '🥐', bg: 'linear-gradient(135deg, #FFF7ED, #FED7AA)', accent: '#FB923C' },
-  { label: 'Pranzo',    emoji: '🥗', bg: 'linear-gradient(135deg, #F0FDF4, #BBF7D0)', accent: '#22C55E' },
-  { label: 'Cena',      emoji: '🍝', bg: 'linear-gradient(135deg, #EFF6FF, #BFDBFE)', accent: '#3B82F6' },
-  { label: 'Spuntini',  emoji: '🍎', bg: 'linear-gradient(135deg, #FFF1F2, #FECDD3)', accent: '#F43F5E' },
+  { label: 'Colazione', emoji: '🌅', accent: '#FB923C', img: '/food/meal-breakfast.jpg' },
+  { label: 'Pranzo',    emoji: '☀️',  accent: '#22C55E', img: '/food/meal-lunch.jpg' },
+  { label: 'Cena',      emoji: '🌙',  accent: '#3B82F6', img: '/food/meal-dinner.jpg' },
+  { label: 'Spuntini',  emoji: '🍎',  accent: '#F43F5E', img: '/food/meal-snack.jpg' },
 ];
 
 function MealImageCard({ item, meals }: { item: typeof MEAL_IMAGES[0]; meals: Meal[] }) {
@@ -215,14 +215,14 @@ function MealImageCard({ item, meals }: { item: typeof MEAL_IMAGES[0]; meals: Me
           boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
         }}
       >
-        {/* Meal hero — gradient + emoji */}
-        <div style={{
-          height: 100, position: 'relative', background: item.bg,
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}>
-          <span style={{ fontSize: 44, lineHeight: 1, filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.10))' }}>
-            {item.emoji}
-          </span>
+        {/* Food photo */}
+        <div style={{ height: 100, overflow: 'hidden', position: 'relative' }}>
+          <img
+            src={item.img}
+            alt={item.label}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            loading="lazy"
+          />
           {count > 0 && (
             <div style={{
               position: 'absolute', top: 8, right: 8,
