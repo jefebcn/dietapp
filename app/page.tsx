@@ -236,7 +236,7 @@ export default function OnboardingPage() {
           </button>
         ) : (
           <Link
-            href="/register"
+            href="/login"
             style={{
               height: 48,
               padding: '0 20px',

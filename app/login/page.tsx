@@ -77,10 +77,11 @@ export default function LoginPage() {
         cred = await signInWithEmailAndPassword(auth, email, password);
       } else {
         cred = await createUserWithEmailAndPassword(auth, email, password);
+        const regToken = await cred.user.getIdToken();
         await fetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ uid: cred.user.uid, email, name: name.trim() || email.split('@')[0] }),
+          body: JSON.stringify({ uid: cred.user.uid, email, name: name.trim() || email.split('@')[0], idToken: regToken }),
         });
       }
       const idToken = await cred.user.getIdToken();
@@ -105,14 +106,14 @@ export default function LoginPage() {
       const auth = getAuth(getApp());
       const cred = await signInWithPopup(auth, new GoogleAuthProvider());
       const isNew = (cred as unknown as { _tokenResponse?: { isNewUser?: boolean } })._tokenResponse?.isNewUser;
+      const idToken = await cred.user.getIdToken();
       if (isNew) {
         await fetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ uid: cred.user.uid, email: cred.user.email, name: cred.user.displayName }),
+          body: JSON.stringify({ uid: cred.user.uid, email: cred.user.email, name: cred.user.displayName, idToken }),
         });
       }
-      const idToken = await cred.user.getIdToken();
       await persistSession(idToken);
       router.push('/dashboard');
     } catch (err: unknown) {
@@ -121,7 +122,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="relative min-h-screen flex flex-col items-center justify-center px-4 py-8">
+    <div className="relative min-h-screen flex flex-col items-center justify-center px-4 py-8"
+      style={{ background: 'linear-gradient(145deg, #0F0A1E 0%, #1A0D2E 50%, #0D1520 100%)' }}
+    >
 
       {/* ── Logo ── */}
       <motion.div
