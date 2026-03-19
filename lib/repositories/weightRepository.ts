@@ -17,7 +17,7 @@
  */
 
 import { getAdminDb } from '@/lib/firebase-admin.config';
-import { FieldValue, Timestamp } from 'firebase-admin/firestore';
+import { FieldValue, FieldPath, Timestamp } from 'firebase-admin/firestore';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -258,13 +258,16 @@ async function _refreshGoldPeriod(
 /** Fetch Gold metrics for the last N weeks. */
 export async function getRecentGoldWeeks(uid: string, count = 8): Promise<GoldMetrics[]> {
   const db = getAdminDb();
+  // Document IDs are 'week_YYYY-WW' — filter by prefix on the document ID
+  // (same field for range + order → no composite index required)
   const snap = await db
     .collection(`users/${uid}/weight_gold`)
-    .where('type', '==', 'week')
-    .orderBy('period', 'desc')
+    .where(FieldPath.documentId(), '>=', 'week_')
+    .where(FieldPath.documentId(), '<',  'week_z')
+    .orderBy(FieldPath.documentId(), 'desc')
     .limit(count)
     .get();
-  return snap.docs.map((d) => d.data() as GoldMetrics);
+  return snap.docs.map((d) => ({ ...(d.data() as GoldMetrics), period: d.id }));
 }
 
 /** Fetch Gold metrics for the last N months. */
@@ -272,9 +275,10 @@ export async function getRecentGoldMonths(uid: string, count = 6): Promise<GoldM
   const db = getAdminDb();
   const snap = await db
     .collection(`users/${uid}/weight_gold`)
-    .where('type', '==', 'month')
-    .orderBy('period', 'desc')
+    .where(FieldPath.documentId(), '>=', 'month_')
+    .where(FieldPath.documentId(), '<',  'month_z')
+    .orderBy(FieldPath.documentId(), 'desc')
     .limit(count)
     .get();
-  return snap.docs.map((d) => d.data() as GoldMetrics);
+  return snap.docs.map((d) => ({ ...(d.data() as GoldMetrics), period: d.id }));
 }

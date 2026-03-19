@@ -13,6 +13,7 @@ import { getAdminAuth } from '@/lib/firebase-admin.config';
 import { getUserById } from '@/lib/repositories/userRepository';
 import { getStreakState, getFreezeTokens } from '@/lib/repositories/streakRepository';
 import { getRecentGoldWeeks } from '@/lib/repositories/weightRepository';
+import type { GoldMetrics } from '@/lib/repositories/weightRepository';
 import { getUserLeague, LEAGUES } from '@/lib/repositories/leagueRepository';
 import { BottomTabBar } from '@/components/BottomTabBar';
 import ProfileClient from './ProfileClient';
@@ -33,11 +34,11 @@ export default async function ProfilePage() {
   }
 
   const [user, streak, freezeTokens, weightTrend, league] = await Promise.all([
-    getUserById(uid),
-    getStreakState(uid),
-    getFreezeTokens(uid),
-    getRecentGoldWeeks(uid, 8),
-    getUserLeague(uid),
+    getUserById(uid).catch(() => null),
+    getStreakState(uid).catch(() => null),
+    getFreezeTokens(uid).catch(() => null),
+    getRecentGoldWeeks(uid, 8).catch(() => [] as Awaited<ReturnType<typeof getRecentGoldWeeks>>),
+    getUserLeague(uid).catch(() => null),
   ]);
 
   if (!user) redirect('/login');

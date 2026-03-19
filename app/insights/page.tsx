@@ -11,6 +11,7 @@ import type { Metadata } from 'next';
 
 import { getAdminAuth } from '@/lib/firebase-admin.config';
 import { getRecentBronzeLogs, getRecentGoldWeeks } from '@/lib/repositories/weightRepository';
+import type { BronzeLog, GoldMetrics } from '@/lib/repositories/weightRepository';
 import { getDailyStatsRange } from '@/lib/repositories/mealRepository';
 import { getUserById } from '@/lib/repositories/userRepository';
 import { getStreakState } from '@/lib/repositories/streakRepository';
@@ -39,11 +40,11 @@ export default async function InsightsPage() {
   }
 
   const [recentLogs, weeklyTrend, monthStats, user, streakState] = await Promise.all([
-    getRecentBronzeLogs(uid, 10),
-    getRecentGoldWeeks(uid, 8),
-    getDailyStatsRange(uid, daysAgo(29), new Date().toISOString().split('T')[0]),
-    getUserById(uid),
-    getStreakState(uid),
+    getRecentBronzeLogs(uid, 10).catch(() => [] as Awaited<ReturnType<typeof getRecentBronzeLogs>>),
+    getRecentGoldWeeks(uid, 8).catch(() => [] as Awaited<ReturnType<typeof getRecentGoldWeeks>>),
+    getDailyStatsRange(uid, daysAgo(29), new Date().toISOString().split('T')[0]).catch(() => []),
+    getUserById(uid).catch(() => null),
+    getStreakState(uid).catch(() => null),
   ]);
 
   const goals = user?.goals ?? { kcal: 2000, protein: 150, carbs: 200, fat: 65 };
