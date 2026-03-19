@@ -256,9 +256,18 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
     });
   }
 
-  // Group meals by type
+  // Known meal type keys
+  const knownTypes = MEAL_TYPES.map((t) => t.key) as string[];
+
+  // Group meals by type — meals without mealType are put in their own bucket
   const getMealsForType = (typeKey: string) =>
-    meals.filter((m) => (m.mealType ?? 'spuntino') === typeKey);
+    meals.filter((m) => {
+      if (!m.mealType) return false; // handled separately as legacy
+      return m.mealType === typeKey;
+    });
+
+  // Legacy meals: from the old app, no mealType field
+  const legacyMeals = meals.filter((m) => !m.mealType);
 
   const activeType = MEAL_TYPES.find((t) => t.key === activeMealType)!;
 
@@ -307,6 +316,63 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
             onDelete={handleDelete}
           />
         ))}
+
+        {/* Legacy meals from old app (no mealType field) */}
+        {legacyMeals.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="rounded-2xl overflow-hidden"
+            style={{ background: '#FFFFFF', border: '1px solid #E5EBE0', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+          >
+            <div className="flex items-center gap-3 px-4 py-3">
+              <span className="text-xl">📦</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold" style={{ color: '#1C1917' }}>Pasti importati</p>
+                <p className="text-[10px]" style={{ color: '#9CA3AF' }}>Dalla versione precedente dell&apos;app</p>
+              </div>
+              <span className="text-xs font-bold px-2 py-0.5 rounded-full"
+                style={{ background: '#F3F6F0', color: '#6B7280', border: '1px solid #E5EBE0' }}>
+                {Math.round(legacyMeals.reduce((s, m) => s + m.kcal, 0))} kcal
+              </span>
+            </div>
+            <ul className="px-3 pb-3 space-y-1.5" style={{ borderTop: '1px solid #F3F6F0' }}>
+              {legacyMeals.map((meal) => (
+                <motion.li
+                  key={meal.id}
+                  layout
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: 8, height: 0 }}
+                  className="flex items-center gap-2.5 px-3 py-2 rounded-xl mt-1.5"
+                  style={{ background: '#F8FAF7', border: '1px solid #E5EBE0' }}
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-semibold truncate" style={{ color: '#1C1917' }}>{meal.name}</p>
+                    <div className="flex gap-2.5 mt-0.5">
+                      <MacroPill value={meal.protein} label="P" color="#0EA5E9"/>
+                      <MacroPill value={meal.carbs}   label="C" color="#8B5CF6"/>
+                      <MacroPill value={meal.fat}     label="G" color="#F59E0B"/>
+                    </div>
+                  </div>
+                  <span className="text-[11px] font-bold flex-shrink-0" style={{ color: '#F97316' }}>
+                    {Math.round(meal.kcal)}
+                  </span>
+                  <motion.button
+                    onClick={() => handleDelete(meal.id)}
+                    whileTap={{ scale: 0.80 }}
+                    className="flex-shrink-0 p-1 rounded-lg"
+                    style={{ background: 'rgba(239,68,68,0.08)', color: '#EF4444' }}
+                  >
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                  </motion.button>
+                </motion.li>
+              ))}
+            </ul>
+          </motion.div>
+        )}
       </div>
 
       {/* ── Global Add FAB ── */}
