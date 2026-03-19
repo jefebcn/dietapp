@@ -57,6 +57,7 @@ export default async function SettingsPage() {
             name: user.name ?? '',
             email: user.email ?? '',
             goals: user.goals ?? { kcal: 2000, protein: 150, carbs: 200, fat: 65 },
+            heightCm: (user as { heightCm?: number }).heightCm,
           }}
         />
       </main>

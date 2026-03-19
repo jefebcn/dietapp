@@ -13,7 +13,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { updateProfileAction, updateGoalsAction } from '@/lib/actions/userActions';
+import { updateProfileAction, updateGoalsAction, updateHeightAction } from '@/lib/actions/userActions';
 import { useTheme } from '@/components/ThemeProvider';
 
 interface Props {
@@ -21,6 +21,7 @@ interface Props {
     name: string;
     email: string;
     goals: { kcal: number; protein: number; carbs: number; fat: number };
+    heightCm?: number;
   };
 }
 
@@ -70,6 +71,8 @@ export default function SettingsClient({ user }: Props) {
   const { theme, toggle } = useTheme();
   const [name, setName] = useState(user.name);
   const [profileStatus, setProfileStatus] = useState<SaveStatus>('idle');
+  const [height, setHeight] = useState(user.heightCm ? String(user.heightCm) : '');
+  const [heightStatus, setHeightStatus] = useState<SaveStatus>('idle');
 
   const [kcal, setKcal] = useState(String(user.goals.kcal));
   const [protein, setProtein] = useState(String(user.goals.protein));
@@ -84,6 +87,16 @@ export default function SettingsClient({ user }: Props) {
     const result = await updateProfileAction({ name });
     setProfileStatus(result.success ? 'saved' : 'error');
     if (result.success) setTimeout(() => setProfileStatus('idle'), 2500);
+  };
+
+  const handleHeightSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const h = parseInt(height);
+    if (!h || h < 100 || h > 250) return;
+    setHeightStatus('saving');
+    const result = await updateHeightAction({ heightCm: h });
+    setHeightStatus(result.success ? 'saved' : 'error');
+    if (result.success) setTimeout(() => setHeightStatus('idle'), 2500);
   };
 
   const handleGoalsSave = async (e: React.FormEvent) => {
@@ -148,6 +161,22 @@ export default function SettingsClient({ user }: Props) {
             <form onSubmit={handleProfileSave} className="space-y-3">
               <GlassField label="Nome visualizzato" value={name} onChange={setName} placeholder="Il tuo nome"/>
               <SaveBtn status={profileStatus} label="💾 Salva profilo"/>
+            </form>
+          </div>
+
+          {/* Height for BMI */}
+          <div className="mt-3 pt-3" style={{ borderTop: '1px solid #F3F6F0' }}>
+            <form onSubmit={handleHeightSave} className="space-y-3">
+              <GlassField
+                label="Altezza (per calcolo BMI)"
+                type="number" value={height}
+                onChange={setHeight}
+                placeholder="175"
+                suffix="cm" min={100} max={250}
+              />
+              {height && parseInt(height) >= 100 && parseInt(height) <= 250 && (
+                <SaveBtn status={heightStatus} label="📏 Salva altezza"/>
+              )}
             </form>
           </div>
         </div>
