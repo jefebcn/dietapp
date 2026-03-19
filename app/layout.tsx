@@ -28,16 +28,21 @@ export const metadata: Metadata = {
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'NutriTrack',
+    startupImage: '/apple.png',
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#F3F6F0',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#F3F6F0' },
+    { media: '(prefers-color-scheme: dark)',  color: '#F3F6F0' },
+  ],
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
+  userScalable: false,
   viewportFit: 'cover',
 };
 
