@@ -43,12 +43,17 @@ export default async function ProfilePage() {
   if (!user) redirect('/login');
 
   return (
-    <div className="relative min-h-screen">
+    <div className="relative min-h-screen" style={{ background: '#F3F6F0' }}>
       {/* Header */}
-      <header className="page-header">
+      <header className="page-header" style={{
+        background: 'rgba(243,246,240,0.92)',
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderBottom: '1px solid #E5EBE0',
+      }}>
         <div className="max-w-2xl mx-auto px-4 py-3">
-          <p className="text-xs font-semibold" style={{ color: 'rgba(248,250,252,0.45)' }}>Il tuo spazio</p>
-          <h1 className="text-xl" style={{ fontFamily: 'var(--font-display)', color: '#F8FAFC', textShadow: '0 0 24px rgba(34,211,238,0.40)' }}>
+          <p className="text-xs font-semibold" style={{ color: '#9CA3AF' }}>Il tuo spazio</p>
+          <h1 className="text-xl" style={{ fontFamily: 'var(--font-display)', color: '#1C1917' }}>
             👤 Il Tuo Profilo
           </h1>
         </div>

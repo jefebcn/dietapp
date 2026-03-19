@@ -21,7 +21,7 @@ import type { NextRequest } from 'next/server';
 export const runtime = 'nodejs';
 
 // ── Route tables ─────────────────────────────────────────────────────────────
-const PROTECTED = ['/dashboard', '/diary', '/weight', '/settings', '/profile', '/leagues', '/insights', '/premium'];
+const PROTECTED = ['/dashboard', '/diary', '/weight', '/settings', '/profile', '/leagues', '/insights', '/premium', '/scan', '/plan'];
 const AUTH_ONLY = ['/login', '/register'];
 
 // ── Lightweight cookie presence check ────────────────────────────────────────
