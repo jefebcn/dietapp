@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 
 import { getAdminAuth } from '@/lib/firebase-admin.config';
-import { getUserById } from '@/lib/repositories/userRepository';
+import { getUserById, upsertUserFromAuth } from '@/lib/repositories/userRepository';
 import { getDailyStats, getDailyStatsRange, getMealsByDate } from '@/lib/repositories/mealRepository';
 import { getStreakState } from '@/lib/repositories/streakRepository';
 
@@ -48,12 +48,14 @@ export default async function DashboardPage() {
 
   const today = dateStr(new Date());
 
+  // upsertUserFromAuth: returns existing doc or auto-creates one from Firebase Auth
+  // so old users from previous app versions are never stuck in a redirect loop
   const [user, todayStats, weekStats, todayMeals, streakState] = await Promise.all([
-    getUserById(uid),
-    getDailyStats(uid, today),
-    getDailyStatsRange(uid, daysAgo(6), today),
-    getMealsByDate(uid, today),
-    getStreakState(uid),
+    upsertUserFromAuth(uid).catch(() => getUserById(uid)),
+    getDailyStats(uid, today).catch(() => null),
+    getDailyStatsRange(uid, daysAgo(6), today).catch(() => []),
+    getMealsByDate(uid, today).catch(() => []),
+    getStreakState(uid).catch(() => null),
   ]);
 
   if (!user) redirect('/login');

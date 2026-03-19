@@ -9,6 +9,7 @@ import Link from 'next/link';
 
 import { getAdminAuth } from '@/lib/firebase-admin.config';
 import { getRecentBronzeLogs, getRecentGoldWeeks } from '@/lib/repositories/weightRepository';
+import type { BronzeLog, GoldMetrics } from '@/lib/repositories/weightRepository';
 import { BottomTabBar } from '@/components/BottomTabBar';
 import WeightClient from './WeightClient';
 
@@ -26,8 +27,8 @@ export default async function WeightPage() {
   } catch { redirect('/login'); }
 
   const [recentLogs, weeklyTrend] = await Promise.all([
-    getRecentBronzeLogs(uid, 15),
-    getRecentGoldWeeks(uid, 8),
+    getRecentBronzeLogs(uid, 15).catch(() => [] as Awaited<ReturnType<typeof getRecentBronzeLogs>>),
+    getRecentGoldWeeks(uid, 8).catch(() => [] as Awaited<ReturnType<typeof getRecentGoldWeeks>>),
   ]);
 
   return (

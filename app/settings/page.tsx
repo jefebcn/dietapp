@@ -10,7 +10,7 @@ import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 
 import { getAdminAuth } from '@/lib/firebase-admin.config';
-import { getUserById } from '@/lib/repositories/userRepository';
+import { upsertUserFromAuth } from '@/lib/repositories/userRepository';
 import { BottomTabBar } from '@/components/BottomTabBar';
 import SettingsClient from './SettingsClient';
 
@@ -29,7 +29,7 @@ export default async function SettingsPage() {
     redirect('/login');
   }
 
-  const user = await getUserById(uid);
+  const user = await upsertUserFromAuth(uid).catch(() => null);
   if (!user) redirect('/login');
 
   return (
