@@ -15,6 +15,14 @@ import { motion, AnimatePresence, PanInfo } from 'framer-motion';
 import type { GoldMetrics } from '@/lib/repositories/weightRepository';
 import type { LeagueDefinition, LeagueTier } from '@/lib/repositories/leagueRepository';
 
+// League data inlined — avoid importing firebase-admin in a client component
+const LEAGUES_CLIENT = [
+  { id: 'bronze'   as LeagueTier, name: 'Lega Bronze',   emoji: '🥉', minPoints: 0,    maxMembers: 1000 },
+  { id: 'silver'   as LeagueTier, name: 'Lega Silver',   emoji: '🥈', minPoints: 500,  maxMembers: 500  },
+  { id: 'gold'     as LeagueTier, name: 'Lega Gold',     emoji: '🥇', minPoints: 2000, maxMembers: 200  },
+  { id: 'platinum' as LeagueTier, name: 'Lega Platinum', emoji: '💎', minPoints: 5000, maxMembers: 50   },
+];
+
 interface ProfileClientProps {
   user: {
     name: string;
@@ -35,9 +43,120 @@ const slideVariants = {
   exit: (dir: number) => ({ x: dir < 0 ? '100%' : '-100%', opacity: 0 }),
 };
 
+// ── League Info Modal ─────────────────────────────────────────────────────────
+
+function LeagueInfoModal({ onClose }: { onClose: () => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 100,
+        background: 'rgba(0,0,0,0.45)', backdropFilter: 'blur(4px)',
+        display: 'flex', alignItems: 'flex-end',
+      }}
+    >
+      <motion.div
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', stiffness: 380, damping: 36 }}
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          width: '100%',
+          background: '#FFFFFF',
+          borderRadius: '24px 24px 0 0',
+          padding: '20px 20px calc(24px + env(safe-area-inset-bottom, 0px))',
+          boxShadow: '0 -4px 30px rgba(0,0,0,0.12)',
+        }}
+      >
+        {/* Handle */}
+        <div style={{
+          width: 36, height: 4, borderRadius: 99,
+          background: '#E5EBE0', margin: '0 auto 20px',
+        }} />
+
+        <h3 style={{ fontSize: 18, fontWeight: 800, color: '#1C1917', marginBottom: 6 }}>
+          Come funzionano le Leghe
+        </h3>
+        <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6, marginBottom: 20 }}>
+          Guadagni <strong>NutriPoints</strong> ogni giorno che registri i tuoi pasti. Più sei costante, più punti accumuli e più alta sarà la lega che raggiungi.
+        </p>
+
+        {/* How to earn points */}
+        <div style={{
+          background: 'rgba(249,115,22,0.06)', borderRadius: 16,
+          padding: '14px 16px', marginBottom: 16,
+          border: '1px solid rgba(249,115,22,0.18)',
+        }}>
+          <p style={{ fontSize: 12, fontWeight: 700, color: '#F97316', marginBottom: 8 }}>Come guadagnare NutriPoints</p>
+          {[
+            { icon: '🍽️', text: 'Registro almeno un pasto → +10 pt/giorno' },
+            { icon: '🔥', text: 'Streak 7 giorni → +50 pt bonus' },
+            { icon: '🔥', text: 'Streak 30 giorni → +200 pt bonus' },
+            { icon: '⚖️', text: 'Registro il peso → +5 pt/giorno' },
+          ].map(({ icon, text }) => (
+            <div key={text} style={{ display: 'flex', gap: 10, alignItems: 'center', marginBottom: 6 }}>
+              <span style={{ fontSize: 16 }}>{icon}</span>
+              <span style={{ fontSize: 12, color: '#4B5563' }}>{text}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* League tiers */}
+        <p style={{ fontSize: 12, fontWeight: 700, color: '#6B7280', marginBottom: 10, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+          Livelli lega
+        </p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {LEAGUES_CLIENT.map((l) => {
+            return (
+              <div key={l.id} style={{
+                display: 'flex', alignItems: 'center', gap: 12,
+                padding: '10px 14px', borderRadius: 14,
+                background: '#F8FAF7', border: '1px solid #E5EBE0',
+              }}>
+                <span style={{ fontSize: 22 }}>{l.emoji}</span>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: '#1C1917' }}>{l.name}</p>
+                  <p style={{ fontSize: 11, color: '#9CA3AF' }}>
+                    {l.minPoints === 0 ? 'Disponibile a tutti' : `${l.minPoints.toLocaleString()} NutriPoints`}
+                    {' · '}max {l.maxMembers} membri
+                  </p>
+                </div>
+                {l.id === 'platinum' && (
+                  <span style={{
+                    fontSize: 10, fontWeight: 700, color: '#8B5CF6',
+                    background: 'rgba(139,92,246,0.10)',
+                    padding: '2px 8px', borderRadius: 99,
+                  }}>Top</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        <button
+          onClick={onClose}
+          style={{
+            marginTop: 20, width: '100%', padding: '13px',
+            borderRadius: 14, border: 'none',
+            background: 'linear-gradient(145deg, #F97316, #EA6C0A)',
+            color: '#fff', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+          }}
+        >
+          Capito!
+        </button>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 export default function ProfileClient({ user, streak, weightTrend, league }: ProfileClientProps) {
   const [activeTab, setActiveTab] = useState<Tab>('Premi');
   const [direction, setDirection] = useState(0);
+  const [showLeagueInfo, setShowLeagueInfo] = useState(false);
   const tabIndex = TABS.indexOf(activeTab);
 
   function goTo(tab: Tab) {
@@ -64,6 +183,11 @@ export default function ProfileClient({ user, streak, weightTrend, league }: Pro
 
   return (
     <div className="space-y-4">
+
+      {/* ── League Info Modal ── */}
+      <AnimatePresence>
+        {showLeagueInfo && <LeagueInfoModal onClose={() => setShowLeagueInfo(false)} />}
+      </AnimatePresence>
 
       {/* ── Premium Banner ── */}
       <motion.a
@@ -136,10 +260,23 @@ export default function ProfileClient({ user, streak, weightTrend, league }: Pro
                 {user.email}
               </p>
               {league && (
-                <span className="inline-block text-xs px-2 py-0.5 rounded-full mt-1 font-semibold"
-                  style={{ background: 'rgba(249,115,22,0.10)', color: '#F97316', border: '1px solid rgba(249,115,22,0.22)', fontFamily: 'var(--font-ui)' }}>
-                  {league.emoji} {league.name}
-                </span>
+                <div className="flex items-center gap-1.5 mt-1">
+                  <span className="inline-block text-xs px-2 py-0.5 rounded-full font-semibold"
+                    style={{ background: 'rgba(249,115,22,0.10)', color: '#F97316', border: '1px solid rgba(249,115,22,0.22)', fontFamily: 'var(--font-ui)' }}>
+                    {league.emoji} {league.name}
+                  </span>
+                  <button
+                    onClick={() => setShowLeagueInfo(true)}
+                    style={{
+                      width: 18, height: 18, borderRadius: '50%',
+                      background: '#F3F6F0', border: '1px solid #E5EBE0',
+                      fontSize: 10, fontWeight: 700, color: '#9CA3AF',
+                      cursor: 'pointer', flexShrink: 0,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}
+                    aria-label="Come funzionano le leghe"
+                  >?</button>
+                </div>
               )}
             </div>
 
@@ -204,7 +341,7 @@ export default function ProfileClient({ user, streak, weightTrend, league }: Pro
             onDragEnd={handleDragEnd}
             className="w-full"
           >
-            {activeTab === 'Premi'      && <AwardsTab streak={streak} league={league} G={G}/>}
+            {activeTab === 'Premi'      && <AwardsTab streak={streak} league={league} G={G} onLeagueInfo={() => setShowLeagueInfo(true)}/>}
             {activeTab === 'Statistiche' && <StatsTab user={user} streak={streak} G={G}/>}
             {activeTab === 'Storico'    && <HistoryTab weightTrend={weightTrend} G={G}/>}
           </motion.div>
@@ -216,10 +353,11 @@ export default function ProfileClient({ user, streak, weightTrend, league }: Pro
 
 // ── Sub-panels ─────────────────────────────────────────────────────────────────
 
-function AwardsTab({ streak, league, G }: {
+function AwardsTab({ streak, league, G, onLeagueInfo }: {
   streak: ProfileClientProps['streak'];
   league: ProfileClientProps['league'];
   G: Record<string, React.CSSProperties>;
+  onLeagueInfo: () => void;
 }) {
   const badges = [
     { earned: streak.current >= 3,   emoji: '🔥', label: '3 giorni di fila',  desc: `Streak: ${streak.current}`,         color: '245,158,11' },
@@ -233,7 +371,31 @@ function AwardsTab({ streak, league, G }: {
   ];
 
   return (
-    <div className="grid grid-cols-2 gap-2.5">
+    <div className="space-y-2.5">
+      {/* League info banner */}
+      <button
+        onClick={onLeagueInfo}
+        className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-left"
+        style={{
+          background: 'rgba(249,115,22,0.06)',
+          border: '1px solid rgba(249,115,22,0.20)',
+        }}
+      >
+        <span className="text-xl">{league?.emoji ?? '🥉'}</span>
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-bold" style={{ color: '#F97316' }}>
+            {league ? league.name : 'Lega Bronze'} — come funziona?
+          </p>
+          <p className="text-xs" style={{ color: '#9CA3AF' }}>
+            Guadagna NutriPoints registrando i pasti ogni giorno
+          </p>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#F97316" strokeWidth="2.5">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
+      </button>
+
+      <div className="grid grid-cols-2 gap-2.5">
       {badges.map((badge) => (
         <motion.div
           key={badge.label}
@@ -263,6 +425,7 @@ function AwardsTab({ streak, league, G }: {
           )}
         </motion.div>
       ))}
+      </div>
     </div>
   );
 }

@@ -325,3 +325,73 @@ body {
   padding-bottom: env(safe-area-inset-bottom, 0px);
   touch-action: none;
 }
+
+/* ── View Transitions API (smoother page navigation) ────────────────────── */
+
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: vt-fade-out 0.15s ease forwards;
+}
+
+::view-transition-new(root) {
+  animation: vt-fade-in 0.18s ease forwards;
+}
+
+@keyframes vt-fade-out {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.98); }
+}
+
+@keyframes vt-fade-in {
+  from { opacity: 0; transform: scale(0.98); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* ── PWA Standalone mode ─────────────────────────────────────────────────── */
+
+/* When saved to home screen on iOS/Android, run as a true native-feeling app */
+@media (display-mode: standalone) {
+  /* Prevent Safari-style overscroll bounce at the page level */
+  html, body {
+    overscroll-behavior: none;
+    /* iOS: prevent the rubber-band bounce that reveals the white background */
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  /* The root scroll container handles overflow instead */
+  #__next,
+  [data-nextjs-scroll-focus-boundary] {
+    height: 100%;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Add top padding for the status bar when using black-translucent */
+  .page-header,
+  .app-header {
+    padding-top: max(env(safe-area-inset-top, 0px), 20px);
+  }
+
+  /* Hide any browser-chrome indicators */
+  ::-webkit-scrollbar { display: none; }
+  scrollbar-width: none;
+}
+
+/* iOS Safari: prevent long-press callout on interactive elements */
+button, a, [role="button"] {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Tap highlight removed app-wide for native feel */
+* {
+  -webkit-tap-highlight-color: transparent;
+}

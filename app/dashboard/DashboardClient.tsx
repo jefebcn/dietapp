@@ -11,10 +11,11 @@
  *  • Streak + AI tip
  */
 
-import { useState } from 'react';
+import { useState, useTransition, useRef } from 'react';
 import useSWR from 'swr';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { logWeightAction } from '@/lib/actions/mealActions';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -56,6 +57,115 @@ function buildWeek(todayStr: string): WeekDay[] {
     });
   }
   return days;
+}
+
+// ── Weight Quick-Log Widget ───────────────────────────────────────────────────
+
+function WeightQuickLog() {
+  const [value, setValue] = useState('');
+  const [status, setStatus] = useState<'idle' | 'ok' | 'err'>('idle');
+  const [isPending, startTransition] = useTransition();
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    const raw = parseFloat(value.replace(',', '.'));
+    if (isNaN(raw) || raw < 20 || raw > 300) { setStatus('err'); return; }
+    startTransition(async () => {
+      const result = await logWeightAction({ rawValue: raw, rawUnit: 'kg' });
+      if (result.success) {
+        setStatus('ok');
+        setValue('');
+        setTimeout(() => setStatus('idle'), 2500);
+      } else {
+        setStatus('err');
+        setTimeout(() => setStatus('idle'), 2000);
+      }
+    });
+  }
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.05 }}
+      style={{
+        background: '#fff',
+        borderRadius: 20,
+        padding: '14px 16px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
+        marginBottom: 14,
+        border: '1.5px solid rgba(14,165,233,0.15)',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+        <div style={{
+          width: 36, height: 36, borderRadius: 11,
+          background: 'rgba(14,165,233,0.12)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, flexShrink: 0,
+        }}>⚖️</div>
+        <div style={{ flex: 1 }}>
+          <p style={{ fontSize: 14, fontWeight: 700, color: '#1C1917', lineHeight: 1 }}>Peso di oggi</p>
+          <p style={{ fontSize: 11, color: '#9CA3AF', marginTop: 2 }}>Registra il tuo peso giornaliero</p>
+        </div>
+        <Link href="/weight" style={{ fontSize: 11, fontWeight: 600, color: '#0EA5E9', textDecoration: 'none', flexShrink: 0 }}>
+          Storico →
+        </Link>
+      </div>
+
+      <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+        <div style={{ position: 'relative', flex: 1 }}>
+          <input
+            ref={inputRef}
+            type="number"
+            inputMode="decimal"
+            step="0.1"
+            min="20"
+            max="300"
+            placeholder="0.0"
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            disabled={isPending}
+            style={{
+              width: '100%',
+              padding: '10px 40px 10px 14px',
+              borderRadius: 12,
+              border: `1.5px solid ${status === 'err' ? '#EF4444' : '#E5EBE0'}`,
+              fontSize: 16, fontWeight: 700, color: '#1C1917',
+              background: '#F8FAF7',
+              outline: 'none',
+              appearance: 'textfield',
+            }}
+          />
+          <span style={{
+            position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
+            fontSize: 12, fontWeight: 600, color: '#9CA3AF',
+          }}>kg</span>
+        </div>
+
+        <motion.button
+          type="submit"
+          disabled={isPending || !value}
+          whileTap={{ scale: 0.94 }}
+          style={{
+            padding: '10px 18px',
+            borderRadius: 12,
+            border: 'none',
+            background: status === 'ok' ? '#22C55E' : status === 'err' ? '#EF4444' : '#0EA5E9',
+            color: '#fff',
+            fontSize: 13,
+            fontWeight: 700,
+            cursor: 'pointer',
+            opacity: isPending || !value ? 0.6 : 1,
+            flexShrink: 0,
+            transition: 'background 0.2s',
+          }}
+        >
+          {isPending ? '…' : status === 'ok' ? '✓' : status === 'err' ? '!' : 'Salva'}
+        </motion.button>
+      </form>
+    </motion.div>
+  );
 }
 
 // ── Calorie Arc Ring (SVG) ────────────────────────────────────────────────────
@@ -127,16 +237,31 @@ function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
           </text>
         </g>
 
-        {/* Center: fire icon placeholder + kcal */}
-        <text x={cx} y={cy - 18} textAnchor="middle" fontSize="22" dominantBaseline="middle">🔥</text>
-        <text x={cx} y={cy + 8} textAnchor="middle" fontSize="26" fontWeight="900" fill="#1C1917"
-          fontFamily="Inter, system-ui, sans-serif">
-          {left.toLocaleString()}
-        </text>
-        <text x={cx} y={cy + 26} textAnchor="middle" fontSize="11" fill="#9CA3AF"
-          fontFamily="Inter, system-ui, sans-serif" fontWeight="600">
-          {over ? 'kcal over' : 'Kcal'}
-        </text>
+        {/* Center: foreignObject avoids emoji/number overlap in SVG text */}
+        <foreignObject x={cx - 52} y={cy - 46} width={104} height={92}>
+          <div style={{
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            height: '100%', gap: 0,
+            fontFamily: 'Inter, system-ui, sans-serif',
+          }}>
+            <span style={{ fontSize: 22, lineHeight: '1', display: 'block' }}>
+              {over ? '⚠️' : '🔥'}
+            </span>
+            <span style={{
+              fontSize: 26, fontWeight: 900, color: over ? '#EF4444' : '#1C1917',
+              lineHeight: '1.1', display: 'block', marginTop: 4,
+            }}>
+              {left.toLocaleString()}
+            </span>
+            <span style={{
+              fontSize: 11, fontWeight: 600, color: '#9CA3AF',
+              lineHeight: '1', display: 'block', marginTop: 3,
+            }}>
+              {over ? 'kcal over' : 'Kcal'}
+            </span>
+          </div>
+        </foreignObject>
 
         {/* Arc labels */}
         <text x={cx - R - 2} y={cy + 38} textAnchor="middle" fontSize="10" fill="#9CA3AF"
@@ -439,6 +564,9 @@ export default function DashboardClient({
           </div>
         </div>
 
+        {/* ── Weight quick-log ── */}
+        <WeightQuickLog />
+
         {/* ── Quick actions ── */}
         <div style={{ display: 'flex', gap: 10 }}>
           <Link href="/insights" style={{ flex: 1, textDecoration: 'none' }}>
@@ -464,7 +592,7 @@ export default function DashboardClient({
             </motion.div>
           </Link>
 
-          <Link href="/weight" style={{ flex: 1, textDecoration: 'none' }}>
+          <Link href="/diary" style={{ flex: 1, textDecoration: 'none' }}>
             <motion.div
               whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
               style={{
@@ -475,14 +603,14 @@ export default function DashboardClient({
             >
               <div style={{
                 width: 38, height: 38, borderRadius: 12,
-                background: 'rgba(14,165,233,0.12)',
+                background: 'rgba(249,115,22,0.12)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
               }}>
-                ⚖️
+                📔
               </div>
               <div>
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#1C1917' }}>Peso</p>
-                <p style={{ fontSize: 11, color: '#9CA3AF' }}>Traccia</p>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#1C1917' }}>Diario</p>
+                <p style={{ fontSize: 11, color: '#9CA3AF' }}>Pasti</p>
               </div>
             </motion.div>
           </Link>

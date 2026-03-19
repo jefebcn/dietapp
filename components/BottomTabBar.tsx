@@ -96,6 +96,7 @@ export function BottomTabBar() {
             <Link
               key={tab.href}
               href={tab.href}
+              prefetch={true}
               style={{
                 flex: 1,
                 display: 'flex',
@@ -144,6 +145,7 @@ export function BottomTabBar() {
         <div style={{ width: 72, flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <Link
             href="/scan"
+            prefetch={true}
             aria-label="Scanner alimentare"
             style={{
               width: 56,
@@ -174,6 +176,7 @@ export function BottomTabBar() {
             <Link
               key={tab.href}
               href={tab.href}
+              prefetch={true}
               style={{
                 flex: 1,
                 display: 'flex',
