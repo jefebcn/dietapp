@@ -98,12 +98,18 @@ export async function addBronzeLog(
 ): Promise<string> {
   const db = getAdminDb();
   const ref = db.collection(`users/${uid}/weight_bronze`).doc();
-  const log: BronzeLog = {
-    ...input,
+  // Firestore Admin SDK rejects documents that contain `undefined` values.
+  // Build the log object explicitly so optional fields (e.g. notes) are
+  // omitted entirely when not provided rather than set to undefined.
+  const log: Record<string, unknown> = {
     uid,
+    rawValue: input.rawValue,
+    rawUnit: input.rawUnit,
+    source: input.source,
     createdAt: isoNow(),
     timezone: input.timezone ?? 'UTC',
   };
+  if (input.notes !== undefined) log.notes = input.notes;
   await ref.set(log);
   return ref.id;
 }

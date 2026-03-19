@@ -17,16 +17,24 @@
  * preventing stale server sessions after client-side logout.
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { onIdTokenChanged } from 'firebase/auth';
 import { getClientAuth } from '@/lib/firebase-client.config';
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  // Track whether we previously had an authenticated user.
+  // We only clear the server session cookie when transitioning from
+  // authenticated → unauthenticated (i.e. explicit sign-out), NOT on every
+  // cold page-load by an anonymous visitor (which would fire unnecessarily
+  // on the public landing page and generate avoidable network errors).
+  const hadUser = useRef<boolean | null>(null);
+
   useEffect(() => {
     const auth = getClientAuth();
 
     const unsubscribe = onIdTokenChanged(auth, async (user) => {
       if (user) {
+        hadUser.current = true;
         try {
           const idToken = await user.getIdToken();
           await fetch('/api/login', {
@@ -38,12 +46,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.warn('[AuthProvider] Failed to sync session cookie:', err);
         }
       } else {
-        // User signed out – clear the server-side session cookie
-        try {
-          await fetch('/api/auth/session', { method: 'DELETE' });
-        } catch (err) {
-          console.warn('[AuthProvider] Failed to clear session cookie:', err);
+        // Only clear the server-side session cookie when the user has just
+        // signed out (transition from authenticated → unauthenticated).
+        // Skip the DELETE call on initial load with no cached Firebase user
+        // to avoid unnecessary requests on the public landing page.
+        if (hadUser.current === true) {
+          try {
+            await fetch('/api/auth/session', { method: 'DELETE' });
+          } catch (err) {
+            console.warn('[AuthProvider] Failed to clear session cookie:', err);
+          }
         }
+        hadUser.current = false;
       }
     });
 

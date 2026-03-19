@@ -147,12 +147,14 @@ export async function logWeightAction(
     const tz = input.timezone ?? 'Europe/Rome';
 
     // 🥉 Bronze: raw log
+    // Omit optional fields when undefined – Firestore Admin SDK rejects
+    // documents with explicit `undefined` values.
     const bronzeId = await addBronzeLog(uid, {
       rawValue: input.rawValue,
       rawUnit: input.rawUnit,
-      notes: input.notes,
       source: 'manual',
       timezone: tz,
+      ...(input.notes !== undefined && { notes: input.notes }),
     });
 
     // 🥈 Silver: normalise + validate
@@ -163,10 +165,10 @@ export async function logWeightAction(
         uid,
         rawValue: input.rawValue,
         rawUnit: input.rawUnit,
-        notes: input.notes,
         source: 'manual',
         timezone: tz,
         createdAt: new Date().toISOString(),
+        ...(input.notes !== undefined && { notes: input.notes }),
       },
       input.heightCm,
     );
