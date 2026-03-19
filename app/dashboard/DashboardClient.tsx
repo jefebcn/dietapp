@@ -52,7 +52,7 @@ function buildWeek(todayStr: string): WeekDay[] {
     d.setDate(today.getDate() + offset);
     days.push({
       date: d.toISOString().split('T')[0],
-      dayName: d.toLocaleDateString('en-US', { weekday: 'short' }),
+      dayName: d.toLocaleDateString('it-IT', { weekday: 'short' }),
       dayNum: d.getDate(),
       isToday: offset === 0,
     });
@@ -392,7 +392,7 @@ export default function DashboardClient({
   const weekDays = buildWeek(today);
 
   // Format display date
-  const displayDate = new Date(today + 'T12:00:00').toLocaleDateString('en-US', {
+  const displayDate = new Date(today + 'T12:00:00').toLocaleDateString('it-IT', {
     weekday: 'long', day: 'numeric', month: 'long',
   });
 

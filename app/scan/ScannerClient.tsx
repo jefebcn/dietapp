@@ -8,9 +8,10 @@
  * Animated scan line, mode selector, camera controls.
  */
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useTransition } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { addMealAction } from '@/lib/actions/mealActions';
 
 type ScanMode = 'food' | 'barcode' | 'label' | 'ingredients';
 
@@ -40,6 +41,13 @@ const DEMO_RESULTS: Record<ScanMode, ScanResult> = {
 
 // ── Result sheet ──────────────────────────────────────────────────────────────
 
+const MEAL_TYPES_SCAN = [
+  { key: 'colazione', label: 'Colazione', icon: '🌅' },
+  { key: 'pranzo',    label: 'Pranzo',    icon: '☀️'  },
+  { key: 'cena',      label: 'Cena',      icon: '🌙'  },
+  { key: 'spuntino',  label: 'Spuntino',  icon: '🍎'  },
+] as const;
+
 function ResultSheet({
   result,
   onDismiss,
@@ -47,13 +55,28 @@ function ResultSheet({
 }: {
   result: ScanResult;
   onDismiss: () => void;
-  onAdd: (r: ScanResult) => void;
+  onAdd: (r: ScanResult, mealType: string) => Promise<void>;
 }) {
+  const [mealType, setMealType] = useState<string>('spuntino');
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+
   const macros = [
-    { label: 'Carboidrati', value: result.carbs,   color: '#8B5CF6', unit: 'g' },
-    { label: 'Proteine',    value: result.protein,  color: '#0EA5E9', unit: 'g' },
-    { label: 'Grassi',      value: result.fat,      color: '#F59E0B', unit: 'g' },
+    { label: 'Carboidrati', value: result.carbs,   color: '#8B5CF6' },
+    { label: 'Proteine',    value: result.protein,  color: '#0EA5E9' },
+    { label: 'Grassi',      value: result.fat,      color: '#F59E0B' },
   ];
+
+  async function handleSave() {
+    setSaving(true);
+    setSaveError('');
+    try {
+      await onAdd(result, mealType);
+    } catch {
+      setSaveError('Errore durante il salvataggio. Riprova.');
+      setSaving(false);
+    }
+  }
 
   return (
     <motion.div
@@ -73,40 +96,59 @@ function ResultSheet({
       }}
     >
       {/* Handle */}
-      <div style={{
-        width: 40, height: 4, borderRadius: 99,
-        background: '#E5EBE0', margin: '0 auto 20px',
-      }} />
+      <div style={{ width: 40, height: 4, borderRadius: 99, background: '#E5EBE0', margin: '0 auto 20px' }} />
 
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14 }}>
         <div>
           <p style={{ fontSize: 20, fontWeight: 800, color: '#1C1917' }}>{result.name}</p>
           <p style={{ fontSize: 13, color: '#9CA3AF', marginTop: 2 }}>{result.portion}</p>
         </div>
-        <div style={{
-          background: 'rgba(249,115,22,0.10)',
-          borderRadius: 14, padding: '8px 14px',
-        }}>
+        <div style={{ background: 'rgba(249,115,22,0.10)', borderRadius: 14, padding: '8px 14px' }}>
           <p style={{ fontSize: 22, fontWeight: 900, color: '#F97316', lineHeight: 1 }}>{result.kcal}</p>
           <p style={{ fontSize: 10, color: '#F97316', fontWeight: 600, textAlign: 'center' }}>kcal</p>
         </div>
       </div>
 
       {/* Macro pills */}
-      <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+      <div style={{ display: 'flex', gap: 10, marginBottom: 16 }}>
         {macros.map((m) => (
-          <div key={m.label} style={{
-            flex: 1,
-            background: `${m.color}12`,
-            borderRadius: 12,
-            padding: '10px 8px',
-            textAlign: 'center',
-          }}>
+          <div key={m.label} style={{ flex: 1, background: `${m.color}12`, borderRadius: 12, padding: '10px 8px', textAlign: 'center' }}>
             <p style={{ fontSize: 16, fontWeight: 800, color: m.color }}>{m.value}g</p>
             <p style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 600, marginTop: 2 }}>{m.label}</p>
           </div>
         ))}
       </div>
+
+      {/* Meal type selector */}
+      <div style={{ marginBottom: 16 }}>
+        <p style={{ fontSize: 11, fontWeight: 700, color: '#6B7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8 }}>
+          Aggiungi a
+        </p>
+        <div style={{ display: 'flex', gap: 6 }}>
+          {MEAL_TYPES_SCAN.map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setMealType(t.key)}
+              style={{
+                flex: 1, padding: '8px 0', borderRadius: 12, border: 'none',
+                background: mealType === t.key ? '#F97316' : '#F3F6F0',
+                color: mealType === t.key ? '#fff' : '#6B7280',
+                fontSize: 10, fontWeight: 700, cursor: 'pointer',
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3,
+              }}
+            >
+              <span style={{ fontSize: 16 }}>{t.icon}</span>
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {saveError && (
+        <p style={{ fontSize: 12, color: '#EF4444', fontWeight: 600, textAlign: 'center', marginBottom: 10 }}>
+          ⚠️ {saveError}
+        </p>
+      )}
 
       {/* Actions */}
       <div style={{ display: 'flex', gap: 10 }}>
@@ -121,15 +163,17 @@ function ResultSheet({
           Scansiona ancora
         </button>
         <button
-          onClick={() => onAdd(result)}
+          onClick={handleSave}
+          disabled={saving}
           style={{
             flex: 1, padding: '14px 0', borderRadius: 14, border: 'none',
-            background: 'linear-gradient(145deg, #FB923C, #F97316)',
-            cursor: 'pointer', fontSize: 14, fontWeight: 700, color: '#fff',
-            boxShadow: '0 4px 14px rgba(249,115,22,0.32)',
+            background: saving ? 'rgba(249,115,22,0.40)' : 'linear-gradient(145deg, #FB923C, #F97316)',
+            cursor: saving ? 'default' : 'pointer',
+            fontSize: 14, fontWeight: 700, color: '#fff',
+            boxShadow: saving ? 'none' : '0 4px 14px rgba(249,115,22,0.32)',
           }}
         >
-          Aggiungi al diario
+          {saving ? '⏳ Salvando...' : '+ Aggiungi al diario'}
         </button>
       </div>
     </motion.div>
@@ -143,6 +187,7 @@ export default function ScannerClient() {
   const [scanning, setScanning]   = useState(false);
   const [result, setResult]       = useState<ScanResult | null>(null);
   const [added, setAdded]         = useState(false);
+  const [addedName, setAddedName] = useState('');
   const [flash, setFlash]         = useState(false);
   const [hasCamera, setHasCamera] = useState(false);
   const [cameraError, setCameraError] = useState('');
@@ -202,10 +247,27 @@ export default function ScannerClient() {
     }, 2200);
   }
 
-  function handleAdd(r: ScanResult) {
-    setAdded(true);
-    setResult(null);
-    setTimeout(() => setAdded(false), 2500);
+  async function handleAdd(r: ScanResult, mealType: string) {
+    const today = new Date().toISOString().split('T')[0];
+    const res = await addMealAction(today, {
+      name: r.name,
+      kcal: r.kcal,
+      protein: r.protein,
+      carbs: r.carbs,
+      fat: r.fat,
+      qty: parseFloat(r.portion) || 100,
+      unit: r.portion.replace(/[\d.]/g, '').trim() || 'g',
+      source: 'barcode',
+      mealType,
+    });
+    if (res.success) {
+      setAddedName(r.name);
+      setResult(null);
+      setAdded(true);
+      setTimeout(() => setAdded(false), 3000);
+    } else {
+      throw new Error(res.error);
+    }
   }
 
   function toggleFlash() {
@@ -329,19 +391,21 @@ export default function ScannerClient() {
         <AnimatePresence>
           {added && (
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, scale: 0.85 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.85 }}
               style={{
                 position: 'absolute', top: '50%', left: '50%',
                 transform: 'translate(-50%, -50%)',
                 background: '#22C55E', color: '#fff',
-                borderRadius: 16, padding: '16px 24px',
-                fontSize: 15, fontWeight: 700,
-                boxShadow: '0 8px 24px rgba(34,197,94,0.40)',
+                borderRadius: 20, padding: '18px 28px',
+                textAlign: 'center',
+                boxShadow: '0 8px 30px rgba(34,197,94,0.45)',
               }}
             >
-              ✅ Aggiunto al diario!
+              <p style={{ fontSize: 28, marginBottom: 4 }}>✅</p>
+              <p style={{ fontSize: 15, fontWeight: 800 }}>Aggiunto al diario!</p>
+              {addedName && <p style={{ fontSize: 12, opacity: 0.85, marginTop: 4 }}>{addedName}</p>}
             </motion.div>
           )}
         </AnimatePresence>

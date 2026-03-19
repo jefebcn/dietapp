@@ -14,6 +14,7 @@ import {
   getBronzeLogsForDate,
 } from '@/lib/repositories/weightRepository';
 import type { BronzeLog, GoldMetrics } from '@/lib/repositories/weightRepository';
+import { getUserById } from '@/lib/repositories/userRepository';
 import { BottomTabBar } from '@/components/BottomTabBar';
 import WeightClient from './WeightClient';
 
@@ -44,13 +45,16 @@ export default async function WeightPage({
       : today;
   const isPast = viewDate !== today;
 
-  const [recentLogs, weeklyTrend, dayLogs] = await Promise.all([
+  const [recentLogs, weeklyTrend, dayLogs, user] = await Promise.all([
     getRecentBronzeLogs(uid, 20).catch(() => [] as Awaited<ReturnType<typeof getRecentBronzeLogs>>),
     getRecentGoldWeeks(uid, 8).catch(() => [] as Awaited<ReturnType<typeof getRecentGoldWeeks>>),
     isPast
       ? getBronzeLogsForDate(uid, viewDate).catch(() => [] as Awaited<ReturnType<typeof getBronzeLogsForDate>>)
       : Promise.resolve([] as Awaited<ReturnType<typeof getBronzeLogsForDate>>),
+    getUserById(uid).catch(() => null),
   ]);
+
+  const savedHeightCm = (user as { heightCm?: number } | null)?.heightCm;
 
   const displayDate = new Date(viewDate + 'T12:00:00').toLocaleDateString('it-IT', {
     weekday: 'long', day: 'numeric', month: 'long',
@@ -113,6 +117,7 @@ export default async function WeightPage({
           weeklyTrend={weeklyTrend}
           viewDate={viewDate}
           dayLogs={dayLogs}
+          savedHeightCm={savedHeightCm}
         />
       </main>
 

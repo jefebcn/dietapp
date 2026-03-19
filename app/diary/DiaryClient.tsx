@@ -11,10 +11,11 @@
  *  • Sticky header with quick stats
  */
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BottomSheet } from '@/components/BottomSheet';
-import { addMealAction, deleteMealAction } from '@/lib/actions/mealActions';
+import { addMealAction, deleteMealAction, copyDayMealsAction, searchFoodAction } from '@/lib/actions/mealActions';
+import type { FoodSearchResult } from '@/lib/actions/mealActions';
 
 interface Meal {
   id: string; name: string; kcal: number;
@@ -54,12 +55,14 @@ function MacroPill({ value, label, color }: { value: number; label: string; colo
 // ── Category Section ───────────────────────────────────────────────────────────
 
 function CategorySection({
-  type, meals, onAdd, onDelete,
+  type, meals, onAdd, onDeleteRequest, onDeleteConfirm, confirmDeleteId,
 }: {
   type: typeof MEAL_TYPES[number];
   meals: Meal[];
   onAdd: (typeKey: MealTypeKey) => void;
-  onDelete: (id: string) => void;
+  onDeleteRequest: (id: string) => void;
+  onDeleteConfirm: (id: string) => void;
+  confirmDeleteId: string | null;
 }) {
   const [expanded, setExpanded] = useState(true);
   const catKcal = meals.reduce((s, m) => s + m.kcal, 0);
@@ -137,24 +140,45 @@ function CategorySection({
                     >
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold truncate" style={{ color: '#1C1917' }}>{meal.name}</p>
-                        <div className="flex gap-2.5 mt-0.5">
-                          <MacroPill value={meal.protein} label="P" color="#0EA5E9"/>
-                          <MacroPill value={meal.carbs}   label="C" color="#8B5CF6"/>
-                          <MacroPill value={meal.fat}     label="G" color="#F59E0B"/>
-                        </div>
+                        {confirmDeleteId === meal.id ? (
+                          <div className="flex gap-2 mt-1">
+                            <button
+                              onClick={() => onDeleteConfirm(meal.id)}
+                              className="text-[10px] font-bold px-2 py-0.5 rounded-lg"
+                              style={{ background: 'rgba(239,68,68,0.12)', color: '#EF4444', border: '1px solid rgba(239,68,68,0.25)' }}
+                            >
+                              Elimina
+                            </button>
+                            <button
+                              onClick={() => onDeleteRequest('')}
+                              className="text-[10px] font-bold px-2 py-0.5 rounded-lg"
+                              style={{ background: '#F3F6F0', color: '#6B7280', border: '1px solid #E5EBE0' }}
+                            >
+                              Annulla
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex gap-2.5 mt-0.5">
+                            <MacroPill value={meal.protein} label="P" color="#0EA5E9"/>
+                            <MacroPill value={meal.carbs}   label="C" color="#8B5CF6"/>
+                            <MacroPill value={meal.fat}     label="G" color="#F59E0B"/>
+                          </div>
+                        )}
                       </div>
                       <span className="text-[11px] font-bold flex-shrink-0"
                         style={{ color: '#F97316' }}>{Math.round(meal.kcal)}</span>
-                      <motion.button
-                        onClick={() => onDelete(meal.id)}
-                        whileTap={{ scale: 0.80 }}
-                        className="flex-shrink-0 p-1 rounded-lg"
-                        style={{ background: 'rgba(239,68,68,0.08)', color: '#EF4444' }}
-                      >
-                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                          <path d="M18 6L6 18M6 6l12 12"/>
-                        </svg>
-                      </motion.button>
+                      {confirmDeleteId !== meal.id && (
+                        <motion.button
+                          onClick={() => onDeleteRequest(meal.id)}
+                          whileTap={{ scale: 0.80 }}
+                          className="flex-shrink-0 p-1 rounded-lg"
+                          style={{ background: 'rgba(239,68,68,0.08)', color: '#EF4444' }}
+                        >
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                            <path d="M18 6L6 18M6 6l12 12"/>
+                          </svg>
+                        </motion.button>
+                      )}
                     </motion.li>
                   ))}
                 </AnimatePresence>
@@ -201,25 +225,85 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
   const [activeMealType, setActiveMealType] = useState<MealTypeKey>('colazione');
   const [isPending, startTransition] = useTransition();
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
 
   const [form, setForm] = useState({
     name: '', kcal: '', protein: '', carbs: '', fat: '', qty: '100', unit: 'g',
   });
   const [error, setError] = useState('');
 
+  // Food search state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<FoodSearchResult[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   function openAddSheet(typeKey: MealTypeKey) {
     setSelectedMeal(null);
     setActiveMealType(typeKey);
     setForm({ name: '', kcal: '', protein: '', carbs: '', fat: '', qty: '100', unit: 'g' });
     setError('');
+    setSearchQuery('');
+    setSearchResults([]);
     setSheetOpen(true);
   }
 
-  function handleDelete(mealId: string) {
+  const handleSearchInput = useCallback((q: string) => {
+    setSearchQuery(q);
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    if (q.trim().length < 2) { setSearchResults([]); return; }
+    setSearchLoading(true);
+    searchTimerRef.current = setTimeout(async () => {
+      const res = await searchFoodAction(q.trim());
+      setSearchLoading(false);
+      if (res.success) setSearchResults(res.results);
+    }, 500);
+  }, []);
+
+  function applySearchResult(food: FoodSearchResult) {
+    setForm({
+      name: food.name,
+      kcal: String(food.nutrients.kcal),
+      protein: String(food.nutrients.protein),
+      carbs: String(food.nutrients.carbs),
+      fat: String(food.nutrients.fat),
+      qty: '100',
+      unit: 'g',
+    });
+    setSearchQuery('');
+    setSearchResults([]);
+  }
+
+  function handleDeleteRequest(mealId: string) {
+    setConfirmDeleteId(mealId || null);
+  }
+
+  function handleDeleteConfirm(mealId: string) {
+    setConfirmDeleteId(null);
     startTransition(async () => {
       const result = await deleteMealAction(today, mealId);
       if (result.success) {
         setMeals((prev) => prev.filter((m) => m.id !== mealId));
+      }
+    });
+  }
+
+  function handleCopyFromYesterday() {
+    if (copyStatus === 'loading') return;
+    const yesterday = new Date(today + 'T12:00:00');
+    yesterday.setDate(yesterday.getDate() - 1);
+    const yesterdayStr = yesterday.toISOString().split('T')[0];
+    setCopyStatus('loading');
+    startTransition(async () => {
+      const result = await copyDayMealsAction(yesterdayStr, today);
+      if (result.success) {
+        setCopyStatus('done');
+        // Reload page to show copied meals
+        window.location.reload();
+      } else {
+        setCopyStatus('error');
+        setTimeout(() => setCopyStatus('idle'), 3000);
       }
     });
   }
@@ -238,6 +322,7 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
         fat: parseFloat(form.fat) || 0,
         qty: parseFloat(form.qty) || 100,
         unit: form.unit, source: 'manual',
+        mealType: activeMealType,
       });
       if (result.success) {
         const newMeal: Meal = {
@@ -313,7 +398,9 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
             type={type}
             meals={getMealsForType(type.key)}
             onAdd={openAddSheet}
-            onDelete={handleDelete}
+            onDeleteRequest={handleDeleteRequest}
+            onDeleteConfirm={handleDeleteConfirm}
+            confirmDeleteId={confirmDeleteId}
           />
         ))}
 
@@ -359,7 +446,7 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
                     {Math.round(meal.kcal)}
                   </span>
                   <motion.button
-                    onClick={() => handleDelete(meal.id)}
+                    onClick={() => handleDeleteRequest(meal.id)}
                     whileTap={{ scale: 0.80 }}
                     className="flex-shrink-0 p-1 rounded-lg"
                     style={{ background: 'rgba(239,68,68,0.08)', color: '#EF4444' }}
@@ -374,6 +461,43 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
           </motion.div>
         )}
       </div>
+
+      {/* ── Copy from yesterday ── */}
+      {meals.length === 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-3 p-4 rounded-2xl flex items-center justify-between gap-3"
+          style={{
+            background: '#F0FDF4',
+            border: '1.5px solid #86EFAC',
+            boxShadow: '0 2px 8px rgba(34,197,94,0.06)',
+          }}
+        >
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold" style={{ color: '#15803D', fontFamily: 'var(--font-ui)' }}>
+              📋 Copia i pasti di ieri
+            </p>
+            <p className="text-[10px] mt-0.5" style={{ color: '#4ADE80' }}>
+              Nessun pasto oggi – vuoi riutilizzare quelli di ieri?
+            </p>
+          </div>
+          <button
+            onClick={handleCopyFromYesterday}
+            disabled={copyStatus === 'loading'}
+            className="flex-shrink-0 px-3 py-2 rounded-xl text-xs font-bold disabled:opacity-50"
+            style={{
+              background: copyStatus === 'done' ? '#22C55E' : copyStatus === 'error' ? '#EF4444' : '#15803D',
+              color: '#fff',
+              fontFamily: 'var(--font-ui)',
+              border: 'none',
+              minWidth: 72,
+            }}
+          >
+            {copyStatus === 'loading' ? '...' : copyStatus === 'done' ? '✓ Copiati' : copyStatus === 'error' ? '✗ Errore' : 'Copia'}
+          </button>
+        </motion.div>
+      )}
 
       {/* ── Global Add FAB ── */}
       <motion.button
@@ -406,6 +530,82 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
               {error}
             </p>
           )}
+
+          {/* ── Food Search ── */}
+          <div>
+            <label className="block text-xs font-bold mb-1.5" style={{ color: '#6B7280', fontFamily: 'var(--font-ui)' }}>
+              🔍 Cerca alimento
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="es. pasta, pollo, yogurt..."
+                value={searchQuery}
+                onChange={(e) => handleSearchInput(e.target.value)}
+                className="app-input w-full px-3 py-2.5 rounded-xl text-sm outline-none"
+                style={{ fontFamily: 'var(--font-ui)', color: '#1C1917', paddingRight: '2.5rem' }}
+              />
+              {searchLoading && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 0.7, repeat: Infinity, ease: 'linear' }}
+                    style={{ width: 14, height: 14, border: '2px solid #F97316', borderTopColor: 'transparent', borderRadius: '50%' }}
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Search results */}
+            <AnimatePresence>
+              {searchResults.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  className="mt-1.5 rounded-xl overflow-hidden"
+                  style={{ border: '1px solid #E5EBE0', boxShadow: '0 4px 12px rgba(0,0,0,0.08)' }}
+                >
+                  {searchResults.map((food, idx) => (
+                    <button
+                      key={food.id}
+                      type="button"
+                      onClick={() => applySearchResult(food)}
+                      className="w-full flex items-center justify-between px-3 py-2.5 text-left"
+                      style={{
+                        background: '#FFFFFF',
+                        borderBottom: idx < searchResults.length - 1 ? '1px solid #F3F6F0' : 'none',
+                      }}
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs font-semibold truncate" style={{ color: '#1C1917', fontFamily: 'var(--font-ui)' }}>
+                          {food.name}
+                        </p>
+                        {food.brand && (
+                          <p className="text-[10px] truncate" style={{ color: '#9CA3AF' }}>{food.brand}</p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0 ml-3">
+                        <span className="text-xs font-bold" style={{ color: '#F97316' }}>{food.nutrients.kcal} kcal</span>
+                        <span className="text-[10px]" style={{ color: '#9CA3AF' }}>per 100g</span>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#C9D5C4" strokeWidth="2.5">
+                          <path d="M9 18l6-6-6-6"/>
+                        </svg>
+                      </div>
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3">
+            <div className="flex-1 h-px" style={{ background: '#E5EBE0' }} />
+            <span className="text-[10px] font-bold" style={{ color: '#9CA3AF', fontFamily: 'var(--font-ui)' }}>oppure inserisci manualmente</span>
+            <div className="flex-1 h-px" style={{ background: '#E5EBE0' }} />
+          </div>
+
           {/* Meal type selector */}
           <div>
             <label className="block text-xs font-bold mb-2" style={{ color: '#6B7280', fontFamily: 'var(--font-ui)' }}>

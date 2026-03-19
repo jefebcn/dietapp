@@ -24,6 +24,7 @@ interface Props {
   weeklyTrend: GoldMetrics[];
   viewDate: string;
   dayLogs: (BronzeLog & { id: string })[];
+  savedHeightCm?: number;
 }
 
 interface ChartPoint {
@@ -284,14 +285,14 @@ function WeeklyBars({ data }: { data: GoldMetrics[] }) {
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
-export default function WeightClient({ recentLogs, weeklyTrend, viewDate, dayLogs }: Props) {
+export default function WeightClient({ recentLogs, weeklyTrend, viewDate, dayLogs, savedHeightCm }: Props) {
   const today = new Date().toISOString().split('T')[0];
   const isPast = viewDate !== today;
 
   const [unit, setUnit]       = useState<'kg' | 'lbs'>('kg');
   const [value, setValue]     = useState('');
   const [notes, setNotes]     = useState('');
-  const [heightCm, setHeightCm] = useState('');
+  const [heightCm, setHeightCm] = useState(savedHeightCm ? String(savedHeightCm) : '');
   const [loading, setLoading] = useState(false);
   const [lastResult, setLastResult] = useState<{ kg: number } | { error: string } | null>(null);
   const [period, setPeriod]   = useState<'7d' | '30d' | 'all'>('30d');

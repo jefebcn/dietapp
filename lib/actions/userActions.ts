@@ -33,6 +33,25 @@ export async function updateProfileAction(
   }
 }
 
+export interface UpdateHeightInput {
+  heightCm: number;
+}
+
+export async function updateHeightAction(
+  input: UpdateHeightInput,
+): Promise<{ success: true } | { success: false; error: string }> {
+  try {
+    const uid = await getAuthenticatedUid();
+    const h = Math.round(input.heightCm);
+    if (h < 100 || h > 250) throw new Error('Altezza non valida (100–250 cm)');
+    await updateUser(uid, { heightCm: h });
+    return { success: true as const };
+  } catch (err) {
+    console.error('[updateHeightAction]', err);
+    return { success: false as const, error: err instanceof Error ? err.message : 'Unknown error' };
+  }
+}
+
 export interface UpdateGoalsInput {
   kcal: number;
   protein: number;
