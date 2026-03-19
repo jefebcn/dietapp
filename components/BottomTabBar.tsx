@@ -33,17 +33,14 @@ function AnalyticsIcon({ active }: { active: boolean }) {
   );
 }
 
-function PlanIcon({ active }: { active: boolean }) {
+function ContestIcon({ active }: { active: boolean }) {
   const c = active ? '#F97316' : '#9CA3AF';
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="4" width="18" height="18" rx="2" fill={active ? 'rgba(249,115,22,0.08)' : 'none'} />
-      <line x1="16" y1="2" x2="16" y2="6" />
-      <line x1="8" y1="2" x2="8" y2="6" />
-      <line x1="3" y1="10" x2="21" y2="10" />
-      <line x1="8" y1="14" x2="8.01" y2="14" strokeWidth="3" />
-      <line x1="12" y1="14" x2="12.01" y2="14" strokeWidth="3" />
-      <line x1="16" y1="14" x2="16.01" y2="14" strokeWidth="3" />
+      <path d="M8 21V13H5l-2-6h18l-2 6h-3v8" fill={active ? 'rgba(249,115,22,0.08)' : 'none'} />
+      <path d="M12 13v8" />
+      <path d="M8 21h8" />
+      <circle cx="12" cy="6" r="2" fill={active ? '#F97316' : 'none'} />
     </svg>
   );
 }
@@ -63,7 +60,7 @@ function SettingIcon({ active }: { active: boolean }) {
 const TABS = [
   { href: '/dashboard', label: 'Home',      Icon: HomeIcon      },
   { href: '/insights',  label: 'Analytics', Icon: AnalyticsIcon },
-  { href: '/plan',      label: 'Plan',      Icon: PlanIcon      },
+  { href: '/contest',   label: 'Contest',   Icon: ContestIcon   },
   { href: '/settings',  label: 'Setting',   Icon: SettingIcon   },
 ];
 

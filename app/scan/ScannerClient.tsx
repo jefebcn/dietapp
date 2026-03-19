@@ -145,26 +145,45 @@ export default function ScannerClient() {
   const [added, setAdded]         = useState(false);
   const [flash, setFlash]         = useState(false);
   const [hasCamera, setHasCamera] = useState(false);
+  const [cameraError, setCameraError] = useState('');
   const videoRef                  = useRef<HTMLVideoElement>(null);
   const streamRef                 = useRef<MediaStream | null>(null);
 
-  // Try to access camera
+  // Step 1: request camera access and store the stream.
+  // We must NOT try to set videoRef.current.srcObject here because the
+  // <video> element is only rendered once hasCamera = true (it's conditional).
+  // Setting hasCamera triggers a re-render that mounts the <video>, then
+  // Step 2 attaches the stream via a separate useEffect.
   const startCamera = useCallback(async () => {
-    if (!navigator.mediaDevices?.getUserMedia) return;
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setCameraError('Camera non disponibile su questo dispositivo.');
+      return;
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' },
+        video: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } },
       });
       streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        setHasCamera(true);
+      setHasCamera(true); // triggers re-render → <video> mounts → Step 2 runs
+    } catch (err: unknown) {
+      const msg = (err as { name?: string })?.name;
+      if (msg === 'NotAllowedError' || msg === 'PermissionDeniedError') {
+        setCameraError('Permesso fotocamera negato. Abilita l\'accesso nelle impostazioni del browser.');
+      } else if (msg === 'NotFoundError' || msg === 'DevicesNotFoundError') {
+        setCameraError('Nessuna fotocamera trovata su questo dispositivo.');
+      } else {
+        setCameraError('Impossibile avviare la fotocamera.');
       }
-    } catch {
-      // Camera denied or unavailable — use static image mockup
       setHasCamera(false);
     }
   }, []);
+
+  // Step 2: once the <video> element is in the DOM, attach the stream.
+  useEffect(() => {
+    if (hasCamera && videoRef.current && streamRef.current) {
+      videoRef.current.srcObject = streamRef.current;
+    }
+  }, [hasCamera]);
 
   useEffect(() => {
     startCamera();
@@ -190,8 +209,15 @@ export default function ScannerClient() {
   }
 
   function toggleFlash() {
-    setFlash((f) => !f);
-    // Real flash: streamRef.current?.getVideoTracks()[0]?.applyConstraints({ advanced: [{ torch: !flash }] })
+    const newFlash = !flash;
+    setFlash(newFlash);
+    // Apply torch constraint on the active camera track where supported (mobile Chrome/Android)
+    const track = streamRef.current?.getVideoTracks()[0];
+    if (track) {
+      track.applyConstraints({ advanced: [{ torch: newFlash } as MediaTrackConstraintSet] }).catch(() => {
+        // torch not supported on this device/browser — silently ignore
+      });
+    }
   }
 
   return (
@@ -199,21 +225,50 @@ export default function ScannerClient() {
 
       {/* ── Camera / viewfinder ── */}
       <div style={{ position: 'relative', height: 'calc(100dvh - 220px)', overflow: 'hidden' }}>
-        {hasCamera ? (
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
-        ) : (
-          // Fallback: food photo mockup
-          <img
-            src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=700&q=80"
-            alt="Food to scan"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          />
+        {/* Always render <video> so videoRef is available when hasCamera becomes true */}
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          style={{
+            width: '100%', height: '100%', objectFit: 'cover',
+            display: hasCamera ? 'block' : 'none',
+          }}
+        />
+        {/* Fallback shown while camera is loading or unavailable */}
+        {!hasCamera && (
+          <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            <img
+              src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=700&q=80"
+              alt="Food to scan"
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+            {cameraError && (
+              <div style={{
+                position: 'absolute', bottom: 20, left: 16, right: 16,
+                background: 'rgba(0,0,0,0.72)', borderRadius: 14,
+                padding: '10px 14px',
+                backdropFilter: 'blur(8px)',
+              }}>
+                <p style={{ fontSize: 12, color: '#FCA5A5', fontWeight: 600, textAlign: 'center' }}>
+                  ⚠️ {cameraError}
+                </p>
+                <button
+                  onClick={() => { setCameraError(''); setHasCamera(false); startCamera(); }}
+                  style={{
+                    display: 'block', margin: '8px auto 0',
+                    fontSize: 11, fontWeight: 700, color: '#F97316',
+                    background: 'rgba(249,115,22,0.15)',
+                    border: '1px solid rgba(249,115,22,0.30)',
+                    borderRadius: 8, padding: '4px 12px', cursor: 'pointer',
+                  }}
+                >
+                  Riprova
+                </button>
+              </div>
+            )}
+          </div>
         )}
 
         {/* Scan frame overlay */}

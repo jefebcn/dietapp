@@ -15,6 +15,7 @@ import { useState, useTransition, useRef } from 'react';
 import useSWR from 'swr';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { logWeightAction } from '@/lib/actions/mealActions';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -378,6 +379,7 @@ function MealImageCard({ item, meals }: { item: typeof MEAL_IMAGES[0]; meals: Me
 export default function DashboardClient({
   uid, today, stats, goals, todayMeals, weekStats, userName, streak = 0, tip,
 }: Props) {
+  const router = useRouter();
   const [selectedDay, setSelectedDay] = useState(today);
 
   const { data: liveStats } = useSWR<DailyStats>(
@@ -455,41 +457,63 @@ export default function DashboardClient({
           paddingBottom: 4,
           scrollbarWidth: 'none',
         }}>
-          {weekDays.map((d) => (
-            <button
-              key={d.date}
-              onClick={() => setSelectedDay(d.date)}
-              style={{
-                flex: '0 0 auto',
-                width: 44,
-                padding: '8px 4px',
-                borderRadius: 14,
-                border: 'none',
-                cursor: 'pointer',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                gap: 4,
-                background: d.isToday ? '#F97316' : 'transparent',
-                transition: 'all 0.18s',
-              }}
-            >
-              <span style={{
-                fontSize: 10, fontWeight: 600,
-                color: d.isToday ? 'rgba(255,255,255,0.85)' : '#9CA3AF',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-              }}>
-                {d.dayName.slice(0, 3)}
-              </span>
-              <span style={{
-                fontSize: 15, fontWeight: 800,
-                color: d.isToday ? '#fff' : '#1C1917',
-              }}>
-                {d.dayNum}
-              </span>
-            </button>
-          ))}
+          {weekDays.map((d) => {
+            const isSelected = d.date === selectedDay;
+            const isFuture = d.date > today;
+            return (
+              <button
+                key={d.date}
+                onClick={() => {
+                  if (isFuture) return; // can't navigate to future days
+                  setSelectedDay(d.date);
+                  // Navigate to diary for any day, so user can view/edit
+                  router.push(`/diary?date=${d.date}`);
+                }}
+                title={isFuture ? '' : d.isToday ? 'Oggi' : `Vai al ${d.date}`}
+                style={{
+                  flex: '0 0 auto',
+                  width: 44,
+                  padding: '8px 4px',
+                  borderRadius: 14,
+                  border: 'none',
+                  cursor: isFuture ? 'default' : 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 4,
+                  background: d.isToday
+                    ? '#F97316'
+                    : isSelected
+                    ? 'rgba(249,115,22,0.12)'
+                    : 'transparent',
+                  opacity: isFuture ? 0.35 : 1,
+                  transition: 'all 0.18s',
+                  outline: isSelected && !d.isToday ? '2px solid rgba(249,115,22,0.40)' : 'none',
+                }}
+              >
+                <span style={{
+                  fontSize: 10, fontWeight: 600,
+                  color: d.isToday ? 'rgba(255,255,255,0.85)' : '#9CA3AF',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.05em',
+                }}>
+                  {d.dayName.slice(0, 3)}
+                </span>
+                <span style={{
+                  fontSize: 15, fontWeight: 800,
+                  color: d.isToday ? '#fff' : '#1C1917',
+                }}>
+                  {d.dayNum}
+                </span>
+                {!d.isToday && !isFuture && weekStats.find((s) => s.date === d.date && s.mealCount > 0) && (
+                  <span style={{
+                    width: 5, height: 5, borderRadius: '50%',
+                    background: '#F97316', opacity: 0.7,
+                  }} />
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
