@@ -14,6 +14,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { updateProfileAction, updateGoalsAction } from '@/lib/actions/userActions';
+import { useTheme } from '@/components/ThemeProvider';
 
 interface Props {
   user: {
@@ -66,6 +67,7 @@ function GlassField({
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export default function SettingsClient({ user }: Props) {
+  const { theme, toggle } = useTheme();
   const [name, setName] = useState(user.name);
   const [profileStatus, setProfileStatus] = useState<SaveStatus>('idle');
 
@@ -224,6 +226,60 @@ export default function SettingsClient({ user }: Props) {
               </a>
             ))}
           </div>
+        </div>
+      </motion.div>
+
+      {/* ── Tema ── */}
+      <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.14 }}>
+        <div className="p-4 rounded-2xl"
+          style={{
+            background: '#FFFFFF',
+            border: '1px solid rgba(139,92,246,0.18)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+          }}>
+          <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: '#8B5CF6', fontFamily: 'var(--font-ui)' }}>
+            🎨 Aspetto
+          </p>
+
+          <button
+            onClick={toggle}
+            className="w-full flex items-center justify-between rounded-2xl px-4 py-3"
+            style={{
+              background: theme === 'dark' ? 'rgba(139,92,246,0.10)' : '#F8FAF7',
+              border: `1.5px solid ${theme === 'dark' ? 'rgba(139,92,246,0.30)' : '#E5EBE0'}`,
+              cursor: 'pointer',
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-xl">{theme === 'dark' ? '🌙' : '☀️'}</span>
+              <div className="text-left">
+                <p className="text-sm font-bold" style={{ color: '#1C1917', fontFamily: 'var(--font-ui)' }}>
+                  {theme === 'dark' ? 'Tema scuro' : 'Tema chiaro'}
+                </p>
+                <p className="text-xs" style={{ color: '#9CA3AF', fontFamily: 'var(--font-ui)' }}>
+                  {theme === 'dark' ? 'Tocca per tornare al tema chiaro' : 'Tocca per attivare il tema scuro'}
+                </p>
+              </div>
+            </div>
+            {/* Toggle pill */}
+            <div style={{
+              width: 48, height: 28, borderRadius: 99,
+              background: theme === 'dark' ? '#8B5CF6' : '#E5EBE0',
+              position: 'relative',
+              transition: 'background 0.22s',
+              flexShrink: 0,
+            }}>
+              <div style={{
+                position: 'absolute',
+                top: 3,
+                left: theme === 'dark' ? 23 : 3,
+                width: 22, height: 22, borderRadius: '50%',
+                background: '#FFFFFF',
+                boxShadow: '0 1px 4px rgba(0,0,0,0.18)',
+                transition: 'left 0.22s',
+              }} />
+            </div>
+          </button>
         </div>
       </motion.div>
 
