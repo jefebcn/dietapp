@@ -8,6 +8,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 import { getAdminAuth } from '@/lib/firebase-admin.config';
 import { getMealsByDate, getDailyStats } from '@/lib/repositories/mealRepository';
@@ -82,7 +83,7 @@ export default async function DiaryPage({
                 </svg>
               </a>
             )}
-            <div>
+            <div style={{ flex: 1 }}>
               <p className="text-xs font-semibold capitalize" style={{ color: isPast ? '#F97316' : '#9CA3AF' }}>
                 {isPast ? `📅 ${displayDate}` : displayDate}
               </p>
@@ -90,6 +91,27 @@ export default async function DiaryPage({
                 📖 Diario Alimentare
               </h1>
             </div>
+
+            {/* Day-switcher: Pasti ↔ Peso (only for past dates) */}
+            {isPast && (
+              <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
+                <span style={{
+                  fontSize: 11, fontWeight: 700, padding: '6px 12px', borderRadius: 10,
+                  background: '#F97316', border: '1.5px solid rgba(249,115,22,0.4)',
+                  color: '#fff',
+                }}>
+                  🍽️ Pasti
+                </span>
+                <Link href={`/weight?date=${viewDate}`} style={{
+                  fontSize: 11, fontWeight: 700, padding: '6px 12px', borderRadius: 10,
+                  background: '#fff', border: '1.5px solid #E5EBE0',
+                  color: '#6B7280', textDecoration: 'none',
+                  boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                }}>
+                  ⚖️ Peso
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </header>

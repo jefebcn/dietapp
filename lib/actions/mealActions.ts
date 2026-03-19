@@ -133,6 +133,8 @@ export interface LogWeightInput {
   notes?: string;
   timezone?: string;
   heightCm?: number;
+  /** Target date YYYY-MM-DD. Defaults to today. Used for logging on past dates. */
+  date?: string;
 }
 
 /**
@@ -146,6 +148,12 @@ export async function logWeightAction(
     const uid = await getAuthenticatedUid();
     const tz = input.timezone ?? 'Europe/Rome';
 
+    // Resolve target date: use provided date or today.
+    // For past dates use noon UTC to stay unambiguously within that calendar day.
+    const today = new Date().toISOString().split('T')[0];
+    const targetDate = input.date && input.date <= today ? input.date : today;
+    const createdAt = `${targetDate}T12:00:00.000Z`;
+
     // 🥉 Bronze: raw log
     // Omit optional fields when undefined – Firestore Admin SDK rejects
     // documents with explicit `undefined` values.
@@ -154,6 +162,7 @@ export async function logWeightAction(
       rawUnit: input.rawUnit,
       source: 'manual',
       timezone: tz,
+      createdAt, // honour past-date logging
       ...(input.notes !== undefined && { notes: input.notes }),
     });
 
@@ -167,7 +176,7 @@ export async function logWeightAction(
         rawUnit: input.rawUnit,
         source: 'manual',
         timezone: tz,
-        createdAt: new Date().toISOString(),
+        createdAt, // same date so Silver lands on the right day
         ...(input.notes !== undefined && { notes: input.notes }),
       },
       input.heightCm,

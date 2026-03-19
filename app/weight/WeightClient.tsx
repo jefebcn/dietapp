@@ -22,6 +22,8 @@ import type { BronzeLog, GoldMetrics } from '@/lib/repositories/weightRepository
 interface Props {
   recentLogs: (BronzeLog & { id: string })[];
   weeklyTrend: GoldMetrics[];
+  viewDate: string;
+  dayLogs: (BronzeLog & { id: string })[];
 }
 
 interface ChartPoint {
@@ -282,7 +284,10 @@ function WeeklyBars({ data }: { data: GoldMetrics[] }) {
 
 // ── Main Component ────────────────────────────────────────────────────────────
 
-export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
+export default function WeightClient({ recentLogs, weeklyTrend, viewDate, dayLogs }: Props) {
+  const today = new Date().toISOString().split('T')[0];
+  const isPast = viewDate !== today;
+
   const [unit, setUnit]       = useState<'kg' | 'lbs'>('kg');
   const [value, setValue]     = useState('');
   const [notes, setNotes]     = useState('');
@@ -333,6 +338,7 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
       notes: notes || undefined,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       heightCm: h > 0 ? h : undefined,
+      ...(isPast && { date: viewDate }),
     });
     setLoading(false);
     if (result.success) {
@@ -346,8 +352,93 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
 
   // ── render ──────────────────────────────────────────────────────────────────
 
+  const displayDate = new Date(viewDate + 'T12:00:00').toLocaleDateString('it-IT', {
+    weekday: 'long', day: 'numeric', month: 'long',
+  });
+
   return (
     <div className="space-y-4">
+
+      {/* ── Past-day banner ── */}
+      {isPast && (
+        <motion.div
+          style={{
+            background: 'rgba(249,115,22,0.08)',
+            border: '1.5px solid rgba(249,115,22,0.25)',
+            borderRadius: '1rem',
+            padding: '12px 16px',
+            display: 'flex', alignItems: 'center', gap: 10,
+          }}
+          initial={{ opacity: 0, y: -6 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <span style={{ fontSize: 20 }}>📅</span>
+          <div>
+            <p style={{ fontSize: 11, fontWeight: 700, color: '#F97316', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              Giorno precedente
+            </p>
+            <p style={{ fontSize: 13, fontWeight: 800, color: '#1C1917', textTransform: 'capitalize' }}>
+              {displayDate}
+            </p>
+          </div>
+        </motion.div>
+      )}
+
+      {/* ── Day-specific logs (past date) ── */}
+      {isPast && (
+        <motion.div
+          style={{
+            background: '#FFF7ED',
+            border: '1.5px solid #FED7AA',
+            borderRadius: '1.5rem', padding: 16,
+            boxShadow: '0 2px 8px rgba(249,115,22,0.06)',
+          }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.06 }}
+        >
+          <h3 style={{
+            fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
+            letterSpacing: '0.08em', color: '#6B7280', marginBottom: 10,
+          }}>
+            ⚖️ Pesate del giorno
+          </h3>
+          {dayLogs.length === 0 ? (
+            <p style={{ fontSize: 13, color: '#9CA3AF', fontWeight: 600, textAlign: 'center', padding: '10px 0' }}>
+              Nessuna pesata registrata per questo giorno
+            </p>
+          ) : (
+            <ul>
+              {dayLogs.map((log, i) => {
+                const kg = toKg(log.rawValue, log.rawUnit);
+                return (
+                  <li key={log.id} style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                    padding: '8px 2px',
+                    borderBottom: i < dayLogs.length - 1 ? '1px solid #FEE2C5' : 'none',
+                  }}>
+                    <div>
+                      <p style={{ fontSize: 12, fontWeight: 600, color: '#1C1917' }}>
+                        {new Date(log.createdAt).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                      {log.notes && (
+                        <p style={{ fontSize: 10, color: '#9CA3AF', marginTop: 1 }}>{log.notes}</p>
+                      )}
+                    </div>
+                    <p style={{ fontSize: 16, fontWeight: 900, color: '#F97316' }}>
+                      {log.rawValue}
+                      <span style={{ fontSize: 10, fontWeight: 500, color: '#9CA3AF', marginLeft: 2 }}>{log.rawUnit}</span>
+                      {log.rawUnit !== 'kg' && (
+                        <span style={{ fontSize: 10, fontWeight: 600, color: '#9CA3AF', marginLeft: 4 }}>({kg} kg)</span>
+                      )}
+                    </p>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </motion.div>
+      )}
 
       {/* ── 1. Stats Row ── */}
       {!isEmpty && (
@@ -554,7 +645,7 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
           fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
           letterSpacing: '0.08em', color: '#6B7280', marginBottom: 14,
         }}>
-          ⚖️ Registra peso
+          {isPast ? `⚖️ Aggiungi pesata – ${viewDate}` : '⚖️ Registra peso'}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-3">

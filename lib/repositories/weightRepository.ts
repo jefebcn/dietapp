@@ -94,7 +94,8 @@ function monthKey(date: Date): string {
  */
 export async function addBronzeLog(
   uid: string,
-  input: Omit<BronzeLog, 'uid' | 'createdAt'>,
+  // Allow an optional createdAt override for logging weights on past dates.
+  input: Omit<BronzeLog, 'uid' | 'createdAt'> & { createdAt?: string },
 ): Promise<string> {
   const db = getAdminDb();
   const ref = db.collection(`users/${uid}/weight_bronze`).doc();
@@ -106,12 +107,31 @@ export async function addBronzeLog(
     rawValue: input.rawValue,
     rawUnit: input.rawUnit,
     source: input.source,
-    createdAt: isoNow(),
+    createdAt: input.createdAt ?? isoNow(),
     timezone: input.timezone ?? 'UTC',
   };
   if (input.notes !== undefined) log.notes = input.notes;
   await ref.set(log);
   return ref.id;
+}
+
+/**
+ * Fetch Bronze logs whose createdAt starts with a specific YYYY-MM-DD date.
+ * Used when viewing/editing a past day.
+ */
+export async function getBronzeLogsForDate(uid: string, date: string): Promise<(BronzeLog & { id: string })[]> {
+  const db = getAdminDb();
+  // Firestore range query on string field: 'YYYY-MM-DD' ≤ createdAt < 'YYYY-MM-DE'
+  const nextDay = new Date(date + 'T12:00:00Z');
+  nextDay.setUTCDate(nextDay.getUTCDate() + 1);
+  const nextDayStr = nextDay.toISOString().split('T')[0];
+  const snap = await db
+    .collection(`users/${uid}/weight_bronze`)
+    .where('createdAt', '>=', date)
+    .where('createdAt', '<', nextDayStr)
+    .orderBy('createdAt', 'desc')
+    .get();
+  return snap.docs.map((d) => ({ id: d.id, ...(d.data() as BronzeLog) }));
 }
 
 /** Fetch the N most recent Bronze logs for a user. */
