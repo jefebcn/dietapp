@@ -17,7 +17,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 const SLIDES = [
   {
     id: 0,
-    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=700&q=80',
+    image: '/food/slide-salad.jpg',
     topLabel: 'Healthy Food',
     topColor: '#22C55E',
     midLabel: 'Habits,',
@@ -26,7 +26,7 @@ const SLIDES = [
   },
   {
     id: 1,
-    image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=700&q=80',
+    image: '/food/slide-calories.jpg',
     topLabel: 'Track Calories',
     topColor: '#F97316',
     midLabel: '& Macros',
@@ -35,7 +35,7 @@ const SLIDES = [
   },
   {
     id: 2,
-    image: 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=700&q=80',
+    image: '/food/slide-scan.jpg',
     topLabel: 'Scan Food',
     topColor: '#0EA5E9',
     midLabel: 'with a single',
@@ -105,9 +105,7 @@ export default function OnboardingPage() {
             {/* Soft bottom fade */}
             <div style={{
               position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
+              bottom: 0, left: 0, right: 0,
               height: '40%',
               background: 'linear-gradient(to bottom, transparent, #F3F6F0)',
             }} />

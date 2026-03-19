@@ -190,14 +190,10 @@ function MacroCard({
 // ── Meal image card ───────────────────────────────────────────────────────────
 
 const MEAL_IMAGES = [
-  { label: 'Colazione', emoji: '🌅', bg: '#FFF7ED', accent: '#FB923C',
-    img: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400&q=75' },
-  { label: 'Pranzo', emoji: '☀️', bg: '#F0FDF4', accent: '#22C55E',
-    img: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&q=75' },
-  { label: 'Cena', emoji: '🌙', bg: '#EFF6FF', accent: '#3B82F6',
-    img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=75' },
-  { label: 'Spuntini', emoji: '🍎', bg: '#FFF1F2', accent: '#F43F5E',
-    img: 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=400&q=75' },
+  { label: 'Colazione', emoji: '🌅', accent: '#FB923C', img: '/food/meal-breakfast.jpg' },
+  { label: 'Pranzo',    emoji: '☀️',  accent: '#22C55E', img: '/food/meal-lunch.jpg' },
+  { label: 'Cena',      emoji: '🌙',  accent: '#3B82F6', img: '/food/meal-dinner.jpg' },
+  { label: 'Spuntini',  emoji: '🍎',  accent: '#F43F5E', img: '/food/meal-snack.jpg' },
 ];
 
 function MealImageCard({ item, meals }: { item: typeof MEAL_IMAGES[0]; meals: Meal[] }) {
@@ -219,7 +215,7 @@ function MealImageCard({ item, meals }: { item: typeof MEAL_IMAGES[0]; meals: Me
           boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
         }}
       >
-        {/* Food image */}
+        {/* Food photo */}
         <div style={{ height: 100, overflow: 'hidden', position: 'relative' }}>
           <img
             src={item.img}
