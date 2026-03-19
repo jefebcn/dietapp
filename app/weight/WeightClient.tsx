@@ -23,24 +23,27 @@ interface Props {
 // ── Card styles ─────────────────────────────────────────────────────────────
 
 const CARD_INDIGO = {
-  background: 'linear-gradient(145deg, #EEF2FF 0%, #E0E7FF 100%)',
-  border: '2.5px solid #A5B4FC',
+  background: 'rgba(99,102,241,0.12)',
+  border: '1px solid rgba(165,180,252,0.25)',
   borderRadius: '1.5rem',
-  boxShadow: '0 6px 0 #4338CA, 0 10px 28px rgba(67,56,202,0.15), inset 0 2px 0 rgba(255,255,255,0.70)',
+  backdropFilter: 'blur(16px)',
+  WebkitBackdropFilter: 'blur(16px)',
 };
 
 const CARD_EMERALD = {
-  background: 'linear-gradient(145deg, #ECFDF5 0%, #D1FAE5 100%)',
-  border: '2.5px solid #6EE7B7',
+  background: 'rgba(16,185,129,0.12)',
+  border: '1px solid rgba(110,231,183,0.25)',
   borderRadius: '1.5rem',
-  boxShadow: '0 6px 0 #059669, 0 10px 28px rgba(5,150,105,0.12), inset 0 2px 0 rgba(255,255,255,0.70)',
+  backdropFilter: 'blur(16px)',
+  WebkitBackdropFilter: 'blur(16px)',
 };
 
 const CARD_AMBER = {
-  background: 'linear-gradient(145deg, #FFFBEB 0%, #FEF3C7 100%)',
-  border: '2.5px solid #FDE68A',
+  background: 'rgba(245,158,11,0.12)',
+  border: '1px solid rgba(253,230,138,0.25)',
   borderRadius: '1.5rem',
-  boxShadow: '0 6px 0 #B45309, 0 10px 28px rgba(180,83,9,0.12), inset 0 2px 0 rgba(255,255,255,0.70)',
+  backdropFilter: 'blur(16px)',
+  WebkitBackdropFilter: 'blur(16px)',
 };
 
 // ── Mini bar chart ───────────────────────────────────────────────────────────
@@ -55,7 +58,7 @@ function TrendChart({ data }: { data: GoldMetrics[] }) {
 
   return (
     <div>
-      <p className="text-xs font-extrabold uppercase tracking-wide mb-3" style={{ color: '#3730A3' }}>
+      <p className="text-xs font-extrabold uppercase tracking-wide mb-3" style={{ color: 'rgba(248,250,252,0.65)' }}>
         Andamento settimanale
       </p>
       <div className="flex items-end gap-1.5 h-20">
@@ -70,9 +73,8 @@ function TrendChart({ data }: { data: GoldMetrics[] }) {
                   style={{
                     background: isLatest
                       ? 'linear-gradient(180deg, #818CF8 0%, #6366F1 100%)'
-                      : 'linear-gradient(180deg, #C7D2FE 0%, #A5B4FC 100%)',
-                    boxShadow: isLatest ? '0 2px 0 #4338CA' : undefined,
-                    border: isLatest ? '1.5px solid #818CF8' : '1px solid rgba(99,102,241,0.2)',
+                      : 'rgba(165,180,252,0.35)',
+                    border: isLatest ? '1.5px solid rgba(165,180,252,0.5)' : '1px solid rgba(165,180,252,0.15)',
                   }}
                   initial={{ height: 0 }}
                   animate={{ height: `${Math.max(pct, 8)}%` }}
@@ -82,7 +84,7 @@ function TrendChart({ data }: { data: GoldMetrics[] }) {
               </div>
               <span
                 className="text-[9px] font-bold text-center leading-tight"
-                style={{ color: isLatest ? '#4338CA' : '#6366F1', opacity: isLatest ? 1 : 0.6 }}
+                style={{ color: isLatest ? '#A5B4FC' : 'rgba(165,180,252,0.6)' }}
               >
                 {w.avgKg}
               </span>
@@ -91,10 +93,10 @@ function TrendChart({ data }: { data: GoldMetrics[] }) {
         })}
       </div>
       <div className="flex justify-between mt-1">
-        <span className="text-[10px]" style={{ color: '#6366F1', opacity: 0.6 }}>
+        <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.40)' }}>
           {data[0]?.period.replace('week_', 'S')}
         </span>
-        <span className="text-[10px] font-bold" style={{ color: '#4338CA' }}>
+        <span className="text-[10px] font-bold" style={{ color: 'rgba(248,250,252,0.65)' }}>
           {data[data.length - 1]?.period.replace('week_', 'S')}
         </span>
       </div>
@@ -156,22 +158,21 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
             className="flex-shrink-0 flex items-center justify-center rounded-2xl"
             style={{
               width: 60, height: 60,
-              background: 'linear-gradient(145deg, #E0E7FF, #C7D2FE)',
-              border: '3px solid #A5B4FC',
-              boxShadow: '0 4px 0 #4338CA',
+              background: 'rgba(255,255,255,0.10)',
+              border: '1px solid rgba(255,255,255,0.18)',
               fontSize: 28,
             }}
           >
             ⚖️
           </div>
           <div>
-            <p className="text-xs font-extrabold uppercase tracking-wide" style={{ color: '#4338CA' }}>
+            <p className="text-xs font-extrabold uppercase tracking-wide" style={{ color: 'rgba(248,250,252,0.40)' }}>
               Ultimo aggiornamento
             </p>
-            <p className="text-3xl font-black leading-tight" style={{ color: '#1E1B4B' }}>
+            <p className="text-3xl font-black leading-tight" style={{ color: '#F8FAFC' }}>
               {latestWeight.rawValue} <span className="text-lg font-bold">{latestWeight.rawUnit}</span>
             </p>
-            <p className="text-xs" style={{ color: '#6366F1', opacity: 0.8 }}>
+            <p className="text-xs" style={{ color: 'rgba(248,250,252,0.65)' }}>
               {new Date(latestWeight.createdAt).toLocaleDateString('it-IT', {
                 day: 'numeric', month: 'long', year: 'numeric',
               })}
@@ -188,7 +189,7 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.08 }}
       >
-        <h2 className="text-sm font-extrabold uppercase tracking-wide mb-4" style={{ color: '#065F46' }}>
+        <h2 className="text-sm font-extrabold uppercase tracking-wide mb-4" style={{ color: 'rgba(248,250,252,0.65)' }}>
           📝 Registra peso
         </h2>
 
@@ -196,7 +197,7 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
           {/* Unit toggle */}
           <div
             className="flex rounded-xl p-0.5 gap-0.5"
-            style={{ background: 'rgba(255,255,255,0.6)', border: '2px solid #6EE7B7' }}
+            style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.14)' }}
           >
             {(['kg', 'lbs'] as const).map((u) => (
               <button
@@ -205,10 +206,9 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
                 onClick={() => setUnit(u)}
                 className="flex-1 py-2 rounded-xl text-sm font-bold transition-all"
                 style={{
-                  background: unit === u ? 'linear-gradient(145deg, #D1FAE5, #A7F3D0)' : 'transparent',
-                  color: unit === u ? '#065F46' : '#6B7280',
-                  boxShadow: unit === u ? '0 2px 0 #059669' : 'none',
-                  border: unit === u ? '1.5px solid #6EE7B7' : '1.5px solid transparent',
+                  background: unit === u ? 'rgba(255,255,255,0.14)' : 'transparent',
+                  color: unit === u ? '#F8FAFC' : 'rgba(248,250,252,0.40)',
+                  border: unit === u ? '1.5px solid rgba(255,255,255,0.18)' : '1.5px solid transparent',
                 }}
               >
                 {u}
@@ -218,7 +218,7 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
 
           {/* Weight input */}
           <div>
-            <label className="block text-xs font-bold mb-1" style={{ color: '#065F46' }}>
+            <label className="block text-xs font-bold mb-1" style={{ color: 'rgba(248,250,252,0.65)' }}>
               Peso ({unit})
             </label>
             <input
@@ -230,19 +230,14 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
               onChange={(e) => setValue(e.target.value)}
               placeholder={unit === 'kg' ? 'es. 75.5' : 'es. 166'}
               required
-              className="w-full rounded-xl px-4 py-3 text-lg font-bold outline-none transition-all"
-              style={{
-                background: 'rgba(255,255,255,0.8)',
-                border: '2px solid #6EE7B7',
-                color: '#1E1B4B',
-                boxShadow: '0 2px 0 #059669, inset 0 2px 6px rgba(0,0,0,0.04)',
-              }}
+              className="glass-input w-full rounded-xl px-4 py-3 text-lg font-bold outline-none transition-all"
+              style={{ color: '#F8FAFC', fontFamily: 'var(--font-ui)' }}
             />
           </div>
 
           {/* Height (optional, for BMI) */}
           <div>
-            <label className="block text-xs font-bold mb-1" style={{ color: '#065F46' }}>
+            <label className="block text-xs font-bold mb-1" style={{ color: 'rgba(248,250,252,0.65)' }}>
               Altezza in cm (opzionale, per BMI)
             </label>
             <input
@@ -253,19 +248,14 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
               value={heightCm}
               onChange={(e) => setHeightCm(e.target.value)}
               placeholder="es. 175"
-              className="w-full rounded-xl px-4 py-2.5 text-sm font-medium outline-none transition-all"
-              style={{
-                background: 'rgba(255,255,255,0.8)',
-                border: '2px solid #6EE7B7',
-                color: '#1E1B4B',
-                boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.04)',
-              }}
+              className="glass-input w-full rounded-xl px-4 py-2.5 text-sm font-medium outline-none transition-all"
+              style={{ color: '#F8FAFC', fontFamily: 'var(--font-ui)' }}
             />
           </div>
 
           {/* Notes */}
           <div>
-            <label className="block text-xs font-bold mb-1" style={{ color: '#065F46' }}>
+            <label className="block text-xs font-bold mb-1" style={{ color: 'rgba(248,250,252,0.65)' }}>
               Note (opzionale)
             </label>
             <input
@@ -274,13 +264,8 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
               onChange={(e) => setNotes(e.target.value)}
               placeholder="es. Dopo colazione"
               maxLength={120}
-              className="w-full rounded-xl px-4 py-2.5 text-sm font-medium outline-none transition-all"
-              style={{
-                background: 'rgba(255,255,255,0.8)',
-                border: '2px solid #6EE7B7',
-                color: '#1E1B4B',
-                boxShadow: 'inset 0 2px 6px rgba(0,0,0,0.04)',
-              }}
+              className="glass-input w-full rounded-xl px-4 py-2.5 text-sm font-medium outline-none transition-all"
+              style={{ color: '#F8FAFC', fontFamily: 'var(--font-ui)' }}
             />
           </div>
 
@@ -294,8 +279,8 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
                 className="px-4 py-3 rounded-xl text-sm font-bold"
                 style={
                   'error' in lastResult
-                    ? { background: '#FFE4E6', color: '#BE123C', border: '2px solid #FECDD3' }
-                    : { background: '#D1FAE5', color: '#065F46', border: '2px solid #6EE7B7' }
+                    ? { background: 'rgba(244,63,94,0.15)', color: '#FDA4AF', border: '1.5px solid rgba(244,63,94,0.30)' }
+                    : { background: 'rgba(16,185,129,0.15)', color: '#6EE7B7', border: '1.5px solid rgba(16,185,129,0.30)' }
                 }
               >
                 {'error' in lastResult
@@ -309,14 +294,7 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
           <motion.button
             type="submit"
             disabled={loading || !value}
-            className="w-full py-3.5 rounded-2xl text-base font-extrabold disabled:opacity-50"
-            style={{
-              background: 'linear-gradient(145deg, #34D399, #10B981)',
-              color: '#fff',
-              border: '2.5px solid #6EE7B7',
-              boxShadow: '0 5px 0 #065F46',
-              fontFamily: 'var(--font-ui)',
-            }}
+            className="btn btn-emerald w-full py-3.5 disabled:opacity-50"
             whileHover={{ scale: 1.02, y: -2 }}
             whileTap={{ scale: 0.98, y: 3 }}
           >
@@ -347,7 +325,7 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.24 }}
         >
-          <h3 className="text-sm font-extrabold uppercase tracking-wide mb-3" style={{ color: '#92400E' }}>
+          <h3 className="text-sm font-extrabold uppercase tracking-wide mb-3" style={{ color: 'rgba(248,250,252,0.65)' }}>
             Ultime registrazioni
           </h3>
           <ul className="space-y-2">
@@ -358,19 +336,19 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.04 }}
                 className="flex items-center justify-between py-2"
-                style={{ borderBottom: i < recentLogs.length - 1 ? '2px solid rgba(180,83,9,0.10)' : 'none' }}
+                style={{ borderBottom: i < recentLogs.length - 1 ? '1px solid rgba(255,255,255,0.08)' : 'none' }}
               >
                 <div>
-                  <p className="text-sm font-extrabold" style={{ color: '#1E1B4B' }}>
+                  <p className="text-sm font-extrabold" style={{ color: '#F8FAFC' }}>
                     {log.rawValue} {log.rawUnit}
                   </p>
                   {log.notes && (
-                    <p className="text-xs" style={{ color: '#92400E', opacity: 0.75 }}>
+                    <p className="text-xs" style={{ color: 'rgba(248,250,252,0.65)' }}>
                       {log.notes}
                     </p>
                   )}
                 </div>
-                <span className="text-xs font-bold" style={{ color: '#B45309' }}>
+                <span className="text-xs font-bold" style={{ color: 'rgba(248,250,252,0.40)' }}>
                   {new Date(log.createdAt).toLocaleDateString('it-IT', {
                     day: 'numeric', month: 'short',
                   })}

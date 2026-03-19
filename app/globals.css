@@ -353,7 +353,23 @@ body {
 /* ── Page Content ────────────────────────────────────────────────────────── */
 
 .page-content {
-  padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px));
+}
+
+/* ── Gradient text utility ───────────────────────────────────────────────── */
+
+.gradient-text-violet-cyan {
+  background: linear-gradient(135deg, #8B5CF6, #22D3EE);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-amber {
+  background: linear-gradient(135deg, #F59E0B, #FCD34D);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 /* ── Header ──────────────────────────────────────────────────────────────── */

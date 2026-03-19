@@ -35,22 +35,15 @@ export default async function WeightPage() {
   ]);
 
   return (
-    <div
-      className="relative min-h-screen"
-      style={{
-        background: 'linear-gradient(160deg, #EEF2FF 0%, #F5F0FF 40%, #ECFDF5 100%)',
-        backgroundAttachment: 'fixed',
-      }}
-    >
+    <div className="relative min-h-screen">
       {/* Header */}
       <header
         className="sticky top-0 z-30"
         style={{
-          background: 'rgba(238,242,255,0.92)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderBottom: '2.5px solid #A5B4FC',
-          boxShadow: '0 4px 20px rgba(67,56,202,0.10)',
+          background: 'rgba(8,11,20,0.82)',
+          backdropFilter: 'blur(28px)',
+          WebkitBackdropFilter: 'blur(28px)',
+          borderBottom: '1px solid rgba(255,255,255,0.07)',
         }}
       >
         <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
@@ -58,19 +51,19 @@ export default async function WeightPage() {
             href="/dashboard"
             className="flex items-center justify-center w-9 h-9 rounded-xl"
             style={{
-              background: 'rgba(67,56,202,0.08)',
-              border: '2px solid #A5B4FC',
+              background: 'rgba(255,255,255,0.06)',
+              border: '1px solid rgba(255,255,255,0.14)',
             }}
             aria-label="Torna alla dashboard"
           >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4338CA" strokeWidth="2.5" strokeLinecap="round">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F8FAFC" strokeWidth="2.5" strokeLinecap="round">
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </a>
           <div>
             <h1
               className="text-2xl leading-tight"
-              style={{ fontFamily: 'var(--font-display)', color: '#312E81' }}
+              style={{ fontFamily: 'var(--font-display)', color: '#F8FAFC' }}
             >
               ⚖️ Traccia Peso
             </h1>
