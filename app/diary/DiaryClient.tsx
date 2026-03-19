@@ -33,9 +33,9 @@ interface DiaryClientProps {
 
 const MEAL_TYPES = [
   { key: 'colazione', label: 'Colazione', icon: '🌅', color: '245,158,11',   time: '07:00–10:00' },
-  { key: 'pranzo',    label: 'Pranzo',    icon: '☀️',  color: '34,211,238',  time: '12:00–14:00' },
+  { key: 'pranzo',    label: 'Pranzo',    icon: '☀️',  color: '14,165,233',  time: '12:00–14:00' },
   { key: 'cena',      label: 'Cena',      icon: '🌙',  color: '139,92,246',  time: '19:00–21:00' },
-  { key: 'spuntino',  label: 'Spuntini',  icon: '🍎',  color: '52,211,153',  time: 'Qualsiasi ora' },
+  { key: 'spuntino',  label: 'Spuntini',  icon: '🍎',  color: '34,197,94',   time: 'Qualsiasi ora' },
 ] as const;
 
 type MealTypeKey = typeof MEAL_TYPES[number]['key'];
@@ -46,7 +46,7 @@ function MacroPill({ value, label, color }: { value: number; label: string; colo
   return (
     <div className="flex items-center gap-1">
       <span className="text-[10px] font-bold" style={{ color }}>{label}</span>
-      <span className="text-[10px] font-semibold" style={{ color: 'rgba(248,250,252,0.55)' }}>{Math.round(value)}g</span>
+      <span className="text-[10px] font-semibold" style={{ color: '#6B7280' }}>{Math.round(value)}g</span>
     </div>
   );
 }
@@ -73,10 +73,9 @@ function CategorySection({
       animate={{ opacity: 1, y: 0 }}
       className="rounded-2xl overflow-hidden"
       style={{
-        background: `rgba(${type.color},0.06)`,
+        background: '#FFFFFF',
         border: `1px solid rgba(${type.color},0.20)`,
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
       }}
     >
       {/* Header */}
@@ -86,18 +85,18 @@ function CategorySection({
       >
         <span className="text-xl">{type.icon}</span>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-bold" style={{ color: '#F8FAFC', fontFamily: 'var(--font-ui)' }}>
+          <p className="text-sm font-bold" style={{ color: '#1C1917', fontFamily: 'var(--font-ui)' }}>
             {type.label}
           </p>
-          <p className="text-[10px]" style={{ color: `rgba(${type.color},0.60)` }}>{type.time}</p>
+          <p className="text-[10px]" style={{ color: `rgba(${type.color},0.80)` }}>{type.time}</p>
         </div>
         <div className="flex items-center gap-2">
           {catKcal > 0 && (
             <span className="text-xs font-bold px-2 py-0.5 rounded-full"
               style={{
-                background: `rgba(${type.color},0.18)`,
+                background: `rgba(${type.color},0.12)`,
                 color: `rgb(${type.color})`,
-                border: `1px solid rgba(${type.color},0.30)`,
+                border: `1px solid rgba(${type.color},0.25)`,
               }}>
               {Math.round(catKcal)} kcal
             </span>
@@ -134,23 +133,23 @@ function CategorySection({
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 8, height: 0 }}
                       className="flex items-center gap-2.5 px-3 py-2 rounded-xl"
-                      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }}
+                      style={{ background: '#F8FAF7', border: '1px solid #E5EBE0' }}
                     >
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-semibold truncate" style={{ color: '#F8FAFC' }}>{meal.name}</p>
+                        <p className="text-xs font-semibold truncate" style={{ color: '#1C1917' }}>{meal.name}</p>
                         <div className="flex gap-2.5 mt-0.5">
-                          <MacroPill value={meal.protein} label="P" color="#22D3EE"/>
-                          <MacroPill value={meal.carbs}   label="C" color="#FB923C"/>
-                          <MacroPill value={meal.fat}     label="G" color="#F87171"/>
+                          <MacroPill value={meal.protein} label="P" color="#0EA5E9"/>
+                          <MacroPill value={meal.carbs}   label="C" color="#8B5CF6"/>
+                          <MacroPill value={meal.fat}     label="G" color="#F59E0B"/>
                         </div>
                       </div>
                       <span className="text-[11px] font-bold flex-shrink-0"
-                        style={{ color: '#FCD34D' }}>{Math.round(meal.kcal)}</span>
+                        style={{ color: '#F97316' }}>{Math.round(meal.kcal)}</span>
                       <motion.button
                         onClick={() => onDelete(meal.id)}
                         whileTap={{ scale: 0.80 }}
                         className="flex-shrink-0 p-1 rounded-lg"
-                        style={{ background: 'rgba(248,113,113,0.10)', color: '#F87171' }}
+                        style={{ background: 'rgba(239,68,68,0.08)', color: '#EF4444' }}
                       >
                         <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                           <path d="M18 6L6 18M6 6l12 12"/>
@@ -166,9 +165,9 @@ function CategorySection({
             {meals.length > 0 && (
               <div className="px-4 py-2 flex gap-4"
                 style={{ borderTop: `1px solid rgba(${type.color},0.10)` }}>
-                <MacroPill value={catProtein} label="Prot" color="#22D3EE"/>
-                <MacroPill value={catCarbs}   label="Carb" color="#FB923C"/>
-                <MacroPill value={catFat}     label="Gras" color="#F87171"/>
+                <MacroPill value={catProtein} label="Prot" color="#0EA5E9"/>
+                <MacroPill value={catCarbs}   label="Carb" color="#8B5CF6"/>
+                <MacroPill value={catFat}     label="Gras" color="#F59E0B"/>
               </div>
             )}
 
@@ -178,8 +177,8 @@ function CategorySection({
                 onClick={() => onAdd(type.key)}
                 className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-bold transition-all"
                 style={{
-                  background: `rgba(${type.color},0.10)`,
-                  border: `1px solid rgba(${type.color},0.25)`,
+                  background: `rgba(${type.color},0.08)`,
+                  border: `1px solid rgba(${type.color},0.22)`,
                   color: `rgb(${type.color})`,
                 }}
               >
@@ -272,23 +271,23 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
           animate={{ opacity: 1, y: 0 }}
           className="mb-4 p-4 rounded-2xl"
           style={{
-            background: 'rgba(245,158,11,0.07)',
-            border: '1px solid rgba(245,158,11,0.22)',
-            backdropFilter: 'blur(16px)',
+            background: '#FFFFFF',
+            border: '1px solid #E5EBE0',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
           }}
         >
           <div className="flex justify-between items-center">
             {[
-              { label: 'Calorie', value: `${Math.round(stats.totalKcal)}`, color: '#FCD34D' },
-              { label: 'Proteine', value: `${Math.round(stats.totalProtein)}g`, color: '#22D3EE' },
-              { label: 'Carboidrati', value: `${Math.round(stats.totalCarbs)}g`, color: '#FB923C' },
-              { label: 'Grassi', value: `${Math.round(stats.totalFat)}g`, color: '#F87171' },
+              { label: 'Calorie', value: `${Math.round(stats.totalKcal)}`, color: '#F97316' },
+              { label: 'Proteine', value: `${Math.round(stats.totalProtein)}g`, color: '#0EA5E9' },
+              { label: 'Carboidrati', value: `${Math.round(stats.totalCarbs)}g`, color: '#8B5CF6' },
+              { label: 'Grassi', value: `${Math.round(stats.totalFat)}g`, color: '#F59E0B' },
             ].map((item) => (
               <div key={item.label} className="text-center">
                 <p className="text-lg font-black leading-none" style={{ color: item.color, fontFamily: 'var(--font-ui)' }}>
                   {item.value}
                 </p>
-                <p className="text-[10px] font-semibold mt-0.5" style={{ color: 'rgba(248,250,252,0.45)' }}>
+                <p className="text-[10px] font-semibold mt-0.5" style={{ color: '#9CA3AF' }}>
                   {item.label}
                 </p>
               </div>
@@ -315,11 +314,11 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
         onClick={() => openAddSheet('spuntino')}
         className="w-full py-3.5 rounded-2xl text-sm font-bold"
         style={{
-          background: 'linear-gradient(145deg, #8B5CF6, #7C3AED)',
+          background: 'linear-gradient(145deg, #F97316, #EA6C0A)',
           color: '#fff',
           fontFamily: 'var(--font-ui)',
-          border: '1px solid rgba(196,181,253,0.28)',
-          boxShadow: '0 4px 0 rgba(91,33,182,0.70), 0 8px 24px rgba(139,92,246,0.30)',
+          border: '1px solid rgba(249,115,22,0.30)',
+          boxShadow: '0 4px 0 rgba(234,108,10,0.30), 0 8px 24px rgba(249,115,22,0.18)',
         }}
         whileHover={{ scale: 1.02, y: -2 }}
         whileTap={{ scale: 0.98, y: 3 }}
@@ -337,13 +336,13 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
         <form onSubmit={handleAdd} className="space-y-3">
           {error && (
             <p className="text-sm px-3 py-2 rounded-xl"
-              style={{ color: '#FDA4AF', background: 'rgba(244,63,94,0.12)', border: '1.5px solid rgba(244,63,94,0.25)', fontFamily: 'var(--font-ui)' }}>
+              style={{ color: '#DC2626', background: 'rgba(239,68,68,0.08)', border: '1.5px solid rgba(239,68,68,0.20)', fontFamily: 'var(--font-ui)' }}>
               {error}
             </p>
           )}
           {/* Meal type selector */}
           <div>
-            <label className="block text-xs font-bold mb-2" style={{ color: 'rgba(248,250,252,0.55)', fontFamily: 'var(--font-ui)' }}>
+            <label className="block text-xs font-bold mb-2" style={{ color: '#6B7280', fontFamily: 'var(--font-ui)' }}>
               Tipo di pasto
             </label>
             <div className="grid grid-cols-4 gap-1.5">
@@ -353,9 +352,9 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
                   onClick={() => setActiveMealType(t.key)}
                   className="flex flex-col items-center gap-1 py-2 rounded-xl text-[10px] font-bold transition-all"
                   style={{
-                    background: activeMealType === t.key ? `rgba(${t.color},0.20)` : 'rgba(255,255,255,0.05)',
-                    border: activeMealType === t.key ? `1px solid rgba(${t.color},0.40)` : '1px solid rgba(255,255,255,0.10)',
-                    color: activeMealType === t.key ? `rgb(${t.color})` : 'rgba(248,250,252,0.45)',
+                    background: activeMealType === t.key ? `rgba(${t.color},0.12)` : '#F8FAF7',
+                    border: activeMealType === t.key ? `1px solid rgba(${t.color},0.35)` : '1px solid #E5EBE0',
+                    color: activeMealType === t.key ? `rgb(${t.color})` : '#9CA3AF',
                     fontFamily: 'var(--font-ui)',
                   }}
                 >
@@ -375,15 +374,15 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
           ].map(({ key, label, type, required, placeholder }) => (
             <div key={key}>
               <label className="block text-xs font-bold mb-1.5"
-                style={{ color: 'rgba(248,250,252,0.55)', fontFamily: 'var(--font-ui)' }}>
+                style={{ color: '#6B7280', fontFamily: 'var(--font-ui)' }}>
                 {label}
               </label>
               <input
                 type={type} required={required} placeholder={placeholder}
                 value={form[key as keyof typeof form]}
                 onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
-                className="glass-input w-full px-3 py-2.5 rounded-xl text-sm outline-none"
-                style={{ fontFamily: 'var(--font-ui)', color: '#F8FAFC' }}
+                className="app-input w-full px-3 py-2.5 rounded-xl text-sm outline-none"
+                style={{ fontFamily: 'var(--font-ui)', color: '#1C1917' }}
               />
             </div>
           ))}
@@ -391,21 +390,21 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block text-xs font-bold mb-1.5"
-                style={{ color: 'rgba(248,250,252,0.55)', fontFamily: 'var(--font-ui)' }}>
+                style={{ color: '#6B7280', fontFamily: 'var(--font-ui)' }}>
                 Quantità
               </label>
               <input type="number" value={form.qty} onChange={(e) => setForm((f) => ({ ...f, qty: e.target.value }))}
-                className="glass-input w-full px-3 py-2.5 rounded-xl text-sm outline-none"
-                style={{ fontFamily: 'var(--font-ui)', color: '#F8FAFC' }}/>
+                className="app-input w-full px-3 py-2.5 rounded-xl text-sm outline-none"
+                style={{ fontFamily: 'var(--font-ui)', color: '#1C1917' }}/>
             </div>
             <div>
               <label className="block text-xs font-bold mb-1.5"
-                style={{ color: 'rgba(248,250,252,0.55)', fontFamily: 'var(--font-ui)' }}>
+                style={{ color: '#6B7280', fontFamily: 'var(--font-ui)' }}>
                 Unità
               </label>
               <select value={form.unit} onChange={(e) => setForm((f) => ({ ...f, unit: e.target.value }))}
-                className="glass-input w-full px-3 py-2.5 rounded-xl text-sm outline-none"
-                style={{ fontFamily: 'var(--font-ui)', color: '#F8FAFC', background: 'rgba(255,255,255,0.06)' }}>
+                className="app-input w-full px-3 py-2.5 rounded-xl text-sm outline-none"
+                style={{ fontFamily: 'var(--font-ui)', color: '#1C1917', background: '#F8FAF7' }}>
                 <option value="g">grammi (g)</option>
                 <option value="ml">millilitri (ml)</option>
                 <option value="porz">porzione</option>
@@ -417,9 +416,9 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
           <button type="submit" disabled={isPending}
             className="w-full py-3 rounded-2xl text-sm font-bold disabled:opacity-55"
             style={{
-              background: `linear-gradient(145deg, rgb(${activeType.color}), rgba(${activeType.color},0.80))`,
+              background: `linear-gradient(145deg, rgb(${activeType.color}), rgba(${activeType.color},0.85))`,
               color: '#fff', fontFamily: 'var(--font-ui)',
-              boxShadow: `0 4px 0 rgba(${activeType.color},0.50)`,
+              boxShadow: `0 4px 0 rgba(${activeType.color},0.25)`,
             }}>
             {isPending ? 'Salvataggio...' : `${activeType.icon} Aggiungi a ${activeType.label}`}
           </button>

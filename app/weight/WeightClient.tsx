@@ -50,27 +50,28 @@ function StatCard({
 }) {
   return (
     <div style={{
-      background: 'rgba(255,255,255,0.05)',
-      border: '1px solid rgba(255,255,255,0.09)',
+      background: '#FFFFFF',
+      border: '1.5px solid #E5EBE0',
       borderRadius: '1rem',
       padding: '12px 14px',
+      boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
     }}>
       <p style={{
         fontSize: 10, fontWeight: 700, letterSpacing: '0.07em',
-        textTransform: 'uppercase', color: 'rgba(248,250,252,0.45)', marginBottom: 4,
+        textTransform: 'uppercase', color: '#9CA3AF', marginBottom: 4,
       }}>
         {label}
       </p>
       <p style={{ fontSize: 22, fontWeight: 900, lineHeight: 1, color }}>
         {value}
         {unit && (
-          <span style={{ fontSize: 12, fontWeight: 600, marginLeft: 3, color: 'rgba(248,250,252,0.50)' }}>
+          <span style={{ fontSize: 12, fontWeight: 600, marginLeft: 3, color: '#9CA3AF' }}>
             {unit}
           </span>
         )}
       </p>
       {sub && (
-        <p style={{ fontSize: 10, marginTop: 4, color: 'rgba(248,250,252,0.40)', fontWeight: 600 }}>
+        <p style={{ fontSize: 10, marginTop: 4, color: '#9CA3AF', fontWeight: 600 }}>
           {sub}
         </p>
       )}
@@ -85,7 +86,7 @@ function WeightLineChart({ points }: { points: ChartPoint[] }) {
     return (
       <div style={{ padding: '24px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
         <span style={{ fontSize: 32 }}>📊</span>
-        <p style={{ fontSize: 12, fontWeight: 600, color: 'rgba(248,250,252,0.35)' }}>
+        <p style={{ fontSize: 12, fontWeight: 600, color: '#C9D5C4' }}>
           Registra almeno 2 pesate per il grafico
         </p>
       </div>
@@ -117,7 +118,7 @@ function WeightLineChart({ points }: { points: ChartPoint[] }) {
   const fillPath = `${linePath} L ${lastX} ${(H - pY).toFixed(1)} L ${pX} ${(H - pY).toFixed(1)} Z`;
 
   const delta = points[points.length - 1].kg - points[0].kg;
-  const lineColor = delta > 0.05 ? '#F87171' : delta < -0.05 ? '#34D399' : '#A78BFA';
+  const lineColor = delta > 0.05 ? '#EF4444' : delta < -0.05 ? '#22C55E' : '#F97316';
   const lastIdx = points.length - 1;
 
   return (
@@ -135,7 +136,7 @@ function WeightLineChart({ points }: { points: ChartPoint[] }) {
           key={f}
           x1={pX} y1={(pY + f * plotH).toFixed(1)}
           x2={W - pX} y2={(pY + f * plotH).toFixed(1)}
-          stroke="rgba(255,255,255,0.055)" strokeWidth="1" strokeDasharray="4 4"
+          stroke="#E5EBE0" strokeWidth="1" strokeDasharray="4 4"
         />
       ))}
 
@@ -156,7 +157,7 @@ function WeightLineChart({ points }: { points: ChartPoint[] }) {
             cx={toX(i).toFixed(1)} cy={toY(points[i].kg).toFixed(1)}
             r={i === lastIdx ? 5 : 3.5}
             fill={i === lastIdx ? lineColor : 'rgba(255,255,255,0.22)'}
-            stroke="rgba(8,11,20,0.85)" strokeWidth="1.5"
+            stroke="#F3F6F0" strokeWidth="1.5"
           />
           {i === lastIdx && (
             <text
@@ -171,11 +172,11 @@ function WeightLineChart({ points }: { points: ChartPoint[] }) {
       ))}
 
       {/* Date axis labels */}
-      <text x={pX} y={H - 1} fill="rgba(248,250,252,0.35)"
+      <text x={pX} y={H - 1} fill="#9CA3AF"
         fontSize="8.5" textAnchor="start" fontFamily="Inter, system-ui, sans-serif">
         {points[0].label}
       </text>
-      <text x={W - pX} y={H - 1} fill="rgba(248,250,252,0.55)"
+      <text x={W - pX} y={H - 1} fill="#6B7280"
         fontSize="8.5" textAnchor="end" fontFamily="Inter, system-ui, sans-serif">
         {points[lastIdx].label}
       </text>
@@ -235,7 +236,7 @@ function WeeklyBars({ data }: { data: GoldMetrics[] }) {
     <div>
       <p style={{
         fontSize: 10, fontWeight: 700, textTransform: 'uppercase',
-        letterSpacing: '0.08em', color: 'rgba(248,250,252,0.45)', marginBottom: 12,
+        letterSpacing: '0.08em', color: '#6B7280', marginBottom: 12,
       }}>
         Media settimanale (kg)
       </p>
@@ -251,7 +252,7 @@ function WeeklyBars({ data }: { data: GoldMetrics[] }) {
             <div key={w.period} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
               <span style={{
                 fontSize: 8, fontWeight: 700,
-                color: isLast ? '#A78BFA' : 'rgba(248,250,252,0.30)',
+                color: isLast ? '#F97316' : '#9CA3AF',
               }}>
                 {w.avgKg}
               </span>
@@ -260,16 +261,16 @@ function WeeklyBars({ data }: { data: GoldMetrics[] }) {
                   style={{
                     width: '100%', borderRadius: '5px 5px 3px 3px',
                     background: isLast
-                      ? 'linear-gradient(180deg, #A78BFA 0%, #8B5CF6 100%)'
-                      : 'rgba(139,92,246,0.22)',
-                    border: `1px solid ${isLast ? 'rgba(167,139,250,0.45)' : 'rgba(139,92,246,0.15)'}`,
+                      ? 'linear-gradient(180deg, #FB923C 0%, #F97316 100%)'
+                      : 'rgba(249,115,22,0.15)',
+                    border: `1px solid ${isLast ? 'rgba(249,115,22,0.50)' : 'rgba(249,115,22,0.15)'}`,
                   }}
                   initial={{ height: 0 }}
                   animate={{ height: `${Math.max(pct, 6)}%` }}
                   transition={{ duration: 0.55, delay: i * 0.05, ease: 'easeOut' }}
                 />
               </div>
-              <span style={{ fontSize: 7, color: 'rgba(248,250,252,0.30)' }}>S{weekLabel}</span>
+              <span style={{ fontSize: 7, color: '#C9D5C4' }}>S{weekLabel}</span>
               <span style={{ fontSize: 7, fontWeight: 700, color: trendColor }}>{trendArrow}</span>
             </div>
           );
@@ -360,7 +361,7 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
             label="Peso attuale"
             value={latestKg?.toFixed(1) ?? '—'}
             unit="kg"
-            color="#A78BFA"
+            color="#F97316"
             sub={latestLog
               ? new Date(latestLog.createdAt).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })
               : undefined}
@@ -373,7 +374,7 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
               border: '1px solid rgba(255,255,255,0.09)',
               borderRadius: '1rem', padding: '12px 14px',
             }}>
-              <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'rgba(248,250,252,0.45)', marginBottom: 4 }}>
+              <p style={{ fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#6B7280', marginBottom: 4 }}>
                 BMI
               </p>
               <p style={{ fontSize: 22, fontWeight: 900, lineHeight: 1, color: getBmiInfo(bmi).color }}>
@@ -392,7 +393,7 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
               justifyContent: 'center', alignItems: 'center', gap: 5,
             }}>
               <span style={{ fontSize: 22 }}>📏</span>
-              <p style={{ fontSize: 10, color: 'rgba(248,250,252,0.40)', fontWeight: 600, textAlign: 'center' }}>
+              <p style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 600, textAlign: 'center' }}>
                 Aggiungi altezza per il BMI
               </p>
             </div>
@@ -426,10 +427,10 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
       {!isEmpty && (
         <motion.div
           style={{
-            background: 'rgba(139,92,246,0.07)',
-            border: '1px solid rgba(139,92,246,0.22)',
+            background: '#F5F3FF',
+            border: '1.5px solid #DDD6FE',
             borderRadius: '1.5rem', padding: 16,
-            backdropFilter: 'blur(16px)',
+            boxShadow: '0 2px 10px rgba(139,92,246,0.06)',
           }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -439,7 +440,7 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
             <p style={{
               fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
-              letterSpacing: '0.08em', color: 'rgba(248,250,252,0.55)',
+              letterSpacing: '0.08em', color: '#6B7280',
             }}>
               Andamento peso
             </p>
@@ -450,9 +451,9 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
                   onClick={() => setPeriod(p)}
                   style={{
                     fontSize: 10, fontWeight: 700, padding: '3px 9px', borderRadius: 8,
-                    background: period === p ? 'rgba(139,92,246,0.28)' : 'transparent',
-                    color: period === p ? '#C4B5FD' : 'rgba(248,250,252,0.35)',
-                    border: `1px solid ${period === p ? 'rgba(139,92,246,0.45)' : 'transparent'}`,
+                    background: period === p ? 'rgba(139,92,246,0.12)' : 'transparent',
+                    color: period === p ? '#8B5CF6' : '#9CA3AF',
+                    border: `1px solid ${period === p ? '#C4B5FD' : 'transparent'}`,
                     transition: 'all 0.15s', cursor: 'pointer',
                   }}
                 >
@@ -469,9 +470,9 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
             <div style={{
               display: 'flex', justifyContent: 'space-between',
               marginTop: 10, paddingTop: 10,
-              borderTop: '1px solid rgba(255,255,255,0.07)',
+              borderTop: '1px solid #E5EBE0',
             }}>
-              <span style={{ fontSize: 11, color: 'rgba(248,250,252,0.40)' }}>
+              <span style={{ fontSize: 11, color: '#9CA3AF' }}>
                 Inizio: {chartPoints[0].kg} kg
               </span>
               <span style={{
@@ -489,10 +490,10 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
       {bmi && (
         <motion.div
           style={{
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.09)',
+            background: '#FFFFFF',
+            border: '1.5px solid #E5EBE0',
             borderRadius: '1.5rem', padding: 16,
-            backdropFilter: 'blur(16px)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
           }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -500,7 +501,7 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
         >
           <p style={{
             fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
-            letterSpacing: '0.08em', color: 'rgba(248,250,252,0.55)', marginBottom: 12,
+            letterSpacing: '0.08em', color: '#6B7280', marginBottom: 12,
           }}>
             Indice di Massa Corporea
           </p>
@@ -524,10 +525,10 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
       {weeklyTrend.length > 1 && (
         <motion.div
           style={{
-            background: 'rgba(255,255,255,0.05)',
-            border: '1px solid rgba(255,255,255,0.09)',
+            background: '#FFFFFF',
+            border: '1.5px solid #E5EBE0',
             borderRadius: '1.5rem', padding: 16,
-            backdropFilter: 'blur(16px)',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
           }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -540,10 +541,10 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
       {/* ── 5. Log Form ── */}
       <motion.div
         style={{
-          background: 'rgba(52,211,153,0.07)',
-          border: '1px solid rgba(52,211,153,0.22)',
+          background: '#F0FDF4',
+          border: '1.5px solid #86EFAC',
           borderRadius: '1.5rem', padding: 18,
-          backdropFilter: 'blur(16px)',
+          boxShadow: '0 2px 10px rgba(34,197,94,0.06)',
         }}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -551,7 +552,7 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
       >
         <h2 style={{
           fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
-          letterSpacing: '0.08em', color: 'rgba(248,250,252,0.55)', marginBottom: 14,
+          letterSpacing: '0.08em', color: '#6B7280', marginBottom: 14,
         }}>
           ⚖️ Registra peso
         </h2>
@@ -583,7 +584,7 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
           {/* Weight + Height */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'rgba(248,250,252,0.55)', marginBottom: 5 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280', marginBottom: 5 }}>
                 Peso ({unit})
               </label>
               <input
@@ -592,11 +593,11 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
                 placeholder={unit === 'kg' ? '75.5' : '166'}
                 required
                 className="glass-input w-full rounded-xl px-3 py-2.5 text-base font-bold outline-none"
-                style={{ color: '#F8FAFC' }}
+                style={{ color: '#1C1917' }}
               />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'rgba(248,250,252,0.55)', marginBottom: 5 }}>
+              <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280', marginBottom: 5 }}>
                 Altezza (cm)
               </label>
               <input
@@ -604,14 +605,14 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
                 value={heightCm} onChange={(e) => setHeightCm(e.target.value)}
                 placeholder="175"
                 className="glass-input w-full rounded-xl px-3 py-2.5 text-sm font-medium outline-none"
-                style={{ color: '#F8FAFC' }}
+                style={{ color: '#1C1917' }}
               />
             </div>
           </div>
 
           {/* Notes */}
           <div>
-            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: 'rgba(248,250,252,0.55)', marginBottom: 5 }}>
+            <label style={{ display: 'block', fontSize: 11, fontWeight: 700, color: '#6B7280', marginBottom: 5 }}>
               Note (opzionale)
             </label>
             <input
@@ -619,7 +620,7 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
               placeholder="es. Dopo colazione"
               maxLength={120}
               className="glass-input w-full rounded-xl px-3 py-2.5 text-sm font-medium outline-none"
-              style={{ color: '#F8FAFC' }}
+              style={{ color: '#1C1917' }}
             />
           </div>
 
@@ -657,10 +658,10 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
       {recentLogs.length > 0 && (
         <motion.div
           style={{
-            background: 'rgba(245,158,11,0.07)',
-            border: '1px solid rgba(245,158,11,0.20)',
+            background: '#FFFBEB',
+            border: '1.5px solid #FDE68A',
             borderRadius: '1.5rem', padding: 16,
-            backdropFilter: 'blur(16px)',
+            boxShadow: '0 2px 8px rgba(245,158,11,0.06)',
           }}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -668,7 +669,7 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
         >
           <h3 style={{
             fontSize: 11, fontWeight: 700, textTransform: 'uppercase',
-            letterSpacing: '0.08em', color: 'rgba(248,250,252,0.55)', marginBottom: 12,
+            letterSpacing: '0.08em', color: '#6B7280', marginBottom: 12,
           }}>
             Storico pesate
           </h3>
@@ -683,7 +684,7 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
             {['Data', 'Peso', 'Δ'].map((h) => (
               <span key={h} style={{
                 fontSize: 9, fontWeight: 700, textTransform: 'uppercase',
-                letterSpacing: '0.06em', color: 'rgba(248,250,252,0.30)',
+                letterSpacing: '0.06em', color: '#C9D5C4',
                 textAlign: h !== 'Data' ? 'right' : 'left',
                 minWidth: h === 'Δ' ? 38 : undefined,
               }}>
@@ -713,17 +714,17 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
                     display: 'grid', gridTemplateColumns: '1fr auto auto',
                     gap: 8, padding: '8px 2px', alignItems: 'center',
                     borderBottom: i < Math.min(recentLogs.length, 14) - 1
-                      ? '1px solid rgba(255,255,255,0.05)' : 'none',
+                      ? '1px solid #F3F6F0' : 'none',
                   }}
                 >
                   <div>
-                    <p style={{ fontSize: 12, fontWeight: 600, color: '#F8FAFC' }}>
+                    <p style={{ fontSize: 12, fontWeight: 600, color: '#1C1917' }}>
                       {new Date(log.createdAt).toLocaleDateString('it-IT', {
                         weekday: 'short', day: 'numeric', month: 'short',
                       })}
                     </p>
                     {log.notes && (
-                      <p style={{ fontSize: 10, color: 'rgba(248,250,252,0.40)', marginTop: 1 }}>
+                      <p style={{ fontSize: 10, color: '#9CA3AF', marginTop: 1 }}>
                         {log.notes}
                       </p>
                     )}
@@ -731,10 +732,10 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
 
                   <p style={{
                     fontSize: 14, fontWeight: 900, textAlign: 'right',
-                    color: i === 0 ? '#A78BFA' : '#F8FAFC',
+                    color: i === 0 ? '#F97316' : '#1C1917',
                   }}>
                     {log.rawValue}
-                    <span style={{ fontSize: 10, fontWeight: 500, color: 'rgba(248,250,252,0.40)', marginLeft: 2 }}>
+                    <span style={{ fontSize: 10, fontWeight: 500, color: '#9CA3AF', marginLeft: 2 }}>
                       {log.rawUnit}
                     </span>
                   </p>
@@ -751,7 +752,7 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
           </ul>
 
           {recentLogs.length > 14 && (
-            <p style={{ fontSize: 11, color: 'rgba(248,250,252,0.30)', textAlign: 'center', marginTop: 10 }}>
+            <p style={{ fontSize: 11, color: '#C9D5C4', textAlign: 'center', marginTop: 10 }}>
               + altri {recentLogs.length - 14} log
             </p>
           )}
@@ -768,8 +769,8 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
         >
           <div style={{
             width: 72, height: 72,
-            background: 'rgba(139,92,246,0.12)',
-            border: '1.5px solid rgba(139,92,246,0.28)',
+            background: '#EDE9FE',
+            border: '1.5px solid #C4B5FD',
             borderRadius: '50%',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             fontSize: 30,
@@ -777,10 +778,10 @@ export default function WeightClient({ recentLogs, weeklyTrend }: Props) {
             ⚖️
           </div>
           <div>
-            <p style={{ fontSize: 16, fontWeight: 800, color: '#F8FAFC', marginBottom: 6 }}>
+            <p style={{ fontSize: 16, fontWeight: 800, color: '#1C1917', marginBottom: 6 }}>
               Nessun peso registrato
             </p>
-            <p style={{ fontSize: 13, color: 'rgba(248,250,252,0.45)', lineHeight: 1.6 }}>
+            <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.6 }}>
               Inizia a tracciare il tuo peso per<br />visualizzare grafici e analisi completa
             </p>
           </div>

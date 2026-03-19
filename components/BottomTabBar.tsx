@@ -1,209 +1,223 @@
 'use client';
 
 /**
- * BottomTabBar  –  Dark Glass Navigation (5 tabs)
+ * BottomTabBar  –  Light Healthy Theme Navigation
  *
- * Tabs: Home | Diario | Insights | Leghe | Profilo
- * Inspired by Yazio, Lifesum 5-tab structure.
- * Active tab: colored glow pill.
- * Squash-and-Stretch bounce on tab activation.
+ * Tabs: Home | Analytics | +(Scanner) | Plan | Setting
+ * Active state: orange icon + label, subtle bg pill
+ * Center + button: floating orange FAB that lifts above the bar
  */
 
-import { usePathname, useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useRef, useState } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { motion } from 'framer-motion';
 
-interface Tab {
-  label: string;
-  href: string;
-  glowColor: string;
-  activePillBg: string;
-  activePillBorder: string;
-  activeTextColor: string;
-  icon: (active: boolean) => React.ReactNode;
+// ── SVG icon components ───────────────────────────────────────────────────────
+
+function HomeIcon({ active }: { active: boolean }) {
+  const c = active ? '#F97316' : '#9CA3AF';
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z" fill={active ? 'rgba(249,115,22,0.10)' : 'none'} />
+      <path d="M9 21V13h6v8" />
+    </svg>
+  );
 }
 
-const tabs: Tab[] = [
-  {
-    label: 'Home',
-    href: '/dashboard',
-    glowColor: 'rgba(139,92,246,0.55)',
-    activePillBg: 'rgba(139,92,246,0.18)',
-    activePillBorder: 'rgba(139,92,246,0.40)',
-    activeTextColor: '#C4B5FD',
-    icon: (active) => (
-      <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
-        <path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H5a1 1 0 01-1-1V9.5z"
-          fill={active ? 'rgba(167,139,250,0.28)' : 'none'}
-          stroke={active ? '#A78BFA' : 'rgba(255,255,255,0.28)'}
-          strokeWidth="2" strokeLinejoin="round"/>
-        <path d="M9 21V12h6v9" stroke={active ? '#A78BFA' : 'rgba(255,255,255,0.28)'} strokeWidth="2" strokeLinecap="round"/>
-      </svg>
-    ),
-  },
-  {
-    label: 'Diario',
-    href: '/diary',
-    glowColor: 'rgba(245,158,11,0.55)',
-    activePillBg: 'rgba(245,158,11,0.14)',
-    activePillBorder: 'rgba(245,158,11,0.35)',
-    activeTextColor: '#FCD34D',
-    icon: (active) => (
-      <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="3" width="18" height="18" rx="3"
-          fill={active ? 'rgba(252,211,77,0.14)' : 'none'}
-          stroke={active ? '#FCD34D' : 'rgba(255,255,255,0.28)'} strokeWidth="2"/>
-        <path d="M8 8h8M8 12h8M8 16h5" stroke={active ? '#FCD34D' : 'rgba(255,255,255,0.28)'} strokeWidth="2" strokeLinecap="round"/>
-        <circle cx="19" cy="19" r="5" fill="#8B5CF6"/>
-        <path d="M17 19h4M19 17v4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round"/>
-      </svg>
-    ),
-  },
-  {
-    label: 'Insights',
-    href: '/insights',
-    glowColor: 'rgba(52,211,153,0.55)',
-    activePillBg: 'rgba(52,211,153,0.12)',
-    activePillBorder: 'rgba(52,211,153,0.32)',
-    activeTextColor: '#34D399',
-    icon: (active) => (
-      <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
-        <rect x="2" y="14" width="4" height="8" rx="1"
-          fill={active ? 'rgba(52,211,153,0.35)' : 'none'}
-          stroke={active ? '#34D399' : 'rgba(255,255,255,0.28)'} strokeWidth="1.8"/>
-        <rect x="9" y="9" width="4" height="13" rx="1"
-          fill={active ? 'rgba(52,211,153,0.28)' : 'none'}
-          stroke={active ? '#34D399' : 'rgba(255,255,255,0.28)'} strokeWidth="1.8"/>
-        <rect x="16" y="4" width="4" height="18" rx="1"
-          fill={active ? 'rgba(52,211,153,0.35)' : 'none'}
-          stroke={active ? '#34D399' : 'rgba(255,255,255,0.28)'} strokeWidth="1.8"/>
-      </svg>
-    ),
-  },
-  {
-    label: 'Leghe',
-    href: '/leagues',
-    glowColor: 'rgba(168,85,247,0.55)',
-    activePillBg: 'rgba(168,85,247,0.18)',
-    activePillBorder: 'rgba(168,85,247,0.40)',
-    activeTextColor: '#D8B4FE',
-    icon: (active) => (
-      <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2l2.4 7.4H22l-6.2 4.5 2.4 7.4L12 17l-6.2 4.3 2.4-7.4L2 9.4h7.6L12 2z"
-          fill={active ? 'rgba(216,180,254,0.22)' : 'none'}
-          stroke={active ? '#D8B4FE' : 'rgba(255,255,255,0.28)'}
-          strokeWidth="2" strokeLinejoin="round"/>
-      </svg>
-    ),
-  },
-  {
-    label: 'Profilo',
-    href: '/profile',
-    glowColor: 'rgba(34,211,238,0.55)',
-    activePillBg: 'rgba(34,211,238,0.12)',
-    activePillBorder: 'rgba(34,211,238,0.32)',
-    activeTextColor: '#67E8F9',
-    icon: (active) => (
-      <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="8" r="4"
-          fill={active ? 'rgba(103,232,249,0.20)' : 'none'}
-          stroke={active ? '#67E8F9' : 'rgba(255,255,255,0.28)'} strokeWidth="2"/>
-        <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"
-          stroke={active ? '#67E8F9' : 'rgba(255,255,255,0.28)'} strokeWidth="2" strokeLinecap="round"/>
-      </svg>
-    ),
-  },
+function AnalyticsIcon({ active }: { active: boolean }) {
+  const c = active ? '#F97316' : '#9CA3AF';
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+    </svg>
+  );
+}
+
+function PlanIcon({ active }: { active: boolean }) {
+  const c = active ? '#F97316' : '#9CA3AF';
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" fill={active ? 'rgba(249,115,22,0.08)' : 'none'} />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+      <line x1="8" y1="14" x2="8.01" y2="14" strokeWidth="3" />
+      <line x1="12" y1="14" x2="12.01" y2="14" strokeWidth="3" />
+      <line x1="16" y1="14" x2="16.01" y2="14" strokeWidth="3" />
+    </svg>
+  );
+}
+
+function SettingIcon({ active }: { active: boolean }) {
+  const c = active ? '#F97316' : '#9CA3AF';
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3" />
+      <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" />
+    </svg>
+  );
+}
+
+// ── Tab definitions ───────────────────────────────────────────────────────────
+
+const TABS = [
+  { href: '/dashboard', label: 'Home',      Icon: HomeIcon      },
+  { href: '/insights',  label: 'Analytics', Icon: AnalyticsIcon },
+  { href: '/plan',      label: 'Plan',      Icon: PlanIcon      },
+  { href: '/settings',  label: 'Setting',   Icon: SettingIcon   },
 ];
 
-// Squash-and-Stretch bounce
-const iconVariants = {
-  idle: { scale: 1, y: 0 },
-  active: {
-    scale: [1, 1.35, 0.88, 1.12, 0.96, 1] as number[],
-    y: [0, -7, 2, -3, 0.5, 0] as number[],
-    transition: {
-      duration: 0.50,
-      times: [0, 0.28, 0.48, 0.65, 0.82, 1],
-      ease: 'easeOut' as const,
-    },
-  },
-};
+// ── Component ─────────────────────────────────────────────────────────────────
 
 export function BottomTabBar() {
   const pathname = usePathname();
-  const router = useRouter();
-  const prevPath = useRef(pathname);
-  const [justActivated, setJustActivated] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (prevPath.current !== pathname) {
-      const active = tabs.find((t) => pathname.startsWith(t.href));
-      if (active) {
-        setJustActivated(active.href);
-        setTimeout(() => setJustActivated(null), 600);
-      }
-      prevPath.current = pathname;
-    }
-  }, [pathname]);
 
   return (
-    <nav className="bottom-nav" aria-label="Navigazione principale"
-      style={{ paddingLeft: '0.5rem', paddingRight: '0.5rem' }}>
-      {tabs.map((tab) => {
-        const isActive = pathname.startsWith(tab.href);
-        const isBouncing = justActivated === tab.href;
+    <nav
+      className="bottom-nav"
+      aria-label="Navigazione principale"
+      style={{ height: `calc(72px + var(--safe-bottom))` }}
+    >
+      {/* Inner flex row: 2 tabs | center FAB | 2 tabs */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        height: 72,
+        paddingLeft: 8,
+        paddingRight: 8,
+        position: 'relative',
+      }}>
 
-        return (
-          <button
-            key={tab.href}
-            onClick={() => router.push(tab.href)}
-            aria-current={isActive ? 'page' : undefined}
-            aria-label={tab.label}
-            className="relative flex flex-col items-center justify-center gap-0.5 flex-1 py-1.5 rounded-2xl"
-            style={{ minWidth: 0 }}
-          >
-            {/* Active glow pill */}
-            <AnimatePresence>
-              {isActive && (
-                <motion.span
-                  layoutId="tab-active-bg"
-                  className="absolute inset-x-0.5 top-0.5 bottom-0.5 rounded-xl"
-                  style={{
-                    background: tab.activePillBg,
-                    border: `1px solid ${tab.activePillBorder}`,
-                    boxShadow: `0 0 14px ${tab.glowColor}`,
-                  }}
-                  initial={{ opacity: 0, scale: 0.85 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.85 }}
-                  transition={{ type: 'spring', stiffness: 500, damping: 38 }}
-                />
-              )}
-            </AnimatePresence>
-
-            {/* Icon + bounce */}
-            <motion.span
-              className="relative z-10"
-              variants={iconVariants}
-              animate={isBouncing ? 'active' : 'idle'}
-            >
-              {tab.icon(isActive)}
-            </motion.span>
-
-            {/* Label */}
-            <span
-              className="relative z-10 text-[9px] font-semibold leading-none"
+        {/* Left 2 tabs */}
+        {TABS.slice(0, 2).map((tab) => {
+          const isActive = pathname === tab.href || pathname.startsWith(tab.href + '/');
+          const { Icon } = tab;
+          return (
+            <Link
+              key={tab.href}
+              href={tab.href}
               style={{
-                fontFamily: 'var(--font-ui)',
-                color: isActive ? tab.activeTextColor : 'rgba(255,255,255,0.25)',
-                textShadow: isActive ? `0 0 8px ${tab.glowColor}` : 'none',
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 3,
+                padding: '8px 4px',
+                textDecoration: 'none',
+                color: isActive ? '#F97316' : '#9CA3AF',
+                position: 'relative',
               }}
             >
-              {tab.label}
-            </span>
-          </button>
-        );
-      })}
+              {isActive && (
+                <motion.span
+                  layoutId="tab-pill"
+                  style={{
+                    position: 'absolute',
+                    inset: '4px 6px',
+                    borderRadius: 12,
+                    background: 'rgba(249,115,22,0.08)',
+                    border: '1px solid rgba(249,115,22,0.18)',
+                  }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 40 }}
+                />
+              )}
+              <span style={{ position: 'relative', zIndex: 1 }}>
+                <Icon active={isActive} />
+              </span>
+              <span style={{
+                position: 'relative', zIndex: 1,
+                fontSize: 10,
+                fontWeight: isActive ? 700 : 500,
+                fontFamily: 'var(--font-ui)',
+                color: isActive ? '#F97316' : '#9CA3AF',
+              }}>
+                {tab.label}
+              </span>
+            </Link>
+          );
+        })}
+
+        {/* Center FAB — scanner */}
+        <div style={{ width: 72, flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+          <Link
+            href="/scan"
+            aria-label="Scanner alimentare"
+            style={{
+              width: 56,
+              height: 56,
+              borderRadius: '50%',
+              background: 'linear-gradient(145deg, #FB923C, #F97316)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 6px 20px rgba(249,115,22,0.42)',
+              transform: 'translateY(-10px)',
+              textDecoration: 'none',
+              border: '3px solid white',
+            }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </Link>
+        </div>
+
+        {/* Right 2 tabs */}
+        {TABS.slice(2).map((tab) => {
+          const isActive = pathname === tab.href || pathname.startsWith(tab.href + '/');
+          const { Icon } = tab;
+          return (
+            <Link
+              key={tab.href}
+              href={tab.href}
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 3,
+                padding: '8px 4px',
+                textDecoration: 'none',
+                color: isActive ? '#F97316' : '#9CA3AF',
+                position: 'relative',
+              }}
+            >
+              {isActive && (
+                <motion.span
+                  layoutId="tab-pill"
+                  style={{
+                    position: 'absolute',
+                    inset: '4px 6px',
+                    borderRadius: 12,
+                    background: 'rgba(249,115,22,0.08)',
+                    border: '1px solid rgba(249,115,22,0.18)',
+                  }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 40 }}
+                />
+              )}
+              <span style={{ position: 'relative', zIndex: 1 }}>
+                <Icon active={isActive} />
+              </span>
+              <span style={{
+                position: 'relative', zIndex: 1,
+                fontSize: 10,
+                fontWeight: isActive ? 700 : 500,
+                fontFamily: 'var(--font-ui)',
+                color: isActive ? '#F97316' : '#9CA3AF',
+              }}>
+                {tab.label}
+              </span>
+            </Link>
+          );
+        })}
+      </div>
     </nav>
   );
 }

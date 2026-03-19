@@ -5,7 +5,7 @@
  *
  * Redesigned with:
  *  • Premium upgrade banner at top (for free users)
- *  • Large avatar with gradient ring
+ *  • Large avatar with orange gradient
  *  • Streak & league highlights
  *  • Swipeable tabs: Premi / Stats / Storico
  */
@@ -54,11 +54,12 @@ export default function ProfileClient({ user, streak, weightTrend, league }: Pro
 
   const initials = user.name.split(' ').map((n) => n[0]).join('').slice(0, 2).toUpperCase() || '?';
 
+  // Light card styles
   const G = {
-    base: { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: '1.5rem', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)' } as React.CSSProperties,
-    cyan: { background: 'rgba(34,211,238,0.07)', border: '1px solid rgba(34,211,238,0.22)', borderRadius: '1.5rem', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)' } as React.CSSProperties,
-    amber: { background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.22)', borderRadius: '1.5rem', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)' } as React.CSSProperties,
-    violet: { background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.22)', borderRadius: '1.5rem', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)' } as React.CSSProperties,
+    base: { background: '#FFFFFF', border: '1px solid #E5EBE0', borderRadius: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' } as React.CSSProperties,
+    cyan: { background: '#FFFFFF', border: '1px solid rgba(14,165,233,0.20)', borderRadius: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' } as React.CSSProperties,
+    amber: { background: '#FFFFFF', border: '1px solid rgba(245,158,11,0.20)', borderRadius: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' } as React.CSSProperties,
+    violet: { background: '#FFFFFF', border: '1px solid rgba(139,92,246,0.20)', borderRadius: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' } as React.CSSProperties,
   };
 
   return (
@@ -71,23 +72,24 @@ export default function ProfileClient({ user, streak, weightTrend, league }: Pro
         animate={{ opacity: 1, y: 0 }}
         className="block relative overflow-hidden rounded-2xl p-4"
         style={{
-          background: 'linear-gradient(135deg, rgba(245,158,11,0.14), rgba(139,92,246,0.12))',
-          border: '1px solid rgba(245,158,11,0.30)',
+          background: 'linear-gradient(135deg, rgba(249,115,22,0.08), rgba(139,92,246,0.06))',
+          border: '1px solid rgba(249,115,22,0.25)',
+          boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
         }}
       >
         <div className="absolute top-0 right-0 w-24 h-24"
-          style={{ background: 'radial-gradient(circle, rgba(245,158,11,0.20) 0%, transparent 70%)', filter: 'blur(20px)' }}/>
+          style={{ background: 'radial-gradient(circle, rgba(249,115,22,0.12) 0%, transparent 70%)', filter: 'blur(20px)' }}/>
         <div className="relative flex items-center gap-3">
           <span className="text-2xl">✨</span>
           <div className="flex-1">
-            <p className="text-sm font-bold" style={{ color: '#FCD34D', fontFamily: 'var(--font-ui)' }}>
+            <p className="text-sm font-bold" style={{ color: '#F97316', fontFamily: 'var(--font-ui)' }}>
               Prova Premium Gratis per 7 giorni
             </p>
-            <p className="text-xs mt-0.5" style={{ color: 'rgba(248,250,252,0.50)', fontFamily: 'var(--font-ui)' }}>
+            <p className="text-xs mt-0.5" style={{ color: '#9CA3AF', fontFamily: 'var(--font-ui)' }}>
               AI illimitata · Grafici avanzati · Streak freeze ∞ · €4,99/mese
             </p>
           </div>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(252,211,77,0.60)" strokeWidth="2.5">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(249,115,22,0.60)" strokeWidth="2.5">
             <path d="M9 18l6-6-6-6"/>
           </svg>
         </div>
@@ -101,29 +103,25 @@ export default function ProfileClient({ user, streak, weightTrend, league }: Pro
         className="relative overflow-hidden"
         style={G.cyan}
       >
-        {/* Background glow */}
-        <div className="absolute top-0 left-0 w-32 h-32 pointer-events-none"
-          style={{ background: 'radial-gradient(circle, rgba(34,211,238,0.15) 0%, transparent 70%)', filter: 'blur(20px)' }}/>
-
         <div className="relative p-5">
           <div className="flex items-center gap-4 mb-4">
-            {/* Avatar */}
+            {/* Avatar – orange gradient */}
             <div className="relative flex-shrink-0">
               <div
                 className="w-16 h-16 rounded-2xl flex items-center justify-center text-xl font-black"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(34,211,238,0.25), rgba(139,92,246,0.25))',
-                  border: '2px solid rgba(34,211,238,0.40)',
-                  color: '#F8FAFC',
+                  background: 'linear-gradient(135deg, #F97316, #EA6C0A)',
+                  border: '2px solid rgba(249,115,22,0.30)',
+                  color: '#FFFFFF',
                   fontFamily: 'var(--font-ui)',
-                  boxShadow: '0 0 24px rgba(34,211,238,0.30)',
+                  boxShadow: '0 4px 16px rgba(249,115,22,0.25)',
                 }}
               >
                 {initials}
               </div>
               {league && (
                 <div className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center text-xs"
-                  style={{ background: 'rgba(8,11,20,0.90)', border: '1.5px solid rgba(255,255,255,0.20)' }}>
+                  style={{ background: '#FFFFFF', border: '1.5px solid #E5EBE0', boxShadow: '0 1px 4px rgba(0,0,0,0.10)' }}>
                   {league.emoji}
                 </div>
               )}
@@ -131,23 +129,23 @@ export default function ProfileClient({ user, streak, weightTrend, league }: Pro
 
             {/* Info */}
             <div className="flex-1 min-w-0">
-              <h2 className="text-xl truncate" style={{ fontFamily: 'var(--font-display)', color: '#F8FAFC' }}>
+              <h2 className="text-xl truncate" style={{ fontFamily: 'var(--font-display)', color: '#1C1917' }}>
                 {user.name}
               </h2>
-              <p className="text-sm truncate" style={{ color: 'rgba(248,250,252,0.50)', fontFamily: 'var(--font-ui)' }}>
+              <p className="text-sm truncate" style={{ color: '#6B7280', fontFamily: 'var(--font-ui)' }}>
                 {user.email}
               </p>
               {league && (
                 <span className="inline-block text-xs px-2 py-0.5 rounded-full mt-1 font-semibold"
-                  style={{ background: 'rgba(255,255,255,0.10)', color: '#F8FAFC', border: '1px solid rgba(255,255,255,0.18)', fontFamily: 'var(--font-ui)' }}>
+                  style={{ background: 'rgba(249,115,22,0.10)', color: '#F97316', border: '1px solid rgba(249,115,22,0.22)', fontFamily: 'var(--font-ui)' }}>
                   {league.emoji} {league.name}
                 </span>
               )}
             </div>
 
             <a href="/settings" className="flex-shrink-0 p-2 rounded-xl"
-              style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.14)' }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(248,250,252,0.55)" strokeWidth="2">
+              style={{ background: '#F8FAF7', border: '1px solid #E5EBE0' }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2">
                 <circle cx="12" cy="12" r="3"/>
                 <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
               </svg>
@@ -157,17 +155,17 @@ export default function ProfileClient({ user, streak, weightTrend, league }: Pro
           {/* Streak + Goals quick stats */}
           <div className="grid grid-cols-3 gap-2">
             {[
-              { icon: '🔥', value: streak.current, label: 'Streak', color: '#FCD34D' },
-              { icon: '⚡', value: streak.longest, label: 'Record', color: '#A78BFA' },
-              { icon: '🧊', value: streak.freezeTokens, label: 'Freeze', color: '#67E8F9' },
+              { icon: '🔥', value: streak.current, label: 'Streak', color: '#F59E0B' },
+              { icon: '⚡', value: streak.longest, label: 'Record', color: '#8B5CF6' },
+              { icon: '🧊', value: streak.freezeTokens, label: 'Freeze', color: '#0EA5E9' },
             ].map((stat) => (
               <div key={stat.label} className="text-center py-2.5 rounded-xl"
-                style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.09)' }}>
+                style={{ background: '#F8FAF7', border: '1px solid #E5EBE0' }}>
                 <div className="text-base mb-0.5">{stat.icon}</div>
                 <p className="text-lg font-black leading-none" style={{ color: stat.color, fontFamily: 'var(--font-ui)' }}>
                   {stat.value}
                 </p>
-                <p className="text-[10px] font-semibold mt-0.5" style={{ color: 'rgba(248,250,252,0.40)' }}>{stat.label}</p>
+                <p className="text-[10px] font-semibold mt-0.5" style={{ color: '#9CA3AF' }}>{stat.label}</p>
               </div>
             ))}
           </div>
@@ -176,14 +174,14 @@ export default function ProfileClient({ user, streak, weightTrend, league }: Pro
 
       {/* ── Tabs ── */}
       <div className="flex gap-1 p-1 rounded-2xl"
-        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+        style={{ background: '#FFFFFF', border: '1px solid #E5EBE0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
         {TABS.map((tab) => (
           <button key={tab} onClick={() => goTo(tab)}
             className="flex-1 py-2 rounded-xl text-sm font-bold transition-all"
             style={{
-              background: activeTab === tab ? 'rgba(255,255,255,0.12)' : 'transparent',
-              color: activeTab === tab ? '#F8FAFC' : 'rgba(248,250,252,0.38)',
-              border: activeTab === tab ? '1px solid rgba(255,255,255,0.18)' : '1px solid transparent',
+              background: activeTab === tab ? '#F97316' : 'transparent',
+              color: activeTab === tab ? '#FFFFFF' : '#6B7280',
+              border: activeTab === tab ? '1px solid rgba(249,115,22,0.30)' : '1px solid transparent',
               fontFamily: 'var(--font-ui)',
             }}>
             {tab}
@@ -226,12 +224,12 @@ function AwardsTab({ streak, league, G }: {
   const badges = [
     { earned: streak.current >= 3,   emoji: '🔥', label: '3 giorni di fila',  desc: `Streak: ${streak.current}`,         color: '245,158,11' },
     { earned: streak.current >= 7,   emoji: '⚡', label: 'Una settimana!',     desc: 'Streak di 7 giorni',                color: '139,92,246' },
-    { earned: streak.current >= 30,  emoji: '🌙', label: 'Un mese!',           desc: 'Streak di 30 giorni',               color: '34,211,238' },
+    { earned: streak.current >= 30,  emoji: '🌙', label: 'Un mese!',           desc: 'Streak di 30 giorni',               color: '14,165,233' },
     { earned: streak.longest >= 30,  emoji: '🏆', label: 'Mese intero record', desc: `Record: ${streak.longest} giorni`,  color: '245,158,11' },
     { earned: !!league && league.tier !== 'bronze', emoji: league?.emoji ?? '🥉', label: league?.name ?? 'Lega Bronze', desc: 'Promosso di lega', color: '168,85,247' },
-    { earned: streak.freezeTokens > 0, emoji: '🧊', label: 'Streak Freeze',   desc: `${streak.freezeTokens} disponibili`, color: '34,211,238' },
-    { earned: streak.longest >= 7,   emoji: '💪', label: 'Costante',          desc: 'Record 7+ giorni',                  color: '52,211,153' },
-    { earned: streak.current >= 14,  emoji: '🌟', label: 'Due settimane!',    desc: 'Streak di 14 giorni',               color: '245,158,11' },
+    { earned: streak.freezeTokens > 0, emoji: '🧊', label: 'Streak Freeze',   desc: `${streak.freezeTokens} disponibili`, color: '14,165,233' },
+    { earned: streak.longest >= 7,   emoji: '💪', label: 'Costante',          desc: 'Record 7+ giorni',                  color: '34,197,94' },
+    { earned: streak.current >= 14,  emoji: '🌟', label: 'Due settimane!',    desc: 'Streak di 14 giorni',               color: '249,115,22' },
   ];
 
   return (
@@ -240,25 +238,26 @@ function AwardsTab({ streak, league, G }: {
         <motion.div
           key={badge.label}
           initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: badge.earned ? 1 : 0.4, scale: 1 }}
+          animate={{ opacity: badge.earned ? 1 : 0.45, scale: 1 }}
           transition={{ type: 'spring', stiffness: 280 }}
           className="p-3.5 rounded-2xl"
           style={{
-            background: badge.earned ? `rgba(${badge.color},0.12)` : 'rgba(255,255,255,0.04)',
-            border: badge.earned ? `1px solid rgba(${badge.color},0.30)` : '1px solid rgba(255,255,255,0.08)',
+            background: badge.earned ? `rgba(${badge.color},0.08)` : '#F8FAF7',
+            border: badge.earned ? `1px solid rgba(${badge.color},0.25)` : '1px solid #E5EBE0',
             filter: badge.earned ? 'none' : 'grayscale(1)',
+            boxShadow: badge.earned ? '0 1px 4px rgba(0,0,0,0.04)' : 'none',
           }}
         >
           <div className="text-2xl mb-1.5">{badge.emoji}</div>
-          <p className="text-xs font-bold leading-tight mb-0.5" style={{ color: '#F8FAFC', fontFamily: 'var(--font-ui)' }}>
+          <p className="text-xs font-bold leading-tight mb-0.5" style={{ color: '#1C1917', fontFamily: 'var(--font-ui)' }}>
             {badge.label}
           </p>
-          <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.50)', fontFamily: 'var(--font-ui)' }}>
+          <p className="text-[10px]" style={{ color: '#6B7280', fontFamily: 'var(--font-ui)' }}>
             {badge.desc}
           </p>
           {badge.earned && (
             <div className="mt-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full inline-block"
-              style={{ background: `rgba(${badge.color},0.20)`, color: `rgb(${badge.color})` }}>
+              style={{ background: `rgba(${badge.color},0.12)`, color: `rgb(${badge.color})` }}>
               Sbloccato ✓
             </div>
           )}
@@ -274,13 +273,13 @@ function StatsTab({ user, streak, G }: {
   G: Record<string, React.CSSProperties>;
 }) {
   const stats = [
-    { label: 'Streak attuale',     value: `${streak.current}`,         unit: 'giorni', icon: '🔥', color: '#FCD34D' },
-    { label: 'Record streak',      value: `${streak.longest}`,         unit: 'giorni', icon: '⚡', color: '#A78BFA' },
-    { label: 'Streak Freeze',      value: `${streak.freezeTokens}`,    unit: 'token',  icon: '🧊', color: '#67E8F9' },
-    { label: 'Obiettivo calorie',  value: `${user.goals.kcal}`,        unit: 'kcal',   icon: '🔥', color: '#FCD34D' },
-    { label: 'Obiettivo proteine', value: `${user.goals.protein}`,     unit: 'g',      icon: '💪', color: '#22D3EE' },
-    { label: 'Obiettivo carb.',    value: `${user.goals.carbs}`,       unit: 'g',      icon: '🌾', color: '#FB923C' },
-    { label: 'Obiettivo grassi',   value: `${user.goals.fat}`,         unit: 'g',      icon: '🥑', color: '#F87171' },
+    { label: 'Streak attuale',     value: `${streak.current}`,         unit: 'giorni', icon: '🔥', color: '#F59E0B' },
+    { label: 'Record streak',      value: `${streak.longest}`,         unit: 'giorni', icon: '⚡', color: '#8B5CF6' },
+    { label: 'Streak Freeze',      value: `${streak.freezeTokens}`,    unit: 'token',  icon: '🧊', color: '#0EA5E9' },
+    { label: 'Obiettivo calorie',  value: `${user.goals.kcal}`,        unit: 'kcal',   icon: '🔥', color: '#F97316' },
+    { label: 'Obiettivo proteine', value: `${user.goals.protein}`,     unit: 'g',      icon: '💪', color: '#0EA5E9' },
+    { label: 'Obiettivo carb.',    value: `${user.goals.carbs}`,       unit: 'g',      icon: '🌾', color: '#8B5CF6' },
+    { label: 'Obiettivo grassi',   value: `${user.goals.fat}`,         unit: 'g',      icon: '🥑', color: '#F59E0B' },
   ];
 
   return (
@@ -292,11 +291,11 @@ function StatsTab({ user, streak, G }: {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: i * 0.04 }}
           className="flex items-center justify-between px-4 py-3 rounded-2xl"
-          style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
+          style={{ background: '#FFFFFF', border: '1px solid #E5EBE0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
         >
           <div className="flex items-center gap-2.5">
             <span className="text-base">{stat.icon}</span>
-            <span className="text-sm" style={{ color: 'rgba(248,250,252,0.65)', fontFamily: 'var(--font-ui)' }}>
+            <span className="text-sm" style={{ color: '#6B7280', fontFamily: 'var(--font-ui)' }}>
               {stat.label}
             </span>
           </div>
@@ -304,7 +303,7 @@ function StatsTab({ user, streak, G }: {
             <span className="text-base font-black" style={{ color: stat.color, fontFamily: 'var(--font-ui)' }}>
               {stat.value}
             </span>
-            <span className="text-xs" style={{ color: 'rgba(248,250,252,0.40)', fontFamily: 'var(--font-ui)' }}>
+            <span className="text-xs" style={{ color: '#9CA3AF', fontFamily: 'var(--font-ui)' }}>
               {stat.unit}
             </span>
           </div>
@@ -322,11 +321,11 @@ function HistoryTab({ weightTrend, G }: {
     return (
       <div className="p-8 rounded-2xl text-center" style={G.base}>
         <span className="text-4xl">📊</span>
-        <p className="text-sm mt-3" style={{ color: 'rgba(248,250,252,0.55)', fontFamily: 'var(--font-ui)' }}>
+        <p className="text-sm mt-3" style={{ color: '#6B7280', fontFamily: 'var(--font-ui)' }}>
           Inizia a registrare il peso per vedere la cronologia
         </p>
         <a href="/insights" className="inline-block mt-3 text-xs px-4 py-2 rounded-xl font-bold"
-          style={{ background: 'rgba(52,211,153,0.18)', color: '#34D399', border: '1px solid rgba(52,211,153,0.30)', fontFamily: 'var(--font-ui)' }}>
+          style={{ background: 'rgba(34,197,94,0.10)', color: '#16A34A', border: '1px solid rgba(34,197,94,0.25)', fontFamily: 'var(--font-ui)' }}>
           ⚖️ Vai a Insights
         </a>
       </div>
@@ -342,22 +341,22 @@ function HistoryTab({ weightTrend, G }: {
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: i * 0.05 }}
           className="flex items-center justify-between p-4 rounded-2xl"
-          style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}
+          style={{ background: '#FFFFFF', border: '1px solid #E5EBE0', boxShadow: '0 1px 3px rgba(0,0,0,0.04)' }}
         >
           <div>
-            <p className="text-sm font-bold" style={{ color: '#F8FAFC', fontFamily: 'var(--font-ui)' }}>
+            <p className="text-sm font-bold" style={{ color: '#1C1917', fontFamily: 'var(--font-ui)' }}>
               {w.period.replace('week_', 'Settimana ').replace('month_', '')}
             </p>
-            <p className="text-xs" style={{ color: 'rgba(248,250,252,0.45)', fontFamily: 'var(--font-ui)' }}>
+            <p className="text-xs" style={{ color: '#9CA3AF', fontFamily: 'var(--font-ui)' }}>
               {w.sampleCount} rilevazioni
             </p>
           </div>
           <div className="text-right">
-            <p className="text-lg font-black" style={{ color: '#F8FAFC', fontFamily: 'var(--font-ui)' }}>
+            <p className="text-lg font-black" style={{ color: '#1C1917', fontFamily: 'var(--font-ui)' }}>
               {w.avgKg} kg
             </p>
             <p className="text-xs font-bold" style={{
-              color: w.trend < 0 ? '#34D399' : w.trend > 0 ? '#F87171' : 'rgba(248,250,252,0.45)',
+              color: w.trend < 0 ? '#16A34A' : w.trend > 0 ? '#DC2626' : '#9CA3AF',
               fontFamily: 'var(--font-ui)',
             }}>
               {w.trend > 0 ? '↑' : w.trend < 0 ? '↓' : '→'} {Math.abs(w.trend).toFixed(2)} kg/g

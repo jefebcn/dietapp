@@ -1,13 +1,11 @@
 /**
- * /app/weight/page.tsx  –  Weight Tracking Page
- *
- * Server Component: auth-gated. Fetches recent weight history (Silver + Gold)
- * and passes to the interactive WeightClient for logging new entries.
+ * /app/weight/page.tsx  –  Weight Tracking Page (light healthy theme)
  */
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
+import Link from 'next/link';
 
 import { getAdminAuth } from '@/lib/firebase-admin.config';
 import { getRecentBronzeLogs, getRecentGoldWeeks } from '@/lib/repositories/weightRepository';
@@ -25,9 +23,7 @@ export default async function WeightPage() {
   try {
     const decoded = await getAdminAuth().verifySessionCookie(sessionCookie, true);
     uid = decoded.uid;
-  } catch {
-    redirect('/login');
-  }
+  } catch { redirect('/login'); }
 
   const [recentLogs, weeklyTrend] = await Promise.all([
     getRecentBronzeLogs(uid, 15),
@@ -35,43 +31,31 @@ export default async function WeightPage() {
   ]);
 
   return (
-    <div className="relative min-h-screen">
+    <div style={{ minHeight: '100dvh', background: 'var(--bg-app)' }}>
+
       {/* Header */}
-      <header
-        className="sticky top-0 z-30"
-        style={{
-          background: 'rgba(8,11,20,0.82)',
-          backdropFilter: 'blur(28px)',
-          WebkitBackdropFilter: 'blur(28px)',
-          borderBottom: '1px solid rgba(255,255,255,0.07)',
-        }}
-      >
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
-          <a
-            href="/dashboard"
-            className="flex items-center justify-center w-9 h-9 rounded-xl"
-            style={{
-              background: 'rgba(255,255,255,0.06)',
-              border: '1px solid rgba(255,255,255,0.14)',
-            }}
-            aria-label="Torna alla dashboard"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F8FAFC" strokeWidth="2.5" strokeLinecap="round">
+      <header className="page-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px' }}>
+          <Link href="/dashboard" style={{
+            width: 36, height: 36, borderRadius: '50%',
+            background: '#fff', border: '1.5px solid #E5EBE0',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            textDecoration: 'none', boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+          }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#1C1917" strokeWidth="2.5" strokeLinecap="round">
               <path d="M15 18l-6-6 6-6" />
             </svg>
-          </a>
+          </Link>
           <div>
-            <h1
-              className="text-2xl leading-tight"
-              style={{ fontFamily: 'var(--font-display)', color: '#F8FAFC' }}
-            >
+            <p style={{ fontSize: 12, color: '#9CA3AF', fontWeight: 500 }}>Monitoraggio</p>
+            <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1C1917', fontFamily: 'var(--font-display)' }}>
               ⚖️ Traccia Peso
             </h1>
           </div>
         </div>
       </header>
 
-      <main className="relative z-10 max-w-2xl mx-auto px-4 pt-4 space-y-4 page-content">
+      <main className="page-content" style={{ padding: '16px 20px' }}>
         <WeightClient recentLogs={recentLogs} weeklyTrend={weeklyTrend} />
       </main>
 

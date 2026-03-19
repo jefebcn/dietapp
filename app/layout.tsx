@@ -2,16 +2,14 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { AuthProvider } from '@/components/AuthProvider';
 
-// ── Metadata ───────────────────────────────────────────────────────────────
-
 export const metadata: Metadata = {
   title: {
     template: '%s | NutriTrack',
-    default: 'NutriTrack – Il tuo diario nutrizionale intelligente',
+    default: 'NutriTrack – Healthy Food & Nutrition Tracking',
   },
   description:
-    'Traccia pasti, calorie e macro con NutriTrack. Il tuo diario nutrizionale intelligente.',
-  keywords: ['dieta', 'nutrizione', 'calorie', 'macro', 'diario alimentare', 'salute'],
+    'Track calories, monitor macros, and build healthy eating habits with NutriTrack. Simple, visual, achievable.',
+  keywords: ['nutrition', 'calories', 'macros', 'healthy food', 'diet', 'meal tracking', 'health'],
   authors: [{ name: 'NutriTrack' }],
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://nutritrack.it'),
   openGraph: {
@@ -19,37 +17,31 @@ export const metadata: Metadata = {
     locale: 'it_IT',
     url: 'https://nutritrack.it',
     siteName: 'NutriTrack',
-    title: 'NutriTrack – Il tuo diario nutrizionale intelligente',
-    description: 'Traccia pasti, calorie e macro con NutriTrack.',
+    title: 'NutriTrack – Healthy Food & Nutrition Tracking',
+    description: 'Track calories, monitor macros, and build healthy eating habits.',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'NutriTrack',
-    description: 'Il tuo diario nutrizionale intelligente.',
+    description: 'Healthy Food & Nutrition Tracking',
   },
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'black-translucent',
+    statusBarStyle: 'default',
     title: 'NutriTrack',
   },
 };
 
 export const viewport: Viewport = {
-  themeColor: '#080B14',
+  themeColor: '#F3F6F0',
   width: 'device-width',
   initialScale: 1,
   maximumScale: 1,
   viewportFit: 'cover',
 };
 
-// ── Root Layout ────────────────────────────────────────────────────────────
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="it">
       <head>
@@ -61,14 +53,6 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased min-h-screen">
-        {/* ── Animated Dark Background ── */}
-        <div className="app-bg" aria-hidden="true">
-          <div className="bg-orb bg-orb-violet" />
-          <div className="bg-orb bg-orb-cyan" />
-          <div className="bg-orb bg-orb-amber" />
-        </div>
-
-        {/* ── App Content ── */}
         <AuthProvider>
           {children}
         </AuthProvider>

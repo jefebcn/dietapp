@@ -1,15 +1,14 @@
 'use client';
 
 /**
- * DashboardClient  –  NutriTrack Premium Dark Glass Dashboard
+ * DashboardClient  –  Light Healthy Theme Dashboard
  *
- * Inspired by top competitors (MyFitnessPal, Yazio, Lifesum):
- *  • Prominent calorie ring center-stage
- *  • Macro progress with modern bars
- *  • Meal categories (Colazione, Pranzo, Cena, Spuntini)
- *  • Water tracker with interactive buttons
- *  • Weekly chart with goal line
- *  • AI daily tip card
+ * Layout mirrors the reference design:
+ *  • Header: avatar + user name + date + week calendar strip + notification
+ *  • Calories Left card: orange arc ring + kcal number + 75% badge
+ *  • Macro row: 3 colored cards (Carbs/Protein/Fat) with progress bars
+ *  • Meal suggestions grid: 2-column image cards
+ *  • Streak + AI tip
  */
 
 import { useState } from 'react';
@@ -23,12 +22,15 @@ interface Meal {
   id: string; name: string; kcal: number;
   protein: number; carbs: number; fat: number;
   qty: number; unit: string; addedAt: string;
+  mealType?: string;
 }
 interface DailyStats {
   date: string; totalKcal: number; totalProtein: number;
   totalCarbs: number; totalFat: number; mealCount: number;
 }
 interface Goals { kcal: number; protein: number; carbs: number; fat: number; }
+interface WeekDay { date: string; dayName: string; dayNum: number; isToday: boolean; }
+
 interface Props {
   uid: string; today: string; stats: DailyStats; goals: Goals;
   todayMeals: Meal[]; weekStats: DailyStats[]; userName: string;
@@ -37,526 +39,462 @@ interface Props {
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
-// ── Calorie Ring ───────────────────────────────────────────────────────────────
+// ── Week calendar helpers ─────────────────────────────────────────────────────
+
+function buildWeek(todayStr: string): WeekDay[] {
+  const today = new Date(todayStr + 'T12:00:00');
+  const dayOfWeek = today.getDay(); // 0=Sun
+  const days: WeekDay[] = [];
+  for (let offset = -3; offset <= 3; offset++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() + offset);
+    days.push({
+      date: d.toISOString().split('T')[0],
+      dayName: d.toLocaleDateString('en-US', { weekday: 'short' }),
+      dayNum: d.getDate(),
+      isToday: offset === 0,
+    });
+  }
+  return days;
+}
+
+// ── Calorie Arc Ring (SVG) ────────────────────────────────────────────────────
 
 function CalorieRing({ consumed, goal }: { consumed: number; goal: number }) {
-  const r = 68;
-  const circ = 2 * Math.PI * r;
-  const pct = Math.min(consumed / Math.max(goal, 1), 1);
-  const offset = circ * (1 - pct);
-  const isOver = consumed > goal;
-  const remaining = Math.max(goal - consumed, 0);
+  const pct   = Math.min(consumed / Math.max(goal, 1), 1);
+  const left  = Math.max(goal - consumed, 0);
+  const over  = consumed > goal;
+
+  // SVG arc parameters
+  const R = 70, cx = 90, cy = 95;
+  const startAngle = 210; // degrees
+  const sweep      = 300; // total arc degrees
+
+  function polarToXY(angleDeg: number) {
+    const rad = ((angleDeg - 90) * Math.PI) / 180;
+    return { x: cx + R * Math.cos(rad), y: cy + R * Math.sin(rad) };
+  }
+
+  function arcPath(fromDeg: number, toDeg: number) {
+    const s = polarToXY(fromDeg);
+    const e = polarToXY(toDeg);
+    const large = toDeg - fromDeg > 180 ? 1 : 0;
+    return `M ${s.x.toFixed(2)} ${s.y.toFixed(2)} A ${R} ${R} 0 ${large} 1 ${e.x.toFixed(2)} ${e.y.toFixed(2)}`;
+  }
+
+  const arcStart = startAngle;
+  const arcEnd   = startAngle + sweep;
+  const fillEnd  = startAngle + sweep * pct;
+  const pctLabel = Math.round(pct * 100);
+
+  // Badge position at 75% of arc
+  const badgeAngle = startAngle + sweep * 0.75;
+  const badgePos   = polarToXY(badgeAngle);
 
   return (
-    <div className="relative flex items-center justify-center" style={{ width: 172, height: 172 }}>
-      <svg width="172" height="172" viewBox="0 0 172 172" aria-hidden="true">
-        <defs>
-          <filter id="glow-amber">
-            <feGaussianBlur stdDeviation="3" result="b"/>
-            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-          <filter id="glow-rose">
-            <feGaussianBlur stdDeviation="3" result="b"/>
-            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
-          </filter>
-          <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor={isOver ? '#F87171' : '#F59E0B'}/>
-            <stop offset="100%" stopColor={isOver ? '#EF4444' : '#FCD34D'}/>
-          </linearGradient>
-        </defs>
-        {/* Outer decorative ring */}
-        <circle cx="86" cy="86" r={r + 10} fill="none"
-          stroke="rgba(255,255,255,0.04)" strokeWidth="1"/>
-        {/* Track */}
-        <circle cx="86" cy="86" r={r} fill="none"
-          stroke="rgba(255,255,255,0.07)" strokeWidth="14"/>
-        {/* Progress */}
-        <motion.circle
-          cx="86" cy="86" r={r} fill="none"
-          stroke="url(#ring-grad)" strokeWidth="14"
+    <div style={{ position: 'relative', width: 180, height: 160, margin: '0 auto' }}>
+      <svg viewBox="0 0 180 160" style={{ width: '100%', height: '100%', overflow: 'visible' }}>
+        {/* Background arc */}
+        <path
+          d={arcPath(arcStart, arcEnd)}
+          fill="none"
+          stroke="#F3F6F0"
+          strokeWidth={14}
           strokeLinecap="round"
-          strokeDasharray={circ}
-          initial={{ strokeDashoffset: circ }}
-          animate={{ strokeDashoffset: offset }}
-          transition={{ duration: 1.6, ease: [0.22, 1, 0.36, 1] }}
-          transform="rotate(-90 86 86)"
-          filter={isOver ? 'url(#glow-rose)' : 'url(#glow-amber)'}
         />
+        {/* Progress arc */}
+        <motion.path
+          d={arcPath(arcStart, fillEnd)}
+          fill="none"
+          stroke={over ? '#EF4444' : '#F97316'}
+          strokeWidth={14}
+          strokeLinecap="round"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: pct }}
+          transition={{ duration: 1.2, ease: 'easeOut' }}
+        />
+
+        {/* Percentage badge */}
+        <g>
+          <circle cx={badgePos.x} cy={badgePos.y} r="16"
+            fill={over ? '#EF4444' : '#F97316'}
+            filter="drop-shadow(0 2px 4px rgba(249,115,22,0.40))" />
+          <text x={badgePos.x} y={badgePos.y + 1}
+            textAnchor="middle" dominantBaseline="middle"
+            fontSize="8" fontWeight="800" fill="white"
+            fontFamily="Inter, system-ui, sans-serif">
+            {pctLabel}%
+          </text>
+        </g>
+
+        {/* Center: fire icon placeholder + kcal */}
+        <text x={cx} y={cy - 18} textAnchor="middle" fontSize="22" dominantBaseline="middle">🔥</text>
+        <text x={cx} y={cy + 8} textAnchor="middle" fontSize="26" fontWeight="900" fill="#1C1917"
+          fontFamily="Inter, system-ui, sans-serif">
+          {left.toLocaleString()}
+        </text>
+        <text x={cx} y={cy + 26} textAnchor="middle" fontSize="11" fill="#9CA3AF"
+          fontFamily="Inter, system-ui, sans-serif" fontWeight="600">
+          {over ? 'kcal over' : 'Kcal'}
+        </text>
+
+        {/* Arc labels */}
+        <text x={cx - R - 2} y={cy + 38} textAnchor="middle" fontSize="10" fill="#9CA3AF"
+          fontFamily="Inter, system-ui, sans-serif">0</text>
+        <text x={cx + R + 2} y={cy + 38} textAnchor="middle" fontSize="10" fill="#9CA3AF"
+          fontFamily="Inter, system-ui, sans-serif">100</text>
       </svg>
-      {/* Center content */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
-        <motion.span
-          className="text-3xl font-black leading-none"
-          style={{ color: isOver ? '#F87171' : '#FCD34D', fontFamily: 'var(--font-ui)' }}
-          initial={{ opacity: 0, scale: 0.7 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4, duration: 0.4, type: 'spring', stiffness: 260 }}
-        >
-          {consumed.toLocaleString('it-IT')}
-        </motion.span>
-        <span className="text-[11px] font-semibold" style={{ color: 'rgba(248,250,252,0.45)' }}>
-          / {goal.toLocaleString()} kcal
-        </span>
-        <span
-          className="text-[10px] font-bold mt-1 px-2.5 py-0.5 rounded-full"
-          style={isOver
-            ? { background: 'rgba(248,113,113,0.18)', color: '#FCA5A5', border: '1px solid rgba(248,113,113,0.35)' }
-            : { background: 'rgba(245,158,11,0.18)', color: '#FCD34D', border: '1px solid rgba(245,158,11,0.35)' }
-          }
-        >
-          {isOver ? `+${consumed - goal} oltre` : `${remaining} rim.`}
-        </span>
-      </div>
     </div>
   );
 }
 
-// ── Macro Ring (compact circular) ─────────────────────────────────────────────
+// ── Macro Card ────────────────────────────────────────────────────────────────
 
-function MacroRing({ value, goal, label, color, size = 52 }: {
-  value: number; goal: number; label: string; color: string; size?: number;
+function MacroCard({
+  label, value, goal, color, icon,
+}: {
+  label: string; value: number; goal: number; color: string; icon: string;
 }) {
-  const r = size / 2 - 6;
-  const circ = 2 * Math.PI * r;
   const pct = Math.min(value / Math.max(goal, 1), 1);
-  const offset = circ * (1 - pct);
-  const cx = size / 2;
   return (
-    <div className="flex flex-col items-center gap-1">
-      <div className="relative" style={{ width: size, height: size }}>
-        <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-          <circle cx={cx} cy={cx} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth="4"/>
-          <motion.circle cx={cx} cy={cx} r={r} fill="none" stroke={color} strokeWidth="4"
-            strokeLinecap="round" strokeDasharray={circ}
-            initial={{ strokeDashoffset: circ }}
-            animate={{ strokeDashoffset: offset }}
-            transition={{ duration: 1.0, ease: 'easeOut', delay: 0.2 }}
-            transform={`rotate(-90 ${cx} ${cx})`}
-            style={{ filter: `drop-shadow(0 0 4px ${color}88)` }}
-          />
-        </svg>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-[10px] font-black" style={{ color }}>{Math.round(value)}</span>
-        </div>
-      </div>
-      <span className="text-[9px] font-bold uppercase tracking-wide" style={{ color: 'rgba(248,250,252,0.45)' }}>{label}</span>
-    </div>
-  );
-}
-
-// ── Water Tracker ──────────────────────────────────────────────────────────────
-
-function WaterTracker() {
-  const [count, setCount] = useState(0);
-  const goal = 8;
-  const pct = (count / goal) * 100;
-  return (
-    <div className="p-4 rounded-2xl" style={{
-      background: 'rgba(34,211,238,0.07)',
-      border: '1px solid rgba(34,211,238,0.22)',
-      backdropFilter: 'blur(16px)',
+    <div style={{
+      background: color,
+      borderRadius: 20,
+      padding: '14px 14px 12px',
+      flex: 1,
+      minWidth: 0,
     }}>
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-base">💧</span>
-          <span className="text-xs font-bold uppercase tracking-wide" style={{ color: '#22D3EE' }}>Acqua</span>
-        </div>
-        <span className="text-xs font-bold" style={{ color: 'rgba(34,211,238,0.70)' }}>{count}/{goal} bicchieri</span>
-      </div>
+      <p style={{ fontSize: 16, fontWeight: 900, color: '#fff', lineHeight: 1 }}>
+        {value}
+        <span style={{ fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.75)', marginLeft: 1 }}>
+          /{goal}
+        </span>
+      </p>
       {/* Progress bar */}
-      <div className="h-2 rounded-full mb-3" style={{ background: 'rgba(255,255,255,0.07)' }}>
-        <motion.div className="h-full rounded-full"
-          style={{ background: 'linear-gradient(90deg, #06B6D4, #22D3EE)', boxShadow: '0 0 10px rgba(34,211,238,0.50)' }}
-          animate={{ width: `${pct}%` }}
-          transition={{ duration: 0.4, ease: 'easeOut' }}
+      <div style={{
+        height: 4, background: 'rgba(255,255,255,0.25)',
+        borderRadius: 99, margin: '8px 0 6px', overflow: 'hidden',
+      }}>
+        <motion.div
+          style={{ height: '100%', background: 'rgba(255,255,255,0.85)', borderRadius: 99 }}
+          initial={{ width: 0 }}
+          animate={{ width: `${pct * 100}%` }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
         />
       </div>
-      {/* Cups grid */}
-      <div className="flex gap-1.5 flex-wrap">
-        {Array.from({ length: goal }).map((_, i) => (
-          <motion.button
-            key={i}
-            onClick={() => setCount(i < count ? i : i + 1)}
-            whileTap={{ scale: 0.75 }}
-            className="w-7 h-7 rounded-xl flex items-center justify-center text-sm transition-all"
-            style={i < count
-              ? { background: 'rgba(34,211,238,0.25)', border: '1px solid rgba(34,211,238,0.60)', boxShadow: '0 0 8px rgba(34,211,238,0.40)' }
-              : { background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.10)' }
-            }
-            aria-label={`Bicchiere ${i+1}`}
-          >💧</motion.button>
-        ))}
-      </div>
+      <p style={{ fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.90)' }}>{label}</p>
     </div>
   );
 }
 
-// ── Weekly Chart ───────────────────────────────────────────────────────────────
+// ── Meal image card ───────────────────────────────────────────────────────────
 
-function WeeklyChart({ weekStats, goalKcal }: { weekStats: DailyStats[]; goalKcal: number }) {
-  const max = Math.max(goalKcal * 1.3, ...weekStats.map((d) => d.totalKcal), 100);
-  const days = ['Dom','Lun','Mar','Mer','Gio','Ven','Sab'];
-  const today = new Date().toISOString().split('T')[0];
-  const goalPct = (goalKcal / max) * 100;
+const MEAL_IMAGES = [
+  { label: 'Colazione', emoji: '🌅', bg: '#FFF7ED', accent: '#FB923C',
+    img: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400&q=75' },
+  { label: 'Pranzo', emoji: '☀️', bg: '#F0FDF4', accent: '#22C55E',
+    img: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&q=75' },
+  { label: 'Cena', emoji: '🌙', bg: '#EFF6FF', accent: '#3B82F6',
+    img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=75' },
+  { label: 'Spuntini', emoji: '🍎', bg: '#FFF1F2', accent: '#F43F5E',
+    img: 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=400&q=75' },
+];
+
+function MealImageCard({ item, meals }: { item: typeof MEAL_IMAGES[0]; meals: Meal[] }) {
+  const type = item.label.toLowerCase().replace('à', 'a') === 'colazione' ? 'breakfast'
+             : item.label.toLowerCase() === 'pranzo' ? 'lunch'
+             : item.label.toLowerCase() === 'cena'   ? 'dinner'
+             : 'snack';
+  const count = meals.filter((m) => (m.mealType ?? '') === type).length;
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-xs font-bold uppercase tracking-wide" style={{ color: 'rgba(248,250,252,0.45)' }}>
-          Ultime 7 giornate
-        </p>
-        <p className="text-[10px] font-semibold" style={{ color: 'rgba(245,158,11,0.70)' }}>
-          Target {goalKcal.toLocaleString()} kcal
-        </p>
-      </div>
-      <div className="relative flex items-end gap-1.5 h-20">
-        {/* Goal line */}
-        <div className="absolute left-0 right-0 border-t border-dashed pointer-events-none"
-          style={{ bottom: `${goalPct}%`, borderColor: 'rgba(245,158,11,0.35)' }}/>
-
-        {weekStats.map((day, idx) => {
-          const pct = Math.min((day.totalKcal / max) * 100, 100);
-          const isToday = day.date === today;
-          const isOver = day.totalKcal > goalKcal;
-          const d = new Date(day.date + 'T12:00:00');
-          return (
-            <div key={day.date} className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full flex flex-col justify-end" style={{ height: 64 }}>
-                <motion.div className="w-full rounded-t-lg"
-                  style={{
-                    background: isToday
-                      ? 'linear-gradient(180deg, #FBBF24, #F59E0B)'
-                      : isOver ? 'linear-gradient(180deg, #F87171, #EF4444)'
-                      : 'rgba(255,255,255,0.12)',
-                    boxShadow: isToday ? '0 0 14px rgba(245,158,11,0.55)' : undefined,
-                  }}
-                  initial={{ height: 0 }}
-                  animate={{ height: `${Math.max(pct, day.totalKcal > 0 ? 6 : 2)}%` }}
-                  transition={{ duration: 0.7, delay: idx * 0.06, ease: 'easeOut' }}
-                  title={`${day.date}: ${Math.round(day.totalKcal)} kcal`}
-                />
-              </div>
-              <span className="text-[9px] font-bold"
-                style={{ color: isToday ? '#FBBF24' : 'rgba(248,250,252,0.35)' }}>
-                {days[d.getDay()]}
-              </span>
+    <Link href="/diary" style={{ textDecoration: 'none', display: 'block' }}>
+      <motion.div
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.97 }}
+        style={{
+          background: '#fff',
+          borderRadius: 18,
+          overflow: 'hidden',
+          boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
+        }}
+      >
+        {/* Food image */}
+        <div style={{ height: 100, overflow: 'hidden', position: 'relative' }}>
+          <img
+            src={item.img}
+            alt={item.label}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            loading="lazy"
+          />
+          {count > 0 && (
+            <div style={{
+              position: 'absolute', top: 8, right: 8,
+              background: item.accent, color: '#fff',
+              fontSize: 10, fontWeight: 800, borderRadius: 99,
+              padding: '2px 7px',
+            }}>
+              {count}
             </div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// ── Meal Row ───────────────────────────────────────────────────────────────────
-
-function MealRow({ meal, onDelete }: { meal: Meal; onDelete: (id: string) => void }) {
-  const [deleting, setDeleting] = useState(false);
-  const [showMacros, setShowMacros] = useState(false);
-
-  return (
-    <motion.li layout
-      initial={{ opacity: 0, x: -8 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: 12, height: 0 }}
-      className="rounded-2xl overflow-hidden"
-      style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
-    >
-      <button className="w-full flex items-center gap-3 px-3.5 py-2.5 text-left"
-        onClick={() => setShowMacros((v) => !v)}>
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold truncate" style={{ color: '#F8FAFC' }}>{meal.name}</p>
-          <p className="text-xs" style={{ color: 'rgba(248,250,252,0.40)' }}>
-            {meal.qty}{meal.unit}
+          )}
+        </div>
+        {/* Label */}
+        <div style={{ padding: '8px 10px' }}>
+          <p style={{ fontSize: 12, fontWeight: 700, color: '#1C1917' }}>
+            {item.emoji} {item.label}
+          </p>
+          <p style={{ fontSize: 10, color: '#9CA3AF', marginTop: 1 }}>
+            {count === 0 ? 'Aggiungi pasto' : `${count} voce${count > 1 ? 'i' : ''}`}
           </p>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="text-xs font-bold px-2.5 py-0.5 rounded-full"
-            style={{ background: 'rgba(245,158,11,0.16)', color: '#FCD34D', border: '1px solid rgba(245,158,11,0.28)' }}>
-            {Math.round(meal.kcal)} kcal
-          </span>
-          <motion.button
-            onClick={async (e) => { e.stopPropagation(); setDeleting(true); await onDelete(meal.id); setDeleting(false); }}
-            disabled={deleting}
-            className="p-1.5 rounded-xl"
-            style={{ background: 'rgba(248,113,113,0.10)', color: '#F87171', border: '1px solid rgba(248,113,113,0.20)' }}
-            whileTap={{ scale: 0.82 }}
-          >
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-              <path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>
-            </svg>
-          </motion.button>
-        </div>
-      </button>
-      <AnimatePresence>
-        {showMacros && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="px-3.5 pb-2.5 flex gap-3"
-            style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}
-          >
-            {[
-              { label: 'Prot', val: meal.protein, color: '#22D3EE' },
-              { label: 'Carb', val: meal.carbs, color: '#FB923C' },
-              { label: 'Gras', val: meal.fat, color: '#F87171' },
-            ].map((m) => (
-              <div key={m.label} className="flex items-center gap-1 pt-2">
-                <span className="text-[10px] font-bold" style={{ color: m.color }}>{m.label}</span>
-                <span className="text-[10px]" style={{ color: 'rgba(248,250,252,0.55)' }}>{Math.round(m.val)}g</span>
-              </div>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </motion.li>
+      </motion.div>
+    </Link>
   );
 }
 
-// ── Main Component ─────────────────────────────────────────────────────────────
+// ── Main Component ────────────────────────────────────────────────────────────
 
 export default function DashboardClient({
-  uid, today, stats: initialStats, goals, todayMeals: initialMeals, weekStats, userName, streak = 0, tip,
+  uid, today, stats, goals, todayMeals, weekStats, userName, streak = 0, tip,
 }: Props) {
-  const { data: mealsData, mutate } = useSWR(`/api/meals?date=${today}`, fetcher, {
-    fallbackData: { meals: initialMeals, stats: initialStats },
-    refreshInterval: 30_000,
-    revalidateOnFocus: true,
+  const [selectedDay, setSelectedDay] = useState(today);
+
+  const { data: liveStats } = useSWR<DailyStats>(
+    `/api/stats?date=${today}`,
+    fetcher,
+    { fallbackData: stats, refreshInterval: 30_000 },
+  );
+
+  const current = liveStats ?? stats;
+  const weekDays = buildWeek(today);
+
+  // Format display date
+  const displayDate = new Date(today + 'T12:00:00').toLocaleDateString('en-US', {
+    weekday: 'long', day: 'numeric', month: 'long',
   });
 
-  const meals: Meal[] = mealsData?.meals ?? initialMeals;
-  const stats: DailyStats = mealsData?.stats ?? initialStats;
-  const hitGoal = stats.totalKcal >= goals.kcal * 0.88 && stats.totalKcal <= goals.kcal * 1.05;
-
-  const handleDeleteMeal = async (mealId: string) => {
-    await fetch(`/api/meals/${mealId}?date=${today}`, { method: 'DELETE' });
-    mutate();
-  };
-
-  const G = {
-    base: {
-      background: 'rgba(255,255,255,0.06)',
-      border: '1px solid rgba(255,255,255,0.10)',
-      borderRadius: '1.5rem',
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
-      boxShadow: '0 8px 32px rgba(0,0,0,0.28)',
-    } as React.CSSProperties,
-    amber: {
-      background: 'rgba(245,158,11,0.07)',
-      border: '1px solid rgba(245,158,11,0.25)',
-      borderRadius: '1.5rem',
-      backdropFilter: 'blur(20px)',
-      WebkitBackdropFilter: 'blur(20px)',
-      boxShadow: '0 8px 32px rgba(245,158,11,0.08)',
-    } as React.CSSProperties,
-  };
+  // First name
+  const firstName = userName.split(' ')[0] || userName;
 
   return (
-    <div className="space-y-3">
+    <div style={{ minHeight: '100dvh', background: 'var(--bg-app)' }}>
 
-      {/* ── Tip Card ── */}
-      {tip && (
+      {/* ── Header ── */}
+      <div style={{ padding: '16px 20px 0' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+          {/* Avatar + name */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <Link href="/profile" style={{ textDecoration: 'none' }}>
+              <div style={{
+                width: 44, height: 44, borderRadius: '50%',
+                background: 'linear-gradient(135deg, #F97316, #FB923C)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                color: '#fff', fontSize: 18, fontWeight: 800,
+                boxShadow: '0 2px 10px rgba(249,115,22,0.30)',
+              }}>
+                {firstName.charAt(0).toUpperCase()}
+              </div>
+            </Link>
+            <div>
+              <p style={{ fontSize: 17, fontWeight: 800, color: '#1C1917', lineHeight: 1.2 }}>
+                {firstName}
+              </p>
+              <p style={{ fontSize: 12, color: '#9CA3AF', fontWeight: 500 }}>
+                {displayDate}
+              </p>
+            </div>
+          </div>
+
+          {/* Right icons */}
+          <div style={{ display: 'flex', gap: 10 }}>
+            {streak > 0 && (
+              <div className="streak-badge">
+                🔥 {streak}
+              </div>
+            )}
+            <Link href="/diary" style={{
+              width: 38, height: 38, borderRadius: '50%',
+              background: '#fff', border: '1.5px solid #E5EBE0',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              textDecoration: 'none',
+              boxShadow: '0 1px 4px rgba(0,0,0,0.06)',
+            }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" strokeWidth="2" strokeLinecap="round">
+                <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" />
+              </svg>
+            </Link>
+          </div>
+        </div>
+
+        {/* Week calendar strip */}
+        <div style={{
+          display: 'flex',
+          gap: 4,
+          overflowX: 'auto',
+          paddingBottom: 4,
+          scrollbarWidth: 'none',
+        }}>
+          {weekDays.map((d) => (
+            <button
+              key={d.date}
+              onClick={() => setSelectedDay(d.date)}
+              style={{
+                flex: '0 0 auto',
+                width: 44,
+                padding: '8px 4px',
+                borderRadius: 14,
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 4,
+                background: d.isToday ? '#F97316' : 'transparent',
+                transition: 'all 0.18s',
+              }}
+            >
+              <span style={{
+                fontSize: 10, fontWeight: 600,
+                color: d.isToday ? 'rgba(255,255,255,0.85)' : '#9CA3AF',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+              }}>
+                {d.dayName.slice(0, 3)}
+              </span>
+              <span style={{
+                fontSize: 15, fontWeight: 800,
+                color: d.isToday ? '#fff' : '#1C1917',
+              }}>
+                {d.dayNum}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* ── Scrollable content ── */}
+      <div style={{ padding: '16px 20px', paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))' }}>
+
+        {/* ── Calories Left card ── */}
         <motion.div
-          initial={{ opacity: 0, y: -8 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex gap-3 items-start px-4 py-3 rounded-2xl"
           style={{
-            background: 'rgba(139,92,246,0.07)',
-            border: '1px solid rgba(139,92,246,0.20)',
-            backdropFilter: 'blur(16px)',
+            background: '#fff',
+            borderRadius: 24,
+            padding: '18px 20px 16px',
+            boxShadow: '0 2px 12px rgba(0,0,0,0.06)',
+            marginBottom: 14,
           }}
         >
-          <span className="text-xl flex-shrink-0">💡</span>
-          <p className="text-xs font-medium leading-relaxed pt-0.5" style={{ color: 'rgba(248,250,252,0.72)' }}>{tip}</p>
-        </motion.div>
-      )}
-
-      {/* ── Row 1: Calorie Ring Hero ── */}
-      <motion.div
-        className="flex flex-col items-center py-5 px-4 relative overflow-hidden"
-        style={G.amber}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        {/* Subtle radial bg */}
-        <div className="absolute inset-0 pointer-events-none"
-          style={{ background: 'radial-gradient(ellipse at 50% 0%, rgba(245,158,11,0.12) 0%, transparent 70%)' }}/>
-
-        <p className="text-xs font-bold uppercase tracking-widest mb-3 relative"
-          style={{ color: 'rgba(252,211,77,0.60)' }}>Calorie Oggi</p>
-
-        <CalorieRing consumed={Math.round(stats.totalKcal)} goal={goals.kcal} />
-
-        {hitGoal && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mt-3 flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full"
-            style={{ background: 'rgba(52,211,153,0.18)', color: '#6EE7B7', border: '1px solid rgba(52,211,153,0.35)' }}
-          >
-            ✨ Obiettivo raggiunto!
-          </motion.div>
-        )}
-
-        {/* Macro rings row */}
-        <div className="flex gap-6 mt-4 relative">
-          <MacroRing value={stats.totalProtein} goal={goals.protein} label="Prot" color="#22D3EE"/>
-          <MacroRing value={stats.totalCarbs}   goal={goals.carbs}   label="Carb" color="#FB923C"/>
-          <MacroRing value={stats.totalFat}     goal={goals.fat}     label="Gras" color="#F87171"/>
-        </div>
-      </motion.div>
-
-      {/* ── Row 2: Weekly Chart + Water ── */}
-      {weekStats.length > 0 && (
-        <div className="grid grid-cols-5 gap-3">
-          <motion.div
-            className="col-span-3 p-4"
-            style={G.base}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.12 }}
-          >
-            <WeeklyChart weekStats={weekStats} goalKcal={goals.kcal}/>
-          </motion.div>
-          <motion.div
-            className="col-span-2"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.18 }}
-          >
-            <WaterTracker/>
-          </motion.div>
-        </div>
-      )}
-
-      {/* ── Row 3: Quick Actions ── */}
-      <motion.div
-        className="grid grid-cols-4 gap-2"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, delay: 0.22 }}
-      >
-        {[
-          { label: 'Diario', icon: '📋', href: '/diary',    accent: '245,158,11' },
-          { label: 'Insight', icon: '📊', href: '/insights', accent: '52,211,153' },
-          { label: 'Leghe',  icon: '🏆', href: '/leagues',  accent: '168,85,247' },
-          { label: 'Impost.', icon: '⚙️', href: '/settings', accent: '139,92,246' },
-        ].map((action) => (
-          <motion.a
-            key={action.href}
-            href={action.href}
-            className="flex flex-col items-center gap-1.5 py-3 px-1 text-center rounded-2xl"
-            style={{
-              background: `rgba(${action.accent},0.07)`,
-              border: `1px solid rgba(${action.accent},0.20)`,
-              backdropFilter: 'blur(14px)',
-            }}
-            whileHover={{ scale: 1.05, y: -2 }}
-            whileTap={{ scale: 0.94 }}
-          >
-            <motion.span className="text-xl"
-              animate={{ y: [0, -4, 0] }}
-              transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}>
-              {action.icon}
-            </motion.span>
-            <span className="text-[10px] font-bold" style={{ color: 'rgba(248,250,252,0.65)' }}>{action.label}</span>
-          </motion.a>
-        ))}
-      </motion.div>
-
-      {/* ── Row 4: Today's Meals ── */}
-      <motion.div
-        className="p-4"
-        style={G.base}
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, delay: 0.28 }}
-      >
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm font-bold" style={{ color: '#F8FAFC' }}>Pasti di oggi</h3>
-            {meals.length > 0 && (
-              <span className="text-xs font-bold px-2 py-0.5 rounded-full"
-                style={{ background: 'rgba(139,92,246,0.16)', color: '#C4B5FD', border: '1px solid rgba(139,92,246,0.28)' }}>
-                {meals.length}
-              </span>
-            )}
+          {/* Card header */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+            <p style={{ fontSize: 15, fontWeight: 700, color: '#1C1917' }}>Calories Left</p>
+            <Link href="/insights" style={{
+              fontSize: 18, color: '#9CA3AF', textDecoration: 'none', lineHeight: 1,
+            }}>···</Link>
           </div>
-          <Link href="/diary">
-            <motion.span
-              className="text-xs font-bold px-3 py-1.5 rounded-full cursor-pointer"
-              style={{
-                background: 'rgba(139,92,246,0.16)',
-                color: '#C4B5FD',
-                border: '1px solid rgba(139,92,246,0.32)',
-                boxShadow: '0 0 12px rgba(139,92,246,0.20)',
-              }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.96 }}
-            >
-              + Aggiungi
-            </motion.span>
-          </Link>
-        </div>
 
-        {meals.length === 0 ? (
+          {/* Ring */}
+          <CalorieRing consumed={current.totalKcal} goal={goals.kcal} />
+
+          {/* Macro cards row */}
+          <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+            <MacroCard label="Carbos"   value={current.totalCarbs}   goal={goals.carbs}   color="#8B5CF6" icon="🌾" />
+            <MacroCard label="Protein"  value={current.totalProtein} goal={goals.protein} color="#0EA5E9" icon="💪" />
+            <MacroCard label="Fat"      value={current.totalFat}     goal={goals.fat}     color="#F59E0B" icon="🥑" />
+          </div>
+        </motion.div>
+
+        {/* ── AI Tip ── */}
+        {tip && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            className="py-8 flex flex-col items-center gap-2 text-center"
-          >
-            <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-3xl"
-              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.09)' }}>
-              🍽️
-            </div>
-            <p className="text-sm font-bold mt-2" style={{ color: 'rgba(248,250,252,0.60)' }}>Nessun pasto ancora</p>
-            <p className="text-xs" style={{ color: 'rgba(248,250,252,0.35)' }}>Aggiungi il tuo primo pasto!</p>
-          </motion.div>
-        ) : (
-          <AnimatePresence>
-            <ul className="space-y-2">
-              {meals.map((meal) => (
-                <MealRow key={meal.id} meal={meal} onDelete={handleDeleteMeal}/>
-              ))}
-            </ul>
-          </AnimatePresence>
-        )}
-      </motion.div>
-
-      {/* ── Premium Banner (for free users) ── */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.45, delay: 0.35 }}
-      >
-        <Link href="/premium">
-          <div className="relative overflow-hidden p-4 rounded-2xl cursor-pointer group"
+            transition={{ delay: 0.1 }}
             style={{
-              background: 'linear-gradient(135deg, rgba(245,158,11,0.12), rgba(139,92,246,0.12))',
-              border: '1px solid rgba(245,158,11,0.28)',
-            }}>
-            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity"
-              style={{ background: 'linear-gradient(135deg, rgba(245,158,11,0.06), rgba(139,92,246,0.06))' }}/>
-            <div className="relative flex items-center gap-3">
-              <span className="text-2xl">✨</span>
-              <div className="flex-1">
-                <p className="text-sm font-bold" style={{ color: '#FCD34D' }}>Prova Premium Gratis</p>
-                <p className="text-xs" style={{ color: 'rgba(248,250,252,0.55)' }}>
-                  AI illimitata, grafici avanzati e molto altro · €4,99/mese
-                </p>
-              </div>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(252,211,77,0.60)" strokeWidth="2.5">
-                <path d="M9 18l6-6-6-6"/>
-              </svg>
-            </div>
-          </div>
-        </Link>
-      </motion.div>
+              background: 'rgba(249,115,22,0.07)',
+              border: '1.5px solid rgba(249,115,22,0.18)',
+              borderRadius: 16,
+              padding: '12px 16px',
+              marginBottom: 14,
+              display: 'flex',
+              gap: 10,
+              alignItems: 'flex-start',
+            }}
+          >
+            <span style={{ fontSize: 20, flexShrink: 0 }}>💡</span>
+            <p style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.5, fontWeight: 500 }}>{tip}</p>
+          </motion.div>
+        )}
 
+        {/* ── Meal suggestions ── */}
+        <div style={{ marginBottom: 16 }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+            <p style={{ fontSize: 16, fontWeight: 700, color: '#1C1917' }}>I miei pasti</p>
+            <Link href="/diary" style={{ fontSize: 13, fontWeight: 600, color: '#F97316', textDecoration: 'none' }}>
+              Vedi tutti →
+            </Link>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            {MEAL_IMAGES.map((item) => (
+              <MealImageCard key={item.label} item={item} meals={todayMeals} />
+            ))}
+          </div>
+        </div>
+
+        {/* ── Quick actions ── */}
+        <div style={{ display: 'flex', gap: 10 }}>
+          <Link href="/insights" style={{ flex: 1, textDecoration: 'none' }}>
+            <motion.div
+              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+              style={{
+                background: '#fff', borderRadius: 16, padding: '14px 16px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                display: 'flex', gap: 10, alignItems: 'center',
+              }}
+            >
+              <div style={{
+                width: 38, height: 38, borderRadius: 12,
+                background: 'rgba(34,197,94,0.12)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
+              }}>
+                📈
+              </div>
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#1C1917' }}>Analisi</p>
+                <p style={{ fontSize: 11, color: '#9CA3AF' }}>Progressi</p>
+              </div>
+            </motion.div>
+          </Link>
+
+          <Link href="/weight" style={{ flex: 1, textDecoration: 'none' }}>
+            <motion.div
+              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+              style={{
+                background: '#fff', borderRadius: 16, padding: '14px 16px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                display: 'flex', gap: 10, alignItems: 'center',
+              }}
+            >
+              <div style={{
+                width: 38, height: 38, borderRadius: 12,
+                background: 'rgba(14,165,233,0.12)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
+              }}>
+                ⚖️
+              </div>
+              <div>
+                <p style={{ fontSize: 13, fontWeight: 700, color: '#1C1917' }}>Peso</p>
+                <p style={{ fontSize: 11, color: '#9CA3AF' }}>Traccia</p>
+              </div>
+            </motion.div>
+          </Link>
+        </div>
+
+      </div>
+
+      {/* Bottom tab bar is rendered by the page server component */}
     </div>
   );
 }

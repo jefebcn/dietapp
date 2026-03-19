@@ -49,13 +49,13 @@ function StreakCalendar({ monthStats, goals }: { monthStats: DailyStats[]; goals
 
   return (
     <div>
-      <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: 'rgba(248,250,252,0.45)' }}>
+      <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: '#9CA3AF' }}>
         Ultime 4 settimane
       </p>
       <div className="grid grid-cols-7 gap-1">
         {['L','M','M','G','V','S','D'].map((d, i) => (
           <div key={i} className="text-center text-[9px] font-bold pb-1"
-            style={{ color: 'rgba(248,250,252,0.30)' }}>{d}</div>
+            style={{ color: '#9CA3AF' }}>{d}</div>
         ))}
         {days.map((day) => (
           <motion.div
@@ -63,12 +63,12 @@ function StreakCalendar({ monthStats, goals }: { monthStats: DailyStats[]; goals
             className="aspect-square rounded-lg flex items-center justify-center text-[9px] font-bold"
             style={
               day.isToday
-                ? { background: 'rgba(139,92,246,0.45)', border: '1px solid rgba(139,92,246,0.70)', color: '#C4B5FD' }
+                ? { background: 'rgba(139,92,246,0.15)', border: '1px solid rgba(139,92,246,0.50)', color: '#8B5CF6' }
                 : day.hitGoal
-                ? { background: 'rgba(52,211,153,0.25)', border: '1px solid rgba(52,211,153,0.45)', color: '#34D399' }
+                ? { background: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.40)', color: '#22C55E' }
                 : day.hasData
-                ? { background: 'rgba(245,158,11,0.18)', border: '1px solid rgba(245,158,11,0.35)', color: '#FCD34D' }
-                : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', color: 'rgba(248,250,252,0.25)' }
+                ? { background: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.30)', color: '#F59E0B' }
+                : { background: '#F3F6F0', border: '1px solid #E5EBE0', color: '#9CA3AF' }
             }
             title={`${day.dateStr}: ${Math.round(day.stat?.totalKcal ?? 0)} kcal`}
           >
@@ -78,13 +78,13 @@ function StreakCalendar({ monthStats, goals }: { monthStats: DailyStats[]; goals
       </div>
       <div className="flex gap-4 mt-2.5">
         {[
-          { color: 'rgba(52,211,153,0.25)', border: '1px solid rgba(52,211,153,0.45)', label: 'Obiettivo raggiunto' },
-          { color: 'rgba(245,158,11,0.18)', border: '1px solid rgba(245,158,11,0.35)', label: 'Pasto tracciato' },
-          { color: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)', label: 'Nessun dato' },
+          { color: 'rgba(34,197,94,0.15)', border: '1px solid rgba(34,197,94,0.40)', label: 'Obiettivo raggiunto' },
+          { color: 'rgba(245,158,11,0.12)', border: '1px solid rgba(245,158,11,0.30)', label: 'Pasto tracciato' },
+          { color: '#F3F6F0', border: '1px solid #E5EBE0', label: 'Nessun dato' },
         ].map((item) => (
           <div key={item.label} className="flex items-center gap-1">
             <div className="w-3 h-3 rounded" style={{ background: item.color, border: item.border }}/>
-            <span className="text-[9px]" style={{ color: 'rgba(248,250,252,0.40)' }}>{item.label}</span>
+            <span className="text-[9px]" style={{ color: '#9CA3AF' }}>{item.label}</span>
           </div>
         ))}
       </div>
@@ -102,17 +102,17 @@ function MonthChart({ monthStats, goalKcal }: { monthStats: DailyStats[]; goalKc
   return (
     <div>
       <div className="flex items-center justify-between mb-3">
-        <p className="text-xs font-bold uppercase tracking-wide" style={{ color: 'rgba(248,250,252,0.45)' }}>
+        <p className="text-xs font-bold uppercase tracking-wide" style={{ color: '#6B7280' }}>
           Calorie – ultimi 14 giorni
         </p>
-        <p className="text-[10px] font-semibold" style={{ color: 'rgba(245,158,11,0.65)' }}>
+        <p className="text-[10px] font-semibold" style={{ color: '#F59E0B' }}>
           Target {goalKcal.toLocaleString()}
         </p>
       </div>
       <div className="relative flex items-end gap-1 h-24">
         {/* Goal line */}
         <div className="absolute left-0 right-0 border-t border-dashed"
-          style={{ bottom: `${(goalKcal / max) * 100}%`, borderColor: 'rgba(245,158,11,0.35)' }}/>
+          style={{ bottom: `${(goalKcal / max) * 100}%`, borderColor: 'rgba(245,158,11,0.45)' }}/>
         {last14.map((day, idx) => {
           const pct = Math.min((day.totalKcal / max) * 100, 100);
           const isOver = day.totalKcal > goalKcal;
@@ -126,8 +126,8 @@ function MonthChart({ monthStats, goalKcal }: { monthStats: DailyStats[]; goalKc
                   style={{
                     background: isToday ? 'linear-gradient(180deg, #FBBF24, #F59E0B)'
                       : isOver ? 'linear-gradient(180deg, #F87171, #EF4444)'
-                      : 'rgba(255,255,255,0.14)',
-                    boxShadow: isToday ? '0 0 10px rgba(245,158,11,0.50)' : undefined,
+                      : '#D1D5DB',
+                    boxShadow: isToday ? '0 0 10px rgba(245,158,11,0.35)' : undefined,
                   }}
                   initial={{ height: 0 }}
                   animate={{ height: `${Math.max(pct, day.totalKcal > 0 ? 4 : 2)}%` }}
@@ -136,7 +136,7 @@ function MonthChart({ monthStats, goalKcal }: { monthStats: DailyStats[]; goalKc
                 />
               </div>
               <span className="text-[8px] font-bold"
-                style={{ color: isToday ? '#FBBF24' : 'rgba(248,250,252,0.28)' }}>
+                style={{ color: isToday ? '#F59E0B' : '#9CA3AF' }}>
                 {days[d.getDay()].charAt(0)}
               </span>
             </div>
@@ -166,22 +166,22 @@ function MacroBreakdown({ monthStats }: { monthStats: DailyStats[] }) {
   const totalMacroKcal = proteinKcal + carbsKcal + fatKcal;
 
   const macros = [
-    { label: 'Proteine', grams: avg.protein, kcal: proteinKcal, pct: (proteinKcal / totalMacroKcal) * 100, color: '#22D3EE' },
-    { label: 'Carboidrati', grams: avg.carbs, kcal: carbsKcal, pct: (carbsKcal / totalMacroKcal) * 100, color: '#FB923C' },
-    { label: 'Grassi', grams: avg.fat, kcal: fatKcal, pct: (fatKcal / totalMacroKcal) * 100, color: '#F87171' },
+    { label: 'Proteine', grams: avg.protein, kcal: proteinKcal, pct: (proteinKcal / totalMacroKcal) * 100, color: '#0EA5E9' },
+    { label: 'Carboidrati', grams: avg.carbs, kcal: carbsKcal, pct: (carbsKcal / totalMacroKcal) * 100, color: '#8B5CF6' },
+    { label: 'Grassi', grams: avg.fat, kcal: fatKcal, pct: (fatKcal / totalMacroKcal) * 100, color: '#F59E0B' },
   ];
 
   return (
     <div className="space-y-3">
-      <p className="text-xs font-bold uppercase tracking-wide" style={{ color: 'rgba(248,250,252,0.45)' }}>
+      <p className="text-xs font-bold uppercase tracking-wide" style={{ color: '#6B7280' }}>
         Media giornaliera ({activeDays.length} giorni)
       </p>
       <div className="flex items-center gap-2">
         <div className="text-center">
-          <p className="text-2xl font-black" style={{ color: '#FCD34D', fontFamily: 'var(--font-ui)' }}>
+          <p className="text-2xl font-black" style={{ color: '#F97316', fontFamily: 'var(--font-ui)' }}>
             {Math.round(avg.kcal)}
           </p>
-          <p className="text-[10px]" style={{ color: 'rgba(248,250,252,0.40)' }}>kcal/giorno</p>
+          <p className="text-[10px]" style={{ color: '#9CA3AF' }}>kcal/giorno</p>
         </div>
         {/* Horizontal bar breakdown */}
         <div className="flex-1">
@@ -189,7 +189,7 @@ function MacroBreakdown({ monthStats }: { monthStats: DailyStats[] }) {
             {macros.map((m) => (
               <motion.div key={m.label}
                 className="rounded-full"
-                style={{ background: m.color, boxShadow: `0 0 8px ${m.color}66` }}
+                style={{ background: m.color }}
                 initial={{ width: 0 }} animate={{ width: `${m.pct}%` }}
                 transition={{ duration: 0.8, ease: 'easeOut' }}
               />
@@ -199,7 +199,7 @@ function MacroBreakdown({ monthStats }: { monthStats: DailyStats[] }) {
             {macros.map((m) => (
               <div key={m.label} className="flex items-center gap-1">
                 <div className="w-2 h-2 rounded-full" style={{ background: m.color }}/>
-                <span className="text-[9px] font-semibold" style={{ color: 'rgba(248,250,252,0.55)' }}>
+                <span className="text-[9px] font-semibold" style={{ color: '#6B7280' }}>
                   {m.label.slice(0, 4)} {Math.round(m.grams)}g
                 </span>
               </div>
@@ -222,7 +222,7 @@ function WeightChart({ data }: { data: GoldMetrics[] }) {
 
   return (
     <div>
-      <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: 'rgba(248,250,252,0.45)' }}>
+      <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: '#6B7280' }}>
         Andamento peso
       </p>
       <div className="flex items-end gap-2 h-20">
@@ -235,9 +235,9 @@ function WeightChart({ data }: { data: GoldMetrics[] }) {
               <div className="w-full flex flex-col justify-end" style={{ height: 60 }}>
                 <motion.div className="w-full rounded-t-lg"
                   style={{
-                    background: isLatest ? 'linear-gradient(180deg, #A78BFA, #8B5CF6)' : 'rgba(167,139,250,0.28)',
-                    border: isLatest ? '1px solid rgba(167,139,250,0.50)' : '1px solid rgba(167,139,250,0.15)',
-                    boxShadow: isLatest ? '0 0 12px rgba(139,92,246,0.45)' : undefined,
+                    background: isLatest ? 'linear-gradient(180deg, #A78BFA, #8B5CF6)' : 'rgba(139,92,246,0.20)',
+                    border: isLatest ? '1px solid rgba(139,92,246,0.50)' : '1px solid rgba(139,92,246,0.15)',
+                    boxShadow: isLatest ? '0 0 12px rgba(139,92,246,0.25)' : undefined,
                   }}
                   initial={{ height: 0 }}
                   animate={{ height: `${Math.max(pct, 8)}%` }}
@@ -245,11 +245,11 @@ function WeightChart({ data }: { data: GoldMetrics[] }) {
                   title={`${w.period}: ${w.avgKg} kg`}
                 />
               </div>
-              <span className="text-[9px] font-bold" style={{ color: isLatest ? '#A78BFA' : 'rgba(167,139,250,0.50)' }}>
+              <span className="text-[9px] font-bold" style={{ color: isLatest ? '#8B5CF6' : '#9CA3AF' }}>
                 {w.avgKg}
               </span>
               {trend !== 0 && isLatest && (
-                <span className="text-[8px] font-bold" style={{ color: trend < 0 ? '#34D399' : '#F87171' }}>
+                <span className="text-[8px] font-bold" style={{ color: trend < 0 ? '#22C55E' : '#EF4444' }}>
                   {trend < 0 ? '↓' : '↑'}{Math.abs(trend).toFixed(1)}
                 </span>
               )}
@@ -292,18 +292,19 @@ export default function InsightsClient({
     else setLastResult({ error: result.error });
   };
 
+  // Light card styles
   const G = {
-    base: { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.10)', borderRadius: '1.5rem', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)' } as React.CSSProperties,
-    violet: { background: 'rgba(139,92,246,0.08)', border: '1px solid rgba(139,92,246,0.25)', borderRadius: '1.5rem', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)' } as React.CSSProperties,
-    emerald: { background: 'rgba(52,211,153,0.07)', border: '1px solid rgba(52,211,153,0.22)', borderRadius: '1.5rem', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)' } as React.CSSProperties,
-    amber: { background: 'rgba(245,158,11,0.07)', border: '1px solid rgba(245,158,11,0.22)', borderRadius: '1.5rem', backdropFilter: 'blur(18px)', WebkitBackdropFilter: 'blur(18px)' } as React.CSSProperties,
+    base: { background: '#FFFFFF', border: '1px solid #E5EBE0', borderRadius: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' } as React.CSSProperties,
+    violet: { background: '#FFFFFF', border: '1px solid rgba(139,92,246,0.20)', borderRadius: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' } as React.CSSProperties,
+    emerald: { background: '#FFFFFF', border: '1px solid rgba(34,197,94,0.20)', borderRadius: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' } as React.CSSProperties,
+    amber: { background: '#FFFFFF', border: '1px solid rgba(245,158,11,0.20)', borderRadius: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' } as React.CSSProperties,
   };
 
   return (
     <div className="space-y-4 pb-4">
 
       {/* ── Section tabs ── */}
-      <div className="flex gap-1.5 p-1 rounded-2xl" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }}>
+      <div className="flex gap-1.5 p-1 rounded-2xl" style={{ background: '#FFFFFF', border: '1px solid #E5EBE0', boxShadow: '0 1px 4px rgba(0,0,0,0.04)' }}>
         {[
           { key: 'analytics', label: '📊 Analytics' },
           { key: 'peso', label: '⚖️ Peso' },
@@ -312,9 +313,9 @@ export default function InsightsClient({
             onClick={() => setActiveSection(tab.key as 'analytics' | 'peso')}
             className="flex-1 py-2 rounded-xl text-sm font-bold transition-all"
             style={{
-              background: activeSection === tab.key ? 'rgba(255,255,255,0.12)' : 'transparent',
-              color: activeSection === tab.key ? '#F8FAFC' : 'rgba(248,250,252,0.40)',
-              border: activeSection === tab.key ? '1px solid rgba(255,255,255,0.18)' : '1px solid transparent',
+              background: activeSection === tab.key ? '#F97316' : 'transparent',
+              color: activeSection === tab.key ? '#FFFFFF' : '#6B7280',
+              border: activeSection === tab.key ? '1px solid rgba(249,115,22,0.30)' : '1px solid transparent',
               fontFamily: 'var(--font-ui)',
             }}>
             {tab.label}
@@ -331,14 +332,14 @@ export default function InsightsClient({
               <motion.div className="p-4" style={G.amber}
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
                 <div className="text-2xl mb-1">🔥</div>
-                <p className="text-3xl font-black" style={{ color: '#FCD34D', fontFamily: 'var(--font-ui)' }}>{streak}</p>
-                <p className="text-xs font-bold" style={{ color: 'rgba(252,211,77,0.60)' }}>Giorni di fila</p>
+                <p className="text-3xl font-black" style={{ color: '#F59E0B', fontFamily: 'var(--font-ui)' }}>{streak}</p>
+                <p className="text-xs font-bold" style={{ color: '#9CA3AF' }}>Giorni di fila</p>
               </motion.div>
               <motion.div className="p-4" style={G.violet}
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.06 }}>
                 <div className="text-2xl mb-1">⚡</div>
-                <p className="text-3xl font-black" style={{ color: '#A78BFA', fontFamily: 'var(--font-ui)' }}>{longestStreak}</p>
-                <p className="text-xs font-bold" style={{ color: 'rgba(167,139,250,0.60)' }}>Record personale</p>
+                <p className="text-3xl font-black" style={{ color: '#8B5CF6', fontFamily: 'var(--font-ui)' }}>{longestStreak}</p>
+                <p className="text-xs font-bold" style={{ color: '#9CA3AF' }}>Record personale</p>
               </motion.div>
             </div>
 
@@ -367,8 +368,8 @@ export default function InsightsClient({
             {monthStats.every((d) => d.totalKcal === 0) && (
               <div className="py-12 flex flex-col items-center gap-3 text-center">
                 <span className="text-5xl">📊</span>
-                <p className="text-base font-bold" style={{ color: 'rgba(248,250,252,0.55)' }}>Nessun dato ancora</p>
-                <p className="text-sm" style={{ color: 'rgba(248,250,252,0.35)' }}>Inizia a tracciare i pasti per vedere i tuoi progressi!</p>
+                <p className="text-base font-bold" style={{ color: '#6B7280' }}>Nessun dato ancora</p>
+                <p className="text-sm" style={{ color: '#9CA3AF' }}>Inizia a tracciare i pasti per vedere i tuoi progressi!</p>
               </div>
             )}
           </motion.div>
@@ -380,13 +381,13 @@ export default function InsightsClient({
               <motion.div className="p-4 flex items-center gap-4" style={G.violet}
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
                 <div className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl"
-                  style={{ background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)' }}>⚖️</div>
+                  style={{ background: 'rgba(139,92,246,0.10)', border: '1px solid rgba(139,92,246,0.20)' }}>⚖️</div>
                 <div>
-                  <p className="text-xs font-bold uppercase tracking-wide" style={{ color: 'rgba(248,250,252,0.40)' }}>Ultimo peso</p>
-                  <p className="text-3xl font-black" style={{ color: '#F8FAFC' }}>
-                    {latestWeight.rawValue} <span className="text-lg font-semibold">{latestWeight.rawUnit}</span>
+                  <p className="text-xs font-bold uppercase tracking-wide" style={{ color: '#9CA3AF' }}>Ultimo peso</p>
+                  <p className="text-3xl font-black" style={{ color: '#1C1917' }}>
+                    {latestWeight.rawValue} <span className="text-lg font-semibold" style={{ color: '#6B7280' }}>{latestWeight.rawUnit}</span>
                   </p>
-                  <p className="text-xs" style={{ color: 'rgba(248,250,252,0.50)' }}>
+                  <p className="text-xs" style={{ color: '#9CA3AF' }}>
                     {new Date(latestWeight.createdAt).toLocaleDateString('it-IT', { day: 'numeric', month: 'long' })}
                   </p>
                 </div>
@@ -404,21 +405,22 @@ export default function InsightsClient({
             {/* Log form */}
             <motion.div className="p-5" style={G.emerald}
               initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
-              <h2 className="text-sm font-bold uppercase tracking-wide mb-4" style={{ color: 'rgba(248,250,252,0.60)' }}>
+              <h2 className="text-sm font-bold uppercase tracking-wide mb-4" style={{ color: '#6B7280' }}>
                 📝 Registra peso
               </h2>
               <form onSubmit={handleSubmit} className="space-y-3">
                 {/* Unit toggle */}
                 <div className="flex rounded-xl p-0.5 gap-0.5"
-                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)' }}>
+                  style={{ background: '#F3F6F0', border: '1px solid #E5EBE0' }}>
                   {(['kg','lbs'] as const).map((u) => (
                     <button key={u} type="button" onClick={() => setUnit(u)}
                       className="flex-1 py-2 rounded-xl text-sm font-bold"
                       style={{
-                        background: unit === u ? 'rgba(255,255,255,0.14)' : 'transparent',
-                        color: unit === u ? '#F8FAFC' : 'rgba(248,250,252,0.40)',
-                        border: unit === u ? '1px solid rgba(255,255,255,0.18)' : '1px solid transparent',
+                        background: unit === u ? '#FFFFFF' : 'transparent',
+                        color: unit === u ? '#1C1917' : '#9CA3AF',
+                        border: unit === u ? '1px solid #E5EBE0' : '1px solid transparent',
                         fontFamily: 'var(--font-ui)',
+                        boxShadow: unit === u ? '0 1px 3px rgba(0,0,0,0.08)' : undefined,
                       }}>{u}</button>
                   ))}
                 </div>
@@ -426,32 +428,38 @@ export default function InsightsClient({
                   onChange={(e) => setValue(e.target.value)}
                   placeholder={unit === 'kg' ? 'es. 75.5' : 'es. 166'}
                   required
-                  className="glass-input w-full rounded-xl px-4 py-3 text-lg font-bold outline-none"
-                  style={{ color: '#F8FAFC', fontFamily: 'var(--font-ui)' }}/>
+                  className="app-input w-full rounded-xl px-4 py-3 text-lg font-bold outline-none"
+                  style={{ color: '#1C1917', fontFamily: 'var(--font-ui)' }}/>
                 <input type="number" step="1" min="100" max="250" value={heightCm}
                   onChange={(e) => setHeightCm(e.target.value)}
                   placeholder="Altezza in cm (per BMI)"
-                  className="glass-input w-full rounded-xl px-4 py-2.5 text-sm outline-none"
-                  style={{ color: '#F8FAFC', fontFamily: 'var(--font-ui)' }}/>
+                  className="app-input w-full rounded-xl px-4 py-2.5 text-sm outline-none"
+                  style={{ color: '#1C1917', fontFamily: 'var(--font-ui)' }}/>
                 <input type="text" value={notes} onChange={(e) => setNotes(e.target.value)}
                   placeholder="Note opzionali (es. dopo colazione)"
                   maxLength={120}
-                  className="glass-input w-full rounded-xl px-4 py-2.5 text-sm outline-none"
-                  style={{ color: '#F8FAFC', fontFamily: 'var(--font-ui)' }}/>
+                  className="app-input w-full rounded-xl px-4 py-2.5 text-sm outline-none"
+                  style={{ color: '#1C1917', fontFamily: 'var(--font-ui)' }}/>
                 <AnimatePresence>
                   {lastResult && (
                     <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
                       className="px-4 py-3 rounded-xl text-sm font-bold"
                       style={'error' in lastResult
-                        ? { background: 'rgba(244,63,94,0.15)', color: '#FDA4AF', border: '1.5px solid rgba(244,63,94,0.30)' }
-                        : { background: 'rgba(16,185,129,0.15)', color: '#6EE7B7', border: '1.5px solid rgba(16,185,129,0.30)' }
+                        ? { background: 'rgba(239,68,68,0.08)', color: '#DC2626', border: '1.5px solid rgba(239,68,68,0.20)' }
+                        : { background: 'rgba(34,197,94,0.08)', color: '#16A34A', border: '1.5px solid rgba(34,197,94,0.25)' }
                       }>
                       {'error' in lastResult ? `❌ ${lastResult.error}` : `✅ Salvato: ${lastResult.kg} kg`}
                     </motion.div>
                   )}
                 </AnimatePresence>
                 <button type="submit" disabled={loading || !value}
-                  className="btn btn-emerald w-full py-3.5 disabled:opacity-50">
+                  className="w-full py-3.5 rounded-2xl text-sm font-bold disabled:opacity-50"
+                  style={{
+                    background: 'linear-gradient(145deg, #22C55E, #16A34A)',
+                    color: '#FFFFFF',
+                    fontFamily: 'var(--font-ui)',
+                    boxShadow: '0 4px 0 rgba(22,163,74,0.25)',
+                  }}>
                   {loading ? 'Salvataggio...' : '⚖️ Salva peso'}
                 </button>
               </form>
@@ -461,7 +469,7 @@ export default function InsightsClient({
             {recentLogs.length > 0 && (
               <motion.div className="p-4" style={G.amber}
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.20 }}>
-                <h3 className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: 'rgba(248,250,252,0.50)' }}>
+                <h3 className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: '#9CA3AF' }}>
                   Ultime registrazioni
                 </h3>
                 <ul className="space-y-2">
@@ -469,12 +477,12 @@ export default function InsightsClient({
                     <motion.li key={log.id}
                       initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04 }}
                       className="flex items-center justify-between py-2"
-                      style={{ borderBottom: i < Math.min(recentLogs.length, 8) - 1 ? '1px solid rgba(255,255,255,0.07)' : 'none' }}>
+                      style={{ borderBottom: i < Math.min(recentLogs.length, 8) - 1 ? '1px solid #E5EBE0' : 'none' }}>
                       <div>
-                        <p className="text-sm font-bold" style={{ color: '#F8FAFC' }}>{log.rawValue} {log.rawUnit}</p>
-                        {log.notes && <p className="text-xs" style={{ color: 'rgba(248,250,252,0.55)' }}>{log.notes}</p>}
+                        <p className="text-sm font-bold" style={{ color: '#1C1917' }}>{log.rawValue} {log.rawUnit}</p>
+                        {log.notes && <p className="text-xs" style={{ color: '#6B7280' }}>{log.notes}</p>}
                       </div>
-                      <span className="text-xs font-bold" style={{ color: 'rgba(248,250,252,0.40)' }}>
+                      <span className="text-xs font-bold" style={{ color: '#9CA3AF' }}>
                         {new Date(log.createdAt).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' })}
                       </span>
                     </motion.li>
@@ -486,8 +494,8 @@ export default function InsightsClient({
             {recentLogs.length === 0 && weeklyTrend.length === 0 && (
               <div className="py-12 flex flex-col items-center gap-3 text-center">
                 <span className="text-5xl">⚖️</span>
-                <p className="text-sm font-bold" style={{ color: 'rgba(248,250,252,0.55)' }}>Nessun peso registrato</p>
-                <p className="text-xs" style={{ color: 'rgba(248,250,252,0.35)' }}>Inizia a tracciare il tuo peso!</p>
+                <p className="text-sm font-bold" style={{ color: '#6B7280' }}>Nessun peso registrato</p>
+                <p className="text-xs" style={{ color: '#9CA3AF' }}>Inizia a tracciare il tuo peso!</p>
               </div>
             )}
           </motion.div>
