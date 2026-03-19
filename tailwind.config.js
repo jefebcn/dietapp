@@ -7,25 +7,10 @@ module.exports = {
   ],
   theme: {
     extend: {
-      colors: {
-        cream:    'var(--cream)',
-        cream2:   'var(--cream2)',
-        bark:     'var(--bark)',
-        bark2:    'var(--bark2)',
-        green:    'var(--green)',
-        green2:   'var(--green2)',
-        'green-lt': 'var(--green-lt)',
-        leaf:     'var(--leaf)',
-        orange:   'var(--orange)',
-        'orange-lt': 'var(--orange-lt)',
-        gold:     'var(--gold)',
-        muted:    'var(--muted)',
-        border:   'var(--border)',
-      },
       fontFamily: {
-        sans:  ['var(--font-sans)', 'DM Sans', 'system-ui', 'sans-serif'],
-        serif: ['var(--font-serif)', 'Playfair Display', 'Georgia', 'serif'],
-        mono:  ['var(--font-mono)', 'DM Mono', 'Courier New', 'monospace'],
+        sans:    ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+        mono:    ['DM Mono', 'Courier New', 'monospace'],
       },
       borderRadius: {
         sm: 'var(--radius-sm)',
