@@ -190,14 +190,10 @@ function MacroCard({
 // ── Meal image card ───────────────────────────────────────────────────────────
 
 const MEAL_IMAGES = [
-  { label: 'Colazione', emoji: '🌅', bg: '#FFF7ED', accent: '#FB923C',
-    img: 'https://images.unsplash.com/photo-1533089860892-a7c6f0a88666?w=400&q=75' },
-  { label: 'Pranzo', emoji: '☀️', bg: '#F0FDF4', accent: '#22C55E',
-    img: 'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400&q=75' },
-  { label: 'Cena', emoji: '🌙', bg: '#EFF6FF', accent: '#3B82F6',
-    img: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&q=75' },
-  { label: 'Spuntini', emoji: '🍎', bg: '#FFF1F2', accent: '#F43F5E',
-    img: 'https://images.unsplash.com/photo-1490474418585-ba9bad8fd0ea?w=400&q=75' },
+  { label: 'Colazione', emoji: '🥐', bg: 'linear-gradient(135deg, #FFF7ED, #FED7AA)', accent: '#FB923C' },
+  { label: 'Pranzo',    emoji: '🥗', bg: 'linear-gradient(135deg, #F0FDF4, #BBF7D0)', accent: '#22C55E' },
+  { label: 'Cena',      emoji: '🍝', bg: 'linear-gradient(135deg, #EFF6FF, #BFDBFE)', accent: '#3B82F6' },
+  { label: 'Spuntini',  emoji: '🍎', bg: 'linear-gradient(135deg, #FFF1F2, #FECDD3)', accent: '#F43F5E' },
 ];
 
 function MealImageCard({ item, meals }: { item: typeof MEAL_IMAGES[0]; meals: Meal[] }) {
@@ -219,14 +215,14 @@ function MealImageCard({ item, meals }: { item: typeof MEAL_IMAGES[0]; meals: Me
           boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
         }}
       >
-        {/* Food image */}
-        <div style={{ height: 100, overflow: 'hidden', position: 'relative' }}>
-          <img
-            src={item.img}
-            alt={item.label}
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            loading="lazy"
-          />
+        {/* Meal hero — gradient + emoji */}
+        <div style={{
+          height: 100, position: 'relative', background: item.bg,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <span style={{ fontSize: 44, lineHeight: 1, filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.10))' }}>
+            {item.emoji}
+          </span>
           {count > 0 && (
             <div style={{
               position: 'absolute', top: 8, right: 8,

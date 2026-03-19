@@ -17,7 +17,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 const SLIDES = [
   {
     id: 0,
-    image: 'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=700&q=80',
+    emoji: '🥗',
+    bg: 'linear-gradient(160deg, #DCFCE7 0%, #BBF7D0 40%, #A7F3D0 100%)',
+    accent: '#16A34A',
     topLabel: 'Healthy Food',
     topColor: '#22C55E',
     midLabel: 'Habits,',
@@ -26,7 +28,9 @@ const SLIDES = [
   },
   {
     id: 1,
-    image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=700&q=80',
+    emoji: '🔥',
+    bg: 'linear-gradient(160deg, #FFF7ED 0%, #FED7AA 40%, #FDBA74 100%)',
+    accent: '#EA6C0A',
     topLabel: 'Track Calories',
     topColor: '#F97316',
     midLabel: '& Macros',
@@ -35,7 +39,9 @@ const SLIDES = [
   },
   {
     id: 2,
-    image: 'https://images.unsplash.com/photo-1543339308-43e59d6b73a6?w=700&q=80',
+    emoji: '📷',
+    bg: 'linear-gradient(160deg, #E0F2FE 0%, #BAE6FD 40%, #7DD3FC 100%)',
+    accent: '#0284C7',
     topLabel: 'Scan Food',
     topColor: '#0EA5E9',
     midLabel: 'with a single',
@@ -84,30 +90,37 @@ export default function OnboardingPage() {
           transition={{ duration: 0.36, ease: 'easeInOut' }}
           style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
         >
-          {/* Food image — top half */}
+          {/* Hero panel — gradient + emoji (no external images) */}
           <div style={{
             position: 'relative',
             height: '50vh',
             overflow: 'hidden',
             borderBottomLeftRadius: '2.5rem',
             borderBottomRightRadius: '2.5rem',
+            background: current.bg,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}>
-            <img
-              src={current.image}
-              alt=""
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-                objectPosition: 'center',
-              }}
-            />
+            {/* Large decorative circles */}
+            <div style={{
+              position: 'absolute', top: -40, right: -40,
+              width: 200, height: 200, borderRadius: '50%',
+              background: `${current.accent}18`,
+            }} />
+            <div style={{
+              position: 'absolute', bottom: -20, left: -30,
+              width: 140, height: 140, borderRadius: '50%',
+              background: `${current.accent}12`,
+            }} />
+            {/* Central emoji */}
+            <span style={{ fontSize: 120, lineHeight: 1, filter: 'drop-shadow(0 8px 24px rgba(0,0,0,0.12))' }}>
+              {current.emoji}
+            </span>
             {/* Soft bottom fade */}
             <div style={{
               position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
+              bottom: 0, left: 0, right: 0,
               height: '40%',
               background: 'linear-gradient(to bottom, transparent, #F3F6F0)',
             }} />
