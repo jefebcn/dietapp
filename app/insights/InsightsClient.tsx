@@ -211,48 +211,145 @@ function MacroBreakdown({ monthStats }: { monthStats: DailyStats[] }) {
   );
 }
 
-// ── Weight Trend Chart ─────────────────────────────────────────────────────────
+// ── Weight Line Chart (SVG bezier) ─────────────────────────────────────────────
 
-function WeightChart({ data }: { data: GoldMetrics[] }) {
-  if (data.length < 2) return null;
-  const weights = data.map((d) => d.avgKg);
-  const min = Math.min(...weights) - 1;
-  const max = Math.max(...weights) + 1;
-  const range = max - min;
+interface ChartPoint { date: string; kg: number; label: string; }
+
+function WeightLineChart({ points }: { points: ChartPoint[] }) {
+  if (points.length < 2) {
+    return (
+      <div className="flex flex-col items-center gap-2 py-6">
+        <span className="text-3xl">📊</span>
+        <p className="text-xs font-semibold" style={{ color: '#C9D5C4' }}>
+          Registra almeno 2 pesate per il grafico
+        </p>
+      </div>
+    );
+  }
+
+  const W = 300, H = 130, pX = 10, pY = 14;
+  const plotW = W - pX * 2;
+  const plotH = H - pY * 2;
+
+  const weights = points.map((p) => p.kg);
+  const minW = Math.min(...weights) - 0.8;
+  const maxW = Math.max(...weights) + 0.8;
+  const range = maxW - minW || 1;
+
+  const toX = (i: number) => pX + (i / (points.length - 1)) * plotW;
+  const toY = (kg: number) => pY + (1 - (kg - minW) / range) * plotH;
+
+  let linePath = `M ${toX(0).toFixed(1)} ${toY(points[0].kg).toFixed(1)}`;
+  for (let i = 1; i < points.length; i++) {
+    const x0 = toX(i - 1), y0 = toY(points[i - 1].kg);
+    const x1 = toX(i),     y1 = toY(points[i].kg);
+    const cpx = (x0 + x1) / 2;
+    linePath += ` C ${cpx.toFixed(1)} ${y0.toFixed(1)} ${cpx.toFixed(1)} ${y1.toFixed(1)} ${x1.toFixed(1)} ${y1.toFixed(1)}`;
+  }
+
+  const lastX = toX(points.length - 1).toFixed(1);
+  const fillPath = `${linePath} L ${lastX} ${(H - pY).toFixed(1)} L ${pX} ${(H - pY).toFixed(1)} Z`;
+
+  const delta = points[points.length - 1].kg - points[0].kg;
+  const lineColor = delta > 0.05 ? '#EF4444' : delta < -0.05 ? '#22C55E' : '#8B5CF6';
+  const lastIdx = points.length - 1;
 
   return (
     <div>
-      <p className="text-xs font-bold uppercase tracking-wide mb-3" style={{ color: '#6B7280' }}>
-        Andamento peso
+      <div className="flex items-center justify-between mb-2">
+        <p className="text-xs font-bold uppercase tracking-wide" style={{ color: '#6B7280' }}>
+          Andamento peso
+        </p>
+        {points.length >= 2 && (
+          <span className="text-xs font-bold" style={{ color: delta > 0.05 ? '#EF4444' : delta < -0.05 ? '#22C55E' : '#8B5CF6' }}>
+            {delta >= 0 ? '+' : ''}{delta.toFixed(1)} kg
+          </span>
+        )}
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', overflow: 'visible', display: 'block' }}>
+        <defs>
+          <linearGradient id="insightLineGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stopColor={lineColor} stopOpacity="0.22" />
+            <stop offset="100%" stopColor={lineColor} stopOpacity="0.00" />
+          </linearGradient>
+        </defs>
+        {[0.25, 0.5, 0.75].map((f) => (
+          <line key={f}
+            x1={pX} y1={(pY + f * plotH).toFixed(1)}
+            x2={W - pX} y2={(pY + f * plotH).toFixed(1)}
+            stroke="#E5EBE0" strokeWidth="1" strokeDasharray="4 4"
+          />
+        ))}
+        <path d={fillPath} fill="url(#insightLineGrad)" />
+        <path d={linePath} fill="none" stroke={lineColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        {[0, lastIdx].map((i) => (
+          <g key={i}>
+            <circle
+              cx={toX(i).toFixed(1)} cy={toY(points[i].kg).toFixed(1)}
+              r={i === lastIdx ? 4.5 : 3}
+              fill={i === lastIdx ? lineColor : 'rgba(255,255,255,0.5)'}
+              stroke={lineColor} strokeWidth="1.5"
+            />
+            {i === lastIdx && (
+              <text x={toX(i).toFixed(1)} y={(toY(points[i].kg) - 8).toFixed(1)}
+                fill={lineColor} fontSize="8.5" fontWeight="800" textAnchor="middle"
+                fontFamily="Inter, system-ui, sans-serif">
+                {points[i].kg}
+              </text>
+            )}
+          </g>
+        ))}
+        <text x={pX} y={H - 1} fill="#9CA3AF" fontSize="8" textAnchor="start" fontFamily="Inter, system-ui, sans-serif">
+          {points[0].label}
+        </text>
+        <text x={W - pX} y={H - 1} fill="#6B7280" fontSize="8" textAnchor="end" fontFamily="Inter, system-ui, sans-serif">
+          {points[lastIdx].label}
+        </text>
+      </svg>
+    </div>
+  );
+}
+
+// ── Weight Weekly Bar Chart ─────────────────────────────────────────────────────
+
+function WeightWeeklyBars({ data }: { data: GoldMetrics[] }) {
+  const sorted = [...data].reverse();
+  const weights = sorted.map((d) => d.avgKg);
+  const minW = Math.min(...weights) - 0.3;
+  const maxW = Math.max(...weights) + 0.3;
+  const range = maxW - minW || 1;
+
+  return (
+    <div>
+      <p className="text-xs font-bold uppercase tracking-wide mb-2" style={{ color: '#6B7280' }}>
+        Media settimanale
       </p>
-      <div className="flex items-end gap-2 h-20">
-        {data.map((w, i) => {
-          const pct = range > 0 ? ((w.avgKg - min) / range) * 100 : 50;
-          const isLatest = i === data.length - 1;
-          const trend = i > 0 ? w.avgKg - data[i-1].avgKg : 0;
+      <div className="flex items-end gap-1.5 h-14">
+        {sorted.map((w, i) => {
+          const pct = ((w.avgKg - minW) / range) * 100;
+          const isLast = i === sorted.length - 1;
+          const arrow = w.trend > 0.01 ? '▲' : w.trend < -0.01 ? '▼' : '–';
+          const arrowColor = w.trend > 0.01 ? '#EF4444' : w.trend < -0.01 ? '#22C55E' : '#9CA3AF';
+          const weekLabel = w.period.replace('week_', '').split('-')[1] ?? '';
           return (
-            <div key={w.period} className="flex-1 flex flex-col items-center gap-1">
-              <div className="w-full flex flex-col justify-end" style={{ height: 60 }}>
-                <motion.div className="w-full rounded-t-lg"
-                  style={{
-                    background: isLatest ? 'linear-gradient(180deg, #A78BFA, #8B5CF6)' : 'rgba(139,92,246,0.20)',
-                    border: isLatest ? '1px solid rgba(139,92,246,0.50)' : '1px solid rgba(139,92,246,0.15)',
-                    boxShadow: isLatest ? '0 0 12px rgba(139,92,246,0.25)' : undefined,
-                  }}
-                  initial={{ height: 0 }}
-                  animate={{ height: `${Math.max(pct, 8)}%` }}
-                  transition={{ duration: 0.6, delay: i * 0.06, ease: 'easeOut' }}
-                  title={`${w.period}: ${w.avgKg} kg`}
-                />
-              </div>
-              <span className="text-[9px] font-bold" style={{ color: isLatest ? '#8B5CF6' : '#9CA3AF' }}>
+            <div key={w.period} className="flex-1 flex flex-col items-center gap-0.5">
+              <span className="text-[7px] font-bold" style={{ color: isLast ? '#8B5CF6' : '#9CA3AF' }}>
                 {w.avgKg}
               </span>
-              {trend !== 0 && isLatest && (
-                <span className="text-[8px] font-bold" style={{ color: trend < 0 ? '#22C55E' : '#EF4444' }}>
-                  {trend < 0 ? '↓' : '↑'}{Math.abs(trend).toFixed(1)}
-                </span>
-              )}
+              <div className="w-full flex flex-col justify-end" style={{ height: 40 }}>
+                <motion.div
+                  className="w-full rounded-t-md"
+                  style={{
+                    background: isLast ? 'linear-gradient(180deg, #A78BFA, #8B5CF6)' : 'rgba(139,92,246,0.18)',
+                    border: `1px solid ${isLast ? 'rgba(139,92,246,0.50)' : 'rgba(139,92,246,0.15)'}`,
+                  }}
+                  initial={{ height: 0 }}
+                  animate={{ height: `${Math.max(pct, 6)}%` }}
+                  transition={{ duration: 0.55, delay: i * 0.05, ease: 'easeOut' }}
+                />
+              </div>
+              <span className="text-[7px]" style={{ color: '#C9D5C4' }}>S{weekLabel}</span>
+              <span className="text-[7px] font-bold" style={{ color: arrowColor }}>{arrow}</span>
             </div>
           );
         })}
@@ -394,11 +491,25 @@ export default function InsightsClient({
               </motion.div>
             )}
 
-            {/* Weight trend chart */}
+            {/* Weight line chart – day-by-day progression from bronze logs */}
+            <motion.div className="p-4" style={G.violet}
+              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}>
+              <WeightLineChart points={recentLogs
+                .slice()
+                .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+                .map((l) => ({
+                  date: l.createdAt.split('T')[0],
+                  kg: l.rawUnit === 'kg' ? l.rawValue : Math.round(l.rawValue * 0.453592 * 10) / 10,
+                  label: new Date(l.createdAt).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }),
+                }))}
+              />
+            </motion.div>
+
+            {/* Weekly averages bar chart */}
             {weeklyTrend.length >= 2 && (
               <motion.div className="p-4" style={G.base}
-                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}>
-                <WeightChart data={weeklyTrend}/>
+                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
+                <WeightWeeklyBars data={weeklyTrend}/>
               </motion.div>
             )}
 
