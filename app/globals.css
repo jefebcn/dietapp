@@ -16,22 +16,15 @@
      Primary   → Violet  #8B5CF6 / #A78BFA
      Leagues   → Purple  #A855F7 / #D8B4FE
 
-   Fonts: Waltograph (display) + Fredoka (UI) loaded from CDN
+   Fonts: Plus Jakarta Sans (display) + Inter (UI) loaded from Google Fonts
    ═══════════════════════════════════════════════════════════════════════════ */
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ── Waltograph (display headers only) ──────────────────────────────────── */
-@font-face {
-  font-family: 'Waltograph';
-  src: url('/fonts/waltograph42.otf') format('opentype'),
-       url('/fonts/waltographUI.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
+/* ── Fonts loaded via Google Fonts in layout.tsx ────────────────────────── */
+/* Inter (UI + body) · Plus Jakarta Sans (display headers) */
 
 /* ── Design Tokens ──────────────────────────────────────────────────────── */
 :root {
@@ -96,8 +89,20 @@
   --purple-glow: rgba(168,85,247,0.30);
 
   /* Fonts */
-  --font-display: 'Waltograph', 'Fredoka', cursive;
-  --font-ui:      'Fredoka', 'Nunito', sans-serif;
+  --font-display: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+  --font-ui:      'Inter', system-ui, sans-serif;
+
+  /* Radii */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+
+  /* Indigo — weight / body tracking */
+  --indigo-500: #6366F1;
+  --indigo-400: #818CF8;
+  --indigo-300: #A5B4FC;
+  --indigo-glow: rgba(99,102,241,0.30);
 
   /* Safe area */
   --safe-bottom: env(safe-area-inset-bottom, 0px);
