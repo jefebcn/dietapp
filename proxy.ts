@@ -21,7 +21,10 @@ import type { NextRequest } from 'next/server';
 export const runtime = 'nodejs';
 
 // ── Route tables ─────────────────────────────────────────────────────────────
-const PROTECTED = ['/dashboard', '/diary', '/weight', '/settings', '/profile', '/leagues', '/insights', '/premium', '/scan', '/plan', '/contest'];
+// Hard-protected: require a valid session, redirect to /login if missing.
+// Soft-browsable pages (dashboard, insights, diary, scan, contest) are NOT here —
+// they show a guest/empty state and gate only the save/submit actions.
+const PROTECTED = ['/settings', '/profile', '/weight', '/leagues', '/premium', '/plan'];
 const AUTH_ONLY = ['/login', '/register'];
 
 // ── Lightweight cookie presence check ────────────────────────────────────────

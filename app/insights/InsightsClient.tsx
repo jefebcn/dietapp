@@ -16,6 +16,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { logWeightAction } from '@/lib/actions/mealActions';
 import type { BronzeLog, GoldMetrics } from '@/lib/repositories/weightRepository';
+import { GuestActionPrompt } from '@/components/GuestBanner';
 
 interface DailyStats {
   date: string; totalKcal: number; totalProtein: number;
@@ -30,6 +31,7 @@ interface Props {
   goals: Goals;
   streak: number;
   longestStreak: number;
+  isGuest?: boolean;
 }
 
 // ── Streak Calendar ────────────────────────────────────────────────────────────
@@ -559,7 +561,7 @@ function WeightWeeklyBars({ data }: { data: GoldMetrics[] }) {
 // ── Main Component ─────────────────────────────────────────────────────────────
 
 export default function InsightsClient({
-  recentLogs, weeklyTrend, monthStats, goals, streak, longestStreak,
+  recentLogs, weeklyTrend, monthStats, goals, streak, longestStreak, isGuest = false,
 }: Props) {
   const [unit, setUnit] = useState<'kg' | 'lbs'>('kg');
   const [value, setValue] = useState('');
@@ -703,7 +705,12 @@ export default function InsightsClient({
               </motion.div>
             )}
 
-            {/* Log form */}
+            {/* Log form — gated for guests */}
+            {isGuest ? (
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
+                <GuestActionPrompt action="registrare il tuo peso" />
+              </motion.div>
+            ) : (
             <motion.div className="p-5" style={G.emerald}
               initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
               <h2 className="text-sm font-bold uppercase tracking-wide mb-4" style={{ color: '#6B7280' }}>
@@ -765,6 +772,7 @@ export default function InsightsClient({
                 </button>
               </form>
             </motion.div>
+            )}
 
             {/* Recent logs */}
             {recentLogs.length > 0 && (

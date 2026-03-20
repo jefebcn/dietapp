@@ -18,6 +18,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { logWeightAction } from '@/lib/actions/mealActions';
 import { WaterWidget } from '@/components/WaterWidget';
+import { GuestBanner } from '@/components/GuestBanner';
 import type { WaterResult } from '@/lib/actions/mealActions';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
@@ -36,7 +37,7 @@ interface Goals { kcal: number; protein: number; carbs: number; fat: number; }
 interface WeekDay { date: string; dayName: string; dayNum: number; isToday: boolean; }
 
 interface Props {
-  uid: string; today: string; stats: DailyStats; goals: Goals;
+  uid: string | null; today: string; stats: DailyStats; goals: Goals;
   todayMeals: Meal[]; weekStats: DailyStats[]; userName: string;
   streak?: number; tip?: string; initialWater?: WaterResult;
 }
@@ -64,7 +65,7 @@ function buildWeek(todayStr: string): WeekDay[] {
 
 // ── Weight Quick-Log Widget ───────────────────────────────────────────────────
 
-function WeightQuickLog() {
+function WeightQuickLog({ isGuest }: { isGuest: boolean }) {
   const [value, setValue] = useState('');
   const [status, setStatus] = useState<'idle' | 'ok' | 'err'>('idle');
   const [isPending, startTransition] = useTransition();
@@ -72,6 +73,7 @@ function WeightQuickLog() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (isGuest) { window.location.href = '/login?next=/dashboard'; return; }
     const raw = parseFloat(value.replace(',', '.'));
     if (isNaN(raw) || raw < 20 || raw > 300) { setStatus('err'); return; }
     startTransition(async () => {
@@ -520,6 +522,9 @@ export default function DashboardClient({
       {/* ── Scrollable content ── */}
       <div style={{ padding: '16px 20px', paddingBottom: 'calc(96px + env(safe-area-inset-bottom, 0px))' }}>
 
+        {/* ── Guest banner ── */}
+        {!uid && <GuestBanner />}
+
         {/* ── Calories Left card ── */}
         <motion.div
           initial={{ opacity: 0, y: 12 }}
@@ -589,10 +594,10 @@ export default function DashboardClient({
         </div>
 
         {/* ── Weight quick-log ── */}
-        <WeightQuickLog />
+        <WeightQuickLog isGuest={!uid} />
 
         {/* ── Water tracking ── */}
-        {initialWater && <WaterWidget initial={initialWater} />}
+        {uid && initialWater && <WaterWidget initial={initialWater} />}
 
         {/* ── Quick actions ── */}
         <div style={{ display: 'flex', gap: 10 }}>
