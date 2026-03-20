@@ -10,6 +10,7 @@ import { getAdminAuth } from '@/lib/firebase-admin.config';
 import { getUserById, upsertUserFromAuth } from '@/lib/repositories/userRepository';
 import { getDailyStats, getDailyStatsRange, getMealsByDate } from '@/lib/repositories/mealRepository';
 import { getStreakState } from '@/lib/repositories/streakRepository';
+import { getWaterTodayAction } from '@/lib/actions/mealActions';
 
 import DashboardClient from './DashboardClient';
 import { BottomTabBar } from '@/components/BottomTabBar';
@@ -50,12 +51,13 @@ export default async function DashboardPage() {
 
   // upsertUserFromAuth: returns existing doc or auto-creates one from Firebase Auth
   // so old users from previous app versions are never stuck in a redirect loop
-  const [user, todayStats, weekStats, todayMeals, streakState] = await Promise.all([
+  const [user, todayStats, weekStats, todayMeals, streakState, waterToday] = await Promise.all([
     upsertUserFromAuth(uid).catch(() => getUserById(uid)),
     getDailyStats(uid, today).catch(() => null),
     getDailyStatsRange(uid, daysAgo(6), today).catch(() => []),
     getMealsByDate(uid, today).catch(() => []),
     getStreakState(uid).catch(() => null),
+    getWaterTodayAction().catch(() => null),
   ]);
 
   if (!user) redirect('/login');
@@ -71,6 +73,7 @@ export default async function DashboardPage() {
         uid={uid} today={today} stats={stats} goals={goals}
         todayMeals={todayMeals} weekStats={weekStats}
         userName={user.name ?? ''} streak={streak} tip={tip}
+        initialWater={waterToday ?? undefined}
       />
       <BottomTabBar />
     </div>

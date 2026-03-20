@@ -17,6 +17,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { logWeightAction } from '@/lib/actions/mealActions';
+import { WaterWidget } from '@/components/WaterWidget';
+import type { WaterResult } from '@/lib/actions/mealActions';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -36,7 +38,7 @@ interface WeekDay { date: string; dayName: string; dayNum: number; isToday: bool
 interface Props {
   uid: string; today: string; stats: DailyStats; goals: Goals;
   todayMeals: Meal[]; weekStats: DailyStats[]; userName: string;
-  streak?: number; tip?: string;
+  streak?: number; tip?: string; initialWater?: WaterResult;
 }
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -323,11 +325,9 @@ const MEAL_IMAGES = [
 ];
 
 function MealImageCard({ item, meals }: { item: typeof MEAL_IMAGES[0]; meals: Meal[] }) {
-  const type = item.label.toLowerCase().replace('à', 'a') === 'colazione' ? 'breakfast'
-             : item.label.toLowerCase() === 'pranzo' ? 'lunch'
-             : item.label.toLowerCase() === 'cena'   ? 'dinner'
-             : 'snack';
-  const count = meals.filter((m) => (m.mealType ?? '') === type).length;
+  // mealType is stored in Italian in Firestore ('colazione','pranzo','cena','spuntino')
+  const typeKey = item.label === 'Spuntini' ? 'spuntino' : item.label.toLowerCase();
+  const count = meals.filter((m) => (m.mealType ?? '') === typeKey).length;
 
   return (
     <Link href="/diary" style={{ textDecoration: 'none', display: 'block' }}>
@@ -377,7 +377,7 @@ function MealImageCard({ item, meals }: { item: typeof MEAL_IMAGES[0]; meals: Me
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export default function DashboardClient({
-  uid, today, stats, goals, todayMeals, weekStats, userName, streak = 0, tip,
+  uid, today, stats, goals, todayMeals, weekStats, userName, streak = 0, tip, initialWater,
 }: Props) {
   const router = useRouter();
   const [selectedDay, setSelectedDay] = useState(today);
@@ -590,6 +590,9 @@ export default function DashboardClient({
 
         {/* ── Weight quick-log ── */}
         <WeightQuickLog />
+
+        {/* ── Water tracking ── */}
+        {initialWater && <WaterWidget initial={initialWater} />}
 
         {/* ── Quick actions ── */}
         <div style={{ display: 'flex', gap: 10 }}>

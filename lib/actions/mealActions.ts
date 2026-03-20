@@ -16,6 +16,7 @@ import { getAdminAuth } from '@/lib/firebase-admin.config';
 import { addMeal, deleteMeal, getMealsByDate, getDailyStats } from '@/lib/repositories/mealRepository';
 import { recordMealLog } from '@/lib/repositories/streakRepository';
 import { addBronzeLog, promoteBronzeToSilver, refreshGoldForDate } from '@/lib/repositories/weightRepository';
+import { addWater, getWaterForDate, DAILY_GOAL_ML } from '@/lib/repositories/waterRepository';
 import { mealsCacheTag, statsCacheTag, streakCacheTag, weightCacheTag } from './cacheTags';
 
 // ── Auth helper ───────────────────────────────────────────────────────────────
@@ -323,5 +324,51 @@ export async function logWeightAction(
   } catch (err) {
     console.error('[logWeightAction]', err);
     return { success: false as const, error: err instanceof Error ? err.message : 'Unknown error' };
+  }
+}
+
+// ── Water Tracking ────────────────────────────────────────────────────────────
+
+export interface WaterResult {
+  totalMl: number;
+  goalMl: number;
+  glasses: number;       // floor(totalMl / 250)
+  goalGlasses: number;   // floor(goalMl / 250)
+  pct: number;           // 0-100
+}
+
+function buildWaterResult(totalMl: number): WaterResult {
+  const goalMl = DAILY_GOAL_ML;
+  return {
+    totalMl,
+    goalMl,
+    glasses: Math.floor(totalMl / 250),
+    goalGlasses: Math.floor(goalMl / 250),
+    pct: Math.min(Math.round((totalMl / goalMl) * 100), 100),
+  };
+}
+
+export async function logWaterAction(
+  ml: number,
+): Promise<{ success: true } & WaterResult | { success: false; error: string }> {
+  try {
+    if (ml <= 0 || ml > 2000) throw new Error('Quantità non valida');
+    const uid = await getAuthenticatedUid();
+    const today = new Date().toISOString().split('T')[0];
+    const newTotal = await addWater(uid, today, ml);
+    return { success: true as const, ...buildWaterResult(newTotal) };
+  } catch (err) {
+    return { success: false as const, error: err instanceof Error ? err.message : 'Errore' };
+  }
+}
+
+export async function getWaterTodayAction(): Promise<WaterResult> {
+  try {
+    const uid = await getAuthenticatedUid();
+    const today = new Date().toISOString().split('T')[0];
+    const total = await getWaterForDate(uid, today);
+    return buildWaterResult(total);
+  } catch {
+    return buildWaterResult(0);
   }
 }
