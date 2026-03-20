@@ -77,7 +77,7 @@ export default async function DashboardPage() {
     getWaterTodayAction().catch(() => null),
   ]);
 
-  if (!user) redirect('/login');
+  if (!user) { redirect('/login'); return; }
 
   const stats  = todayStats ?? EMPTY_STATS(today);
   const goals  = user.goals ?? DEFAULT_GOALS;
