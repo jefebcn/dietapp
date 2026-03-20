@@ -317,6 +317,89 @@ function MacroCard({
   );
 }
 
+// ── Daily Challenge card ───────────────────────────────────────────────────────
+
+const CHALLENGES = [
+  { icon: '💪', text: 'Raggiungi 150g di proteine oggi', metric: 'protein', target: 150, unit: 'g' },
+  { icon: '🚰', text: 'Bevi 8 bicchieri d\'acqua (2 L)', metric: 'water', target: 8, unit: 'bicchieri' },
+  { icon: '🥗', text: 'Registra tutti e 3 i pasti principali', metric: 'meals', target: 3, unit: 'pasti' },
+  { icon: '🎯', text: 'Rimani entro il tuo obiettivo calorico', metric: 'kcal', target: 100, unit: '%' },
+  { icon: '🌿', text: 'Tieni i grassi sotto il 30% delle calorie', metric: 'fat', target: 30, unit: '%' },
+];
+
+function DailyChallenge({ stats, goals, todayMeals }: {
+  stats: { totalKcal: number; totalProtein: number; totalFat: number };
+  goals: { kcal: number; protein: number };
+  todayMeals: { mealType?: string }[];
+}) {
+  // Pick challenge based on day of week
+  const dayIdx = new Date().getDay();
+  const challenge = CHALLENGES[dayIdx % CHALLENGES.length];
+
+  // Calculate progress
+  let progress = 0;
+  let current = 0;
+  if (challenge.metric === 'protein') {
+    current = Math.round(stats.totalProtein);
+    progress = Math.min((current / challenge.target) * 100, 100);
+  } else if (challenge.metric === 'meals') {
+    const types = new Set(todayMeals.map(m => m.mealType));
+    current = ['colazione','pranzo','cena'].filter(t => types.has(t)).length;
+    progress = Math.min((current / challenge.target) * 100, 100);
+  } else if (challenge.metric === 'kcal') {
+    progress = goals.kcal > 0 && stats.totalKcal <= goals.kcal ? Math.min((stats.totalKcal / goals.kcal) * 100, 100) : stats.totalKcal > goals.kcal ? 0 : 0;
+    current = stats.totalKcal;
+  } else if (challenge.metric === 'fat') {
+    const fatKcal = stats.totalFat * 9;
+    const pct = stats.totalKcal > 0 ? (fatKcal / stats.totalKcal) * 100 : 0;
+    progress = pct <= 30 && stats.totalKcal > 0 ? 100 : Math.max(0, 100 - (pct - 30) * 10);
+    current = Math.round(pct);
+  }
+  const done = progress >= 100;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.08 }}
+      style={{
+        background: done
+          ? 'linear-gradient(135deg, #22C55E, #16A34A)'
+          : 'linear-gradient(135deg, #7C3AED, #8B5CF6)',
+        borderRadius: 20,
+        padding: '14px 16px',
+        marginBottom: 14,
+        boxShadow: done
+          ? '0 4px 16px rgba(34,197,94,0.30)'
+          : '0 4px 16px rgba(139,92,246,0.30)',
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+        <span style={{ fontSize: 22 }}>{done ? '✅' : challenge.icon}</span>
+        <div style={{ flex: 1 }}>
+          <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.70)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            🎯 Sfida del giorno
+          </p>
+          <p style={{ fontSize: 13, fontWeight: 700, color: '#fff', lineHeight: 1.3, marginTop: 2 }}>
+            {done ? 'Sfida completata! 🎉' : challenge.text}
+          </p>
+        </div>
+      </div>
+      {/* Progress bar */}
+      <div style={{ height: 5, background: 'rgba(255,255,255,0.20)', borderRadius: 99, overflow: 'hidden' }}>
+        <motion.div
+          animate={{ width: `${progress}%` }}
+          transition={{ duration: 0.8, ease: 'easeOut' }}
+          style={{ height: '100%', background: '#fff', borderRadius: 99 }}
+        />
+      </div>
+      <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.65)', marginTop: 5, textAlign: 'right' }}>
+        {Math.round(progress)}% completato
+      </p>
+    </motion.div>
+  );
+}
+
 // ── Meal image card ───────────────────────────────────────────────────────────
 
 const MEAL_IMAGES = [
@@ -556,6 +639,9 @@ export default function DashboardClient({
           </div>
         </motion.div>
 
+        {/* ── Daily Challenge ── */}
+        <DailyChallenge stats={current} goals={goals} todayMeals={todayMeals} />
+
         {/* ── AI Tip ── */}
         {tip && (
           <motion.div
@@ -600,52 +686,32 @@ export default function DashboardClient({
         {uid && initialWater && <WaterWidget initial={initialWater} />}
 
         {/* ── Quick actions ── */}
-        <div style={{ display: 'flex', gap: 10 }}>
-          <Link href="/insights" style={{ flex: 1, textDecoration: 'none' }}>
-            <motion.div
-              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-              style={{
-                background: '#fff', borderRadius: 16, padding: '14px 16px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                display: 'flex', gap: 10, alignItems: 'center',
-              }}
-            >
-              <div style={{
-                width: 38, height: 38, borderRadius: 12,
-                background: 'rgba(34,197,94,0.12)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
-              }}>
-                📈
-              </div>
-              <div>
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#1C1917' }}>Analisi</p>
-                <p style={{ fontSize: 11, color: '#9CA3AF' }}>Progressi</p>
-              </div>
-            </motion.div>
-          </Link>
-
-          <Link href="/diary" style={{ flex: 1, textDecoration: 'none' }}>
-            <motion.div
-              whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
-              style={{
-                background: '#fff', borderRadius: 16, padding: '14px 16px',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
-                display: 'flex', gap: 10, alignItems: 'center',
-              }}
-            >
-              <div style={{
-                width: 38, height: 38, borderRadius: 12,
-                background: 'rgba(249,115,22,0.12)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18,
-              }}>
-                📔
-              </div>
-              <div>
-                <p style={{ fontSize: 13, fontWeight: 700, color: '#1C1917' }}>Diario</p>
-                <p style={{ fontSize: 11, color: '#9CA3AF' }}>Pasti</p>
-              </div>
-            </motion.div>
-          </Link>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10 }}>
+          {[
+            { href: '/insights', icon: '📈', label: 'Analisi',  sub: 'Progressi', bg: 'rgba(34,197,94,0.12)'  },
+            { href: '/diary',    icon: '📔', label: 'Diario',   sub: 'Pasti',     bg: 'rgba(249,115,22,0.12)' },
+            { href: '/scan',     icon: '📷', label: 'Scanner',  sub: 'Scansiona', bg: 'rgba(14,165,233,0.12)' },
+          ].map(({ href, icon, label, sub, bg }) => (
+            <Link key={href} href={href} style={{ textDecoration: 'none' }}>
+              <motion.div
+                whileTap={{ scale: 0.95 }}
+                style={{
+                  background: '#fff', borderRadius: 16, padding: '12px 10px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+                  display: 'flex', flexDirection: 'column', gap: 6, alignItems: 'center',
+                  textAlign: 'center',
+                }}
+              >
+                <div style={{ width: 38, height: 38, borderRadius: 12, background: bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18 }}>
+                  {icon}
+                </div>
+                <div>
+                  <p style={{ fontSize: 12, fontWeight: 700, color: '#1C1917' }}>{label}</p>
+                  <p style={{ fontSize: 10, color: '#9CA3AF' }}>{sub}</p>
+                </div>
+              </motion.div>
+            </Link>
+          ))}
         </div>
 
       </div>
