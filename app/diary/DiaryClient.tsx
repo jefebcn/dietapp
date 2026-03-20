@@ -53,6 +53,22 @@ function MacroPill({ value, label, color }: { value: number; label: string; colo
   );
 }
 
+// ── Food quality indicator ─────────────────────────────────────────────────────
+// Returns color + label based on macro composition
+
+function foodQuality(meal: { kcal: number; protein: number; fat: number; carbs: number }): {
+  color: string; dot: string; title: string;
+} {
+  if (meal.kcal < 20) return { color: '#9CA3AF', dot: '○', title: 'N/D' };
+  const proteinRatio = (meal.protein * 4) / meal.kcal; // protein % of calories
+  const fatRatio = (meal.fat * 9) / meal.kcal;
+  if (proteinRatio >= 0.30) return { color: '#22C55E', dot: '●', title: 'Alto in proteine' };
+  if (proteinRatio >= 0.20 && fatRatio <= 0.40) return { color: '#86EFAC', dot: '●', title: 'Bilanciato' };
+  if (fatRatio >= 0.55) return { color: '#EF4444', dot: '●', title: 'Alto in grassi' };
+  if (meal.kcal > 400) return { color: '#F59E0B', dot: '●', title: 'Calorico' };
+  return { color: '#94A3B8', dot: '●', title: 'Neutro' };
+}
+
 // ── Category Section ───────────────────────────────────────────────────────────
 
 function CategorySection({
@@ -129,7 +145,9 @@ function CategorySection({
             {meals.length > 0 && (
               <ul className="px-3 py-2 space-y-1.5">
                 <AnimatePresence>
-                  {meals.map((meal) => (
+                  {meals.map((meal) => {
+                    const quality = foodQuality(meal);
+                    return (
                     <motion.li
                       key={meal.id}
                       layout
@@ -137,8 +155,12 @@ function CategorySection({
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 8, height: 0 }}
                       className="flex items-center gap-2.5 px-3 py-2 rounded-xl"
-                      style={{ background: '#F8FAF7', border: '1px solid #E5EBE0' }}
+                      style={{ background: '#F8FAF7', border: `1px solid ${quality.color}30` }}
                     >
+                      {/* Quality dot */}
+                      <span title={quality.title} style={{ fontSize: 8, color: quality.color, flexShrink: 0, lineHeight: 1 }}>
+                        {quality.dot}
+                      </span>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs font-semibold truncate" style={{ color: '#1C1917' }}>{meal.name}</p>
                         {confirmDeleteId === meal.id ? (
@@ -181,7 +203,8 @@ function CategorySection({
                         </motion.button>
                       )}
                     </motion.li>
-                  ))}
+                  );
+                  })}
                 </AnimatePresence>
               </ul>
             )}

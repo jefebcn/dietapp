@@ -317,6 +317,272 @@ function MacroCard({
   );
 }
 
+// ── Health Score Card ─────────────────────────────────────────────────────────
+
+function calcHealthScore({
+  kcal, goalKcal, protein, goalProtein, carbs, goalCarbs, fat, goalFat,
+  streak, mealCount,
+}: {
+  kcal: number; goalKcal: number; protein: number; goalProtein: number;
+  carbs: number; goalCarbs: number; fat: number; goalFat: number;
+  streak: number; mealCount: number;
+}): { score: number; label: string; color: string; breakdown: { name: string; pts: number; max: number }[] } {
+  // Calorie adherence: 0–30 pts
+  const calRatio = goalKcal > 0 ? kcal / goalKcal : 0;
+  const calPts = kcal === 0 ? 0 : calRatio <= 1.05
+    ? Math.round(30 * Math.min(calRatio / 0.75, 1))
+    : Math.max(0, 30 - Math.round((calRatio - 1.05) * 60));
+
+  // Protein adherence: 0–25 pts
+  const proRatio = goalProtein > 0 ? protein / goalProtein : 0;
+  const proPts = Math.round(Math.min(proRatio, 1) * 25);
+
+  // Carbs balance: 0–15 pts (within goal = full, over by 20% = 0)
+  const carbRatio = goalCarbs > 0 ? carbs / goalCarbs : 0;
+  const carbPts = carbs === 0 ? 0 : carbRatio <= 1.0 ? 15 : Math.max(0, Math.round(15 - (carbRatio - 1) * 75));
+
+  // Fat balance: 0–15 pts
+  const fatRatio = goalFat > 0 ? fat / goalFat : 0;
+  const fatPts = fat === 0 ? 0 : fatRatio <= 1.0 ? 15 : Math.max(0, Math.round(15 - (fatRatio - 1) * 75));
+
+  // Streak bonus: 0–10 pts
+  const streakPts = Math.min(streak, 10);
+
+  // Meals logged: 0–5 pts
+  const mealPts = Math.min(mealCount, 5);
+
+  const score = Math.min(100, calPts + proPts + carbPts + fatPts + streakPts + mealPts);
+  const label = score >= 85 ? 'Eccellente 🌟' : score >= 70 ? 'Ottimo 💪' : score >= 55 ? 'Buono 👍' : score >= 40 ? 'Migliora 📈' : 'Inizia 🚀';
+  const color = score >= 80 ? '#22C55E' : score >= 60 ? '#F97316' : score >= 40 ? '#F59E0B' : '#EF4444';
+
+  return {
+    score,
+    label,
+    color,
+    breakdown: [
+      { name: 'Calorie', pts: calPts, max: 30 },
+      { name: 'Proteine', pts: proPts, max: 25 },
+      { name: 'Carboidrati', pts: carbPts, max: 15 },
+      { name: 'Grassi', pts: fatPts, max: 15 },
+      { name: 'Streak', pts: streakPts, max: 10 },
+      { name: 'Pasti', pts: mealPts, max: 5 },
+    ],
+  };
+}
+
+function HealthScoreCard({ stats, goals, streak, mealCount }: {
+  stats: { totalKcal: number; totalProtein: number; totalCarbs: number; totalFat: number };
+  goals: { kcal: number; protein: number; carbs: number; fat: number };
+  streak: number;
+  mealCount: number;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const { score, label, color, breakdown } = calcHealthScore({
+    kcal: stats.totalKcal, goalKcal: goals.kcal,
+    protein: stats.totalProtein, goalProtein: goals.protein,
+    carbs: stats.totalCarbs, goalCarbs: goals.carbs,
+    fat: stats.totalFat, goalFat: goals.fat,
+    streak, mealCount,
+  });
+
+  // SVG arc for score ring
+  const R = 34, cx = 42, cy = 42;
+  const sweep = 270;
+  const startAngle = 135;
+  const pct = score / 100;
+  function polarToXY(deg: number) {
+    const rad = ((deg - 90) * Math.PI) / 180;
+    return { x: cx + R * Math.cos(rad), y: cy + R * Math.sin(rad) };
+  }
+  function arcPath(from: number, to: number) {
+    const s = polarToXY(from), e = polarToXY(to);
+    const large = to - from > 180 ? 1 : 0;
+    return `M ${s.x.toFixed(1)} ${s.y.toFixed(1)} A ${R} ${R} 0 ${large} 1 ${e.x.toFixed(1)} ${e.y.toFixed(1)}`;
+  }
+  const fillEnd = startAngle + sweep * pct;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.06 }}
+      style={{
+        background: '#fff',
+        borderRadius: 20,
+        padding: '14px 16px',
+        boxShadow: '0 2px 10px rgba(0,0,0,0.06)',
+        marginBottom: 14,
+        border: `1.5px solid ${color}22`,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        {/* Mini arc ring */}
+        <div style={{ flexShrink: 0 }}>
+          <svg width={84} height={84} viewBox="0 0 84 84">
+            <path d={arcPath(startAngle, startAngle + sweep)}
+              fill="none" stroke="#F3F6F0" strokeWidth={8} strokeLinecap="round" />
+            <motion.path
+              d={arcPath(startAngle, fillEnd)}
+              fill="none" stroke={color} strokeWidth={8} strokeLinecap="round"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: pct }}
+              transition={{ duration: 1, ease: 'easeOut' }}
+            />
+            <text x={cx} y={cy - 3} textAnchor="middle" dominantBaseline="middle"
+              fontSize="18" fontWeight="900" fill={color}
+              fontFamily="Inter, system-ui, sans-serif">{score}</text>
+            <text x={cx} y={cy + 12} textAnchor="middle" dominantBaseline="middle"
+              fontSize="8" fontWeight="600" fill="#9CA3AF"
+              fontFamily="Inter, system-ui, sans-serif">/100</text>
+          </svg>
+        </div>
+
+        {/* Text */}
+        <div style={{ flex: 1 }}>
+          <p style={{ fontSize: 10, color: '#9CA3AF', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            Health Score
+          </p>
+          <p style={{ fontSize: 18, fontWeight: 900, color, lineHeight: 1.2, marginTop: 2 }}>{label}</p>
+          <p style={{ fontSize: 11, color: '#6B7280', marginTop: 3, lineHeight: 1.4 }}>
+            Basato su calorie, macros, streak e pasti registrati oggi.
+          </p>
+        </div>
+
+        {/* Expand toggle */}
+        <button
+          onClick={() => setExpanded(v => !v)}
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer', padding: 4,
+            color: '#9CA3AF', fontSize: 18, lineHeight: 1, flexShrink: 0,
+            transform: expanded ? 'rotate(180deg)' : 'none',
+            transition: 'transform 0.2s',
+          }}
+          aria-label="Dettagli"
+        >
+          ▾
+        </button>
+      </div>
+
+      {/* Breakdown */}
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.22 }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {breakdown.map(({ name, pts, max }) => (
+                <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  <span style={{ fontSize: 11, color: '#6B7280', width: 80, flexShrink: 0 }}>{name}</span>
+                  <div style={{ flex: 1, height: 5, background: '#F3F6F0', borderRadius: 99, overflow: 'hidden' }}>
+                    <motion.div
+                      style={{ height: '100%', background: color, borderRadius: 99 }}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${(pts / max) * 100}%` }}
+                      transition={{ duration: 0.6, ease: 'easeOut' }}
+                    />
+                  </div>
+                  <span style={{ fontSize: 11, fontWeight: 700, color, width: 32, textAlign: 'right', flexShrink: 0 }}>
+                    {pts}/{max}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
+// ── Smart Food Suggestions ────────────────────────────────────────────────────
+
+const FOOD_SUGGESTIONS = [
+  { name: 'Petto di pollo', kcal: 165, protein: 31, carbs: 0, fat: 4, icon: '🍗' },
+  { name: 'Uova sode', kcal: 78, protein: 6, carbs: 1, fat: 5, icon: '🥚' },
+  { name: 'Yogurt greco 0%', kcal: 59, protein: 10, carbs: 4, fat: 0, icon: '🥛' },
+  { name: 'Tonno al naturale', kcal: 116, protein: 26, carbs: 0, fat: 1, icon: '🐟' },
+  { name: 'Ricotta magra', kcal: 136, protein: 11, carbs: 3, fat: 9, icon: '🧀' },
+  { name: 'Banana', kcal: 89, protein: 1, carbs: 23, fat: 0, icon: '🍌' },
+  { name: 'Mela', kcal: 52, protein: 0, carbs: 14, fat: 0, icon: '🍎' },
+  { name: 'Avocado (½)', kcal: 120, protein: 1, carbs: 6, fat: 11, icon: '🥑' },
+  { name: 'Quinoa (80g)', kcal: 111, protein: 4, carbs: 20, fat: 2, icon: '🌾' },
+  { name: 'Mandorle (30g)', kcal: 173, protein: 6, carbs: 6, fat: 15, icon: '🥜' },
+  { name: 'Salmone (100g)', kcal: 208, protein: 20, carbs: 0, fat: 13, icon: '🐠' },
+  { name: 'Riso integrale (80g)', kcal: 114, protein: 3, carbs: 24, fat: 1, icon: '🍚' },
+  { name: 'Fiocchi d\'avena', kcal: 150, protein: 5, carbs: 27, fat: 3, icon: '🥣' },
+  { name: 'Cavolfiore (200g)', kcal: 50, protein: 4, carbs: 10, fat: 0, icon: '🥦' },
+  { name: 'Broccoli (200g)', kcal: 68, protein: 6, carbs: 12, fat: 1, icon: '🥦' },
+];
+
+function SmartSuggestions({ remainingKcal, remainingProtein }: {
+  remainingKcal: number;
+  remainingProtein: number;
+}) {
+  if (remainingKcal <= 50) return null; // nothing meaningful to suggest
+
+  // Filter foods that fit in remaining budget, prioritize protein need
+  const needsProtein = remainingProtein > 20;
+  const candidates = FOOD_SUGGESTIONS
+    .filter(f => f.kcal <= remainingKcal * 1.05) // fits within budget (+5% margin)
+    .sort((a, b) => {
+      if (needsProtein) return b.protein - a.protein; // protein-first
+      return Math.abs(a.kcal - remainingKcal * 0.4) - Math.abs(b.kcal - remainingKcal * 0.4); // size-matching
+    })
+    .slice(0, 3);
+
+  if (candidates.length === 0) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.12 }}
+      style={{
+        background: 'linear-gradient(135deg, rgba(14,165,233,0.06), rgba(34,197,94,0.06))',
+        border: '1.5px solid rgba(14,165,233,0.15)',
+        borderRadius: 20,
+        padding: '14px 16px',
+        marginBottom: 14,
+      }}
+    >
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+        <span style={{ fontSize: 16 }}>🤖</span>
+        <div>
+          <p style={{ fontSize: 10, color: '#0EA5E9', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            Suggerimento AI
+          </p>
+          <p style={{ fontSize: 12, color: '#1C1917', fontWeight: 600 }}>
+            Hai ancora {Math.round(remainingKcal)} kcal{needsProtein ? ` · +${Math.round(remainingProtein)}g proteina` : ''}
+          </p>
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: 8 }}>
+        {candidates.map((food) => (
+          <div key={food.name} style={{
+            flex: 1, background: '#fff', borderRadius: 14, padding: '10px 8px',
+            boxShadow: '0 1px 5px rgba(0,0,0,0.05)', minWidth: 0,
+          }}>
+            <p style={{ fontSize: 18, textAlign: 'center' }}>{food.icon}</p>
+            <p style={{ fontSize: 10, fontWeight: 700, color: '#1C1917', textAlign: 'center', marginTop: 3, lineHeight: 1.2 }}>
+              {food.name}
+            </p>
+            <p style={{ fontSize: 10, color: '#F97316', fontWeight: 700, textAlign: 'center', marginTop: 2 }}>
+              {food.kcal} kcal
+            </p>
+            <p style={{ fontSize: 9, color: '#9CA3AF', textAlign: 'center' }}>
+              P: {food.protein}g
+            </p>
+          </div>
+        ))}
+      </div>
+    </motion.div>
+  );
+}
+
 // ── Daily Challenge card ───────────────────────────────────────────────────────
 
 const CHALLENGES = [
@@ -638,6 +904,20 @@ export default function DashboardClient({
             <MacroCard label="Fat"      value={current.totalFat}     goal={goals.fat}     color="#F59E0B" icon="🥑" />
           </div>
         </motion.div>
+
+        {/* ── Health Score ── */}
+        <HealthScoreCard
+          stats={current} goals={goals}
+          streak={streak} mealCount={current.mealCount}
+        />
+
+        {/* ── Smart Suggestions ── */}
+        {uid && (
+          <SmartSuggestions
+            remainingKcal={Math.max(0, goals.kcal - current.totalKcal)}
+            remainingProtein={Math.max(0, goals.protein - current.totalProtein)}
+          />
+        )}
 
         {/* ── Daily Challenge ── */}
         <DailyChallenge stats={current} goals={goals} todayMeals={todayMeals} />
