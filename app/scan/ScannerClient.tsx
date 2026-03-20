@@ -182,7 +182,7 @@ function ResultSheet({
 
 // ── Main component ────────────────────────────────────────────────────────────
 
-export default function ScannerClient() {
+export default function ScannerClient({ isGuest = false }: { isGuest?: boolean }) {
   const [mode, setMode]           = useState<ScanMode>('food');
   const [scanning, setScanning]   = useState(false);
   const [result, setResult]       = useState<ScanResult | null>(null);
@@ -248,6 +248,7 @@ export default function ScannerClient() {
   }
 
   async function handleAdd(r: ScanResult, mealType: string) {
+    if (isGuest) { window.location.href = '/login?next=/scan'; return; }
     const today = new Date().toISOString().split('T')[0];
     const res = await addMealAction(today, {
       name: r.name,

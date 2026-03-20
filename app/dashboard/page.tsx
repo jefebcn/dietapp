@@ -36,23 +36,40 @@ function getDailyTip(kcal: number, goalKcal: number, protein: number, goalProtei
   return 'Stai andando alla grande! Continua a tracciare i tuoi pasti.';
 }
 
+const EMPTY_STATS = (today: string) => ({ date: today, totalKcal: 0, totalProtein: 0, totalCarbs: 0, totalFat: 0, mealCount: 0 });
+const DEFAULT_GOALS = { kcal: 2000, protein: 150, carbs: 200, fat: 65 };
+
 export default async function DashboardPage() {
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get('__session')?.value;
-  if (!sessionCookie) redirect('/login');
-
-  let uid: string;
-  try {
-    const decoded = await getAdminAuth().verifySessionCookie(sessionCookie, true);
-    uid = decoded.uid;
-  } catch { redirect('/login'); }
-
   const today = dateStr(new Date());
 
-  // upsertUserFromAuth: returns existing doc or auto-creates one from Firebase Auth
-  // so old users from previous app versions are never stuck in a redirect loop
+  // Try to resolve uid — guests get null and see an empty/demo state
+  let uid: string | null = null;
+  if (sessionCookie) {
+    try {
+      const decoded = await getAdminAuth().verifySessionCookie(sessionCookie, true);
+      uid = decoded.uid;
+    } catch { /* invalid cookie — treat as guest */ }
+  }
+
+  // Guest: render full UI with empty data (no redirect)
+  if (!uid) {
+    return (
+      <div style={{ minHeight: '100dvh', background: 'var(--bg-app)' }}>
+        <DashboardClient
+          uid={null} today={today} stats={EMPTY_STATS(today)} goals={DEFAULT_GOALS}
+          todayMeals={[]} weekStats={[]}
+          userName="Ospite" streak={0}
+          tip="Registrati per iniziare a tracciare i tuoi pasti!"
+        />
+        <BottomTabBar />
+      </div>
+    );
+  }
+
   const [user, todayStats, weekStats, todayMeals, streakState, waterToday] = await Promise.all([
-    upsertUserFromAuth(uid).catch(() => getUserById(uid)),
+    upsertUserFromAuth(uid).catch(() => getUserById(uid!)),
     getDailyStats(uid, today).catch(() => null),
     getDailyStatsRange(uid, daysAgo(6), today).catch(() => []),
     getMealsByDate(uid, today).catch(() => []),
@@ -62,8 +79,8 @@ export default async function DashboardPage() {
 
   if (!user) redirect('/login');
 
-  const stats  = todayStats ?? { date: today, totalKcal: 0, totalProtein: 0, totalCarbs: 0, totalFat: 0, mealCount: 0 };
-  const goals  = user.goals ?? { kcal: 2000, protein: 150, carbs: 200, fat: 65 };
+  const stats  = todayStats ?? EMPTY_STATS(today);
+  const goals  = user.goals ?? DEFAULT_GOALS;
   const streak = streakState?.currentStreak ?? 0;
   const tip    = getDailyTip(stats.totalKcal, goals.kcal, stats.totalProtein, goals.protein, streak);
 

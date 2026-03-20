@@ -1,15 +1,16 @@
 /**
  * /app/contest/page.tsx  –  Contest & Challenge Arena
+ * Accessible to guests — shows the full contest UI with empty state.
  */
 
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 
 import { getAdminAuth } from '@/lib/firebase-admin.config';
 import { getUserById } from '@/lib/repositories/userRepository';
 import { getStreakState } from '@/lib/repositories/streakRepository';
 import { BottomTabBar } from '@/components/BottomTabBar';
+import { GuestBanner } from '@/components/GuestBanner';
 import ContestClient from './ContestClient';
 
 export const metadata: Metadata = { title: 'Contest' };
@@ -17,25 +18,24 @@ export const metadata: Metadata = { title: 'Contest' };
 export default async function ContestPage() {
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get('__session')?.value;
-  if (!sessionCookie) redirect('/login');
 
-  let uid: string;
-  try {
-    const decoded = await getAdminAuth().verifySessionCookie(sessionCookie, true);
-    uid = decoded.uid;
-  } catch { redirect('/login'); }
+  let uid: string | null = null;
+  if (sessionCookie) {
+    try {
+      const decoded = await getAdminAuth().verifySessionCookie(sessionCookie, true);
+      uid = decoded.uid;
+    } catch { /* guest */ }
+  }
 
-  const [user, streakState] = await Promise.all([
-    getUserById(uid).catch(() => null),
-    getStreakState(uid).catch(() => null),
-  ]);
-
-  const streak = streakState?.currentStreak ?? 0;
-  const userName = user?.name ?? 'Atleta';
+  const streak = uid
+    ? (await getStreakState(uid).catch(() => null))?.currentStreak ?? 0
+    : 0;
+  const userName = uid
+    ? (await getUserById(uid).catch(() => null))?.name ?? 'Atleta'
+    : 'Ospite';
 
   return (
     <div style={{ minHeight: '100dvh', background: 'var(--bg-app)' }}>
-      {/* Header */}
       <header className="page-header" style={{
         background: 'rgba(243,246,240,0.92)',
         backdropFilter: 'blur(12px)',
@@ -53,6 +53,7 @@ export default async function ContestPage() {
       </header>
 
       <main className="max-w-2xl mx-auto px-4 pt-4 page-content">
+        {!uid && <GuestBanner />}
         <ContestClient streak={streak} userName={userName} />
       </main>
 

@@ -28,6 +28,7 @@ interface DiaryClientProps {
   uid: string; today: string;
   meals: Meal[];
   stats: { totalKcal: number; totalProtein: number; totalCarbs: number; totalFat: number } | null;
+  isGuest?: boolean;
 }
 
 // ── Meal categories ────────────────────────────────────────────────────────────
@@ -219,7 +220,7 @@ function CategorySection({
 
 // ── Main Component ─────────────────────────────────────────────────────────────
 
-export default function DiaryClient({ today, meals: initialMeals, stats }: DiaryClientProps) {
+export default function DiaryClient({ today, meals: initialMeals, stats, isGuest = false }: DiaryClientProps) {
   const [meals, setMeals] = useState<Meal[]>(initialMeals ?? []);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
@@ -240,6 +241,7 @@ export default function DiaryClient({ today, meals: initialMeals, stats }: Diary
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function openAddSheet(typeKey: MealTypeKey) {
+    if (isGuest) { window.location.href = '/login?next=/diary'; return; }
     setSelectedMeal(null);
     setActiveMealType(typeKey);
     setForm({ name: '', kcal: '', protein: '', carbs: '', fat: '', qty: '100', unit: 'g' });

@@ -1,18 +1,18 @@
 /**
  * /app/diary/page.tsx  –  Food Diary
  *
- * Displays today's meals with BottomSheet for food detail entry.
- * Server Component: auth-gated.
+ * Accessible to guests — they see the full UI with empty meals.
+ * Saving/editing meals requires login (gated in DiaryClient).
  */
 
 import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { getAdminAuth } from '@/lib/firebase-admin.config';
 import { getMealsByDate, getDailyStats } from '@/lib/repositories/mealRepository';
 import { BottomTabBar } from '@/components/BottomTabBar';
+import { GuestBanner } from '@/components/GuestBanner';
 import DiaryClient from './DiaryClient';
 
 export const metadata: Metadata = { title: 'Diario' };
@@ -30,19 +30,18 @@ export default async function DiaryPage({
 }) {
   const cookieStore = await cookies();
   const sessionCookie = cookieStore.get('__session')?.value;
-  if (!sessionCookie) redirect('/login');
 
-  let uid: string;
-  try {
-    const decoded = await getAdminAuth().verifySessionCookie(sessionCookie, true);
-    uid = decoded.uid;
-  } catch {
-    redirect('/login');
+  // Try to resolve uid — guests get null
+  let uid: string | null = null;
+  if (sessionCookie) {
+    try {
+      const decoded = await getAdminAuth().verifySessionCookie(sessionCookie, true);
+      uid = decoded.uid;
+    } catch { /* invalid cookie — treat as guest */ }
   }
 
   const today = todayStr();
   const params = await searchParams;
-  // Accept a ?date=YYYY-MM-DD param; fall back to today if missing / invalid
   const viewDate =
     params.date && DATE_RE.test(params.date) && params.date <= today
       ? params.date
@@ -50,14 +49,13 @@ export default async function DiaryPage({
 
   const isPast = viewDate !== today;
 
-  const [meals, stats] = await Promise.all([
-    getMealsByDate(uid, viewDate),
-    getDailyStats(uid, viewDate),
-  ]);
-
   const displayDate = new Date(viewDate + 'T12:00:00').toLocaleDateString('it-IT', {
     weekday: 'long', day: 'numeric', month: 'long',
   });
+
+  // For guests: empty data
+  const meals = uid ? await getMealsByDate(uid, viewDate).catch(() => []) : [];
+  const stats = uid ? await getDailyStats(uid, viewDate).catch(() => null) : null;
 
   return (
     <div className="relative min-h-screen" style={{ background: '#F3F6F0' }}>
@@ -92,8 +90,7 @@ export default async function DiaryPage({
               </h1>
             </div>
 
-            {/* Day-switcher: Pasti ↔ Peso (only for past dates) */}
-            {isPast && (
+            {isPast && uid && (
               <div style={{ display: 'flex', gap: 6, marginLeft: 'auto' }}>
                 <span style={{
                   fontSize: 11, fontWeight: 700, padding: '6px 12px', borderRadius: 10,
@@ -117,7 +114,8 @@ export default async function DiaryPage({
       </header>
 
       <main className="relative z-10 max-w-2xl mx-auto px-4 pt-4 page-content">
-        <DiaryClient uid={uid} today={viewDate} meals={meals} stats={stats} />
+        {!uid && <GuestBanner />}
+        <DiaryClient uid={uid ?? ''} today={viewDate} meals={meals} stats={stats} isGuest={!uid} />
       </main>
 
       <BottomTabBar />
