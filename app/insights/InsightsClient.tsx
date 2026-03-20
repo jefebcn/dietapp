@@ -211,102 +211,300 @@ function MacroBreakdown({ monthStats }: { monthStats: DailyStats[] }) {
   );
 }
 
-// ── Weight Line Chart (SVG bezier) ─────────────────────────────────────────────
+// ── Full Weight Chart with period selector ─────────────────────────────────────
 
-interface ChartPoint { date: string; kg: number; label: string; }
+interface ChartPoint { date: string; kg: number; label: string; notes?: string; }
+type Period = '7d' | '30d' | '90d' | 'all';
 
-function WeightLineChart({ points }: { points: ChartPoint[] }) {
-  if (points.length < 2) {
+const PERIODS: { key: Period; label: string }[] = [
+  { key: '7d',  label: '7G'  },
+  { key: '30d', label: '30G' },
+  { key: '90d', label: '3M'  },
+  { key: 'all', label: 'Tutto' },
+];
+
+function filterByPeriod(points: ChartPoint[], period: Period): ChartPoint[] {
+  if (period === 'all') return points;
+  const days = period === '7d' ? 7 : period === '30d' ? 30 : 90;
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - days);
+  const cutoffStr = cutoff.toISOString().split('T')[0];
+  return points.filter((p) => p.date >= cutoffStr);
+}
+
+function WeightChartFull({ points, period }: { points: ChartPoint[]; period: Period }) {
+  const filtered = filterByPeriod(points, period);
+
+  if (filtered.length < 2) {
     return (
-      <div className="flex flex-col items-center gap-2 py-6">
-        <span className="text-3xl">📊</span>
-        <p className="text-xs font-semibold" style={{ color: '#C9D5C4' }}>
-          Registra almeno 2 pesate per il grafico
+      <div className="flex flex-col items-center gap-2 py-8">
+        <span className="text-4xl">📉</span>
+        <p className="text-xs font-semibold" style={{ color: '#9CA3AF' }}>
+          {filtered.length === 0 ? 'Nessun dato nel periodo selezionato' : 'Registra almeno 2 pesate per il grafico'}
         </p>
       </div>
     );
   }
 
-  const W = 300, H = 130, pX = 10, pY = 14;
-  const plotW = W - pX * 2;
+  const W = 320, H = 160, pLeft = 36, pRight = 10, pY = 18;
+  const plotW = W - pLeft - pRight;
   const plotH = H - pY * 2;
 
-  const weights = points.map((p) => p.kg);
-  const minW = Math.min(...weights) - 0.8;
-  const maxW = Math.max(...weights) + 0.8;
-  const range = maxW - minW || 1;
+  const weights = filtered.map((p) => p.kg);
+  const minW = Math.min(...weights);
+  const maxW = Math.max(...weights);
+  const pad   = Math.max((maxW - minW) * 0.18, 0.5);
+  const lo = minW - pad, hi = maxW + pad;
+  const range = hi - lo || 1;
 
-  const toX = (i: number) => pX + (i / (points.length - 1)) * plotW;
-  const toY = (kg: number) => pY + (1 - (kg - minW) / range) * plotH;
+  const toX = (i: number) => pLeft + (i / (filtered.length - 1)) * plotW;
+  const toY = (kg: number) => pY + (1 - (kg - lo) / range) * plotH;
 
-  let linePath = `M ${toX(0).toFixed(1)} ${toY(points[0].kg).toFixed(1)}`;
-  for (let i = 1; i < points.length; i++) {
-    const x0 = toX(i - 1), y0 = toY(points[i - 1].kg);
-    const x1 = toX(i),     y1 = toY(points[i].kg);
+  let linePath = `M ${toX(0).toFixed(1)} ${toY(filtered[0].kg).toFixed(1)}`;
+  for (let i = 1; i < filtered.length; i++) {
+    const x0 = toX(i - 1), y0 = toY(filtered[i - 1].kg);
+    const x1 = toX(i),     y1 = toY(filtered[i].kg);
     const cpx = (x0 + x1) / 2;
     linePath += ` C ${cpx.toFixed(1)} ${y0.toFixed(1)} ${cpx.toFixed(1)} ${y1.toFixed(1)} ${x1.toFixed(1)} ${y1.toFixed(1)}`;
   }
 
-  const lastX = toX(points.length - 1).toFixed(1);
-  const fillPath = `${linePath} L ${lastX} ${(H - pY).toFixed(1)} L ${pX} ${(H - pY).toFixed(1)} Z`;
+  const lastX = toX(filtered.length - 1).toFixed(1);
+  const fillPath = `${linePath} L ${lastX} ${(pY + plotH).toFixed(1)} L ${pLeft} ${(pY + plotH).toFixed(1)} Z`;
 
-  const delta = points[points.length - 1].kg - points[0].kg;
+  const delta = filtered[filtered.length - 1].kg - filtered[0].kg;
   const lineColor = delta > 0.05 ? '#EF4444' : delta < -0.05 ? '#22C55E' : '#8B5CF6';
-  const lastIdx = points.length - 1;
+
+  // Y-axis labels: 4 grid lines
+  const gridLines = [0, 0.33, 0.67, 1].map((f) => ({
+    y: pY + f * plotH,
+    kg: (hi - f * range).toFixed(1),
+  }));
+
+  // X-axis: show up to 5 labels spread evenly
+  const xLabels: { i: number; label: string }[] = [];
+  const step = Math.max(1, Math.floor((filtered.length - 1) / 4));
+  for (let i = 0; i < filtered.length; i += step) xLabels.push({ i, label: filtered[i].label });
+  if (xLabels[xLabels.length - 1]?.i !== filtered.length - 1)
+    xLabels.push({ i: filtered.length - 1, label: filtered[filtered.length - 1].label });
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-xs font-bold uppercase tracking-wide" style={{ color: '#6B7280' }}>
-          Andamento peso
-        </p>
-        {points.length >= 2 && (
-          <span className="text-xs font-bold" style={{ color: delta > 0.05 ? '#EF4444' : delta < -0.05 ? '#22C55E' : '#8B5CF6' }}>
-            {delta >= 0 ? '+' : ''}{delta.toFixed(1)} kg
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', overflow: 'visible', display: 'block' }}>
+      <defs>
+        <linearGradient id="wGrad" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%"   stopColor={lineColor} stopOpacity="0.20" />
+          <stop offset="100%" stopColor={lineColor} stopOpacity="0.00" />
+        </linearGradient>
+      </defs>
+      {/* Grid lines + Y labels */}
+      {gridLines.map(({ y, kg }) => (
+        <g key={kg}>
+          <line x1={pLeft} y1={y.toFixed(1)} x2={W - pRight} y2={y.toFixed(1)}
+            stroke="#E5EBE0" strokeWidth="1" strokeDasharray="3 3" />
+          <text x={pLeft - 3} y={(y + 3).toFixed(1)} fill="#9CA3AF" fontSize="7.5"
+            textAnchor="end" fontFamily="Inter, system-ui, sans-serif">{kg}</text>
+        </g>
+      ))}
+      {/* Fill + line */}
+      <path d={fillPath} fill="url(#wGrad)" />
+      <path d={linePath} fill="none" stroke={lineColor} strokeWidth="2.2"
+        strokeLinecap="round" strokeLinejoin="round" />
+      {/* All dots */}
+      {filtered.map((p, i) => (
+        <circle key={i}
+          cx={toX(i).toFixed(1)} cy={toY(p.kg).toFixed(1)}
+          r={i === filtered.length - 1 ? 4 : 2.5}
+          fill={i === filtered.length - 1 ? lineColor : '#fff'}
+          stroke={lineColor} strokeWidth="1.5"
+        />
+      ))}
+      {/* Last label */}
+      <text
+        x={toX(filtered.length - 1).toFixed(1)}
+        y={(toY(filtered[filtered.length - 1].kg) - 8).toFixed(1)}
+        fill={lineColor} fontSize="9" fontWeight="800" textAnchor="middle"
+        fontFamily="Inter, system-ui, sans-serif">
+        {filtered[filtered.length - 1].kg}
+      </text>
+      {/* X-axis labels */}
+      {xLabels.map(({ i, label }) => (
+        <text key={i} x={toX(i).toFixed(1)} y={(H - 3).toFixed(1)} fill="#9CA3AF"
+          fontSize="7" textAnchor="middle" fontFamily="Inter, system-ui, sans-serif">
+          {label}
+        </text>
+      ))}
+    </svg>
+  );
+}
+
+// ── Weight Section (chart + stats + table) ─────────────────────────────────────
+
+type SortField = 'date' | 'kg';
+type SortDir   = 'asc' | 'desc';
+
+function WeightSection({
+  allPoints, cardStyle,
+}: {
+  allPoints: ChartPoint[];
+  cardStyle: React.CSSProperties;
+}) {
+  const [period, setPeriod]       = useState<Period>('30d');
+  const [sortField, setSortField] = useState<SortField>('date');
+  const [sortDir, setSortDir]     = useState<SortDir>('desc');
+  const [expanded, setExpanded]   = useState(false);
+
+  const filtered = filterByPeriod(allPoints, period);
+  const weights  = filtered.map((p) => p.kg);
+
+  const stats = weights.length > 0 ? {
+    min:   Math.min(...weights),
+    max:   Math.max(...weights),
+    avg:   Math.round(weights.reduce((s, w) => s + w, 0) / weights.length * 10) / 10,
+    delta: weights.length >= 2 ? weights[weights.length - 1] - weights[0] : 0,
+  } : null;
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) setSortDir((d) => d === 'asc' ? 'desc' : 'asc');
+    else { setSortField(field); setSortDir('desc'); }
+  };
+
+  const sorted = [...filtered].sort((a, b) => {
+    const cmp = sortField === 'date'
+      ? a.date.localeCompare(b.date)
+      : a.kg - b.kg;
+    return sortDir === 'asc' ? cmp : -cmp;
+  });
+
+  const tableRows = expanded ? sorted : sorted.slice(0, 5);
+  const deltaColor = !stats ? '#8B5CF6'
+    : stats.delta > 0.05 ? '#EF4444'
+    : stats.delta < -0.05 ? '#22C55E'
+    : '#8B5CF6';
+
+  const sortIcon = (field: SortField) =>
+    sortField !== field ? ' ↕' : sortDir === 'asc' ? ' ↑' : ' ↓';
+
+  return (
+    <motion.div
+      className="p-4 space-y-4"
+      style={cardStyle}
+      initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div style={{
+            width: 32, height: 32, borderRadius: 10,
+            background: 'rgba(139,92,246,0.12)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15,
+          }}>⚖️</div>
+          <p className="text-sm font-bold" style={{ color: '#1C1917' }}>Andamento Peso</p>
+        </div>
+        {stats && (
+          <span className="text-sm font-black" style={{ color: deltaColor }}>
+            {stats.delta >= 0 ? '+' : ''}{stats.delta.toFixed(1)} kg
           </span>
         )}
       </div>
-      <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', overflow: 'visible', display: 'block' }}>
-        <defs>
-          <linearGradient id="insightLineGrad" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%"   stopColor={lineColor} stopOpacity="0.22" />
-            <stop offset="100%" stopColor={lineColor} stopOpacity="0.00" />
-          </linearGradient>
-        </defs>
-        {[0.25, 0.5, 0.75].map((f) => (
-          <line key={f}
-            x1={pX} y1={(pY + f * plotH).toFixed(1)}
-            x2={W - pX} y2={(pY + f * plotH).toFixed(1)}
-            stroke="#E5EBE0" strokeWidth="1" strokeDasharray="4 4"
-          />
+
+      {/* Period selector */}
+      <div className="flex gap-1.5 p-1 rounded-xl" style={{ background: '#F3F6F0', border: '1px solid #E5EBE0' }}>
+        {PERIODS.map(({ key, label }) => (
+          <button key={key} onClick={() => setPeriod(key)}
+            className="flex-1 py-1.5 rounded-lg text-xs font-bold transition-all"
+            style={{
+              background: period === key ? '#8B5CF6' : 'transparent',
+              color: period === key ? '#FFFFFF' : '#9CA3AF',
+              border: 'none',
+              fontFamily: 'var(--font-ui)',
+            }}>
+            {label}
+          </button>
         ))}
-        <path d={fillPath} fill="url(#insightLineGrad)" />
-        <path d={linePath} fill="none" stroke={lineColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-        {[0, lastIdx].map((i) => (
-          <g key={i}>
-            <circle
-              cx={toX(i).toFixed(1)} cy={toY(points[i].kg).toFixed(1)}
-              r={i === lastIdx ? 4.5 : 3}
-              fill={i === lastIdx ? lineColor : 'rgba(255,255,255,0.5)'}
-              stroke={lineColor} strokeWidth="1.5"
-            />
-            {i === lastIdx && (
-              <text x={toX(i).toFixed(1)} y={(toY(points[i].kg) - 8).toFixed(1)}
-                fill={lineColor} fontSize="8.5" fontWeight="800" textAnchor="middle"
-                fontFamily="Inter, system-ui, sans-serif">
-                {points[i].kg}
-              </text>
-            )}
-          </g>
-        ))}
-        <text x={pX} y={H - 1} fill="#9CA3AF" fontSize="8" textAnchor="start" fontFamily="Inter, system-ui, sans-serif">
-          {points[0].label}
-        </text>
-        <text x={W - pX} y={H - 1} fill="#6B7280" fontSize="8" textAnchor="end" fontFamily="Inter, system-ui, sans-serif">
-          {points[lastIdx].label}
-        </text>
-      </svg>
-    </div>
+      </div>
+
+      {/* Chart */}
+      <WeightChartFull points={allPoints} period={period} />
+
+      {/* Stats row */}
+      {stats && (
+        <div className="grid grid-cols-4 gap-2">
+          {[
+            { label: 'Min',    value: `${stats.min} kg`,  color: '#22C55E' },
+            { label: 'Max',    value: `${stats.max} kg`,  color: '#EF4444' },
+            { label: 'Media',  value: `${stats.avg} kg`,  color: '#8B5CF6' },
+            { label: 'Delta',  value: `${stats.delta >= 0 ? '+' : ''}${stats.delta.toFixed(1)} kg`, color: deltaColor },
+          ].map(({ label, value, color }) => (
+            <div key={label} className="rounded-xl p-2 text-center"
+              style={{ background: '#F8F9FA', border: '1px solid #E5EBE0' }}>
+              <p className="text-[9px] font-bold uppercase" style={{ color: '#9CA3AF' }}>{label}</p>
+              <p className="text-xs font-black mt-0.5" style={{ color }}>{value}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Interactive table */}
+      {filtered.length > 0 && (
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-wide mb-2" style={{ color: '#9CA3AF' }}>
+            Registrazioni ({filtered.length})
+          </p>
+          <div className="rounded-xl overflow-hidden" style={{ border: '1px solid #E5EBE0' }}>
+            {/* Table header */}
+            <div className="grid grid-cols-3 px-3 py-2"
+              style={{ background: '#F3F6F0', borderBottom: '1px solid #E5EBE0' }}>
+              <button className="text-left text-[10px] font-bold" style={{ color: '#6B7280' }}
+                onClick={() => handleSort('date')}>
+                Data{sortIcon('date')}
+              </button>
+              <button className="text-center text-[10px] font-bold" style={{ color: '#6B7280' }}
+                onClick={() => handleSort('kg')}>
+                Peso{sortIcon('kg')}
+              </button>
+              <span className="text-right text-[10px] font-bold" style={{ color: '#6B7280' }}>Note</span>
+            </div>
+            {/* Rows */}
+            {tableRows.map((row, i) => {
+              const prevKg = sorted[sorted.indexOf(row) + (sortDir === 'desc' ? 1 : -1)]?.kg;
+              const diff = prevKg !== undefined ? row.kg - prevKg : null;
+              return (
+                <div key={row.date + i}
+                  className="grid grid-cols-3 items-center px-3 py-2.5"
+                  style={{
+                    borderBottom: i < tableRows.length - 1 ? '1px solid #F3F6F0' : 'none',
+                    background: i % 2 === 0 ? '#FFFFFF' : '#FAFAFA',
+                  }}>
+                  <span className="text-xs font-semibold" style={{ color: '#6B7280' }}>{row.label}</span>
+                  <div className="flex items-center justify-center gap-1">
+                    <span className="text-xs font-black" style={{ color: '#1C1917' }}>{row.kg} kg</span>
+                    {diff !== null && Math.abs(diff) > 0.01 && (
+                      <span className="text-[9px] font-bold" style={{ color: diff > 0 ? '#EF4444' : '#22C55E' }}>
+                        {diff > 0 ? '▲' : '▼'}{Math.abs(diff).toFixed(1)}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-right text-[10px]" style={{ color: '#9CA3AF', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {row.notes ?? '—'}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+          {sorted.length > 5 && (
+            <button onClick={() => setExpanded((v) => !v)}
+              className="w-full mt-2 py-2 rounded-xl text-xs font-bold"
+              style={{
+                background: 'rgba(139,92,246,0.08)',
+                color: '#8B5CF6',
+                border: '1px solid rgba(139,92,246,0.20)',
+                fontFamily: 'var(--font-ui)',
+              }}>
+              {expanded ? '▲ Mostra meno' : `▼ Mostra tutti (${sorted.length})`}
+            </button>
+          )}
+        </div>
+      )}
+    </motion.div>
   );
 }
 
@@ -373,6 +571,17 @@ export default function InsightsClient({
 
   const latestWeight = recentLogs[0];
 
+  // All weight points sorted chronologically for the chart
+  const allWeightPoints: ChartPoint[] = recentLogs
+    .slice()
+    .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+    .map((l) => ({
+      date:   l.createdAt.split('T')[0],
+      kg:     l.rawUnit === 'kg' ? l.rawValue : Math.round(l.rawValue * 0.453592 * 10) / 10,
+      label:  new Date(l.createdAt).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }),
+      notes:  l.notes,
+    }));
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const rawValue = parseFloat(value);
@@ -424,6 +633,9 @@ export default function InsightsClient({
         {activeSection === 'analytics' ? (
           <motion.div key="analytics" initial={{ opacity: 0, x: -16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 16 }} className="space-y-4">
 
+            {/* ── Weight chart + table (first section) ── */}
+            <WeightSection allPoints={allWeightPoints} cardStyle={G.violet} />
+
             {/* ── Streak Cards ── */}
             <div className="grid grid-cols-2 gap-3">
               <motion.div className="p-4" style={G.amber}
@@ -473,7 +685,7 @@ export default function InsightsClient({
         ) : (
           <motion.div key="peso" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} className="space-y-4">
 
-            {/* Last weight */}
+            {/* Last weight summary */}
             {latestWeight && (
               <motion.div className="p-4 flex items-center gap-4" style={G.violet}
                 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
@@ -488,28 +700,6 @@ export default function InsightsClient({
                     {new Date(latestWeight.createdAt).toLocaleDateString('it-IT', { day: 'numeric', month: 'long' })}
                   </p>
                 </div>
-              </motion.div>
-            )}
-
-            {/* Weight line chart – day-by-day progression from bronze logs */}
-            <motion.div className="p-4" style={G.violet}
-              initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}>
-              <WeightLineChart points={recentLogs
-                .slice()
-                .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
-                .map((l) => ({
-                  date: l.createdAt.split('T')[0],
-                  kg: l.rawUnit === 'kg' ? l.rawValue : Math.round(l.rawValue * 0.453592 * 10) / 10,
-                  label: new Date(l.createdAt).toLocaleDateString('it-IT', { day: 'numeric', month: 'short' }),
-                }))}
-              />
-            </motion.div>
-
-            {/* Weekly averages bar chart */}
-            {weeklyTrend.length >= 2 && (
-              <motion.div className="p-4" style={G.base}
-                initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }}>
-                <WeightWeeklyBars data={weeklyTrend}/>
               </motion.div>
             )}
 
